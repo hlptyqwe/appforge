@@ -7,9 +7,10 @@ import (
 	"context"
 
 	"appforge/admin-api/internal/logicutil"
-
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
+	"appforge/proto/common"
+	systempb "appforge/proto/system"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,5 +30,37 @@ func NewSysMenuListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SysMe
 }
 
 func (l *SysMenuListLogic) SysMenuList(req *types.SysMenuListReq) (resp *types.SysMenuListResp, err error) {
-	return logicutil.Proxy[types.SysMenuListResp](l.ctx, req, l.svcCtx.SystemCli.SysMenuList)
+	result, err := l.svcCtx.SystemCli.SysMenuList(l.ctx, &systempb.SysMenuListReq{
+		Page: &common.PageReq{
+			Cursor: req.Cursor,
+			Limit:  req.Limit,
+			Count:  req.Count,
+		},
+		Keyword:  req.Keyword,
+		MenuType: toMenuType(req.MenuType),
+		Enabled:  toCommonStatus(req.Enabled),
+		Visible:  toVisibleStatus(req.Visible),
+		AppScope: systempb.ApplicationScope(req.AppScope),
+	})
+	if err != nil {
+		return logicutil.SystemErrorResp[types.SysMenuListResp](l.ctx, err)
+	}
+
+	resp = &types.SysMenuListResp{Data: make([]types.SysMenuItem, 0, len(result.Data))}
+	if result.Base != nil {
+		resp.Code = result.Base.Code
+		resp.Msg = result.Base.Msg
+		resp.Total = result.Base.Total
+		resp.HasNext = result.Base.HasNext
+		resp.HasPrev = result.Base.HasPrev
+		resp.NextCursor = result.Base.NextCursor
+		resp.PrevCursor = result.Base.PrevCursor
+	}
+	for _, item := range result.Data {
+		if item != nil {
+			resp.Data = append(resp.Data, mapSysMenuItem(item))
+		}
+	}
+
+	return resp, nil
 }

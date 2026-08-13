@@ -9,7 +9,7 @@ import (
 	platformlogic "appforge/admin-api/internal/logic"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,7 +29,7 @@ func NewGetPlatformChannelLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *GetPlatformChannelLogic) GetPlatformChannel(req *types.PlatformIdReq) (resp *types.PlatformChannelResp, err error) {
-	item, err := l.svcCtx.CoreCli.GetChannel(l.ctx, &corepb.ChannelIdReq{Id: req.Id})
+	item, err := l.svcCtx.CoreCli.GetChannel(l.ctx, &core.ChannelIdReq{Id: req.Id})
 	if err != nil {
 		return nil, err
 	}

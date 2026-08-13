@@ -93,12 +93,7 @@ onMounted(() => {
 
     <el-card class="table-card">
       <!-- Table -->
-      <el-table
-        v-loading="loading"
-        :data="list_ref"
-        row-key="id"
-        style="margin-bottom: 16px"
-      >
+      <el-table v-loading="loading" :data="list_ref" row-key="id">
         <el-table-column prop="id" :label="t('common.id')" width="70" />
         <el-table-column prop="username" :label="t('common.username')" min-width="120" />
         <el-table-column prop="ip" :label="t('common.loginIP')" min-width="130" />

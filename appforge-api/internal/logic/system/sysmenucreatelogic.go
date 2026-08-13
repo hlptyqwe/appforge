@@ -6,10 +6,11 @@ package system
 import (
 	"context"
 
+	"appforge/admin-api/internal/logicutil"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
-
-	"appforge/admin-api/internal/logicutil"
+	"appforge/proto/common"
+	systempb "appforge/proto/system"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,5 +30,18 @@ func NewSysMenuCreateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Sys
 }
 
 func (l *SysMenuCreateLogic) SysMenuCreate(req *types.SysMenuCreateReq) (resp *types.RespBase, err error) {
-	return logicutil.Proxy[types.RespBase](l.ctx, req, l.svcCtx.SystemCli.SysMenuCreate)
+	return logicutil.Proxy[types.RespBase](l.ctx, &systempb.SysMenuCreateReq{
+		ParentId:  req.ParentId,
+		Name:      req.Name,
+		MenuType:  toMenuType(req.MenuType),
+		Method:    toRequestMethod(req.Method),
+		Path:      req.Path,
+		Component: req.Component,
+		Icon:      req.Icon,
+		Sort:      req.Sort,
+		Visible:   common.Switch(req.Visible),
+		Enabled:   common.Enable(req.Enabled),
+		Perms:     req.Perms,
+		AppScope:  systempb.ApplicationScope(req.AppScope),
+	}, l.svcCtx.SystemCli.SysMenuCreate)
 }

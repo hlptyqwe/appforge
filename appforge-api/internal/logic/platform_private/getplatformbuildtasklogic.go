@@ -9,7 +9,7 @@ import (
 	platformlogic "appforge/admin-api/internal/logic"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,7 +29,7 @@ func NewGetPlatformBuildTaskLogic(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 func (l *GetPlatformBuildTaskLogic) GetPlatformBuildTask(req *types.PlatformIdReq) (resp *types.PlatformBuildTaskResp, err error) {
-	item, err := l.svcCtx.CoreCli.GetBuildTask(l.ctx, &corepb.BuildTaskIdReq{Id: req.Id})
+	item, err := l.svcCtx.CoreCli.GetBuildTask(l.ctx, &core.BuildTaskIdReq{Id: req.Id})
 	if err != nil {
 		return nil, err
 	}

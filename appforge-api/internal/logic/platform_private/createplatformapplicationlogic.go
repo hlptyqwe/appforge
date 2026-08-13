@@ -9,7 +9,7 @@ import (
 	platformlogic "appforge/admin-api/internal/logic"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,7 +29,7 @@ func NewCreatePlatformApplicationLogic(ctx context.Context, svcCtx *svc.ServiceC
 }
 
 func (l *CreatePlatformApplicationLogic) CreatePlatformApplication(req *types.CreatePlatformApplicationReq) (resp *types.PlatformApplicationResp, err error) {
-	item, err := l.svcCtx.CoreCli.CreateApplication(l.ctx, &corepb.CreateApplicationReq{AppCode: req.AppCode, AppName: req.AppName, PackageName: req.PackageName, Description: req.Description, IconUrl: req.IconUrl, ApiHost: req.ApiHost})
+	item, err := l.svcCtx.CoreCli.CreateApplication(l.ctx, &core.CreateApplicationReq{AppCode: req.AppCode, AppName: req.AppName, PackageName: req.PackageName, Description: req.Description, IconUrl: req.IconUrl, ApiHost: req.ApiHost})
 	if err != nil {
 		return nil, err
 	}

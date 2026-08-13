@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"appforge/proto/builder"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 	"appforge/services/builder/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -34,7 +34,7 @@ func (l *CompleteBuildTaskLogic) CompleteBuildTask(in *builder.CompleteBuildTask
 	if err != nil {
 		return nil, err
 	}
-	resp, err := client.CompleteBuildTask(toCoreContext(l.ctx), &corepb.CompleteBuildTaskReq{TaskId: in.TaskId, BuilderId: in.BuilderId, ApkUrl: in.ApkUrl, ApkSha256: in.ApkSha256, ApkSize: in.ApkSize, LogUrl: in.LogUrl})
+	resp, err := client.CompleteBuildTask(toCoreContext(l.ctx), &core.CompleteBuildTaskReq{TaskId: in.TaskId, BuilderId: in.BuilderId, ApkUrl: in.ApkUrl, ApkSha256: in.ApkSha256, ApkSize: in.ApkSize, LogUrl: in.LogUrl})
 	if err != nil {
 		return nil, err
 	}

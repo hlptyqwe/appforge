@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"appforge/proto/builder"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 	"appforge/services/builder/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -34,7 +34,7 @@ func (l *ReportBuildProgressLogic) ReportBuildProgress(in *builder.ReportBuildPr
 	if err != nil {
 		return nil, err
 	}
-	resp, err := client.ReportBuildProgress(toCoreContext(l.ctx), &corepb.ReportBuildProgressReq{TaskId: in.TaskId, BuilderId: in.BuilderId, Status: corepb.BuildTaskStatus(in.Status), Message: in.Message, Progress: in.Progress})
+	resp, err := client.ReportBuildProgress(toCoreContext(l.ctx), &core.ReportBuildProgressReq{TaskId: in.TaskId, BuilderId: in.BuilderId, Status: core.BuildTaskStatus(in.Status), Message: in.Message, Progress: in.Progress})
 	if err != nil {
 		return nil, err
 	}

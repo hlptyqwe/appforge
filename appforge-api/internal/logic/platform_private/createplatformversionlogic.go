@@ -9,7 +9,7 @@ import (
 	platformlogic "appforge/admin-api/internal/logic"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,7 +29,7 @@ func NewCreatePlatformVersionLogic(ctx context.Context, svcCtx *svc.ServiceConte
 }
 
 func (l *CreatePlatformVersionLogic) CreatePlatformVersion(req *types.CreatePlatformVersionReq) (resp *types.PlatformVersionResp, err error) {
-	item, err := l.svcCtx.CoreCli.CreateVersion(l.ctx, &corepb.CreateVersionReq{AppId: req.AppId, VersionCode: req.VersionCode, VersionName: req.VersionName, SourceApkUrl: req.SourceApkUrl, SourceApkSha256: req.SourceApkSha256, ReleaseNotes: req.ReleaseNotes, BuildConfigJson: req.BuildConfigJson})
+	item, err := l.svcCtx.CoreCli.CreateVersion(l.ctx, &core.CreateVersionReq{AppId: req.AppId, VersionCode: req.VersionCode, VersionName: req.VersionName, SourceApkUrl: req.SourceApkUrl, SourceApkSha256: req.SourceApkSha256, ReleaseNotes: req.ReleaseNotes, BuildConfigJson: req.BuildConfigJson})
 	if err != nil {
 		return nil, err
 	}

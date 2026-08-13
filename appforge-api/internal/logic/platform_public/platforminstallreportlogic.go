@@ -9,7 +9,7 @@ import (
 	platformlogic "appforge/admin-api/internal/logic"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,7 +29,7 @@ func NewPlatformInstallReportLogic(ctx context.Context, svcCtx *svc.ServiceConte
 }
 
 func (l *PlatformInstallReportLogic) PlatformInstallReport(req *types.PlatformInstallReportReq) (resp *types.RespBase, err error) {
-	item, err := l.svcCtx.CoreCli.ReportInstall(l.ctx, &corepb.InstallReportReq{AppId: req.AppId, ChannelCode: req.ChannelCode, InstallId: req.InstallId, AppVersion: req.AppVersion, DeviceModel: req.DeviceModel, Ip: req.Ip, FirstOpenTime: req.FirstOpenTime})
+	item, err := l.svcCtx.CoreCli.ReportInstall(l.ctx, &core.InstallReportReq{AppId: req.AppId, ChannelCode: req.ChannelCode, InstallId: req.InstallId, AppVersion: req.AppVersion, DeviceModel: req.DeviceModel, Ip: req.Ip, FirstOpenTime: req.FirstOpenTime})
 	if err != nil {
 		return nil, err
 	}

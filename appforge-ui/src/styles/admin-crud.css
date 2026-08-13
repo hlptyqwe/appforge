@@ -31,9 +31,25 @@ body {
   box-shadow: none;
 }
 
-.module-page > .el-card:last-of-type {
+.module-page > .table-card {
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.module-page > .table-card > .el-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.module-page > .table-card > .el-card__body > .el-table {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
 }
 
 .module-page .query-card .el-card__body {
@@ -46,5 +62,5 @@ body {
   justify-content: flex-end;
   gap: 12px;
   margin-top: 16px;
+  flex: 0 0 auto;
 }
-

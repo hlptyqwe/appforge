@@ -4,14 +4,14 @@ import (
 	"context"
 
 	builderpb "appforge/proto/builder"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 	"appforge/services/builder/internal/svc"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func coreClient(svcCtx *svc.ServiceContext) (corepb.CoreClient, error) {
+func coreClient(svcCtx *svc.ServiceContext) (core.CoreClient, error) {
 	if svcCtx == nil || svcCtx.CoreClient == nil {
 		return nil, status.Error(codes.Unavailable, "core rpc client is not configured")
 	}
@@ -22,7 +22,7 @@ func toCoreContext(ctx context.Context) context.Context {
 	return ctx
 }
 
-func mapBuildTask(item *corepb.BuildTask) *builderpb.BuildTask {
+func mapBuildTask(item *core.BuildTask) *builderpb.BuildTask {
 	if item == nil {
 		return nil
 	}
@@ -44,7 +44,7 @@ func mapBuildTask(item *corepb.BuildTask) *builderpb.BuildTask {
 	}
 }
 
-func mapBase(base *corepb.RespBase) *builderpb.RespBase {
+func mapBase(base *core.RespBase) *builderpb.RespBase {
 	if base == nil {
 		return &builderpb.RespBase{}
 	}

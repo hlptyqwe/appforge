@@ -114,12 +114,7 @@ onMounted(() => {
 
     <el-card class="table-card">
       <!-- Table -->
-      <el-table
-        v-loading="loading"
-        :data="list_ref"
-        row-key="id"
-        style="margin-bottom: 16px"
-      >
+      <el-table v-loading="loading" :data="list_ref" row-key="id">
         <el-table-column prop="id" :label="t('common.id')" width="70" />
         <el-table-column prop="tenantId" :label="t('common.tenantId')" width="100" />
         <el-table-column prop="username" :label="t('common.username')" min-width="120" />

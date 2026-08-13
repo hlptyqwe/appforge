@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"appforge/proto/builder"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 	"appforge/services/builder/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -34,7 +34,7 @@ func (l *FailBuildTaskLogic) FailBuildTask(in *builder.FailBuildTaskReq) (*build
 	if err != nil {
 		return nil, err
 	}
-	resp, err := client.FailBuildTask(toCoreContext(l.ctx), &corepb.FailBuildTaskReq{TaskId: in.TaskId, BuilderId: in.BuilderId, ErrorMessage: in.ErrorMessage, LogUrl: in.LogUrl})
+	resp, err := client.FailBuildTask(toCoreContext(l.ctx), &core.FailBuildTaskReq{TaskId: in.TaskId, BuilderId: in.BuilderId, ErrorMessage: in.ErrorMessage, LogUrl: in.LogUrl})
 	if err != nil {
 		return nil, err
 	}

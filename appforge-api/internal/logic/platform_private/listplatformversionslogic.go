@@ -9,7 +9,7 @@ import (
 	platformlogic "appforge/admin-api/internal/logic"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,7 +29,7 @@ func NewListPlatformVersionsLogic(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 func (l *ListPlatformVersionsLogic) ListPlatformVersions(req *types.ListPlatformVersionsReq) (resp *types.PlatformVersionListResp, err error) {
-	item, err := l.svcCtx.CoreCli.ListVersions(l.ctx, &corepb.VersionListReq{Page: platformlogic.PlatformPage(req.PageReq), AppId: req.AppId, Status: corepb.VersionStatus(req.Status)})
+	item, err := l.svcCtx.CoreCli.ListVersions(l.ctx, &core.VersionListReq{Page: platformlogic.PlatformPage(req.PageReq), AppId: req.AppId, Status: core.VersionStatus(req.Status)})
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,8 @@ import (
 	"appforge/services/system/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type SysTenantDomainDeleteLogic struct {
@@ -24,7 +26,18 @@ func NewSysTenantDomainDeleteLogic(ctx context.Context, svcCtx *svc.ServiceConte
 }
 
 func (l *SysTenantDomainDeleteLogic) SysTenantDomainDelete(in *system.SysTenantDomainDeleteReq) (*system.RespBase, error) {
-	// todo: add your logic here and delete this line
-
-	return &system.RespBase{}, nil
+	if in == nil || in.GetId() <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "id is required")
+	}
+	item, err := l.svcCtx.TenantDomainModel.FindOne(l.ctx, in.GetId())
+	if err != nil {
+		return nil, notFound(err, "tenant domain")
+	}
+	if _, err := effectiveTenant(l.ctx, item.TenantId); err != nil {
+		return nil, err
+	}
+	if err := l.svcCtx.TenantDomainModel.Delete(l.ctx, item.Id); err != nil {
+		return nil, status.Errorf(codes.Internal, "delete tenant domain failed: %v", err)
+	}
+	return &system.RespBase{Base: responseBase()}, nil
 }

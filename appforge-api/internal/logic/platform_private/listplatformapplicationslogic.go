@@ -9,7 +9,7 @@ import (
 	platformlogic "appforge/admin-api/internal/logic"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,7 +29,7 @@ func NewListPlatformApplicationsLogic(ctx context.Context, svcCtx *svc.ServiceCo
 }
 
 func (l *ListPlatformApplicationsLogic) ListPlatformApplications(req *types.ListPlatformApplicationsReq) (resp *types.PlatformApplicationListResp, err error) {
-	item, err := l.svcCtx.CoreCli.ListApplications(l.ctx, &corepb.ApplicationListReq{Page: platformlogic.PlatformPage(req.PageReq), Keyword: req.Keyword, Status: corepb.ApplicationStatus(req.Status)})
+	item, err := l.svcCtx.CoreCli.ListApplications(l.ctx, &core.ApplicationListReq{Page: platformlogic.PlatformPage(req.PageReq), Keyword: req.Keyword, Status: core.ApplicationStatus(req.Status)})
 	if err != nil {
 		return nil, err
 	}

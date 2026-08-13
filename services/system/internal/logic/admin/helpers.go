@@ -2,8 +2,10 @@ package adminlogic
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -19,6 +21,28 @@ import (
 )
 
 func responseBase() *common.RespBase { return &common.RespBase{Code: 200, Msg: "OK"} }
+
+func responsePage(total int64, hasNext bool, nextCursor int64, hasPrev bool, prevCursor int64) *common.RespBase {
+	return &common.RespBase{
+		Code: 200, Msg: "OK", Total: total, HasNext: hasNext, HasPrev: hasPrev,
+		NextCursor: nextCursor, PrevCursor: prevCursor,
+	}
+}
+
+func pageValues(page *common.PageReq) (int64, int64) {
+	if page == nil {
+		return 0, 20
+	}
+	cursor := page.Cursor
+	limit := page.Limit
+	if limit <= 0 {
+		limit = 20
+	}
+	if limit > 100 {
+		limit = 100
+	}
+	return cursor, limit
+}
 
 func tenantID(ctx context.Context) int64 {
 	if value, err := utils.GetTrustedTenantIdFromCtx(ctx); err == nil {
@@ -98,6 +122,110 @@ func configItem(item *models.SysConfig) *system.SysConfigItem {
 		CreateTimes: item.CreateTimes,
 		UpdateTimes: item.UpdateTimes,
 	}
+}
+
+func roleItem(item *models.SysRole) *system.SysRoleItem {
+	if item == nil {
+		return nil
+	}
+	return &system.SysRoleItem{
+		Id: item.Id, Name: item.Name, Code: item.Code,
+		Enabled: common.Enable(item.Enabled), Remark: item.Remark,
+		CreateTimes: item.CreateTimes, TenantId: item.TenantId, UpdateTimes: item.UpdateTimes,
+		AppScope: system.ApplicationScope(item.AppScope),
+	}
+}
+
+func tenantItem(item *models.SysTenant) *system.SysTenantItem {
+	if item == nil {
+		return nil
+	}
+	return &system.SysTenantItem{
+		Id: item.Id, TenantCode: item.TenantCode, TenantName: item.TenantName,
+		Enabled: common.Enable(item.Enabled), ExpireTime: item.ExpireTime,
+		ContactName: item.ContactName.String, ContactPhone: item.ContactPhone.String,
+		Remark: item.Remark.String, CreateTimes: item.CreateTimes, UpdateTimes: item.UpdateTimes,
+		LoginIp: item.LoginIp.String, LoginTime: item.LoginTime, LoginCount: item.LoginCount,
+	}
+}
+
+func domainItem(item *models.SysTenantDomain) *system.SysTenantDomainItem {
+	if item == nil {
+		return nil
+	}
+	return &system.SysTenantDomainItem{
+		Id: item.Id, TenantId: item.TenantId, Origin: item.Origin,
+		Status: system.TenantDomainStatus(item.Status), Priority: item.Priority,
+		CreateTimes: item.CreateTimes, UpdateTimes: item.UpdateTimes,
+	}
+}
+
+func nullText(value string) sql.NullString {
+	value = strings.TrimSpace(value)
+	return sql.NullString{String: value, Valid: value != ""}
+}
+
+func effectiveAppScope(value system.ApplicationScope) int64 {
+	if value == system.ApplicationScope_APPLICATION_SCOPE_UNKNOWN {
+		return int64(system.ApplicationScope_APPLICATION_SCOPE_ADMIN)
+	}
+	return int64(value)
+}
+
+func effectiveTenant(ctx context.Context, requested int64) (int64, error) {
+	if requested < 0 {
+		return 0, status.Error(codes.InvalidArgument, "tenant_id is invalid")
+	}
+	current := tenantID(ctx)
+	if current > 0 {
+		if requested > 0 && requested != current {
+			return 0, status.Error(codes.PermissionDenied, "cross-tenant access is not allowed")
+		}
+		return current, nil
+	}
+	return requested, nil
+}
+
+func normalizeOrigin(value string) (string, error) {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return "", status.Error(codes.InvalidArgument, "origin is required")
+	}
+	parsed, err := url.Parse(value)
+	if err != nil || parsed.Host == "" || (parsed.Scheme != "http" && parsed.Scheme != "https") {
+		return "", status.Error(codes.InvalidArgument, "origin must be a valid http or https URL")
+	}
+	parsed.Path = strings.TrimRight(parsed.Path, "/")
+	parsed.RawQuery = ""
+	parsed.Fragment = ""
+	return strings.TrimRight(parsed.Scheme+"://"+parsed.Host+parsed.Path, "/"), nil
+}
+
+func replaceUserRoles(ctx context.Context, svcCtx *svc.ServiceContext, user *models.SysUser, roleIDs []int64) error {
+	if _, err := svcCtx.DB.ExecCtx(ctx, "DELETE FROM sys_user_role WHERE user_id = ?", user.Id); err != nil {
+		return status.Errorf(codes.Internal, "clear user roles failed: %v", err)
+	}
+	seen := make(map[int64]struct{}, len(roleIDs))
+	for _, roleID := range roleIDs {
+		if roleID <= 0 {
+			continue
+		}
+		if _, ok := seen[roleID]; ok {
+			continue
+		}
+		seen[roleID] = struct{}{}
+		var role models.SysRole
+		if err := svcCtx.DB.QueryRowCtx(ctx, &role, "SELECT id, tenant_id, app_scope, name, code, enabled, remark, create_times, update_times FROM sys_role WHERE id = ? LIMIT 1", roleID); err != nil {
+			return status.Errorf(codes.InvalidArgument, "role %d not found", roleID)
+		}
+		if role.TenantId != user.TenantId || role.AppScope != user.AppScope {
+			return status.Errorf(codes.InvalidArgument, "role %d is outside user scope", roleID)
+		}
+		if _, err := svcCtx.UserRoleModel.Insert(ctx, &models.SysUserRole{TenantId: user.TenantId, UserId: user.Id, RoleId: roleID}); err != nil {
+			return status.Errorf(codes.Internal, "assign user role failed: %v", err)
+		}
+	}
+	return nil
 }
 
 func profileMenuNode(item *models.SysMenu) *system.SysMenuNode {

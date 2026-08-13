@@ -49,8 +49,14 @@
       "appforge",
       "goctl",
       "gofmt",
+      "logx",
       "otpauth",
-      "reqenc"
+      "reqenc",
+      "sqlc",
+      "sqlx",
+      "stringx",
+      "zeromicro",
+      "zrpc"
     ],
     "window.zoomPerWindow": true
   },

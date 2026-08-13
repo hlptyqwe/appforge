@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"appforge/proto/builder"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 	"appforge/services/builder/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -34,7 +34,7 @@ func (l *ClaimBuildTaskLogic) ClaimBuildTask(in *builder.ClaimBuildTaskReq) (*bu
 	if err != nil {
 		return nil, err
 	}
-	resp, err := client.ClaimBuildTask(toCoreContext(l.ctx), &corepb.ClaimBuildTaskReq{BuilderId: in.BuilderId, LeaseSeconds: in.LeaseSeconds})
+	resp, err := client.ClaimBuildTask(toCoreContext(l.ctx), &core.ClaimBuildTaskReq{BuilderId: in.BuilderId, LeaseSeconds: in.LeaseSeconds})
 	if err != nil {
 		return nil, err
 	}

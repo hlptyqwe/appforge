@@ -1,7 +1,7 @@
 package svc
 
 import (
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 	"appforge/services/builder/internal/config"
 
 	"github.com/zeromicro/go-zero/zrpc"
@@ -9,10 +9,10 @@ import (
 
 type ServiceContext struct {
 	Config     config.Config
-	CoreClient corepb.CoreClient
+	CoreClient core.CoreClient
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	coreRPC := zrpc.MustNewClient(c.CoreRpc)
-	return &ServiceContext{Config: c, CoreClient: corepb.NewCoreClient(coreRPC.Conn())}
+	return &ServiceContext{Config: c, CoreClient: core.NewCoreClient(coreRPC.Conn())}
 }

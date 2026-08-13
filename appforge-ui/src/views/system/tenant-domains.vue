@@ -104,7 +104,7 @@ onMounted(loadList)
         </el-form-item>
       </el-form>
     </el-card>
-    <el-card shadow="never">
+    <el-card shadow="never" class="table-card">
       <el-table v-loading="loading" :data="rows" stripe>
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="origin" label="Origin" min-width="260" />

@@ -7,6 +7,8 @@ import (
 	"appforge/services/system/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type SysTenantDomainListLogic struct {
@@ -24,7 +26,20 @@ func NewSysTenantDomainListLogic(ctx context.Context, svcCtx *svc.ServiceContext
 }
 
 func (l *SysTenantDomainListLogic) SysTenantDomainList(in *system.SysTenantDomainListReq) (*system.SysTenantDomainListResp, error) {
-	// todo: add your logic here and delete this line
-
-	return &system.SysTenantDomainListResp{}, nil
+	if in == nil || in.GetTenantId() <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "tenant_id is required")
+	}
+	tenant, err := effectiveTenant(l.ctx, in.GetTenantId())
+	if err != nil {
+		return nil, err
+	}
+	rows, err := l.svcCtx.TenantDomainModel.FindAllByTenant(l.ctx, tenant)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "list tenant domains failed: %v", err)
+	}
+	data := make([]*system.SysTenantDomainItem, 0, len(rows))
+	for _, row := range rows {
+		data = append(data, domainItem(row))
+	}
+	return &system.SysTenantDomainListResp{Base: responseBase(), Data: data}, nil
 }

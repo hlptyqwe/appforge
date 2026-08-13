@@ -9,7 +9,7 @@ import (
 	platformlogic "appforge/admin-api/internal/logic"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
-	corepb "appforge/proto/core"
+	"appforge/proto/core"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,7 +29,7 @@ func NewGetPlatformSigningConfigLogic(ctx context.Context, svcCtx *svc.ServiceCo
 }
 
 func (l *GetPlatformSigningConfigLogic) GetPlatformSigningConfig(req *types.PlatformIdReq) (resp *types.PlatformSigningConfigResp, err error) {
-	item, err := l.svcCtx.CoreCli.GetSigningConfig(l.ctx, &corepb.SigningConfigIdReq{Id: req.Id})
+	item, err := l.svcCtx.CoreCli.GetSigningConfig(l.ctx, &core.SigningConfigIdReq{Id: req.Id})
 	if err != nil {
 		return nil, err
 	}

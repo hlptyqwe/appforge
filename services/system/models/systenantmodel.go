@@ -56,20 +56,29 @@ func (m *customSysTenantModel) FindPage(ctx context.Context, filter TenantPageFi
 	builder.EqString("contact_phone", filter.ContactPhone)
 	builder.InInt64("id", filter.IDs)
 
-	where := builder.Where()
+	baseWhere := builder.Where()
+	where := baseWhere
 	args := builder.Args()
 
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s ORDER BY id DESC LIMIT ?,?", sysTenantRows, m.table, where)
-	listArgs := append(append([]any{}, args...), cursor, limit)
+	queryArgs := append([]any{}, args...)
+	if cursor > 0 {
+		where += " AND id > ?"
+		queryArgs = append(queryArgs, cursor)
+	}
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s ORDER BY id ASC LIMIT ?", sysTenantRows, m.table, where)
+	queryArgs = append(queryArgs, limit+1)
 
 	var list []*SysTenant
-	err := m.QueryRowsNoCacheCtx(ctx, &list, query, listArgs...)
+	err := m.QueryRowsNoCacheCtx(ctx, &list, query, queryArgs...)
 	if err != nil {
 		return nil, 0, err
 	}
+	if int64(len(list)) > limit {
+		list = list[:limit]
+	}
 
 	var total int64
-	countQuery := fmt.Sprintf("SELECT COUNT(1) FROM %s WHERE %s", m.table, where)
+	countQuery := fmt.Sprintf("SELECT COUNT(1) FROM %s WHERE %s", m.table, baseWhere)
 	err = m.QueryRowNoCacheCtx(ctx, &total, countQuery, args...)
 	if err != nil {
 		return nil, 0, err

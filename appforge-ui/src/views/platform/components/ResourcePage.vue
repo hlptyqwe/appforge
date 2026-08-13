@@ -104,8 +104,7 @@ onMounted(loadData)
       </el-form>
     </el-card>
 
-    <el-card shadow="never">
-      <template #header>{{ title }}</template>
+    <el-card shadow="never" class="table-card">
       <el-table v-loading="loading" :data="rows" stripe>
         <el-table-column prop="id" label="ID" width="90" />
         <el-table-column
