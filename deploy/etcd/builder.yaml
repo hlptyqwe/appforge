@@ -1,0 +1,13 @@
+Name: builder.rpc
+ListenOn: 0.0.0.0:8082
+Mode: dev
+Etcd:
+  Hosts:
+    - etcd:2379
+  Key: builder.rpc
+CoreRpc:
+  Target: core-rpc:8081
+Builder:
+  Id: builder-dev-01
+  LeaseSeconds: 120
+

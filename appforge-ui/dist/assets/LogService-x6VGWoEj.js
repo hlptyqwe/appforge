@@ -1,0 +1,1 @@
+import{d as s,i as n}from"./index-BDDg6DTk.js";const t=new class{baseURL;constructor(){this.baseURL="/admin/logs"}async getLoginLogs(n){return function(n){return s("/admin/system/logs/login",n)}(n||{})}async getOperationLogs(n){return function(n){return s("/admin/system/logs/op",n)}(n||{})}async getOptions(){return n()}};export{t as l};

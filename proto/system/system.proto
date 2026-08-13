@@ -1,0 +1,667 @@
+syntax = "proto3";
+
+package system;
+
+import "proto/common/common.proto";
+import "proto/system/enum.proto";
+
+option go_package = "appforge/proto/system;system";
+
+message Empty {}
+
+message RespBase {
+  common.RespBase base = 1;
+}
+
+//////////////////////
+// Auth / 登录
+//////////////////////
+message LoginReq {
+  string username = 1;
+  string password = 2;
+  string google_code = 3; // optional
+  string ip = 4;
+  string ua = 5;
+  system.ApplicationScope app_scope = 6;
+}
+
+message LoginResp {
+  common.RespBase base = 1;
+  LoginData data = 2;
+}
+
+message LoginData {
+  string token = 1;
+  int64 exp = 2;
+  int64 user_id = 3;
+  string nickname = 4;
+  repeated int64 role_ids = 5;
+  common.Enable google2fa_enabled = 6; // 状态,0表示全部，1表示启用，2表示禁用
+  int64 perms_ver = 7;
+  int64 tenant_id = 8;
+  system.UserType user_type = 9;
+  common.YesNo is_owner = 10;
+  string avatar = 11;
+  system.ApplicationScope app_scope = 12;
+}
+
+message ProfileUser {
+  int64 id = 1;
+  string username = 2;
+  string nickname = 3;
+  string avatar = 4;
+  int64 tenant_id = 5;
+  system.UserType user_type = 6;
+  common.YesNo is_owner = 7;
+  common.Enable google2fa_enabled = 8; // 状态,0表示全部，1表示启用，2表示禁用
+  system.ApplicationScope app_scope = 9;
+}
+
+message SysMenuNode {
+  int64 id = 1;
+  int64 parent_id = 2;
+  string name = 3;
+  system.MenuType menu_type = 4;
+  string path = 5;
+  string component = 6;
+  string icon = 7;
+  int64 sort = 8;
+  common.Switch visible = 9; // 显示开关,0表示全部，1表示显示，2表示隐藏
+  common.Enable enabled = 10; // 状态,0表示全部，1表示启用，2表示禁用
+  string perms = 11;
+  repeated SysMenuNode children = 12;
+  system.ApplicationScope app_scope = 13;
+}
+
+message ProfileData {
+  ProfileUser user = 1;
+  repeated SysMenuNode menus = 2;
+  repeated string perms = 3;
+  repeated int64 role_ids = 4;
+}
+
+message ProfileResp {
+  common.RespBase base = 1;
+  ProfileData data = 2;
+}
+
+message UpdateProfileReq {
+  optional string nickname = 1;
+  optional string avatar = 2;
+  optional string password = 3;
+}
+
+//////////////////////
+// Menu / Perms
+//////////////////////
+message SysMenuItem {
+  int64 id = 1;
+  int64 parent_id = 2;
+  string name = 3;
+  system.MenuType menu_type = 4;
+  system.RequestMethod method = 5;
+  string path = 6;
+  string component = 7;
+  string icon = 8;
+  int64 sort = 9;
+  common.Switch visible = 10; // 显示开关
+  common.Enable enabled = 11; // 状态,0表示全部，1表示启用，2表示禁用
+  string perms = 12; // 按钮必须有，例如 sys:user:add
+  system.ApplicationScope app_scope = 13;
+}
+
+message SysMenuTreeReq {
+  int64 role_id = 1;
+}
+
+message SysMenuTreeResp {
+  common.RespBase base = 1;
+  repeated SysMenuItem data = 2;
+}
+
+//////////////////////
+// Google 2FA
+//////////////////////
+message Google2FAInitReq {
+  int64 user_id = 1;
+}
+message Google2FAInitResp {
+  common.RespBase base = 1;
+  Google2FAInitData data = 2;
+}
+
+message Google2FAInitData {
+  string secret = 1;
+  string otpauth_url = 2;
+  string qr_code = 3;
+}
+
+message Google2FABindReq {
+  int64 user_id = 1;
+  string secret = 2;
+  string code = 3;
+}
+
+message Google2FAEnableReq {
+  int64 user_id = 1;
+  string code = 2;
+}
+message Google2FADisableReq {
+  int64 user_id = 1;
+  string code = 2;
+} // 可选强校验
+message Google2FAResetReq {
+  int64 user_id = 1;
+}
+
+//////////////////////
+// RBAC - 用户
+//////////////////////
+message SysUserItem {
+  int64 id = 1;
+  string username = 2;
+  string nickname = 3;
+  common.Enable enabled = 4; // 状态,0表示全部，1表示启用，2表示禁用
+  repeated int64 role_ids = 5;
+  int64 create_times = 6;
+  common.Enable google2fa_enabled = 7; // 状态,0表示全部，1表示启用，2表示禁用
+  int64 tenant_id = 8;
+  system.UserType user_type = 9;
+  common.YesNo is_owner = 10;
+  string avatar = 11;
+  int64 perms_ver = 12;
+  string last_login_ip = 13;
+  int64 last_login_at = 14;
+  int64 create_by = 15;
+  int64 update_times = 16;
+  system.ApplicationScope app_scope = 17;
+}
+
+message SysUserListReq {
+  common.PageReq page = 1;
+  string keyword = 2;
+  common.Enable enabled = 3; // 状态,0表示全部，1表示启用，2表示禁用
+  system.ApplicationScope app_scope = 4;
+}
+message SysUserListResp {
+  common.RespBase base = 1;
+  repeated SysUserItem data = 2;
+}
+
+message SysUserDetailReq {
+  int64 id = 1;
+}
+message SysUserDetailResp {
+  common.RespBase base = 1;
+  SysUserItem data = 2;
+}
+
+message SysUserCreateReq {
+  string username = 1;
+  string password = 2;
+  string nickname = 3;
+  common.Enable enabled = 4; // 状态,0表示全部，1表示启用，2表示禁用
+  repeated int64 role_ids = 5;
+  int64 tenant_id = 6;
+  system.UserType user_type = 7;
+  common.YesNo is_owner = 8;
+  string avatar = 9;
+  system.ApplicationScope app_scope = 10;
+}
+message SysUserUpdateReq {
+  int64 id = 1;
+  string nickname = 2;
+  common.Enable enabled = 3; // 状态,0表示全部，1表示启用，2表示禁用
+  repeated int64 role_ids = 4;
+  int64 tenant_id = 5;
+  system.UserType user_type = 6;
+  common.YesNo is_owner = 7;
+  string avatar = 8;
+  system.ApplicationScope app_scope = 9;
+}
+message SysUserDeleteReq {
+  int64 id = 1;
+}
+message ChangeUserStatusReq {
+  int64 id = 1;
+  common.Enable enabled = 2; // 状态,0表示全部，1表示启用，2表示禁用
+}
+message ResetUserPwdReq {
+  int64 id = 1;
+  string password = 2;
+}
+message AssignUserRolesReq {
+  int64 user_id = 1;
+  repeated int64 role_ids = 2;
+}
+
+//////////////////////
+// RBAC - 角色
+//////////////////////
+message SysRoleItem {
+  int64 id = 1;
+  string name = 2;
+  string code = 3;
+  common.Enable enabled = 4; // 状态,0表示全部，1表示启用，2表示禁用
+  string remark = 5;
+  int64 create_times = 6;
+  int64 tenant_id = 7;
+  int64 update_times = 8;
+  system.ApplicationScope app_scope = 9;
+}
+message SysRoleListReq {
+  common.PageReq page = 1;
+  string keyword = 2;
+  common.Enable enabled = 3; // 状态,0表示全部，1表示启用，2表示禁用
+  system.ApplicationScope app_scope = 4;
+}
+message SysRoleListResp {
+  common.RespBase base = 1;
+  repeated SysRoleItem data = 2;
+}
+
+message SysRoleCreateReq {
+  string name = 1;
+  string code = 2;
+  common.Enable enabled = 3; // 状态,0表示全部，1表示启用，2表示禁用
+  string remark = 4;
+  int64 tenant_id = 5;
+  system.ApplicationScope app_scope = 6;
+}
+message SysRoleUpdateReq {
+  int64 id = 1;
+  string name = 2;
+  common.Enable enabled = 3; // 状态,0表示全部，1表示启用，2表示禁用
+  string remark = 4;
+  int64 tenant_id = 5;
+  string code = 6;
+  system.ApplicationScope app_scope = 7;
+}
+message SysRoleDeleteReq {
+  int64 id = 1;
+}
+message SysRoleGrantReq {
+  int64 role_id = 1;
+  repeated int64 menu_ids = 2;
+}
+
+message SysRoleGrantDetailReq {
+  int64 id = 1;
+}
+message SysRoleGrantDetailResp {
+  common.RespBase base = 1;
+  SysRoleGrantDetailData data = 2;
+}
+
+message SysRoleGrantDetailData {
+  int64 role_id = 1;
+  repeated int64 menu_ids = 2;
+  repeated string perm_keys = 3;
+}
+
+message SysPermItem {
+  string perm_key = 1;
+  system.RequestMethod method = 2;
+  string path = 3;
+  string name = 4;
+  system.ApplicationScope app_scope = 5;
+}
+
+message SysPermListResp {
+  common.RespBase base = 1;
+  repeated SysPermItem data = 2;
+}
+
+//////////////////////
+// RBAC - 菜单
+//////////////////////
+message SysMenuCreateReq {
+  int64 parent_id = 1;
+  string name = 2;
+  system.MenuType menu_type = 3;
+  system.RequestMethod method = 4;
+  string path = 5;
+  string component = 6;
+  string icon = 7;
+  int64 sort = 8;
+  common.Switch visible = 9; // 显示开关
+  common.Enable enabled = 10; // 状态,0表示全部，1表示启用，2表示禁用
+  string perms = 11;
+  system.ApplicationScope app_scope = 12;
+}
+message SysMenuUpdateReq {
+  int64 id = 1;
+  int64 parent_id = 2;
+  string name = 3;
+  system.MenuType menu_type = 4;
+  system.RequestMethod method = 5;
+  string path = 6;
+  string component = 7;
+  string icon = 8;
+  int64 sort = 9;
+  common.Switch visible = 10; // 显示开关,0表示全部，1表示显示，2表示隐藏
+  common.Enable enabled = 11; // 状态,0表示全部，1表示启用，2表示禁用
+  string perms = 12;
+  system.ApplicationScope app_scope = 13;
+}
+message SysMenuDeleteReq {
+  int64 id = 1;
+}
+
+message SysMenuListReq {
+  common.PageReq page = 1;
+  string keyword = 2;
+  system.MenuType menu_type = 3;
+  common.Enable enabled = 4; // 状态,0表示全部，1表示启用，2表示禁用
+  common.Switch visible = 5; // 显示开关, 0表示全部
+  system.ApplicationScope app_scope = 6;
+}
+message SysMenuListResp {
+  common.RespBase base = 1;
+  repeated SysMenuItem data = 2;
+}
+
+//////////////////////
+// Logs
+//////////////////////
+message LoginLogItem {
+  int64 id = 1;
+  int64 user_id = 2;
+  string username = 3;
+  string ip = 4;
+  string ua = 5;
+  int64 success = 6;
+  string msg = 7;
+  int64 login_at = 8;
+}
+message LoginLogListReq {
+  common.PageReq page = 1;
+  string username = 2;
+  int64 success = 3;
+}
+message LoginLogListResp {
+  common.RespBase base = 1;
+  repeated LoginLogItem data = 2;
+}
+
+message OpLogItem {
+  int64 id = 1;
+  int64 user_id = 2;
+  string username = 3;
+  system.RequestMethod method = 4;
+  string path = 5;
+  string req = 6;
+  string resp = 7;
+  string ip = 8;
+  int64 cost_ms = 9;
+  int64 create_times = 10;
+  int64 update_times = 11;
+  int64 tenant_id = 12;
+  string module = 13;
+  string action = 14;
+}
+message OpLogListReq {
+  common.PageReq page = 1;
+  string username = 2;
+  system.RequestMethod method = 3;
+  string path = 4;
+}
+message OpLogListResp {
+  common.RespBase base = 1;
+  repeated OpLogItem data = 2;
+}
+message CreateOpLogReq {
+  int64 tenant_id = 1;
+  int64 user_id = 2;
+  string username = 3;
+  string module = 4;
+  string action = 5;
+  system.RequestMethod method = 6;
+  string path = 7;
+  string req = 8;
+  string resp = 9;
+  string ip = 10;
+  int64 cost_ms = 11;
+}
+
+message SysConfigCreateReq {
+  string config_key = 1;
+  string config_value = 2;
+  string remark = 3;
+  int64 tenant_id = 4;
+}
+
+message SysConfigUpdateReq {
+  int64 id = 1;
+  string config_key = 2;
+  string config_value = 3;
+  string remark = 4;
+}
+
+message SysConfigDeleteReq {
+  int64 id = 1;
+}
+
+message SysConfigItem {
+  int64 id = 1;
+  string config_key = 2;
+  string config_value = 3;
+  string remark = 4;
+  int64 create_times = 5;
+  int64 update_times = 6;
+  int64 tenant_id = 7;
+}
+
+message SysConfigListReq {
+  common.PageReq page = 1;
+  string keyword = 2;
+  int64 tenant_id = 3;
+}
+message SysConfigListResp {
+  common.RespBase base = 1;
+  repeated SysConfigItem data = 2;
+}
+
+message SysConfigDetailReq {
+  optional int64 id = 1;
+  optional system.SysConfigType config_key = 2;
+  optional int64 tenant_id = 3;
+}
+
+message SysConfigDetailResp {
+  common.RespBase base = 1;
+  SysConfigItem data = 2;
+}
+
+message SysConfigByKeysReq {
+  repeated string config_keys = 1;
+}
+message SysConfigByKeysResp {
+  common.RespBase base = 1;
+  repeated SysConfigItem data = 2;
+}
+
+message LoginUserPermsReq {
+  int64 user_id = 1;
+}
+message LoginUserPermsResp {
+  repeated string perms = 1;
+}
+
+// 租户管理
+message SysTenantItem {
+  int64 id = 1;
+  string tenant_code = 2;
+  string tenant_name = 3;
+  common.Enable enabled = 4; // 状态,0表示全部，1表示启用，2表示禁用
+  int64 expire_time = 5;
+  string contact_name = 6;
+  string contact_phone = 7;
+  string remark = 8;
+  int64 create_times = 9;
+  int64 update_times = 10;
+  string login_ip = 11;
+  int64 login_time = 12;
+  int64 login_count = 13;
+  int64 create_by = 14;
+  int64 update_by = 15;
+}
+
+message SysTenantListReq {
+  common.PageReq page = 1;
+  string keyword = 2;
+  common.Enable enabled = 3; // 状态,0表示全部，1表示启用，2表示禁用
+  string tenant_code = 4;
+  string tenant_name = 5;
+  string contact_name = 6;
+  string contact_phone = 7;
+  repeated int64 ids = 8; // 按租户ID批量查询
+}
+message SysTenantListResp {
+  common.RespBase base = 1;
+  repeated SysTenantItem data = 2;
+}
+
+message SysTenantCreateReq {
+  string username = 1;
+  string tenant_name = 2;
+  string tenant_password = 3;
+  common.Enable enabled = 4; // 状态,0表示全部，1表示启用，2表示禁用
+  int64 expire_time = 5;
+  string contact_name = 6;
+  string contact_phone = 7;
+  string remark = 8;
+}
+
+message SysTenantUpdateReq {
+  int64 id = 1;
+  string tenant_name = 2;
+  string tenant_password = 3;
+  common.Enable enabled = 4; // 状态,0表示全部，1表示启用，2表示禁用
+  int64 expire_time = 5;
+  string contact_name = 6;
+  string contact_phone = 7;
+  string remark = 8;
+}
+
+message SysTenantDeleteReq {
+  int64 id = 1;
+}
+
+message SysTenantDetailReq {
+  optional int64 tenant_id = 1;
+  optional string tenant_code = 2;
+}
+
+message SysTenantDetailResp {
+  common.RespBase base = 1;
+  SysTenantItem data = 2;
+}
+
+message SysTenantDomainItem {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  string origin = 3;
+  TenantDomainStatus status = 4;
+  int64 priority = 5;
+  int64 create_times = 6;
+  int64 update_times = 7;
+}
+message SysTenantDomainListReq {
+  int64 tenant_id = 1;
+}
+message SysTenantDomainListResp {
+  common.RespBase base = 1;
+  repeated SysTenantDomainItem data = 2;
+}
+message SysTenantDomainCreateReq {
+  int64 tenant_id = 1;
+  string origin = 2;
+  TenantDomainStatus status = 3;
+  int64 priority = 4;
+}
+message SysTenantDomainUpdateReq {
+  int64 id = 1;
+  string origin = 2;
+  TenantDomainStatus status = 3;
+  int64 priority = 4;
+}
+message SysTenantDomainDeleteReq {
+  int64 id = 1;
+}
+
+message ResolveTenantDomainReq {
+  int64 tenant_id = 1;
+  string source_origin = 2;
+}
+
+message ResolveTenantDomainResp {
+  common.RespBase base = 1;
+  TenantDomainStatus source_status = 2;
+  string target_origin = 3;
+}
+
+//////////////////////
+// Service
+//////////////////////
+service Admin {
+  rpc Login(LoginReq) returns (LoginResp);
+  rpc GetProfile(Empty) returns (ProfileResp);
+  rpc UpdateProfile(UpdateProfileReq) returns (RespBase);
+  rpc Google2FAInit(Google2FAInitReq) returns (Google2FAInitResp);
+  rpc Google2FABind(Google2FABindReq) returns (RespBase);
+  rpc Google2FAEnable(Google2FAEnableReq) returns (RespBase);
+  rpc Google2FADisable(Google2FADisableReq) returns (RespBase);
+  rpc Google2FAReset(Google2FAResetReq) returns (RespBase);
+  rpc SysUserList(SysUserListReq) returns (SysUserListResp);
+  rpc SysUserDetail(SysUserDetailReq) returns (SysUserDetailResp);
+  rpc SysUserCreate(SysUserCreateReq) returns (RespBase);
+  rpc SysUserUpdate(SysUserUpdateReq) returns (RespBase);
+  rpc SysUserDelete(SysUserDeleteReq) returns (RespBase);
+  rpc ChangeUserStatus(ChangeUserStatusReq) returns (RespBase);
+  rpc ResetUserPwd(ResetUserPwdReq) returns (RespBase);
+  rpc AssignUserRoles(AssignUserRolesReq) returns (RespBase);
+  rpc SysRoleList(SysRoleListReq) returns (SysRoleListResp);
+  rpc SysRoleCreate(SysRoleCreateReq) returns (RespBase);
+  rpc SysRoleUpdate(SysRoleUpdateReq) returns (RespBase);
+  rpc SysRoleDelete(SysRoleDeleteReq) returns (RespBase);
+  rpc SysRoleGrant(SysRoleGrantReq) returns (RespBase);
+  rpc SysRoleGrantDetail(SysRoleGrantDetailReq) returns (SysRoleGrantDetailResp);
+  rpc SysPermList(Empty) returns (SysPermListResp);
+  rpc GetMenuTree(SysMenuTreeReq) returns (SysMenuTreeResp);
+  rpc SysMenuCreate(SysMenuCreateReq) returns (RespBase);
+  rpc SysMenuUpdate(SysMenuUpdateReq) returns (RespBase);
+  rpc SysMenuDelete(SysMenuDeleteReq) returns (RespBase);
+  rpc SysMenuList(SysMenuListReq) returns (SysMenuListResp);
+  rpc LoginLogList(LoginLogListReq) returns (LoginLogListResp);
+  rpc OpLogList(OpLogListReq) returns (OpLogListResp);
+  rpc CreateOpLog(CreateOpLogReq) returns (RespBase);
+  rpc SysConfigCreate(SysConfigCreateReq) returns (RespBase);
+  rpc SysConfigUpdate(SysConfigUpdateReq) returns (RespBase);
+  rpc SysConfigDelete(SysConfigDeleteReq) returns (RespBase);
+  rpc SysConfigList(SysConfigListReq) returns (SysConfigListResp);
+  rpc SysConfigDetail(SysConfigDetailReq) returns (SysConfigDetailResp);
+  rpc LoginUserPerms(LoginUserPermsReq) returns (LoginUserPermsResp);
+  rpc SysTenantCreate(SysTenantCreateReq) returns (RespBase);
+  rpc SysTenantUpdate(SysTenantUpdateReq) returns (RespBase);
+  rpc SysTenantDelete(SysTenantDeleteReq) returns (RespBase);
+  rpc SysTenantList(SysTenantListReq) returns (SysTenantListResp);
+  rpc SysTenantDetail(SysTenantDetailReq) returns (SysTenantDetailResp);
+  rpc SysTenantDomainList(SysTenantDomainListReq) returns (SysTenantDomainListResp);
+  rpc SysTenantDomainCreate(SysTenantDomainCreateReq) returns (RespBase);
+  rpc SysTenantDomainUpdate(SysTenantDomainUpdateReq) returns (RespBase);
+  rpc SysTenantDomainDelete(SysTenantDomainDeleteReq) returns (RespBase);
+}
+
+service App {
+  rpc SysConfigDetail(SysConfigDetailReq) returns (SysConfigDetailResp);
+  rpc SysTenantDetail(SysTenantDetailReq) returns (SysTenantDetailResp);
+}
+
+service System {
+  rpc SysConfigDetail(SysConfigDetailReq) returns (SysConfigDetailResp);
+  rpc SysConfigByKeys(SysConfigByKeysReq) returns (SysConfigByKeysResp);
+  rpc SysTenantList(SysTenantListReq) returns (SysTenantListResp);
+  rpc SysTenantDetail(SysTenantDetailReq) returns (SysTenantDetailResp);
+  rpc ResolveTenantDomain(ResolveTenantDomainReq) returns (ResolveTenantDomainResp);
+}

@@ -1,0 +1,50 @@
+:root {
+  --admin-page-gap: 12px;
+  --admin-card-radius: 12px;
+  --admin-card-border: var(--el-border-color-light);
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+}
+
+.module-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--admin-page-gap);
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.module-page > .el-card {
+  border-radius: var(--admin-card-radius);
+  border-color: var(--admin-card-border);
+  box-shadow: none;
+}
+
+.module-page > .el-card:last-of-type {
+  min-height: 0;
+  overflow: auto;
+}
+
+.module-page .query-card .el-card__body {
+  padding-bottom: 2px;
+}
+
+.module-page .pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+

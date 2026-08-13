@@ -1,0 +1,6 @@
+Log:
+  ServiceName: appforge
+  Mode: console
+  Encoding: plain
+  Level: info
+

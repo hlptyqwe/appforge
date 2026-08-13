@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package system;
+
+import "proto/common/common.proto";
+
+option go_package = "appforge/proto/system;system";
+
+message Interval {
+  string name = 1;
+  int32 k_type = 2;
+}
+
+// 系统配置
+message SystemCore {
+  string site_name = 1; // 网站名称
+  string site_logo = 2; // 网站LOGO
+  common.Enable is_captcha_enabled = 3; // 是否开启验证码,0表示全部，1表示启用，2表示禁用
+  common.Enable is_register_enabled = 4; // 是否开启注册,0表示全部，1表示启用，2表示禁用
+  common.Enable is_guest_enabled = 5; // 是否允许游客登录,0表示全部，1表示启用，2表示禁用
+  common.Enable is_crypto_enabled = 6; // 是否加密接口提交数据,0表示全部，1表示启用，2表示禁用
+  common.Enable admin_must_google_f2a = 7; // 管理后台必须开启google验证码
+  common.Enable app_must_google_f2a = 8; // 客户端必须开启google验证码
+}
+
+// 阿里云 OSS配置
+message AliyunOssConfig {
+  string endpoint = 1;
+  string access_key_id = 2;
+  string access_key_secret = 3;
+  string bucket_name = 4;
+  string bucket_url = 5;
+}
+
+// 腾讯云 COS配置
+message TencentCosConfig {
+  string market = 1;
+  string secret_id = 2;
+  string secret_key = 3;
+  string bucket_name = 4;
+  string bucket_url = 5;
+}
+
+// MINIO配置
+message MinioConfig {
+  string endpoint = 1;
+  string access_key_id = 2;
+  string access_key_secret = 3;
+  string bucket_name = 4;
+  string bucket_url = 5;
+}
+
+// 对象存储配置
+message ObjectStorageConfig {
+  AliyunOssConfig aliyun_oss = 1;
+  TencentCosConfig tencent_cos = 2;
+  MinioConfig minio = 3;
+  int64 oss_type = 4; // 1阿里云OSS 2腾讯云COS 3MINIO
+  string oss_domain = 5; // 对象存储访问域名（可选，优先使用bucket_url）
+}
+
+message ITickConfig {
+  string api_url = 1; // ITICK API地址
+  string api_token = 2; // ITICK API密钥
+  string ws_url = 3; // ITICK WebSocket地址
+  int32 reconcile_interval_minutes = 4; // K线校正间隔，默认5分钟
+  int32 reconcile_window_bars = 5; // 每次校正最近K线数量，默认30
+  int32 gap_scan_interval_minutes = 6; // 缺口扫描间隔，默认60分钟
+  int32 repair_batch_size = 7; // 缺口修复批量大小，默认10
+  int32 building_bucket_ttl_minutes = 8; // 当前K线桶Redis TTL，默认120分钟
+  int32 ws_kline_stale_seconds = 9; // WS K线失效时间，默认30秒
+}
+
+message RechargeConfig {
+  string min_amount = 1; // 最小充值金额，自然货币单位
+  string max_amount = 2; // 最大充值金额，自然货币单位
+  int64 fee_rate = 3; // 手续费配置，单位：万分之几，例如：100表示1%
+}
+
+message WithdrawConfig {
+  string min_amount = 1; // 最小提现金额，自然货币单位
+  string max_amount = 2; // 最大提现金额，自然货币单位
+  int64 fee_rate = 3; // 手续费配置，单位：万分之几，例如：100表示1%
+  int32 daily_limit_per_user = 4; // 每人每天提现次数限制
+  string daily_amount_limit_per_user = 5; // 每人每天提现金额限制，自然货币单位
+  string allowed_time_range = 6; // 允许提现的时间段，例如：每天9:00-18:00，格式为"09:00-18:00"
+  int32 pending_withdrawal_limit_per_user = 7; // 允许未审核在提现数量限制，单位：笔
+  int32 free_withdraw_times_per_day = 8; // 每日免费提现次数，0=没有免费提现
+}
+
+message EmailConfig {
+  common.Enable enabled = 1; // 状态,0表示全部，1表示启用，2表示禁用
+  string smtp_host = 2; // SMTP 主机
+  int32 smtp_port = 3; // SMTP 端口
+  string username = 4; // SMTP 用户名
+  string password = 5; // SMTP 密码
+  string from_email = 6; // 发件邮箱
+  string from_name = 7; // 发件名称
+  string subject_template = 8; // 标题模板，支持 {{code}} {{scene}}
+  string body_template = 9; // 内容模板，支持 {{code}} {{scene}}
+}
+
+message PhoneConfig {
+  common.Enable enabled = 1; // 状态,0表示全部，1表示启用，2表示禁用
+  string provider = 2; // 短信服务商标识
+  string endpoint = 3; // HTTP 网关地址
+  string method = 4; // HTTP 方法，默认 POST
+  string headers_json = 5; // HTTP headers JSON，例如 {"Authorization":"Bearer xxx"}
+  string body_template = 6; // 请求体模板，支持 {{phone}} {{code}} {{scene}}
+}
+
+message ChatConfig {
+  common.Enable enabled = 1; // 状态:1表示启用，2表示禁用
+  string api = 2; // 客服API地址
+  string api_key = 3; // 客服API Key
+  string api_secret = 4; // 客服API Secret
+  string chat_ui_url = 5; // 客服前端地址
+  string chat_ws_url = 6; // 客服WebSocket地址，可选
+}

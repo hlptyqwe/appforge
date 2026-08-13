@@ -1,0 +1,12 @@
+Name: core.rpc
+ListenOn: 0.0.0.0:8081
+Mode: dev
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: core.rpc
+Mysql:
+  DataSource: root:password@tcp(127.0.0.1:3306)/appforge?charset=utf8mb4&parseTime=true&loc=Local
+CacheRedis:
+  - Host: 127.0.0.1:6379
+    Type: node

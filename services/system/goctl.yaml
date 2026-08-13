@@ -1,0 +1,10 @@
+model:
+  types_map:
+    # 金额、价格、数量和费率不能经过 float64，避免生成模型时引入精度损失。
+    dec: &decimal
+      type: decimal.Decimal
+      null_type: decimal.NullDecimal
+      pkg: github.com/shopspring/decimal
+    decimal: *decimal
+    fixed: *decimal
+    numeric: *decimal

@@ -1,0 +1,390 @@
+syntax = "proto3";
+
+package core;
+
+import "proto/common/common.proto";
+
+option go_package = "appforge/proto/core;core";
+
+message RespBase {
+  common.RespBase base = 1;
+}
+
+// 应用状态。
+enum ApplicationStatus {
+  APPLICATION_STATUS_UNKNOWN = 0; // 未知
+  APPLICATION_STATUS_ENABLED = 1; // 启用
+  APPLICATION_STATUS_DISABLED = 2; // 停用
+}
+
+// 应用版本状态。
+enum VersionStatus {
+  VERSION_STATUS_UNKNOWN = 0; // 未知
+  VERSION_STATUS_DRAFT = 1; // 草稿
+  VERSION_STATUS_PUBLISHED = 2; // 已发布
+  VERSION_STATUS_DISABLED = 3; // 已停用
+}
+
+// 推广渠道状态。
+enum ChannelStatus {
+  CHANNEL_STATUS_UNKNOWN = 0; // 未知
+  CHANNEL_STATUS_ENABLED = 1; // 启用
+  CHANNEL_STATUS_DISABLED = 2; // 停用
+}
+
+// APK 构建任务状态。
+enum BuildTaskStatus {
+  BUILD_TASK_STATUS_UNKNOWN = 0; // 未知
+  BUILD_TASK_STATUS_PENDING = 1; // 待处理
+  BUILD_TASK_STATUS_BUILDING = 2; // 构建中
+  BUILD_TASK_STATUS_SIGNING = 3; // 签名中
+  BUILD_TASK_STATUS_UPLOADING = 4; // 上传中
+  BUILD_TASK_STATUS_SUCCESS = 5; // 成功
+  BUILD_TASK_STATUS_FAILED = 6; // 失败
+}
+
+message Application {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  string app_code = 3;
+  string app_name = 4;
+  string package_name = 5;
+  string description = 6;
+  string icon_url = 7;
+  string api_host = 8;
+  ApplicationStatus status = 9; // 应用状态
+  int64 create_by = 10;
+  int64 create_time = 11;
+  int64 update_time = 12;
+}
+
+message Version {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  int64 app_id = 3;
+  int64 version_code = 4;
+  string version_name = 5;
+  string source_apk_url = 6;
+  string source_apk_sha256 = 7;
+  string release_notes = 8;
+  string build_config_json = 9;
+  VersionStatus status = 10; // 版本状态
+  int64 published_at = 11;
+  int64 create_by = 12;
+  int64 create_time = 13;
+  int64 update_time = 14;
+}
+
+message Channel {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  int64 app_id = 3;
+  string channel_code = 4;
+  string channel_name = 5;
+  string landing_url = 6;
+  string download_url = 7;
+  ChannelStatus status = 8; // 渠道状态
+  int64 create_by = 9;
+  int64 create_time = 10;
+  int64 update_time = 11;
+}
+
+// APK签名配置。
+// 密码密文只允许写入，不通过查询接口返回。
+message SigningConfig {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  int64 app_id = 3;
+  string name = 4;
+  string keystore_object_key = 5;
+  string key_alias = 6;
+  string secret_ref = 7;
+  int64 status = 8; // 1启用 2停用
+  int64 last_verified_at = 9;
+  int64 create_by = 10;
+  int64 create_time = 11;
+  int64 update_time = 12;
+}
+
+message BuildTask {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  int64 app_id = 3;
+  int64 version_id = 4;
+  int64 channel_id = 5;
+  int64 signing_config_id = 6;
+  string channel_code = 7;
+  int64 version_code = 8;
+  string version_name = 9;
+  BuildTaskStatus status = 10; // 构建任务状态
+  string builder_id = 11;
+  int32 builder_attempt = 12;
+  int32 priority = 13;
+  string apk_url = 14;
+  string apk_sha256 = 15;
+  int64 apk_size = 16;
+  string log_url = 17;
+  string error_message = 18;
+  int64 queued_at = 19;
+  int64 start_time = 20;
+  int64 finish_time = 21;
+  int64 create_by = 22;
+  int64 create_time = 23;
+  int64 update_time = 24;
+  string source_apk_url = 25; // 构建时使用的原始APK地址快照
+  string build_config_json = 26; // 构建时使用的构建配置快照
+}
+
+message ApplicationIdReq { int64 id = 1; }
+message VersionIdReq { int64 id = 1; }
+message ChannelIdReq { int64 id = 1; }
+message BuildTaskIdReq { int64 id = 1; }
+
+message ApplicationResp {
+  common.RespBase base = 1;
+  Application data = 2;
+}
+
+message VersionResp {
+  common.RespBase base = 1;
+  Version data = 2;
+}
+
+message ChannelResp {
+  common.RespBase base = 1;
+  Channel data = 2;
+}
+
+message SigningConfigResp {
+  common.RespBase base = 1;
+  SigningConfig data = 2;
+}
+
+message SigningConfigListReq {
+  common.PageReq page = 1;
+  int64 app_id = 2;
+  int64 status = 3;
+}
+
+message SigningConfigListResp {
+  common.RespBase base = 1;
+  repeated SigningConfig data = 2;
+}
+
+message BuildTaskResp {
+  common.RespBase base = 1;
+  BuildTask data = 2;
+}
+
+message ApplicationListReq {
+  common.PageReq page = 1;
+  string keyword = 2;
+  ApplicationStatus status = 3;
+}
+
+message ApplicationListResp {
+  common.RespBase base = 1;
+  repeated Application data = 2;
+}
+
+message VersionListReq {
+  common.PageReq page = 1;
+  int64 app_id = 2;
+  VersionStatus status = 3;
+}
+
+message VersionListResp {
+  common.RespBase base = 1;
+  repeated Version data = 2;
+}
+
+message ChannelListReq {
+  common.PageReq page = 1;
+  int64 app_id = 2;
+  string keyword = 3;
+  ChannelStatus status = 4;
+}
+
+message ChannelListResp {
+  common.RespBase base = 1;
+  repeated Channel data = 2;
+}
+
+message BuildTaskListReq {
+  common.PageReq page = 1;
+  int64 app_id = 2;
+  int64 channel_id = 3;
+  BuildTaskStatus status = 4;
+}
+
+message BuildTaskListResp {
+  common.RespBase base = 1;
+  repeated BuildTask data = 2;
+}
+
+message CreateApplicationReq {
+  string app_code = 1;
+  string app_name = 2;
+  string package_name = 3;
+  string description = 4;
+  string icon_url = 5;
+  string api_host = 6;
+}
+
+message CreateVersionReq {
+  int64 app_id = 1;
+  int64 version_code = 2;
+  string version_name = 3;
+  string source_apk_url = 4;
+  string source_apk_sha256 = 5;
+  string release_notes = 6;
+  string build_config_json = 7;
+}
+
+message CreateChannelReq {
+  int64 app_id = 1;
+  string channel_code = 2;
+  string channel_name = 3;
+  string landing_url = 4;
+  string download_url = 5;
+}
+
+message SigningConfigIdReq { int64 id = 1; }
+
+message CreateSigningConfigReq {
+  int64 app_id = 1;
+  string name = 2;
+  string keystore_object_key = 3;
+  string key_alias = 4;
+  string keystore_password_ciphertext = 5;
+  string key_password_ciphertext = 6;
+  string secret_ref = 7;
+}
+
+message CreateBuildTaskReq {
+  int64 app_id = 1;
+  int64 version_id = 2;
+  int64 channel_id = 3;
+  int64 signing_config_id = 4;
+  int32 priority = 5;
+}
+
+message InstallReportReq {
+  int64 app_id = 1;
+  string channel_code = 2;
+  string install_id = 3;
+  string app_version = 4;
+  string device_model = 5;
+  string ip = 6;
+  int64 first_open_time = 7;
+}
+
+message ChannelStatsReq {
+  int64 app_id = 1;
+  int64 channel_id = 2;
+  int64 start_time = 3;
+  int64 end_time = 4;
+}
+
+message ChannelStats {
+  int64 channel_id = 1;
+  string channel_code = 2;
+  int64 clicks = 3;
+  int64 downloads = 4;
+  int64 installs = 5;
+  int64 registrations = 6;
+  int64 first_pays = 7;
+  int64 pays = 8;
+}
+
+message ChannelStatsResp {
+  common.RespBase base = 1;
+  ChannelStats data = 2;
+}
+
+// 渠道转化事件上报。
+message ReportChannelEventReq {
+  int64 app_id = 1;
+  string channel_code = 2;
+  int32 event_type = 3; // 1点击 2下载 4注册 5首充 6付费
+  string event_key = 4;
+  string install_id = 5;
+  int64 user_id = 6;
+  string app_version = 7;
+  string ip = 8;
+  string device_model = 9;
+  int64 event_time = 10;
+  string metadata = 11;
+}
+
+// Builder领取构建任务请求。
+message ClaimBuildTaskReq {
+  string builder_id = 1; // Builder工作节点ID
+  int32 lease_seconds = 2; // 租约秒数
+}
+
+// Builder续租构建任务请求。
+message HeartbeatBuildTaskReq {
+  int64 task_id = 1; // 构建任务ID
+  string builder_id = 2; // Builder工作节点ID
+  int32 lease_seconds = 3; // 租约秒数
+}
+
+// Builder回报构建进度请求。
+message ReportBuildProgressReq {
+  int64 task_id = 1; // 构建任务ID
+  string builder_id = 2; // Builder工作节点ID
+  BuildTaskStatus status = 3; // 当前构建任务状态
+  string message = 4; // 进度说明
+  int32 progress = 5; // 进度百分比
+}
+
+// Builder回报构建成功请求。
+message CompleteBuildTaskReq {
+  int64 task_id = 1; // 构建任务ID
+  string builder_id = 2; // Builder工作节点ID
+  string apk_url = 3; // APK下载地址
+  string apk_sha256 = 4; // APK SHA-256
+  int64 apk_size = 5; // APK大小（字节）
+  string log_url = 6; // 构建日志地址
+}
+
+// Builder回报构建失败请求。
+message FailBuildTaskReq {
+  int64 task_id = 1; // 构建任务ID
+  string builder_id = 2; // Builder工作节点ID
+  string error_message = 3; // 失败原因
+  string log_url = 4; // 构建日志地址
+}
+
+service Core {
+  rpc CreateApplication(CreateApplicationReq) returns (ApplicationResp);
+  rpc GetApplication(ApplicationIdReq) returns (ApplicationResp);
+  rpc ListApplications(ApplicationListReq) returns (ApplicationListResp);
+
+  rpc CreateVersion(CreateVersionReq) returns (VersionResp);
+  rpc GetVersion(VersionIdReq) returns (VersionResp);
+  rpc ListVersions(VersionListReq) returns (VersionListResp);
+
+  rpc CreateChannel(CreateChannelReq) returns (ChannelResp);
+  rpc GetChannel(ChannelIdReq) returns (ChannelResp);
+  rpc ListChannels(ChannelListReq) returns (ChannelListResp);
+
+  rpc CreateSigningConfig(CreateSigningConfigReq) returns (SigningConfigResp);
+  rpc GetSigningConfig(SigningConfigIdReq) returns (SigningConfigResp);
+  rpc ListSigningConfigs(SigningConfigListReq) returns (SigningConfigListResp);
+
+  rpc CreateBuildTask(CreateBuildTaskReq) returns (BuildTaskResp);
+  rpc GetBuildTask(BuildTaskIdReq) returns (BuildTaskResp);
+  rpc ListBuildTasks(BuildTaskListReq) returns (BuildTaskListResp);
+
+  rpc ReportInstall(InstallReportReq) returns (RespBase);
+  rpc ReportChannelEvent(ReportChannelEventReq) returns (RespBase);
+  rpc GetChannelStats(ChannelStatsReq) returns (ChannelStatsResp);
+
+  rpc ClaimBuildTask(ClaimBuildTaskReq) returns (BuildTaskResp);
+  rpc HeartbeatBuildTask(HeartbeatBuildTaskReq) returns (RespBase);
+  rpc ReportBuildProgress(ReportBuildProgressReq) returns (RespBase);
+  rpc CompleteBuildTask(CompleteBuildTaskReq) returns (RespBase);
+  rpc FailBuildTask(FailBuildTaskReq) returns (RespBase);
+}

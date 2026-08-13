@@ -1,0 +1,118 @@
+{
+  "folders": [
+    {
+      "path": "appforge-api",
+      "name": "appforge-api"
+    },
+    {
+      "path": "appforge-ui",
+      "name": "appforge-ui"
+    },
+    {
+      "path": "services",
+      "name": "services"
+    },
+    {
+      "path": "common",
+      "name": "common"
+    },
+    {
+      "path": "proto",
+      "name": "proto"
+    },
+    {
+      "path": ".",
+      "name": "root"
+    }
+  ],
+  "settings": {
+    "go.goroot": "~/.gvm/gos/go.1.26.4",
+    "go.gopath": "~/local/go",
+    "go.useLanguageServer": true, // 启用 Go 语言服务器
+    "go.formatTool": "goimports", // 使用 goimports 工具格式化代码
+    "go.toolsManagement.autoUpdate": true,
+    "gopls": {
+      "ui.semanticTokens": true,
+      "ui.navigation.symbolStyle": "Dynamic",
+      "build.experimentalWorkspaceModule": true
+    },
+    "[go]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "golang.go"
+    },
+    "go.toolsEnvVars": {
+      "GO111MODULE": "on"
+    },
+    "editor.fontSize": 10,
+    "editor.formatOnSave": false,
+    "cSpell.words": [
+      "appforge",
+      "goctl",
+      "gofmt",
+      "otpauth",
+      "reqenc"
+    ],
+    "window.zoomPerWindow": true
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "start:services:all",
+        "type": "shell",
+        "command": "set -e\n# Level 0: no RPC dependencies\ncd \"${workspaceFolder:services}/chat\" && go run chat.go &\nsleep 2\ncd \"${workspaceFolder:services}/asset\" && go run asset.go &\nsleep 2\n# Level 1: system -> chat; option/payment/staking -> asset\ncd \"${workspaceFolder:services}/system\" && go run system.go &\nsleep 2\ncd \"${workspaceFolder:services}/option\" && go run option.go &\nsleep 2\ncd \"${workspaceFolder:services}/payment\" && go run payment.go &\nsleep 2\ncd \"${workspaceFolder:services}/staking\" && go run staking.go &\nsleep 2\n# Level 2: user -> system; market -> system + option\ncd \"${workspaceFolder:services}/user\" && go run user.go &\nsleep 2\ncd \"${workspaceFolder:services}/market\" && go run market.go &\nsleep 2\n# Level 3: trade -> asset + market\ncd \"${workspaceFolder:services}/trade\" && go run trade.go &\nwait",
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "dedicated",
+          "group": "services"
+        }
+      },
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "appforge-api",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "env": {
+          "DEBUG": "true",
+          "VSCODE": "true",
+          "test": "test"
+        },
+        "program": "${workspaceFolder:appforge-api}/"
+      },
+      {
+        "name": "system",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "env": {
+          "DEBUG": "true",
+          "VSCODE": "true",
+          "test": "test"
+        },
+        "program": "${workspaceFolder:services}/system/"
+      }
+    ],
+    "compounds": [
+      {
+        "name": "debug:rpc:all",
+        "configurations": [
+          "system",
+        ],
+        "stopAll": true
+      },
+      {
+        "name": "debug:api:all",
+        "configurations": [
+          "appforge-api"
+        ],
+        "stopAll": true
+      }
+    ]
+  },
+}

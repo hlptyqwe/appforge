@@ -1,0 +1,253 @@
+name: appforge-dev
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: appforge-mysql
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Hong_Kong
+      MYSQL_DATABASE: appforge
+      MYSQL_USER: appforge
+      MYSQL_PASSWORD: appforge_dev_password
+      MYSQL_ROOT_PASSWORD: appforge_dev_root_password
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+08:00
+    ports:
+      - "${APPFORGE_MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ../services/system/system.sql:/docker-entrypoint-initdb.d/10-system.sql:ro
+      - ../services/core/core.sql:/docker-entrypoint-initdb.d/20-core.sql:ro
+      - ./mysql/init/30-seed.sql:/docker-entrypoint-initdb.d/30-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -pappforge_dev_root_password --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    networks:
+      - appforge
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: appforge-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${APPFORGE_REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - appforge
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.6.12
+    container_name: appforge-etcd
+    restart: unless-stopped
+    command:
+      - /usr/local/bin/etcd
+      - --name=appforge-etcd
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd:2380
+      - --initial-cluster=appforge-etcd=http://etcd:2380
+      - --initial-cluster-state=new
+    ports:
+      - "${APPFORGE_ETCD_PORT:-2379}:2379"
+    volumes:
+      - etcd-data:/etcd-data
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/etcdctl", "--endpoints=http://127.0.0.1:2379", "endpoint", "health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - appforge
+
+  etcd-init:
+    build:
+      context: ..
+      dockerfile: deploy/docker/etcd-init.Dockerfile
+    container_name: appforge-etcd-init
+    depends_on:
+      etcd:
+        condition: service_healthy
+    volumes:
+      - ./etcd:/config:ro
+      - ./etcd/init-etcd.sh:/init/init-etcd.sh:ro
+    restart: "no"
+    networks:
+      - appforge
+
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: appforge-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: appforge
+      MINIO_ROOT_PASSWORD: appforge_dev_minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "${APPFORGE_MINIO_PORT:-9000}:9000"
+      - "${APPFORGE_MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - appforge
+
+  minio-init:
+    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+    container_name: appforge-minio-init
+    depends_on:
+      - minio
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until mc alias set local http://minio:9000 appforge appforge_dev_minio; do sleep 1; done
+        mc mb --ignore-existing local/appforge
+        mc anonymous set download local/appforge
+    restart: "no"
+    networks:
+      - appforge
+
+  system-rpc:
+    build:
+      context: ..
+      dockerfile: deploy/docker/go.Dockerfile
+      args:
+        MODULE_DIR: services/system
+    container_name: appforge-system-rpc
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      etcd-init:
+        condition: service_completed_successfully
+    ports:
+      - "${APPFORGE_SYSTEM_RPC_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8080"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks:
+      - appforge
+
+  core-rpc:
+    build:
+      context: ..
+      dockerfile: deploy/docker/go.Dockerfile
+      args:
+        MODULE_DIR: services/core
+    container_name: appforge-core-rpc
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      etcd-init:
+        condition: service_completed_successfully
+    ports:
+      - "${APPFORGE_CORE_RPC_PORT:-8081}:8081"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8081"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks:
+      - appforge
+
+  builder-rpc:
+    build:
+      context: ..
+      dockerfile: deploy/docker/go.Dockerfile
+      args:
+        MODULE_DIR: services/builder
+    container_name: appforge-builder-rpc
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379"]
+    depends_on:
+      core-rpc:
+        condition: service_healthy
+      etcd-init:
+        condition: service_completed_successfully
+    ports:
+      - "${APPFORGE_BUILDER_RPC_PORT:-8082}:8082"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8082"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks:
+      - appforge
+
+  admin-api:
+    build:
+      context: ..
+      dockerfile: deploy/docker/go.Dockerfile
+      args:
+        MODULE_DIR: appforge-api
+    container_name: appforge-admin-api
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379"]
+    depends_on:
+      system-rpc:
+        condition: service_healthy
+      core-rpc:
+        condition: service_healthy
+      etcd-init:
+        condition: service_completed_successfully
+    ports:
+      - "${APPFORGE_API_PORT:-8888}:8888"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8888/admin/system/core"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks:
+      - appforge
+
+  admin-ui:
+    build:
+      context: ..
+      dockerfile: deploy/docker/ui.Dockerfile
+    container_name: appforge-admin-ui
+    restart: unless-stopped
+    depends_on:
+      admin-api:
+        condition: service_healthy
+    ports:
+      - "${APPFORGE_UI_PORT:-5173}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - appforge
+
+volumes:
+  mysql-data:
+  redis-data:
+  etcd-data:
+  minio-data:
+
+networks:
+  appforge:
+    name: appforge-dev

@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "appforge/proto/common;common";
+
+message Empty {}
+
+message RespBase {
+  int32 code = 1;
+  string msg = 2;
+  int64 total = 3;
+  bool has_next = 4;
+  bool has_prev = 5;
+  int64 next_cursor = 6;
+  int64 prev_cursor = 7;
+}
+
+message PageReq {
+  int64 cursor = 1;
+  int64 limit = 2;
+  int64 count = 3; // 已知总数；<=0 时服务端按需重新统计
+}
+
+message TokenInfo {
+  string access_token = 1;
+  string refresh_token = 2;
+  int64 expire_time = 3;
+}
+
+message TimeRange {
+  int64 start_time = 1;
+  int64 end_time = 2;
+}
+
+enum ChainCode {
+  CHAIN_CODE_UNKNOWN = 0; // 未指定
+  // 主网
+  CHAIN_CODE_BTC = 1; // Bitcoin
+  CHAIN_CODE_ETH = 2; // Ethereum mainnet
+  CHAIN_CODE_TRX = 3; // Tron
+  CHAIN_CODE_BSC = 4; // BNB Smart Chain
+  CHAIN_CODE_SOL = 5; // Solana
+  CHAIN_CODE_POLYGON = 6; // Polygon
+  // 代币标准/常用网络展示名
+  CHAIN_CODE_TRC20 = 20; // USDT on Tron
+  CHAIN_CODE_ERC20 = 21; // Token on Ethereum
+  CHAIN_CODE_BEP20 = 22; // Token on BSC
+}
+
+// 是否
+enum YesNo {
+  YES_NO_UNKNOWN = 0;
+  YES_NO_YES = 1; // 是
+  YES_NO_NO = 2; // 否
+}
+
+enum Enable {
+  ENABLE_UNKNOWN = 0; // 未知
+  ENABLE_ENABLED = 1; // 启用
+  ENABLE_DISABLED = 2; // 禁用
+}
+
+// 展示/操作开关
+enum Switch {
+  SWITCH_UNKNOWN = 0;
+  SWITCH_ON = 1; // 开启/展示
+  SWITCH_OFF = 2; // 关闭/隐藏
+}
+
+enum Side {
+  SIDE_UNKNOWN = 0;
+  SIDE_BUY = 1;
+  SIDE_SELL = 2;
+}
+
+// 用户账户用途。特殊交易账户禁止通过普通用户端登录。
+enum UserAccountType {
+  USER_ACCOUNT_TYPE_UNKNOWN = 0;
+  USER_ACCOUNT_TYPE_NORMAL = 1;
+  USER_ACCOUNT_TYPE_INTERNAL_MARKET_MAKER = 2;
+  USER_ACCOUNT_TYPE_SYSTEM = 3;
+}
+
+// 跨交易、行情、流动性和资产展示共享的产品大类。
+enum ProductType {
+  PRODUCT_TYPE_UNKNOWN = 0;
+  PRODUCT_TYPE_SPOT = 1;
+  PRODUCT_TYPE_DERIVATIVE = 2;
+  PRODUCT_TYPE_SECONDS = 3;
+}
+
+// 合约期限类型。现货和秒合约使用 NOT_APPLICABLE。
+enum ContractType {
+  CONTRACT_TYPE_NOT_APPLICABLE = 0;
+  CONTRACT_TYPE_PERPETUAL = 1;
+  CONTRACT_TYPE_DELIVERY = 2;
+}
+
+enum PositionSide {
+  POSITION_SIDE_UNKNOWN = 0;
+  POSITION_SIDE_LONG = 1; // 多头
+  POSITION_SIDE_SHORT = 2; // 空头
+}
+
+// 钱包类型
+enum WalletType {
+  WALLET_TYPE_UNKNOWN = 0;
+  WALLET_TYPE_SPOT = 1; // 现金账户/现货钱包
+  WALLET_TYPE_FUNDING = 2; // 股票账户/资金钱包
+  WALLET_TYPE_CONTRACT = 3; // 合约账户/合约钱包
+  WALLET_TYPE_EARN = 4; // 理财钱包
+  WALLET_TYPE_OPTION = 5; // 期权钱包
+}

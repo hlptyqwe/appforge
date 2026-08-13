@@ -1,0 +1,74 @@
+Name: admin-api
+Host: 0.0.0.0
+Port: 8888
+Mode: dev
+Timeout: 10000
+
+Jwt:
+  AccessSecret: appforge-dev-jwt-secret-change-before-production
+  AccessExpire: 86400
+
+SystemRpc:
+  Target: system-rpc:8080
+
+CoreRpc:
+  Target: core-rpc:8081
+
+# 仅记录会修改数据的后台操作；查询请求不写操作日志。
+Audit:
+  Routes:
+    - Method: POST
+      Path: /admin/system/users
+    - Method: PUT
+      Path: /admin/system/users
+    - Method: DELETE
+      Path: /admin/system/users/:id
+    - Method: POST
+      Path: /admin/system/users/status
+    - Method: POST
+      Path: /admin/system/users/resetPwd
+    - Method: POST
+      Path: /admin/system/users/assignRoles
+    - Method: POST
+      Path: /admin/system/roles
+    - Method: PUT
+      Path: /admin/system/roles
+    - Method: DELETE
+      Path: /admin/system/roles/:id
+    - Method: POST
+      Path: /admin/system/roles/grant
+    - Method: POST
+      Path: /admin/system/menus
+    - Method: PUT
+      Path: /admin/system/menus
+    - Method: DELETE
+      Path: /admin/system/menus/:id
+    - Method: POST
+      Path: /admin/system/configs
+    - Method: PUT
+      Path: /admin/system/configs
+    - Method: DELETE
+      Path: /admin/system/configs/:id
+    - Method: POST
+      Path: /admin/system/tenants
+    - Method: PUT
+      Path: /admin/system/tenants
+    - Method: DELETE
+      Path: /admin/system/tenants/:id
+    - Method: POST
+      Path: /admin/system/tenant-domains
+    - Method: PUT
+      Path: /admin/system/tenant-domains
+    - Method: DELETE
+      Path: /admin/system/tenant-domains/:id
+    - Method: POST
+      Path: /admin/core/applications
+    - Method: POST
+      Path: /admin/core/versions
+    - Method: POST
+      Path: /admin/core/channels
+    - Method: POST
+      Path: /admin/core/signing-configs
+    - Method: POST
+      Path: /admin/core/build-tasks
+

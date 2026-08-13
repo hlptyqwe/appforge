@@ -1,0 +1,594 @@
+// ===== system: 后台用户 =====
+type SysUserListReq {
+	PageReq
+	keyword  string `form:"keyword,optional"`
+	enabled  int64  `form:"enabled,optional"`
+	appScope int64  `form:"appScope,optional"`
+}
+
+type SysUserItem {
+	id               int64   `json:"id"`
+	username         string  `json:"username"`
+	nickname         string  `json:"nickname"`
+	enabled          int64   `json:"enabled"`
+	roleIds          []int64 `json:"roleIds"`
+	createTimes      int64   `json:"createTimes"`
+	google2FaEnabled int64   `json:"google2FaEnabled"`
+	tenantId         int64   `json:"tenantId"`
+	userType         int64   `json:"userType"`
+	isOwner          int64   `json:"isOwner"`
+	avatar           string  `json:"avatar"`
+	permsVer         int64   `json:"permsVer"`
+	lastLoginIp      string  `json:"lastLoginIp"`
+	lastLoginAt      int64   `json:"lastLoginAt"`
+	createBy         int64   `json:"createBy"`
+	updateTimes      int64   `json:"updateTimes"`
+	appScope         int64   `json:"appScope"`
+}
+
+type SysUserListResp {
+	RespBase
+	data []SysUserItem `json:"data"`
+}
+
+type SysUserDetailReq {
+	id int64 `form:"id"`
+}
+
+type SysUserDetailResp {
+	RespBase
+	data SysUserItem `json:"data"`
+}
+
+type SysUserCreateReq {
+	username string  `json:"username"`
+	password string  `json:"password"`
+	nickname string  `json:"nickname,optional"`
+	enabled  int64   `json:"enabled,optional"` // 0未知 1启用 2禁用
+	roleIds  []int64 `json:"roleIds,optional"`
+	appScope int64   `json:"appScope"`
+}
+
+type SysUserUpdateReq {
+	id       int64   `json:"id"`
+	nickname string  `json:"nickname,optional"`
+	enabled  int64   `json:"enabled,optional"`
+	roleIds  []int64 `json:"roleIds,optional"`
+	appScope int64   `json:"appScope,optional"`
+}
+
+type SysUserDeleteReq {
+	id int64 `path:"id"`
+}
+
+type AssignUserRolesReq {
+	userId  int64   `json:"userId"`
+	roleIds []int64 `json:"roleIds"`
+}
+
+type ChangeUserStatusReq {
+	id      int64 `json:"id"`
+	enabled int64 `json:"enabled"` // 0未知 1启用 2禁用
+}
+
+type ResetUserPwdReq {
+	id       int64  `json:"id"`
+	password string `json:"password"`
+}
+
+// ===== system: Google 2FA =====
+type Google2FAInitReq {
+	userId int64 `json:"userId"`
+}
+
+type Google2FAInit {
+	secret     string `json:"secret"`
+	otpauthUrl string `json:"otpauthUrl"`
+	qrCode     string `json:"qrCode,optional"`
+}
+
+type Google2FAInitResp {
+	RespBase
+	data Google2FAInit `json:"data"`
+}
+
+type Google2FABindReq {
+	userId int64  `json:"userId"`
+	secret string `json:"secret"`
+	code   string `json:"code"`
+}
+
+type Google2FAEnableReq {
+	userId int64  `json:"userId"`
+	code   string `json:"code"`
+}
+
+type Google2FADisableReq {
+	userId int64  `json:"userId"`
+	code   string `json:"code,optional"`
+}
+
+type Google2FAResetReq {
+	userId int64 `json:"userId"`
+}
+
+// ===== system: 角色 =====
+type SysRoleItem {
+	id          int64  `json:"id"`
+	name        string `json:"name"`
+	code        string `json:"code"`
+	enabled     int64  `json:"enabled"`
+	remark      string `json:"remark,optional"`
+	tenantId    int64  `json:"tenantId"`
+	createTimes int64  `json:"createTimes"`
+	appScope    int64  `json:"appScope"`
+}
+
+type SysRoleListReq {
+	PageReq
+	keyword  string `form:"keyword,optional"`
+	enabled  int64  `form:"enabled,optional"`
+	appScope int64  `form:"appScope,optional"`
+}
+
+type SysRoleListResp {
+	RespBase
+	data []SysRoleItem `json:"data"`
+}
+
+type SysRoleCreateReq {
+	tenantId int64  `json:"tenantId"`
+	name     string `json:"name"`
+	code     string `json:"code"`
+	enabled  int64  `json:"enabled,optional"`
+	remark   string `json:"remark,optional"`
+	appScope int64  `json:"appScope"`
+}
+
+type SysRoleUpdateReq {
+	id       int64  `json:"id"`
+	tenantId int64  `json:"tenantId,optional"`
+	name     string `json:"name,optional"`
+	enabled  int64  `json:"enabled,optional"`
+	remark   string `json:"remark,optional"`
+	appScope int64  `json:"appScope,optional"`
+}
+
+type SysRoleDeleteReq {
+	id int64 `path:"id"`
+}
+
+type SysRoleGrantReq {
+	roleId  int64   `json:"roleId"`
+	menuIds []int64 `json:"menuIds"`
+}
+
+type SysRoleGrantDetailReq {
+	id int64 `path:"id"`
+}
+
+type SysRoleGrantDetailResp {
+	RespBase
+	data SysRoleGrantDetail `json:"data"`
+}
+
+type SysRoleGrantDetail {
+	RoleId   int64    `json:"roleId"`
+	MenuIds  []int64  `json:"menuIds"`
+	PermKeys []string `json:"permKeys"`
+}
+
+type SysPermItem {
+	PermKey  string `json:"key"` // 唯一权限标识（如 sys:role:add）
+	Name     string `json:"name"` // 展示名称（如 新增角色）
+	AppScope int64  `json:"appScope"`
+}
+
+type SysPermListResp {
+	RespBase
+	data []SysPermItem `json:"data"`
+}
+
+// ===== system: 菜单/按钮 =====
+type SysMenuItem {
+	id        int64  `json:"id"`
+	parentId  int64  `json:"parentId"`
+	name      string `json:"name"`
+	menuType  int64  `json:"menuType"` // 1目录 2菜单 3按钮
+	method    string `json:"method,optional"` // GET POST PUT DELETE
+	path      string `json:"path,optional"`
+	component string `json:"component,optional"`
+	icon      string `json:"icon,optional"`
+	sort      int64  `json:"sort"`
+	visible   int64  `json:"visible"`
+	enabled   int64  `json:"enabled"`
+	perms     string `json:"perms,optional"`
+	appScope  int64  `json:"appScope"`
+}
+
+type SysMenuTreeReq {
+	roleId int64 `path:"roleId"`
+}
+
+type SysMenuTreeResp {
+	RespBase
+	data []SysMenuItem `json:"data"`
+}
+
+type SysMenuCreateReq {
+	parentId  int64  `json:"parentId,optional"`
+	name      string `json:"name"`
+	menuType  int64  `json:"menuType"`
+	method    string `json:"method,optional"` // GET POST PUT DELETE
+	path      string `json:"path,optional"`
+	component string `json:"component,optional"`
+	icon      string `json:"icon,optional"`
+	sort      int64  `json:"sort,optional"`
+	visible   int64  `json:"visible,optional"`
+	enabled   int64  `json:"enabled,optional"`
+	perms     string `json:"perms,optional"`
+	appScope  int64  `json:"appScope"`
+}
+
+type SysMenuUpdateReq {
+	id        int64  `json:"id"`
+	parentId  int64  `json:"parentId,optional"`
+	name      string `json:"name,optional"`
+	menuType  int64  `json:"menuType,optional"`
+	method    string `json:"method,optional"` // GET POST PUT DELETE
+	path      string `json:"path,optional"`
+	component string `json:"component,optional"`
+	icon      string `json:"icon,optional"`
+	sort      int64  `json:"sort,optional"`
+	visible   int64  `json:"visible,optional"`
+	enabled   int64  `json:"enabled,optional"`
+	perms     string `json:"perms,optional"`
+	appScope  int64  `json:"appScope,optional"`
+}
+
+type SysMenuDeleteReq {
+	id int64 `path:"id"`
+}
+
+type SysMenuListReq {
+	PageReq
+	keyword  string `form:"keyword,optional"` // 按 name/perms 模糊
+	enabled  int64  `form:"enabled,optional"` // 0未知 1启用 2禁用
+	visible  int64  `form:"visible,optional"` // 0/1
+	menuType int64  `form:"menuType,optional"` // 1/2/3
+	appScope int64  `form:"appScope,optional"`
+}
+
+type SysMenuListResp {
+	RespBase
+	data []SysMenuItem `json:"data"`
+}
+
+// ===== system: 日志 =====
+type LoginLogItem {
+	id       int64  `json:"id"`
+	userId   int64  `json:"userId"`
+	username string `json:"username"`
+	ip       string `json:"ip"`
+	ua       string `json:"ua"`
+	success  int64  `json:"success"`
+	msg      string `json:"msg,optional"`
+	loginAt  int64  `json:"loginAt"`
+}
+
+type LoginLogListReq {
+	PageReq
+	username string `form:"username,optional"`
+	success  int64  `form:"success,optional"`
+}
+
+type LoginLogListResp {
+	RespBase
+	data []LoginLogItem `json:"data"`
+}
+
+type OpLogItem {
+	id          int64  `json:"id"`
+	tenantId    int64  `json:"tenantId"`
+	userId      int64  `json:"userId"`
+	username    string `json:"username"`
+	module      string `json:"module"`
+	action      string `json:"action"`
+	method      string `json:"method"`
+	path        string `json:"path"`
+	req         string `json:"req,optional"`
+	resp        string `json:"resp,optional"`
+	ip          string `json:"ip"`
+	costMs      int64  `json:"costMs"`
+	createTimes int64  `json:"createTimes"`
+	updateTimes int64  `json:"updateTimes"`
+}
+
+type OpLogListReq {
+	PageReq
+	username string `form:"username,optional"`
+	method   string `form:"method,optional"`
+	path     string `form:"path,optional"`
+}
+
+type OpLogListResp {
+	RespBase
+	data []OpLogItem `json:"data"`
+}
+
+type SysConfigCreateReq {
+	tenantId    int64  `json:"tenantId,optional"`
+	configKey   string `json:"configKey" validate:"required"`
+	configValue string `json:"configValue"`
+	remark      string `json:"remark,optional"`
+}
+
+type SysConfigUpdateReq {
+	id          int64  `json:"id" validate:"required"`
+	configKey   string `json:"configKey,optional"`
+	configValue string `json:"configValue,optional"`
+	remark      string `json:"remark,optional"`
+}
+
+type SysConfigDeleteReq {
+	id int64 `path:"id" validate:"required"`
+}
+
+type SysConfigItem {
+	id          int64  `json:"id"`
+	tenantId    int64  `json:"tenantId"`
+	configKey   string `json:"configKey"`
+	configValue string `json:"configValue"`
+	remark      string `json:"remark,optional"`
+	createTimes int64  `json:"createTimes"`
+	updateTimes int64  `json:"updateTimes"`
+}
+
+type SysConfigListReq {
+	PageReq
+	keyword  string `form:"keyword,optional"`
+	tenantId int64  `form:"tenantId,optional"`
+}
+
+type SysConfigListResp {
+	RespBase
+	data []SysConfigItem `json:"data"`
+}
+
+// ===== system: 租户 =====
+type SysTenantCreateReq {
+	username       string `json:"username"`
+	tenantName     string `json:"tenantName"`
+	tenantPassword string `json:"tenantPassword"`
+	enabled        int64  `json:"enabled"`
+	expireTime     int64  `json:"expireTime"`
+	contactName    string `json:"contactName,optional"`
+	contactPhone   string `json:"contactPhone,optional"`
+	remark         string `json:"remark,optional"`
+}
+
+type SysTenantUpdateReq {
+	id             int64  `json:"id"`
+	tenantName     string `json:"tenantName,optional"`
+	tenantPassword string `json:"tenantPassword,optional"`
+	enabled        int64  `json:"enabled,optional"`
+	expireTime     int64  `json:"expireTime,optional"`
+	contactName    string `json:"contactName,optional"`
+	contactPhone   string `json:"contactPhone,optional"`
+	remark         string `json:"remark,optional"`
+}
+
+type SysTenantDeleteReq {
+	id int64 `path:"id"`
+}
+
+type SysTenantItem {
+	id           int64  `json:"id"`
+	tenantCode   string `json:"tenantCode"`
+	tenantName   string `json:"tenantName"`
+	enabled      int64  `json:"enabled"`
+	expireTime   int64  `json:"expireTime"`
+	contactName  string `json:"contactName,optional"`
+	contactPhone string `json:"contactPhone,optional"`
+	remark       string `json:"remark,optional"`
+	createTimes  int64  `json:"createTimes"`
+	updateTimes  int64  `json:"updateTimes"`
+}
+
+type SysTenantListReq {
+	PageReq
+	keyword      string `form:"keyword,optional"` // 按 tenant_code/tenant_name/contact_name/contact_phone 模糊
+	enabled      int64  `form:"enabled,optional"` // 0全部 1启用 2禁用
+	tenantCode   string `form:"tenantCode,optional"`
+	tenantName   string `form:"tenantName,optional"`
+	contactName  string `form:"contactName,optional"`
+	contactPhone string `form:"contactPhone,optional"`
+}
+
+type SysTenantListResp {
+	RespBase
+	data []SysTenantItem `json:"data"`
+}
+
+type SysTenantDetailReq {
+	tenantId   *int64  `form:"tenantId,optional"`
+	tenantCode *string `form:"tenantCode,optional"`
+}
+
+type SysTenantDetailResp {
+	RespBase
+	data SysTenantItem `json:"data"`
+}
+
+type SysTenantDomainItem {
+	id          int64  `json:"id"`
+	tenantId    int64  `json:"tenantId"`
+	origin      string `json:"origin"`
+	status      int64  `json:"status"`
+	priority    int64  `json:"priority"`
+	createTimes int64  `json:"createTimes"`
+	updateTimes int64  `json:"updateTimes"`
+}
+
+type SysTenantDomainListReq {
+	tenantId int64 `form:"tenantId"`
+}
+
+type SysTenantDomainListResp {
+	RespBase
+	data []SysTenantDomainItem `json:"data"`
+}
+
+type SysTenantDomainCreateReq {
+	tenantId int64  `json:"tenantId"`
+	origin   string `json:"origin"`
+	status   int64  `json:"status"`
+	priority int64  `json:"priority"`
+}
+
+type SysTenantDomainUpdateReq {
+	id       int64  `json:"id"`
+	origin   string `json:"origin"`
+	status   int64  `json:"status"`
+	priority int64  `json:"priority"`
+}
+
+type SysTenantDomainDeleteReq {
+	id int64 `path:"id"`
+}
+
+@server (
+	prefix: /admin/system
+	group:  system
+	jwt:    Jwt
+)
+service admin {
+	// --- 后台用户 ---
+	@handler SysUserList
+	get /users (SysUserListReq) returns (SysUserListResp)
+
+	@handler SysUserDetail
+	get /users/detail (SysUserDetailReq) returns (SysUserDetailResp)
+
+	@handler SysUserCreate
+	post /users (SysUserCreateReq) returns (RespBase)
+
+	@handler SysUserUpdate
+	put /users (SysUserUpdateReq) returns (RespBase)
+
+	@handler SysUserDelete
+	delete /users/:id (SysUserDeleteReq) returns (RespBase)
+
+	@handler ChangeUserStatus
+	post /users/status (ChangeUserStatusReq) returns (RespBase)
+
+	@handler ResetUserPwd
+	post /users/resetPwd (ResetUserPwdReq) returns (RespBase)
+
+	@handler AssignUserRoles
+	post /users/assignRoles (AssignUserRolesReq) returns (RespBase)
+
+	// --- Google 2FA ---
+	@handler Google2FAInit
+	post /users/google2fa/init (Google2FAInitReq) returns (Google2FAInitResp)
+
+	@handler Google2FABind
+	post /users/google2fa/bind (Google2FABindReq) returns (RespBase)
+
+	@handler Google2FAEnable
+	post /users/google2fa/enable (Google2FAEnableReq) returns (RespBase)
+
+	@handler Google2FADisable
+	post /users/google2fa/disable (Google2FADisableReq) returns (RespBase)
+
+	@handler Google2FAReset
+	post /users/google2fa/reset (Google2FAResetReq) returns (RespBase)
+
+	// --- 角色 ---
+	@handler SysRoleList
+	get /roles (SysRoleListReq) returns (SysRoleListResp)
+
+	@handler SysRoleCreate
+	post /roles (SysRoleCreateReq) returns (RespBase)
+
+	@handler SysRoleUpdate
+	put /roles (SysRoleUpdateReq) returns (RespBase)
+
+	@handler SysRoleDelete
+	delete /roles/:id (SysRoleDeleteReq) returns (RespBase)
+
+	@handler SysRoleGrant
+	post /roles/grant (SysRoleGrantReq) returns (RespBase)
+
+	@handler SysRoleGrantDetail
+	get /roles/:id/grant (SysRoleGrantDetailReq) returns (SysRoleGrantDetailResp)
+
+	// 按钮权限列表
+	@handler SysPermList
+	get /perms returns (SysPermListResp)
+
+	// --- 菜单 ---
+	@handler SysMenuTree
+	get /menus/tree/:roleId (SysMenuTreeReq) returns (SysMenuTreeResp)
+
+	@handler SysMenuCreate
+	post /menus (SysMenuCreateReq) returns (RespBase)
+
+	@handler SysMenuUpdate
+	put /menus (SysMenuUpdateReq) returns (RespBase)
+
+	@handler SysMenuDelete
+	delete /menus/:id (SysMenuDeleteReq) returns (RespBase)
+
+	@handler SysMenuList
+	get /menus (SysMenuListReq) returns (SysMenuListResp)
+
+	// --- 日志 ---
+	@handler LoginLogList
+	get /logs/login (LoginLogListReq) returns (LoginLogListResp)
+
+	@handler OpLogList
+	get /logs/op (OpLogListReq) returns (OpLogListResp)
+
+	// --- 系统配置 ---
+	@handler SysConfigList
+	get /configs (SysConfigListReq) returns (SysConfigListResp)
+
+	@handler SysConfigCreate
+	post /configs (SysConfigCreateReq) returns (RespBase)
+
+	@handler SysConfigUpdate
+	put /configs (SysConfigUpdateReq) returns (RespBase)
+
+	@handler SysConfigDelete
+	delete /configs/:id (SysConfigDeleteReq) returns (RespBase)
+
+	// --- 租户 ---
+	@handler SysTenantCreate
+	post /tenants (SysTenantCreateReq) returns (RespBase)
+
+	@handler SysTenantUpdate
+	put /tenants (SysTenantUpdateReq) returns (RespBase)
+
+	@handler SysTenantDelete
+	delete /tenants/:id (SysTenantDeleteReq) returns (RespBase)
+
+	@handler SysTenantList
+	get /tenants (SysTenantListReq) returns (SysTenantListResp)
+
+	@handler SysTenantDetail
+	get /tenant/detail (SysTenantDetailReq) returns (SysTenantDetailResp)
+
+	@handler SysTenantDomainList
+	get /tenant-domains (SysTenantDomainListReq) returns (SysTenantDomainListResp)
+
+	@handler SysTenantDomainCreate
+	post /tenant-domains (SysTenantDomainCreateReq) returns (RespBase)
+
+	@handler SysTenantDomainUpdate
+	put /tenant-domains (SysTenantDomainUpdateReq) returns (RespBase)
+
+	@handler SysTenantDomainDelete
+	delete /tenant-domains/:id (SysTenantDomainDeleteReq) returns (RespBase)
+}
+

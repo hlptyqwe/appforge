@@ -1,0 +1,33 @@
+// Code scaffolded by goctl. Safe to edit.
+// goctl 1.9.2
+
+package system
+
+import (
+	"context"
+
+	"appforge/admin-api/internal/svc"
+	"appforge/admin-api/internal/types"
+
+	"appforge/admin-api/internal/logicutil"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type SysConfigUpdateLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func NewSysConfigUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SysConfigUpdateLogic {
+	return &SysConfigUpdateLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *SysConfigUpdateLogic) SysConfigUpdate(req *types.SysConfigUpdateReq) (resp *types.RespBase, err error) {
+	return logicutil.Proxy[types.RespBase](l.ctx, req, l.svcCtx.SystemCli.SysConfigUpdate)
+}

@@ -1,0 +1,14 @@
+syntax = "v1"
+
+info (
+	title:   "admin-api"
+	desc:    "Admin BFF"
+	author:  "you"
+	version: "1.0"
+)
+
+import "common.api"
+import "auth_public.api"
+import "auth_private.api"
+import "system.api"
+import "platform.api"

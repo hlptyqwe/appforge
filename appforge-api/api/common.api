@@ -1,0 +1,32 @@
+type RespBase {
+	code       int32  `json:"code"`
+	msg        string `json:"msg"`
+	total      int64  `json:"total,optional"`
+	hasNext    bool   `json:"hasNext,optional"`
+	hasPrev    bool   `json:"hasPrev,optional"`
+	nextCursor int64  `json:"nextCursor,optional"`
+	prevCursor int64  `json:"prevCursor,optional"`
+}
+
+type PageReq {
+	cursor int64 `form:"cursor,optional"`
+	limit  int64 `form:"limit,optional"`
+	count  int64 `form:"count,optional"` // 已知总数；<=0 时服务端按需重新统计
+}
+
+type TimeRange {
+	startTime int64 `form:"startTime,optional"`
+	endTime   int64 `form:"endTime,optional"`
+}
+
+type OptionsItem {
+	value int32  `json:"value"`
+	code  string `json:"code"`
+}
+
+type OptionsGroup {
+	key     string        `json:"key"`
+	label   string        `json:"label"`
+	options []OptionsItem `json:"options"`
+}
+

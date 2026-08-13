@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package system;
+
+option go_package = "appforge/proto/system;system";
+
+enum SysConfigType {
+  UNKNOWN = 0;
+  SYSTEM_CORE = 1; // 系统配置
+  OBJECT_STORAGE = 2; // 对象存储配置
+  ITICK_CONFIG = 3; // ITICK配置
+  RECHARGE_CONFIG = 4; // 充值配置
+  WITHDRAW_CONFIG = 5; // 提现配置
+  EMAIL_CONFIG = 6; // 邮件配置
+  PHONE_CONFIG = 7; // 手机短信配置
+  CHAT_CONFIG = 8; // 客服配置
+}
+
+enum MenuType {
+  MENU_TYPE_UNKNOWN = 0;
+  MENU_TYPE_DIR = 1; // 目录
+  MENU_TYPE_MENU = 2; // 菜单
+  MENU_TYPE_BUTTON = 3; // 按钮
+}
+
+enum RequestMethod {
+  REQUEST_METHOD_UNKNOWN = 0;
+  REQUEST_METHOD_GET = 1;
+  REQUEST_METHOD_POST = 2;
+  REQUEST_METHOD_PUT = 3;
+  REQUEST_METHOD_DELETE = 4;
+}
+
+enum UserType {
+  USER_TYPE_UNKNOWN = 0; // 未知
+  USER_TYPE_SYSTEM_ADMIN = 1; // 系统管理员
+  USER_TYPE_TENANT_OWNER = 2; // 租户主账号
+  USER_TYPE_TENANT_ADMIN = 3; // 租户管理员
+}
+
+// 系统账户允许登录的后台应用。一个账户可同时授权多个应用。
+enum ApplicationScope {
+  APPLICATION_SCOPE_UNKNOWN = 0;
+  APPLICATION_SCOPE_ADMIN = 1; // 综合管理后台 admin-ui
+  APPLICATION_SCOPE_LIQUIDITY = 2; // 做市管理后台 liquidity-admin-ui
+}
+
+enum TenantDomainStatus {
+  TENANT_DOMAIN_STATUS_UNKNOWN = 0;
+  TENANT_DOMAIN_STATUS_ACTIVE = 1; // 使用中
+  TENANT_DOMAIN_STATUS_RETIRED = 2; // 已退役
+  TENANT_DOMAIN_STATUS_DISABLED = 3; // 已禁用
+}

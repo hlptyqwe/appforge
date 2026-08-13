@@ -1,0 +1,43 @@
+// System config
+type GetSystemCore {
+	siteName      string         `json:"siteName"`
+	siteLogo      string         `json:"siteLogo"`
+	assetUrl      string         `json:"assetUrl"`
+	mustGoogleF2a int64          `json:"mustGoogleF2a"`
+	options       []OptionsGroup `json:"options"`
+}
+
+type GetSystemCoreResp {
+	RespBase
+	data GetSystemCore `json:"data"`
+}
+
+// ===== auth =====
+type LoginReq {
+	username   string `json:"username"`
+	password   string `json:"password"`
+	googleCode string `json:"googleCode,optional"`
+}
+
+type LoginData {
+	token string `json:"token"`
+	exp   int64  `json:"exp"`
+}
+
+type LoginResp {
+	RespBase
+	data LoginData `json:"data"`
+}
+
+@server (
+	prefix: /admin/system
+	group:  auth_public
+)
+service admin {
+	@handler GetSystemCore
+	get /core returns (GetSystemCoreResp)
+
+	@handler Login
+	post /auth/login (LoginReq) returns (LoginResp)
+}
+

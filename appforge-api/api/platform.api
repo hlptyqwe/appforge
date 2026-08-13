@@ -1,0 +1,335 @@
+// APK渠道动态打包平台 API
+type PlatformApplication {
+	id          int64  `json:"id"`
+	tenantId    int64  `json:"tenantId"`
+	appCode     string `json:"appCode"`
+	appName     string `json:"appName"`
+	packageName string `json:"packageName"`
+	description string `json:"description,optional"`
+	iconUrl     string `json:"iconUrl,optional"`
+	apiHost     string `json:"apiHost,optional"`
+	status      int32  `json:"status"`
+	createBy    int64  `json:"createBy"`
+	createTime  int64  `json:"createTime"`
+	updateTime  int64  `json:"updateTime"`
+}
+
+type PlatformVersion {
+	id              int64  `json:"id"`
+	tenantId        int64  `json:"tenantId"`
+	appId           int64  `json:"appId"`
+	versionCode     int64  `json:"versionCode"`
+	versionName     string `json:"versionName"`
+	sourceApkUrl    string `json:"sourceApkUrl,optional"`
+	sourceApkSha256 string `json:"sourceApkSha256,optional"`
+	releaseNotes    string `json:"releaseNotes,optional"`
+	buildConfigJson string `json:"buildConfigJson,optional"`
+	status          int32  `json:"status"`
+	publishedAt     int64  `json:"publishedAt,optional"`
+	createBy        int64  `json:"createBy"`
+	createTime      int64  `json:"createTime"`
+	updateTime      int64  `json:"updateTime"`
+}
+
+type PlatformChannel {
+	id          int64  `json:"id"`
+	tenantId    int64  `json:"tenantId"`
+	appId       int64  `json:"appId"`
+	channelCode string `json:"channelCode"`
+	channelName string `json:"channelName"`
+	landingUrl  string `json:"landingUrl,optional"`
+	downloadUrl string `json:"downloadUrl,optional"`
+	status      int32  `json:"status"`
+	createBy    int64  `json:"createBy"`
+	createTime  int64  `json:"createTime"`
+	updateTime  int64  `json:"updateTime"`
+}
+
+// APK签名配置。密码密文只写入，不通过查询接口返回。
+type PlatformSigningConfig {
+	id                int64  `json:"id"`
+	tenantId          int64  `json:"tenantId"`
+	appId             int64  `json:"appId"`
+	name              string `json:"name"`
+	keystoreObjectKey string `json:"keystoreObjectKey"`
+	keyAlias          string `json:"keyAlias"`
+	secretRef         string `json:"secretRef,optional"`
+	status            int64  `json:"status"`
+	lastVerifiedAt    int64  `json:"lastVerifiedAt,optional"`
+	createBy          int64  `json:"createBy"`
+	createTime        int64  `json:"createTime"`
+	updateTime        int64  `json:"updateTime"`
+}
+
+type PlatformBuildTask {
+	id              int64  `json:"id"`
+	tenantId        int64  `json:"tenantId"`
+	appId           int64  `json:"appId"`
+	versionId       int64  `json:"versionId"`
+	channelId       int64  `json:"channelId"`
+	signingConfigId int64  `json:"signingConfigId"`
+	channelCode     string `json:"channelCode"`
+	versionCode     int64  `json:"versionCode"`
+	versionName     string `json:"versionName"`
+	status          int32  `json:"status"`
+	builderId       string `json:"builderId,optional"`
+	builderAttempt  int32  `json:"builderAttempt"`
+	priority        int32  `json:"priority"`
+	apkUrl          string `json:"apkUrl,optional"`
+	apkSha256       string `json:"apkSha256,optional"`
+	apkSize         int64  `json:"apkSize"`
+	logUrl          string `json:"logUrl,optional"`
+	errorMessage    string `json:"errorMessage,optional"`
+	queuedAt        int64  `json:"queuedAt"`
+	startTime       int64  `json:"startTime,optional"`
+	finishTime      int64  `json:"finishTime,optional"`
+	createBy        int64  `json:"createBy"`
+	createTime      int64  `json:"createTime"`
+	updateTime      int64  `json:"updateTime"`
+}
+
+type PlatformApplicationResp {
+	RespBase
+	data PlatformApplication `json:"data"`
+}
+
+type PlatformVersionResp {
+	RespBase
+	data PlatformVersion `json:"data"`
+}
+
+type PlatformChannelResp {
+	RespBase
+	data PlatformChannel `json:"data"`
+}
+
+type PlatformSigningConfigResp {
+	RespBase
+	data PlatformSigningConfig `json:"data"`
+}
+
+type PlatformBuildTaskResp {
+	RespBase
+	data PlatformBuildTask `json:"data"`
+}
+
+type PlatformApplicationListResp {
+	RespBase
+	data []PlatformApplication `json:"data"`
+}
+
+type PlatformVersionListResp {
+	RespBase
+	data []PlatformVersion `json:"data"`
+}
+
+type PlatformChannelListResp {
+	RespBase
+	data []PlatformChannel `json:"data"`
+}
+
+type PlatformSigningConfigListResp {
+	RespBase
+	data []PlatformSigningConfig `json:"data"`
+}
+
+type PlatformBuildTaskListResp {
+	RespBase
+	data []PlatformBuildTask `json:"data"`
+}
+
+type CreatePlatformApplicationReq {
+	appCode     string `json:"appCode"`
+	appName     string `json:"appName"`
+	packageName string `json:"packageName"`
+	description string `json:"description,optional"`
+	iconUrl     string `json:"iconUrl,optional"`
+	apiHost     string `json:"apiHost,optional"`
+}
+
+type CreatePlatformVersionReq {
+	appId           int64  `json:"appId"`
+	versionCode     int64  `json:"versionCode"`
+	versionName     string `json:"versionName"`
+	sourceApkUrl    string `json:"sourceApkUrl,optional"`
+	sourceApkSha256 string `json:"sourceApkSha256,optional"`
+	releaseNotes    string `json:"releaseNotes,optional"`
+	buildConfigJson string `json:"buildConfigJson,optional"`
+}
+
+type CreatePlatformChannelReq {
+	appId       int64  `json:"appId"`
+	channelCode string `json:"channelCode,optional"`
+	channelName string `json:"channelName"`
+	landingUrl  string `json:"landingUrl,optional"`
+	downloadUrl string `json:"downloadUrl,optional"`
+}
+
+type CreatePlatformSigningConfigReq {
+	appId                      int64  `json:"appId"`
+	name                       string `json:"name"`
+	keystoreObjectKey          string `json:"keystoreObjectKey"`
+	keyAlias                   string `json:"keyAlias"`
+	keystorePasswordCiphertext string `json:"keystorePasswordCiphertext"`
+	keyPasswordCiphertext      string `json:"keyPasswordCiphertext"`
+	secretRef                  string `json:"secretRef,optional"`
+}
+
+type CreatePlatformBuildTaskReq {
+	appId           int64 `json:"appId"`
+	versionId       int64 `json:"versionId"`
+	channelId       int64 `json:"channelId"`
+	signingConfigId int64 `json:"signingConfigId,optional"`
+	priority        int32 `json:"priority,optional"`
+}
+
+type PlatformIdReq {
+	id int64 `path:"id"`
+}
+
+type ListPlatformApplicationsReq {
+	PageReq
+	keyword string `form:"keyword,optional"`
+	status  int32  `form:"status,optional"`
+}
+
+type ListPlatformVersionsReq {
+	PageReq
+	appId  int64 `form:"appId,optional"`
+	status int32 `form:"status,optional"`
+}
+
+type ListPlatformChannelsReq {
+	PageReq
+	appId   int64  `form:"appId,optional"`
+	keyword string `form:"keyword,optional"`
+	status  int32  `form:"status,optional"`
+}
+
+type ListPlatformSigningConfigsReq {
+	PageReq
+	appId  int64 `form:"appId,optional"`
+	status int64 `form:"status,optional"`
+}
+
+type ListPlatformBuildTasksReq {
+	PageReq
+	appId     int64 `form:"appId,optional"`
+	channelId int64 `form:"channelId,optional"`
+	status    int32 `form:"status,optional"`
+}
+
+type PlatformChannelStats {
+	channelId     int64  `json:"channelId"`
+	channelCode   string `json:"channelCode"`
+	clicks        int64  `json:"clicks"`
+	downloads     int64  `json:"downloads"`
+	installs      int64  `json:"installs"`
+	registrations int64  `json:"registrations"`
+	firstPays     int64  `json:"firstPays"`
+	pays          int64  `json:"pays"`
+}
+
+type PlatformChannelStatsResp {
+	RespBase
+	data PlatformChannelStats `json:"data"`
+}
+
+type GetPlatformChannelStatsReq {
+	appId     int64 `form:"appId"`
+	channelId int64 `form:"channelId"`
+	startTime int64 `form:"startTime,optional"`
+	endTime   int64 `form:"endTime,optional"`
+}
+
+type PlatformInstallReportReq {
+	appId         int64  `json:"appId"`
+	channelCode   string `json:"channelCode"`
+	installId     string `json:"installId"`
+	appVersion    string `json:"appVersion,optional"`
+	deviceModel   string `json:"deviceModel,optional"`
+	ip            string `json:"ip,optional"`
+	firstOpenTime int64  `json:"firstOpenTime,optional"`
+}
+
+type PlatformChannelEventReq {
+	appId       int64  `json:"appId"`
+	channelCode string `json:"channelCode"`
+	eventType   int32  `json:"eventType"`
+	eventKey    string `json:"eventKey"`
+	installId   string `json:"installId,optional"`
+	userId      int64  `json:"userId,optional"`
+	appVersion  string `json:"appVersion,optional"`
+	ip          string `json:"ip,optional"`
+	deviceModel string `json:"deviceModel,optional"`
+	eventTime   int64  `json:"eventTime,optional"`
+	metadata    string `json:"metadata,optional"`
+}
+
+@server (
+	prefix: /api
+	group:  platform_public
+)
+service admin {
+	@handler PlatformInstallReport
+	post /install/report (PlatformInstallReportReq) returns (RespBase)
+
+	@handler PlatformChannelEvent
+	post /channel/event (PlatformChannelEventReq) returns (RespBase)
+}
+
+@server (
+	prefix: /admin/core
+	group:  platform_private
+	jwt:    Jwt
+)
+service admin {
+	@handler CreatePlatformApplication
+	post /applications (CreatePlatformApplicationReq) returns (PlatformApplicationResp)
+
+	@handler GetPlatformApplication
+	get /applications/:id (PlatformIdReq) returns (PlatformApplicationResp)
+
+	@handler ListPlatformApplications
+	get /applications (ListPlatformApplicationsReq) returns (PlatformApplicationListResp)
+
+	@handler CreatePlatformVersion
+	post /versions (CreatePlatformVersionReq) returns (PlatformVersionResp)
+
+	@handler GetPlatformVersion
+	get /versions/:id (PlatformIdReq) returns (PlatformVersionResp)
+
+	@handler ListPlatformVersions
+	get /versions (ListPlatformVersionsReq) returns (PlatformVersionListResp)
+
+	@handler CreatePlatformChannel
+	post /channels (CreatePlatformChannelReq) returns (PlatformChannelResp)
+
+	@handler GetPlatformChannel
+	get /channels/:id (PlatformIdReq) returns (PlatformChannelResp)
+
+	@handler ListPlatformChannels
+	get /channels (ListPlatformChannelsReq) returns (PlatformChannelListResp)
+
+	@handler CreatePlatformSigningConfig
+	post /signing-configs (CreatePlatformSigningConfigReq) returns (PlatformSigningConfigResp)
+
+	@handler GetPlatformSigningConfig
+	get /signing-configs/:id (PlatformIdReq) returns (PlatformSigningConfigResp)
+
+	@handler ListPlatformSigningConfigs
+	get /signing-configs (ListPlatformSigningConfigsReq) returns (PlatformSigningConfigListResp)
+
+	@handler CreatePlatformBuildTask
+	post /build-tasks (CreatePlatformBuildTaskReq) returns (PlatformBuildTaskResp)
+
+	@handler GetPlatformBuildTask
+	get /build-tasks/:id (PlatformIdReq) returns (PlatformBuildTaskResp)
+
+	@handler ListPlatformBuildTasks
+	get /build-tasks (ListPlatformBuildTasksReq) returns (PlatformBuildTaskListResp)
+
+	@handler GetPlatformChannelStats
+	get /channel-stats (GetPlatformChannelStatsReq) returns (PlatformChannelStatsResp)
+}
+

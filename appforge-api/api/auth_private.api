@@ -1,0 +1,57 @@
+type ProfileUser {
+	id               int64  `json:"id"`
+	username         string `json:"username"`
+	nickname         string `json:"nickname,optional"`
+	avatar           string `json:"avatar,optional"`
+	tenantId         int64  `json:"tenantId"` // 所属租户ID：0=系统侧，>0=租户ID
+	userType         int64  `json:"userType"` // 用户类型：1系统管理员 2租户主账号 3租户管理员
+	isOwner          int64  `json:"isOwner"` // 是否租户主账号：1是 2否
+	google2FaEnabled int64  `json:"google2FaEnabled"`
+}
+
+type MenuNode {
+	id        int64      `json:"id"`
+	parentId  int64      `json:"parentId"`
+	name      string     `json:"name"`
+	menuType  int64      `json:"menuType"` // 1目录 2菜单 3按钮
+	path      string     `json:"path,optional"`
+	component string     `json:"component,optional"`
+	icon      string     `json:"icon,optional"`
+	sort      int64      `json:"sort"`
+	visible   int64      `json:"visible"`
+	enabled   int64      `json:"enabled"`
+	perms     string     `json:"perms,optional"`
+	children  []MenuNode `json:"children,optional"`
+}
+
+type ProfileData {
+	user  ProfileUser `json:"user"`
+	menus []MenuNode  `json:"menus"`
+	perms []string    `json:"perms"`
+}
+
+type ProfileResp {
+	RespBase
+	data ProfileData `json:"data"`
+}
+
+type UpdateProfileReq {
+	nickname string `json:"nickname,optional"`
+	avatar   string `json:"avatar,optional"`
+	password string `json:"password,optional"`
+}
+
+@server (
+	prefix: /admin/system
+	group:  auth_private
+	jwt:    Jwt
+)
+service admin {
+	@handler Profile
+	get /auth/profile returns (ProfileResp)
+
+	// 修改头像 URL、密码、昵称
+	@handler UpdateProfile
+	post /auth/profile (UpdateProfileReq) returns (RespBase)
+}
+

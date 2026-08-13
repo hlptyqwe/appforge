@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package builder;
+
+import "proto/common/common.proto";
+
+option go_package = "appforge/proto/builder;builder";
+
+message RespBase {
+  common.RespBase base = 1;
+}
+
+// APK 构建任务状态。
+enum BuildTaskStatus {
+  BUILD_TASK_STATUS_UNKNOWN = 0; // 未知
+  BUILD_TASK_STATUS_PENDING = 1; // 待处理
+  BUILD_TASK_STATUS_BUILDING = 2; // 构建中
+  BUILD_TASK_STATUS_SIGNING = 3; // 签名中
+  BUILD_TASK_STATUS_UPLOADING = 4; // 上传中
+  BUILD_TASK_STATUS_SUCCESS = 5; // 成功
+  BUILD_TASK_STATUS_FAILED = 6; // 失败
+}
+
+message BuildTask {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  int64 app_id = 3;
+  int64 version_id = 4;
+  int64 channel_id = 5;
+  int64 signing_config_id = 6;
+  string channel_code = 7;
+  int64 version_code = 8;
+  string version_name = 9;
+  BuildTaskStatus status = 10; // 构建任务状态
+  int32 builder_attempt = 11;
+  int32 priority = 12;
+  string source_apk_url = 13;
+  string build_config_json = 14;
+}
+
+message ClaimBuildTaskReq {
+  string builder_id = 1;
+  int32 lease_seconds = 2;
+}
+
+message BuildTaskResp {
+  common.RespBase base = 1;
+  BuildTask data = 2;
+}
+
+message HeartbeatBuildTaskReq {
+  int64 task_id = 1;
+  string builder_id = 2;
+  int32 lease_seconds = 3;
+}
+
+message ReportBuildProgressReq {
+  int64 task_id = 1;
+  string builder_id = 2;
+  BuildTaskStatus status = 3; // 当前构建任务状态
+  string message = 4;
+  int32 progress = 5;
+}
+
+message CompleteBuildTaskReq {
+  int64 task_id = 1;
+  string builder_id = 2;
+  string apk_url = 3;
+  string apk_sha256 = 4;
+  int64 apk_size = 5;
+  string log_url = 6;
+}
+
+message FailBuildTaskReq {
+  int64 task_id = 1;
+  string builder_id = 2;
+  string error_message = 3;
+  string log_url = 4;
+}
+
+service Builder {
+  rpc ClaimBuildTask(ClaimBuildTaskReq) returns (BuildTaskResp);
+  rpc HeartbeatBuildTask(HeartbeatBuildTaskReq) returns (RespBase);
+  rpc ReportBuildProgress(ReportBuildProgressReq) returns (RespBase);
+  rpc CompleteBuildTask(CompleteBuildTaskReq) returns (RespBase);
+  rpc FailBuildTask(FailBuildTaskReq) returns (RespBase);
+}
