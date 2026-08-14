@@ -116,6 +116,10 @@ func (m *RbacMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			next(w, r)
 			return
 		}
+		if strings.HasPrefix(path, "/open/v1/") {
+			next(w, r)
+			return
+		}
 		routeScope := applicationScopeForPath(path)
 		if routeScope == system.ApplicationScope_APPLICATION_SCOPE_UNKNOWN {
 			http.Error(w, "Not Found", http.StatusNotFound)
@@ -269,7 +273,7 @@ func parsePerm(perm string) (obj string, act string, ok bool) {
 }
 
 func isPublicPath(path string) bool {
-	if strings.HasPrefix(path, "/d/") {
+	if strings.HasPrefix(path, "/d/") || strings.HasPrefix(path, "/public/v1/") {
 		return true
 	}
 	whiteList := map[string]struct{}{
@@ -280,6 +284,8 @@ func isPublicPath(path string) bool {
 		"/api/install/report":      {},
 		"/api/channel/event":       {},
 		"/health":                  {},
+		"/healthz":                 {},
+		"/readyz":                  {},
 	}
 
 	_, ok := whiteList[path]

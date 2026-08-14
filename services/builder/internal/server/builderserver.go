@@ -53,3 +53,57 @@ func (s *BuilderServer) FailBuildTask(ctx context.Context, in *builder.FailBuild
 	l := logic.NewFailBuildTaskLogic(ctx, s.svcCtx)
 	return l.FailBuildTask(in)
 }
+
+// 注册或刷新V4 Builder节点及能力。
+func (s *BuilderServer) RegisterBuilderNode(ctx context.Context, in *builder.RegisterBuilderNodeReq) (*builder.BuilderNodeResp, error) {
+	l := logic.NewRegisterBuilderNodeLogic(ctx, s.svcCtx)
+	return l.RegisterBuilderNode(in)
+}
+
+// 上报V4 Builder节点心跳和容量。
+func (s *BuilderServer) BuilderNodeHeartbeat(ctx context.Context, in *builder.BuilderNodeHeartbeatReq) (*builder.BuilderNodeResp, error) {
+	l := logic.NewBuilderNodeHeartbeatLogic(ctx, s.svcCtx)
+	return l.BuilderNodeHeartbeat(in)
+}
+
+// 结合节点能力、公平队列和并发槽位领取V4构建任务。
+func (s *BuilderServer) ClaimScheduledBuildTask(ctx context.Context, in *builder.ClaimScheduledBuildTaskReq) (*builder.BuildTaskResp, error) {
+	l := logic.NewClaimScheduledBuildTaskLogic(ctx, s.svcCtx)
+	return l.ClaimScheduledBuildTask(in)
+}
+
+// 修改V4 Builder节点排空状态。
+func (s *BuilderServer) DrainBuilderNode(ctx context.Context, in *builder.DrainBuilderNodeReq) (*builder.BuilderNodeResp, error) {
+	l := logic.NewDrainBuilderNodeLogic(ctx, s.svcCtx)
+	return l.DrainBuilderNode(in)
+}
+
+// 取消V4构建执行并推进fencing代次。
+func (s *BuilderServer) CancelBuildExecution(ctx context.Context, in *builder.CancelBuildExecutionReq) (*builder.BuildTaskResp, error) {
+	l := logic.NewCancelBuildExecutionLogic(ctx, s.svcCtx)
+	return l.CancelBuildExecution(in)
+}
+
+// 解析V4输入可寻址构建缓存。
+func (s *BuilderServer) ResolveBuildCache(ctx context.Context, in *builder.ResolveBuildCacheReq) (*builder.BuildCacheResolutionResp, error) {
+	l := logic.NewResolveBuildCacheLogic(ctx, s.svcCtx)
+	return l.ResolveBuildCache(in)
+}
+
+// 发布V4独立构建缓存产物。
+func (s *BuilderServer) PublishBuildCache(ctx context.Context, in *builder.PublishBuildCacheReq) (*builder.BuildCacheEntryResp, error) {
+	l := logic.NewPublishBuildCacheLogic(ctx, s.svcCtx)
+	return l.PublishBuildCache(in)
+}
+
+// 失效损坏或不再可信的V4构建缓存。
+func (s *BuilderServer) InvalidateBuildCache(ctx context.Context, in *builder.InvalidateBuildCacheReq) (*builder.BuildCacheEntryResp, error) {
+	l := logic.NewInvalidateBuildCacheLogic(ctx, s.svcCtx)
+	return l.InvalidateBuildCache(in)
+}
+
+// 执行V4构建缓存TTL/LRU清理。
+func (s *BuilderServer) CleanupBuildCache(ctx context.Context, in *builder.CleanupBuildCacheReq) (*builder.CleanupBuildCacheResp, error) {
+	l := logic.NewCleanupBuildCacheLogic(ctx, s.svcCtx)
+	return l.CleanupBuildCache(in)
+}

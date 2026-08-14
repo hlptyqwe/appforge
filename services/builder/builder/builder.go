@@ -14,13 +14,31 @@ import (
 )
 
 type (
+	BuildCacheArtifact          = builder.BuildCacheArtifact
+	BuildCacheEntry             = builder.BuildCacheEntry
+	BuildCacheEntryResp         = builder.BuildCacheEntryResp
+	BuildCacheResolution        = builder.BuildCacheResolution
+	BuildCacheResolutionResp    = builder.BuildCacheResolutionResp
 	BuildTask                   = builder.BuildTask
 	BuildTaskResp               = builder.BuildTaskResp
+	BuilderNode                 = builder.BuilderNode
+	BuilderNodeHeartbeatReq     = builder.BuilderNodeHeartbeatReq
+	BuilderNodeResp             = builder.BuilderNodeResp
+	CancelBuildExecutionReq     = builder.CancelBuildExecutionReq
 	ClaimBuildTaskReq           = builder.ClaimBuildTaskReq
+	ClaimScheduledBuildTaskReq  = builder.ClaimScheduledBuildTaskReq
+	CleanupBuildCacheReq        = builder.CleanupBuildCacheReq
+	CleanupBuildCacheResp       = builder.CleanupBuildCacheResp
+	CleanupBuildCacheResult     = builder.CleanupBuildCacheResult
 	CompleteBuildTaskReq        = builder.CompleteBuildTaskReq
+	DrainBuilderNodeReq         = builder.DrainBuilderNodeReq
 	FailBuildTaskReq            = builder.FailBuildTaskReq
 	HeartbeatBuildTaskReq       = builder.HeartbeatBuildTaskReq
+	InvalidateBuildCacheReq     = builder.InvalidateBuildCacheReq
+	PublishBuildCacheReq        = builder.PublishBuildCacheReq
+	RegisterBuilderNodeReq      = builder.RegisterBuilderNodeReq
 	ReportBuildProgressReq      = builder.ReportBuildProgressReq
+	ResolveBuildCacheReq        = builder.ResolveBuildCacheReq
 	RespBase                    = builder.RespBase
 	SigningMaterialValidation   = builder.SigningMaterialValidation
 	ValidateSigningMaterialReq  = builder.ValidateSigningMaterialReq
@@ -34,6 +52,24 @@ type (
 		ReportBuildProgress(ctx context.Context, in *ReportBuildProgressReq, opts ...grpc.CallOption) (*RespBase, error)
 		CompleteBuildTask(ctx context.Context, in *CompleteBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
 		FailBuildTask(ctx context.Context, in *FailBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 注册或刷新V4 Builder节点及能力。
+		RegisterBuilderNode(ctx context.Context, in *RegisterBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+		// 上报V4 Builder节点心跳和容量。
+		BuilderNodeHeartbeat(ctx context.Context, in *BuilderNodeHeartbeatReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+		// 结合节点能力、公平队列和并发槽位领取V4构建任务。
+		ClaimScheduledBuildTask(ctx context.Context, in *ClaimScheduledBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+		// 修改V4 Builder节点排空状态。
+		DrainBuilderNode(ctx context.Context, in *DrainBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+		// 取消V4构建执行并推进fencing代次。
+		CancelBuildExecution(ctx context.Context, in *CancelBuildExecutionReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+		// 解析V4输入可寻址构建缓存。
+		ResolveBuildCache(ctx context.Context, in *ResolveBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheResolutionResp, error)
+		// 发布V4独立构建缓存产物。
+		PublishBuildCache(ctx context.Context, in *PublishBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error)
+		// 失效损坏或不再可信的V4构建缓存。
+		InvalidateBuildCache(ctx context.Context, in *InvalidateBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error)
+		// 执行V4构建缓存TTL/LRU清理。
+		CleanupBuildCache(ctx context.Context, in *CleanupBuildCacheReq, opts ...grpc.CallOption) (*CleanupBuildCacheResp, error)
 	}
 
 	defaultBuilder struct {
@@ -76,4 +112,58 @@ func (m *defaultBuilder) CompleteBuildTask(ctx context.Context, in *CompleteBuil
 func (m *defaultBuilder) FailBuildTask(ctx context.Context, in *FailBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error) {
 	client := builder.NewBuilderClient(m.cli.Conn())
 	return client.FailBuildTask(ctx, in, opts...)
+}
+
+// 注册或刷新V4 Builder节点及能力。
+func (m *defaultBuilder) RegisterBuilderNode(ctx context.Context, in *RegisterBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	client := builder.NewBuilderClient(m.cli.Conn())
+	return client.RegisterBuilderNode(ctx, in, opts...)
+}
+
+// 上报V4 Builder节点心跳和容量。
+func (m *defaultBuilder) BuilderNodeHeartbeat(ctx context.Context, in *BuilderNodeHeartbeatReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	client := builder.NewBuilderClient(m.cli.Conn())
+	return client.BuilderNodeHeartbeat(ctx, in, opts...)
+}
+
+// 结合节点能力、公平队列和并发槽位领取V4构建任务。
+func (m *defaultBuilder) ClaimScheduledBuildTask(ctx context.Context, in *ClaimScheduledBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
+	client := builder.NewBuilderClient(m.cli.Conn())
+	return client.ClaimScheduledBuildTask(ctx, in, opts...)
+}
+
+// 修改V4 Builder节点排空状态。
+func (m *defaultBuilder) DrainBuilderNode(ctx context.Context, in *DrainBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	client := builder.NewBuilderClient(m.cli.Conn())
+	return client.DrainBuilderNode(ctx, in, opts...)
+}
+
+// 取消V4构建执行并推进fencing代次。
+func (m *defaultBuilder) CancelBuildExecution(ctx context.Context, in *CancelBuildExecutionReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
+	client := builder.NewBuilderClient(m.cli.Conn())
+	return client.CancelBuildExecution(ctx, in, opts...)
+}
+
+// 解析V4输入可寻址构建缓存。
+func (m *defaultBuilder) ResolveBuildCache(ctx context.Context, in *ResolveBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheResolutionResp, error) {
+	client := builder.NewBuilderClient(m.cli.Conn())
+	return client.ResolveBuildCache(ctx, in, opts...)
+}
+
+// 发布V4独立构建缓存产物。
+func (m *defaultBuilder) PublishBuildCache(ctx context.Context, in *PublishBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error) {
+	client := builder.NewBuilderClient(m.cli.Conn())
+	return client.PublishBuildCache(ctx, in, opts...)
+}
+
+// 失效损坏或不再可信的V4构建缓存。
+func (m *defaultBuilder) InvalidateBuildCache(ctx context.Context, in *InvalidateBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error) {
+	client := builder.NewBuilderClient(m.cli.Conn())
+	return client.InvalidateBuildCache(ctx, in, opts...)
+}
+
+// 执行V4构建缓存TTL/LRU清理。
+func (m *defaultBuilder) CleanupBuildCache(ctx context.Context, in *CleanupBuildCacheReq, opts ...grpc.CallOption) (*CleanupBuildCacheResp, error) {
+	client := builder.NewBuilderClient(m.cli.Conn())
+	return client.CleanupBuildCache(ctx, in, opts...)
 }

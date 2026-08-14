@@ -9,9 +9,7 @@
   >
     <slot />
     <template #footer>
-      <el-button @click="visible = false">
-        Cancel
-      </el-button>
+      <el-button @click="visible = false"> Cancel </el-button>
       <el-button type="primary" :loading="loading" @click="handleConfirm">
         {{ confirmText }}
       </el-button>

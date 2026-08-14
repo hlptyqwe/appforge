@@ -94,6 +94,33 @@ func TestAuditMiddlewareSystemAdminUsesTargetTenant(t *testing.T) {
 	}
 }
 
+func TestAuditSummariesRecursivelyRedactDeveloperCredentials(t *testing.T) {
+	req := auditRequestSummary(nil, []byte(`{
+		"apiKey":"af_live_secret",
+		"items":[{"signingSecret":"signing-secret","webhookUrl":"https://host/public/v1/source-webhooks/github/path-token"}],
+		"metadata":"{\"clientSecret\":\"nested-secret\",\"name\":\"safe\"}",
+		"tokenExpiresAt":1790000000
+	}`), false)
+
+	for _, secret := range []string{"af_live_secret", "signing-secret", "path-token", "nested-secret"} {
+		if strings.Contains(req, secret) {
+			t.Fatalf("secret %q was not recursively redacted: %s", secret, req)
+		}
+	}
+	for _, marker := range []string{`"apiKey":"***"`, `"signingSecret":"***"`, `"webhookUrl":"***"`, `\"clientSecret\":\"***\"`, `"tokenExpiresAt":1790000000`} {
+		if !strings.Contains(req, marker) {
+			t.Fatalf("expected marker %q in redacted request: %s", marker, req)
+		}
+	}
+}
+
+func TestAuditSummaryNeverStoresNonJSONBody(t *testing.T) {
+	resp := auditResponseSummary(http.StatusBadRequest, []byte("apiKey=plaintext-secret"), false)
+	if strings.Contains(resp, "plaintext-secret") || !strings.Contains(resp, "[REDACTED_NON_JSON_BODY]") {
+		t.Fatalf("non-JSON response was not safely redacted: %s", resp)
+	}
+}
+
 func TestAuditMiddlewareSkipsReadOnlyAndExcludedRequests(t *testing.T) {
 	writer := &opLogWriterStub{}
 	middleware := newAuditMiddlewareForTest(t, writer)

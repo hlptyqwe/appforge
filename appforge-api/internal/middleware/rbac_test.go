@@ -64,6 +64,21 @@ func TestGetRequiredPermissionRequiresMethodMatch(t *testing.T) {
 	}
 }
 
+func TestSourceOAuthAndWebhookRoutesArePublic(t *testing.T) {
+	for _, path := range []string{
+		"/public/v1/source-oauth/callback",
+		"/public/v1/source-webhooks/github/token",
+		"/public/v1/source-webhooks/gitlab/token",
+	} {
+		if !isPublicPath(path) {
+			t.Fatalf("isPublicPath(%q) = false", path)
+		}
+		if !isPublicTraffic(path) {
+			t.Fatalf("isPublicTraffic(%q) = false", path)
+		}
+	}
+}
+
 func mustRule(t *testing.T, method, path, permKey string) PermissionRule {
 	t.Helper()
 

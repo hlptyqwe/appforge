@@ -25,6 +25,7 @@ const (
 	buildStatusUploading = "UPLOADING"
 	buildStatusSuccess   = "SUCCESS"
 	buildStatusFailed    = "FAILED"
+	buildStatusCancelled = "CANCELLED"
 
 	eventTypeClick    = 1
 	eventTypeDownload = 2
@@ -272,6 +273,14 @@ func mapBuildTask(item *models.TBuildTask) *core.BuildTask {
 		WhiteLabelProductId:  item.WhiteLabelProductId,
 		TemplateRevision:     int32(item.TemplateRevision),
 		TemplateSnapshotJson: stringValue(item.TemplateSnapshot),
+		PoolCode:             item.PoolCode,
+		CacheKey:             stringValue(item.CacheKey),
+		CacheEntryId:         item.CacheEntryId,
+		CacheHit:             item.CacheHit == 1,
+		CancelRequestedAt:    timeValue(item.CancelRequestedAt),
+		CancelledAt:          timeValue(item.CancelledAt),
+		CancelReason:         stringValue(item.CancelReason),
+		RetryOfTaskId:        item.RetryOfTaskId,
 	}
 }
 
@@ -344,6 +353,8 @@ func buildStatusToProto(value string) core.BuildTaskStatus {
 		return core.BuildTaskStatus_BUILD_TASK_STATUS_SUCCESS
 	case buildStatusFailed:
 		return core.BuildTaskStatus_BUILD_TASK_STATUS_FAILED
+	case buildStatusCancelled:
+		return core.BuildTaskStatus_BUILD_TASK_STATUS_CANCELLED
 	default:
 		return core.BuildTaskStatus_BUILD_TASK_STATUS_UNKNOWN
 	}
@@ -363,6 +374,8 @@ func protoStatusToDB(value core.BuildTaskStatus) (string, error) {
 		return buildStatusSuccess, nil
 	case core.BuildTaskStatus_BUILD_TASK_STATUS_FAILED:
 		return buildStatusFailed, nil
+	case core.BuildTaskStatus_BUILD_TASK_STATUS_CANCELLED:
+		return buildStatusCancelled, nil
 	default:
 		return "", status.Error(codes.InvalidArgument, "invalid build task status")
 	}
@@ -381,6 +394,9 @@ func notFoundOrInternal(err error, resource string) error {
 	}
 	if err == models.ErrNotFound || err == sqlx.ErrNotFound || err == sql.ErrNoRows {
 		return status.Errorf(codes.NotFound, "%s not found", resource)
+	}
+	if grpcStatus, ok := status.FromError(err); ok && grpcStatus.Code() != codes.Unknown {
+		return err
 	}
 	return status.Error(codes.Internal, fmt.Sprintf("%s query failed: %v", resource, err))
 }

@@ -98,6 +98,284 @@ type PlatformBuildTask {
 	whiteLabelProductId  int64  `json:"whiteLabelProductId"`
 	templateRevision     int32  `json:"templateRevision"`
 	templateSnapshotJson string `json:"templateSnapshotJson,optional"`
+	poolCode             string `json:"poolCode"`
+	cacheKey             string `json:"cacheKey,optional"`
+	cacheEntryId         int64  `json:"cacheEntryId"`
+	cacheHit             bool   `json:"cacheHit"`
+	cancelRequestedAt    int64  `json:"cancelRequestedAt,optional"`
+	cancelledAt          int64  `json:"cancelledAt,optional"`
+	cancelReason         string `json:"cancelReason,optional"`
+	retryOfTaskId        int64  `json:"retryOfTaskId"`
+}
+
+type PlatformBuilderNode {
+	id                   int64  `json:"id"`
+	nodeCode             string `json:"nodeCode"`
+	poolCode             string `json:"poolCode"`
+	endpoint             string `json:"endpoint,optional"`
+	status               int32  `json:"status"`
+	drainStatus          int32  `json:"drainStatus"`
+	maxConcurrency       int32  `json:"maxConcurrency"`
+	runningCount         int32  `json:"runningCount"`
+	cpuCapacity          int32  `json:"cpuCapacity"`
+	memoryCapacity       int64  `json:"memoryCapacity"`
+	diskCapacity         int64  `json:"diskCapacity"`
+	diskFree             int64  `json:"diskFree"`
+	toolchainVersion     string `json:"toolchainVersion"`
+	buildProtocolVersion int32  `json:"buildProtocolVersion"`
+	capabilityJson       string `json:"capabilityJson"`
+	lastErrorMessage     string `json:"lastErrorMessage,optional"`
+	lastHeartbeatAt      int64  `json:"lastHeartbeatAt"`
+	createTime           int64  `json:"createTime"`
+	updateTime           int64  `json:"updateTime"`
+}
+
+type PlatformBuildConcurrencyPolicy {
+	id             int64  `json:"id"`
+	tenantId       int64  `json:"tenantId"`
+	appId          int64  `json:"appId"`
+	poolCode       string `json:"poolCode"`
+	maxConcurrency int32  `json:"maxConcurrency"`
+	fairWeight     int32  `json:"fairWeight"`
+	maxPriority    int32  `json:"maxPriority"`
+	status         int32  `json:"status"`
+	createBy       int64  `json:"createBy"`
+	createTime     int64  `json:"createTime"`
+	updateTime     int64  `json:"updateTime"`
+}
+
+type PlatformBuildCacheEntry {
+	id                   int64  `json:"id"`
+	tenantId             int64  `json:"tenantId"`
+	cacheScope           int32  `json:"cacheScope"`
+	cacheKey             string `json:"cacheKey"`
+	toolchainVersion     string `json:"toolchainVersion"`
+	buildProtocolVersion int32  `json:"buildProtocolVersion"`
+	inputDigest          string `json:"inputDigest"`
+	artifactObjectId     int64  `json:"artifactObjectId"`
+	artifactSha256       string `json:"artifactSha256"`
+	sizeBytes            int64  `json:"sizeBytes"`
+	hitCount             int64  `json:"hitCount"`
+	status               int32  `json:"status"`
+	expiresAt            int64  `json:"expiresAt"`
+	lastHitAt            int64  `json:"lastHitAt,optional"`
+	createTime           int64  `json:"createTime"`
+	updateTime           int64  `json:"updateTime"`
+}
+
+type PlatformBuildSchedulerEvent {
+	id           int64  `json:"id"`
+	tenantId     int64  `json:"tenantId"`
+	appId        int64  `json:"appId"`
+	taskId       int64  `json:"taskId"`
+	nodeCode     string `json:"nodeCode,optional"`
+	poolCode     string `json:"poolCode"`
+	eventType    int32  `json:"eventType"`
+	reasonCode   string `json:"reasonCode,optional"`
+	decisionJson string `json:"decisionJson,optional"`
+	createTime   int64  `json:"createTime"`
+}
+
+type PlatformBuildClusterMetrics {
+	poolCode                    string   `json:"poolCode"`
+	periodMinutes               int32    `json:"periodMinutes"`
+	onlineNodes                 int64    `json:"onlineNodes"`
+	offlineNodes                int64    `json:"offlineNodes"`
+	drainingNodes               int64    `json:"drainingNodes"`
+	totalSlots                  int64    `json:"totalSlots"`
+	runningSlots                int64    `json:"runningSlots"`
+	diskCapacity                int64    `json:"diskCapacity"`
+	diskFree                    int64    `json:"diskFree"`
+	queuedTasks                 int64    `json:"queuedTasks"`
+	runningTasks                int64    `json:"runningTasks"`
+	completedTasks              int64    `json:"completedTasks"`
+	successTasks                int64    `json:"successTasks"`
+	failedTasks                 int64    `json:"failedTasks"`
+	cancelledTasks              int64    `json:"cancelledTasks"`
+	averageQueueMs              int64    `json:"averageQueueMs"`
+	averageBuildMs              int64    `json:"averageBuildMs"`
+	successRate                 float64  `json:"successRate"`
+	cacheHitTasks               int64    `json:"cacheHitTasks"`
+	cacheHitRate                float64  `json:"cacheHitRate"`
+	activeCacheEntries          int64    `json:"activeCacheEntries"`
+	activeCacheBytes            int64    `json:"activeCacheBytes"`
+	leaseRecoveryCount          int64    `json:"leaseRecoveryCount"`
+	cacheValidationFailureCount int64    `json:"cacheValidationFailureCount"`
+	oldestQueuedMs              int64    `json:"oldestQueuedMs"`
+	alerts                      []string `json:"alerts"`
+}
+
+type PlatformOpenApiCredential {
+	id                 int64    `json:"id"`
+	tenantId           int64    `json:"tenantId"`
+	credentialName     string   `json:"credentialName"`
+	keyId              string   `json:"keyId"`
+	scopes             []int32  `json:"scopes"`
+	appIds             []int64  `json:"appIds"`
+	ipAllowlist        []string `json:"ipAllowlist"`
+	rateLimitPerMinute int32    `json:"rateLimitPerMinute"`
+	status             int32    `json:"status"`
+	expiresAt          int64    `json:"expiresAt,optional"`
+	graceExpiresAt     int64    `json:"graceExpiresAt,optional"`
+	rotatedFromId      int64    `json:"rotatedFromId"`
+	lastUsedAt         int64    `json:"lastUsedAt,optional"`
+	createBy           int64    `json:"createBy"`
+	createTime         int64    `json:"createTime"`
+	updateTime         int64    `json:"updateTime"`
+}
+
+type PlatformOpenApiCredentialSecret {
+	credential PlatformOpenApiCredential `json:"credential"`
+	apiKey     string                    `json:"apiKey"`
+}
+
+type PlatformWebhookEndpoint {
+	id            int64    `json:"id"`
+	tenantId      int64    `json:"tenantId"`
+	endpointName  string   `json:"endpointName"`
+	endpointUrl   string   `json:"endpointUrl"`
+	eventTypes    []string `json:"eventTypes"`
+	secretHint    string   `json:"secretHint"`
+	maxAttempts   int32    `json:"maxAttempts"`
+	status        int32    `json:"status"`
+	lastSuccessAt int64    `json:"lastSuccessAt,optional"`
+	lastFailureAt int64    `json:"lastFailureAt,optional"`
+	createBy      int64    `json:"createBy"`
+	createTime    int64    `json:"createTime"`
+	updateTime    int64    `json:"updateTime"`
+}
+
+type PlatformWebhookEndpointSecret {
+	endpoint      PlatformWebhookEndpoint `json:"endpoint"`
+	signingSecret string                  `json:"signingSecret"`
+}
+
+type PlatformWebhookDelivery {
+	id                  int64  `json:"id"`
+	tenantId            int64  `json:"tenantId"`
+	endpointId          int64  `json:"endpointId"`
+	eventId             string `json:"eventId"`
+	eventType           string `json:"eventType"`
+	attempt             int32  `json:"attempt"`
+	status              int32  `json:"status"`
+	responseStatus      int32  `json:"responseStatus"`
+	responseBodyExcerpt string `json:"responseBodyExcerpt,optional"`
+	errorMessage        string `json:"errorMessage,optional"`
+	nextRetryAt         int64  `json:"nextRetryAt"`
+	deliveredAt         int64  `json:"deliveredAt,optional"`
+	createTime          int64  `json:"createTime"`
+	updateTime          int64  `json:"updateTime"`
+}
+
+type PlatformSourceIntegration {
+	id              int64  `json:"id"`
+	tenantId        int64  `json:"tenantId"`
+	platform        int32  `json:"platform"`
+	integrationName string `json:"integrationName"`
+	installationRef string `json:"installationRef"`
+	tokenExpiresAt  int64  `json:"tokenExpiresAt,optional"`
+	status          int32  `json:"status"`
+	lastSyncAt      int64  `json:"lastSyncAt,optional"`
+	createBy        int64  `json:"createBy"`
+	createTime      int64  `json:"createTime"`
+	updateTime      int64  `json:"updateTime"`
+}
+
+type PlatformSourceRepository {
+	id                   int64  `json:"id"`
+	tenantId             int64  `json:"tenantId"`
+	integrationId        int64  `json:"integrationId"`
+	externalRepositoryId string `json:"externalRepositoryId"`
+	repositoryFullName   string `json:"repositoryFullName"`
+	defaultBranch        string `json:"defaultBranch,optional"`
+	permissionLevel      string `json:"permissionLevel"`
+	status               int32  `json:"status"`
+	createTime           int64  `json:"createTime"`
+	updateTime           int64  `json:"updateTime"`
+}
+
+type PlatformSourceOAuthAuthorization {
+	authorizationUrl string `json:"authorizationUrl"`
+}
+
+type PlatformSourceAvailableRepository {
+	externalRepositoryId string `json:"externalRepositoryId"`
+	repositoryFullName   string `json:"repositoryFullName"`
+	defaultBranch        string `json:"defaultBranch,optional"`
+}
+
+type PlatformSourceArtifact {
+	id                 int64  `json:"id"`
+	appId              int64  `json:"appId"`
+	versionId          int64  `json:"versionId"`
+	integrationId      int64  `json:"integrationId"`
+	repositoryId       int64  `json:"repositoryId"`
+	artifactSource     int32  `json:"artifactSource"`
+	externalArtifactId string `json:"externalArtifactId"`
+	commitSha          string `json:"commitSha"`
+	pipelineRef        string `json:"pipelineRef,optional"`
+	jobRef             string `json:"jobRef,optional"`
+	artifactSha256     string `json:"artifactSha256"`
+	storageObjectId    int64  `json:"storageObjectId"`
+	createTime         int64  `json:"createTime"`
+}
+
+type PlatformSourceArtifactImportResult {
+	version  PlatformVersion        `json:"version"`
+	artifact PlatformSourceArtifact `json:"artifact"`
+}
+
+type PlatformSourceBuildTrigger {
+	id                  int64   `json:"id"`
+	tenantId            int64   `json:"tenantId"`
+	repositoryId        int64   `json:"repositoryId"`
+	appId               int64   `json:"appId"`
+	triggerName         string  `json:"triggerName"`
+	eventType           int32   `json:"eventType"`
+	refPattern          string  `json:"refPattern"`
+	artifactSelector    string  `json:"artifactSelector"`
+	channelIds          []int64 `json:"channelIds"`
+	signingConfigId     int64   `json:"signingConfigId"`
+	brandingProfileId   int64   `json:"brandingProfileId,optional"`
+	whiteLabelProductId int64   `json:"whiteLabelProductId,optional"`
+	priority            int32   `json:"priority"`
+	poolCode            string  `json:"poolCode"`
+	versionNamePrefix   string  `json:"versionNamePrefix,optional"`
+	status              int32   `json:"status"`
+	platform            int32   `json:"platform"`
+	repositoryFullName  string  `json:"repositoryFullName"`
+	createTime          int64   `json:"createTime"`
+	updateTime          int64   `json:"updateTime"`
+}
+
+type PlatformSourceBuildTriggerSecret {
+	trigger       PlatformSourceBuildTrigger `json:"trigger"`
+	webhookUrl    string                     `json:"webhookUrl"`
+	signingSecret string                     `json:"signingSecret"`
+}
+
+type PlatformSourceWebhookEvent {
+	id                 int64   `json:"id"`
+	triggerId          int64   `json:"triggerId"`
+	providerEventId    string  `json:"providerEventId"`
+	providerEventType  string  `json:"providerEventType"`
+	sourceRef          string  `json:"sourceRef"`
+	commitSha          string  `json:"commitSha"`
+	artifactSource     int32   `json:"artifactSource"`
+	externalArtifactId string  `json:"externalArtifactId"`
+	releaseRef         string  `json:"releaseRef,optional"`
+	pipelineRef        string  `json:"pipelineRef,optional"`
+	jobRef             string  `json:"jobRef,optional"`
+	payloadSha256      string  `json:"payloadSha256"`
+	versionCode        int64   `json:"versionCode"`
+	versionName        string  `json:"versionName"`
+	status             int32   `json:"status"`
+	attempt            int32   `json:"attempt"`
+	versionId          int64   `json:"versionId,optional"`
+	buildTaskIds       []int64 `json:"buildTaskIds,optional"`
+	errorMessage       string  `json:"errorMessage,optional"`
+	createTime         int64   `json:"createTime"`
+	updateTime         int64   `json:"updateTime"`
 }
 
 // 应用品牌白标配置。
@@ -271,6 +549,152 @@ type PlatformBuildTaskListResp {
 	data []PlatformBuildTask `json:"data"`
 }
 
+type PlatformBuilderNodeResp {
+	RespBase
+	data PlatformBuilderNode `json:"data"`
+}
+
+type PlatformBuilderNodeListResp {
+	RespBase
+	data []PlatformBuilderNode `json:"data"`
+}
+
+type PlatformBuildConcurrencyPolicyResp {
+	RespBase
+	data PlatformBuildConcurrencyPolicy `json:"data"`
+}
+
+type PlatformBuildConcurrencyPolicyListResp {
+	RespBase
+	data []PlatformBuildConcurrencyPolicy `json:"data"`
+}
+
+type PlatformBuildCacheEntryResp {
+	RespBase
+	data PlatformBuildCacheEntry `json:"data"`
+}
+
+type PlatformBuildCacheEntryListResp {
+	RespBase
+	data []PlatformBuildCacheEntry `json:"data"`
+}
+
+type PlatformBuildCacheCleanupResult {
+	invalidatedCount int64   `json:"invalidatedCount"`
+	reclaimableBytes int64   `json:"reclaimableBytes"`
+	objectIds        []int64 `json:"objectIds"`
+}
+
+type PlatformBuildCacheCleanupResp {
+	RespBase
+	data PlatformBuildCacheCleanupResult `json:"data"`
+}
+
+type PlatformBuildSchedulerEventListResp {
+	RespBase
+	data []PlatformBuildSchedulerEvent `json:"data"`
+}
+
+type PlatformBuildClusterMetricsResp {
+	RespBase
+	data PlatformBuildClusterMetrics `json:"data"`
+}
+
+type PlatformOpenApiCredentialResp {
+	RespBase
+	data PlatformOpenApiCredential `json:"data"`
+}
+
+type PlatformOpenApiCredentialListResp {
+	RespBase
+	data []PlatformOpenApiCredential `json:"data"`
+}
+
+type PlatformOpenApiCredentialSecretResp {
+	RespBase
+	data PlatformOpenApiCredentialSecret `json:"data"`
+}
+
+type PlatformWebhookEndpointResp {
+	RespBase
+	data PlatformWebhookEndpoint `json:"data"`
+}
+
+type PlatformWebhookEndpointListResp {
+	RespBase
+	data []PlatformWebhookEndpoint `json:"data"`
+}
+
+type PlatformWebhookEndpointSecretResp {
+	RespBase
+	data PlatformWebhookEndpointSecret `json:"data"`
+}
+
+type PlatformWebhookDeliveryResp {
+	RespBase
+	data PlatformWebhookDelivery `json:"data"`
+}
+
+type PlatformWebhookDeliveryListResp {
+	RespBase
+	data []PlatformWebhookDelivery `json:"data"`
+}
+
+type PlatformSourceIntegrationResp {
+	RespBase
+	data PlatformSourceIntegration `json:"data"`
+}
+
+type PlatformSourceIntegrationListResp {
+	RespBase
+	data []PlatformSourceIntegration `json:"data"`
+}
+
+type PlatformSourceRepositoryResp {
+	RespBase
+	data PlatformSourceRepository `json:"data"`
+}
+
+type PlatformSourceRepositoryListResp {
+	RespBase
+	data []PlatformSourceRepository `json:"data"`
+}
+
+type PlatformSourceOAuthAuthorizationResp {
+	RespBase
+	data PlatformSourceOAuthAuthorization `json:"data"`
+}
+
+type PlatformSourceAvailableRepositoryListResp {
+	RespBase
+	data []PlatformSourceAvailableRepository `json:"data"`
+}
+
+type PlatformSourceArtifactImportResp {
+	RespBase
+	data PlatformSourceArtifactImportResult `json:"data"`
+}
+
+type PlatformSourceBuildTriggerResp {
+	RespBase
+	data PlatformSourceBuildTrigger `json:"data"`
+}
+
+type PlatformSourceBuildTriggerListResp {
+	RespBase
+	data []PlatformSourceBuildTrigger `json:"data"`
+}
+
+type PlatformSourceBuildTriggerSecretResp {
+	RespBase
+	data PlatformSourceBuildTriggerSecret `json:"data"`
+}
+
+type PlatformSourceWebhookEventListResp {
+	RespBase
+	data []PlatformSourceWebhookEvent `json:"data"`
+}
+
 type PlatformBrandingProfileListResp {
 	RespBase
 	data []PlatformBrandingProfile `json:"data"`
@@ -388,13 +812,44 @@ type PlatformStorageDownloadResp {
 }
 
 type CreatePlatformBuildTaskReq {
-	appId               int64 `json:"appId"`
-	versionId           int64 `json:"versionId"`
-	channelId           int64 `json:"channelId"`
-	signingConfigId     int64 `json:"signingConfigId,optional"`
-	priority            int32 `json:"priority,optional"`
-	brandingProfileId   int64 `json:"brandingProfileId,optional"`
-	whiteLabelProductId int64 `json:"whiteLabelProductId,optional"`
+	appId               int64  `json:"appId"`
+	versionId           int64  `json:"versionId"`
+	channelId           int64  `json:"channelId"`
+	signingConfigId     int64  `json:"signingConfigId,optional"`
+	priority            int32  `json:"priority,optional"`
+	brandingProfileId   int64  `json:"brandingProfileId,optional"`
+	whiteLabelProductId int64  `json:"whiteLabelProductId,optional"`
+	poolCode            string `json:"poolCode,optional"`
+}
+
+type CancelPlatformBuildTaskReq {
+	id     int64  `path:"id"`
+	reason string `json:"reason,optional"`
+}
+
+type RetryPlatformBuildTaskReq {
+	id       int64 `path:"id"`
+	priority int32 `json:"priority,optional"`
+}
+
+type DrainPlatformBuilderNodeReq {
+	id          int64 `path:"id"`
+	drainStatus int32 `json:"drainStatus"`
+}
+
+type RecoverPlatformBuilderNodeReq {
+	id     int64  `path:"id"`
+	reason string `json:"reason"`
+}
+
+type UpsertPlatformBuildConcurrencyPolicyReq {
+	id             int64  `json:"id,optional"`
+	appId          int64  `json:"appId,optional"`
+	poolCode       string `json:"poolCode,optional"`
+	maxConcurrency int32  `json:"maxConcurrency"`
+	fairWeight     int32  `json:"fairWeight"`
+	maxPriority    int32  `json:"maxPriority"`
+	status         int32  `json:"status"`
 }
 
 type CreatePlatformWhiteLabelTemplateReq {
@@ -555,6 +1010,189 @@ type ListPlatformBuildTasksReq {
 	status    int32 `form:"status,optional"`
 }
 
+type ListPlatformBuilderNodesReq {
+	PageReq
+	poolCode    string `form:"poolCode,optional"`
+	status      int32  `form:"status,optional"`
+	drainStatus int32  `form:"drainStatus,optional"`
+	keyword     string `form:"keyword,optional"`
+}
+
+type ListPlatformBuildConcurrencyPoliciesReq {
+	PageReq
+	appId    int64  `form:"appId,optional"`
+	poolCode string `form:"poolCode,optional"`
+	status   int32  `form:"status,optional"`
+}
+
+type ListPlatformBuildCacheEntriesReq {
+	PageReq
+	cacheScope int32  `form:"cacheScope,optional"`
+	status     int32  `form:"status,optional"`
+	keyword    string `form:"keyword,optional"`
+}
+
+type InvalidatePlatformBuildCacheReq {
+	id     int64  `path:"id"`
+	reason string `json:"reason,optional"`
+}
+
+type CleanupPlatformBuildCacheReq {
+	limit           int32 `json:"limit,optional"`
+	targetFreeBytes int64 `json:"targetFreeBytes,optional"`
+}
+
+type ListPlatformBuildSchedulerEventsReq {
+	PageReq
+	appId     int64  `form:"appId,optional"`
+	taskId    int64  `form:"taskId,optional"`
+	nodeCode  string `form:"nodeCode,optional"`
+	poolCode  string `form:"poolCode,optional"`
+	eventType int32  `form:"eventType,optional"`
+}
+
+type GetPlatformBuildClusterMetricsReq {
+	poolCode      string `form:"poolCode,optional"`
+	periodMinutes int32  `form:"periodMinutes,optional"`
+}
+
+type CreatePlatformOpenApiCredentialReq {
+	credentialName     string   `json:"credentialName"`
+	scopes             []int32  `json:"scopes"`
+	appIds             []int64  `json:"appIds,optional"`
+	ipAllowlist        []string `json:"ipAllowlist,optional"`
+	rateLimitPerMinute int32    `json:"rateLimitPerMinute"`
+	expiresAt          int64    `json:"expiresAt,optional"`
+}
+
+type ListPlatformOpenApiCredentialsReq {
+	PageReq
+	status  int32  `form:"status,optional"`
+	keyword string `form:"keyword,optional"`
+}
+
+type RotatePlatformOpenApiCredentialReq {
+	id           int64 `path:"id"`
+	graceSeconds int64 `json:"graceSeconds,optional"`
+}
+
+type RevokePlatformOpenApiCredentialReq {
+	id int64 `path:"id"`
+}
+
+type CreatePlatformWebhookEndpointReq {
+	endpointName string   `json:"endpointName"`
+	endpointUrl  string   `json:"endpointUrl"`
+	eventTypes   []string `json:"eventTypes"`
+	maxAttempts  int32    `json:"maxAttempts,optional"`
+}
+
+type UpdatePlatformWebhookEndpointReq {
+	id           int64    `path:"id"`
+	endpointName string   `json:"endpointName"`
+	endpointUrl  string   `json:"endpointUrl"`
+	eventTypes   []string `json:"eventTypes"`
+	maxAttempts  int32    `json:"maxAttempts"`
+	status       int32    `json:"status"`
+}
+
+type ListPlatformWebhookEndpointsReq {
+	PageReq
+	status  int32  `form:"status,optional"`
+	keyword string `form:"keyword,optional"`
+}
+
+type ListPlatformWebhookDeliveriesReq {
+	PageReq
+	endpointId int64  `form:"endpointId,optional"`
+	status     int32  `form:"status,optional"`
+	eventType  string `form:"eventType,optional"`
+}
+
+type ListPlatformSourceIntegrationsReq {
+	PageReq
+	platform int32  `form:"platform,optional"`
+	status   int32  `form:"status,optional"`
+	keyword  string `form:"keyword,optional"`
+}
+
+type CreatePlatformSourceOAuthAuthorizationReq {
+	platform int32 `path:"platform"`
+}
+
+type ListPlatformSourceAvailableRepositoriesReq {
+	id int64 `path:"id"`
+}
+
+type AuthorizePlatformSourceRepositoryReq {
+	id           int64  `path:"id"`
+	repositoryId string `path:"repositoryId"`
+}
+
+type ImportPlatformSourceArtifactReq {
+	appId              int64  `json:"appId"`
+	repositoryId       int64  `json:"repositoryId"`
+	artifactSource     int32  `json:"artifactSource"`
+	externalArtifactId string `json:"externalArtifactId"`
+	releaseRef         string `json:"releaseRef,optional"`
+	versionCode        int64  `json:"versionCode"`
+	versionName        string `json:"versionName"`
+	releaseNotes       string `json:"releaseNotes,optional"`
+}
+
+type CreatePlatformSourceBuildTriggerReq {
+	repositoryId        int64   `json:"repositoryId"`
+	appId               int64   `json:"appId"`
+	triggerName         string  `json:"triggerName"`
+	eventType           int32   `json:"eventType"`
+	refPattern          string  `json:"refPattern,optional"`
+	artifactSelector    string  `json:"artifactSelector"`
+	channelIds          []int64 `json:"channelIds"`
+	signingConfigId     int64   `json:"signingConfigId,optional"`
+	brandingProfileId   int64   `json:"brandingProfileId,optional"`
+	whiteLabelProductId int64   `json:"whiteLabelProductId,optional"`
+	priority            int32   `json:"priority,optional"`
+	poolCode            string  `json:"poolCode,optional"`
+	versionNamePrefix   string  `json:"versionNamePrefix,optional"`
+}
+
+type UpdatePlatformSourceBuildTriggerReq {
+	id                  int64   `path:"id"`
+	triggerName         string  `json:"triggerName"`
+	eventType           int32   `json:"eventType"`
+	refPattern          string  `json:"refPattern,optional"`
+	artifactSelector    string  `json:"artifactSelector"`
+	channelIds          []int64 `json:"channelIds"`
+	signingConfigId     int64   `json:"signingConfigId,optional"`
+	brandingProfileId   int64   `json:"brandingProfileId,optional"`
+	whiteLabelProductId int64   `json:"whiteLabelProductId,optional"`
+	priority            int32   `json:"priority,optional"`
+	poolCode            string  `json:"poolCode,optional"`
+	versionNamePrefix   string  `json:"versionNamePrefix,optional"`
+	status              int32   `json:"status"`
+}
+
+type ListPlatformSourceBuildTriggersReq {
+	PageReq
+	repositoryId int64  `form:"repositoryId,optional"`
+	appId        int64  `form:"appId,optional"`
+	status       int32  `form:"status,optional"`
+	keyword      string `form:"keyword,optional"`
+}
+
+type ListPlatformSourceWebhookEventsReq {
+	PageReq
+	triggerId int64 `form:"triggerId,optional"`
+	status    int32 `form:"status,optional"`
+}
+
+type ListPlatformSourceRepositoriesReq {
+	PageReq
+	integrationId int64  `form:"integrationId,optional"`
+	status        int32  `form:"status,optional"`
+	keyword       string `form:"keyword,optional"`
+}
+
 type ListPlatformBrandingProfilesReq {
 	PageReq
 	appId   int64  `form:"appId,optional"`
@@ -639,6 +1277,296 @@ type PlatformChannelEventReq {
 
 type PlatformChannelDownloadReq {
 	channelCode string `path:"channelCode"`
+}
+
+// V6 商业化套餐、订阅、权益、用量与账单。
+type PlatformBillingPlan {
+	id                  int64  `json:"id"`
+	planCode            string `json:"planCode"`
+	planName            string `json:"planName"`
+	billingCycle        int32  `json:"billingCycle"`
+	priceAmount         int64  `json:"priceAmount"`
+	currency            string `json:"currency"`
+	featureJson         string `json:"featureJson"`
+	buildsPerCycle      int64  `json:"buildsPerCycle"`
+	maxBuildConcurrency int32  `json:"maxBuildConcurrency"`
+	storageBytes        int64  `json:"storageBytes"`
+	maxUploadBytes      int64  `json:"maxUploadBytes"`
+	teamSeats           int32  `json:"teamSeats"`
+	apiRateLimit        int32  `json:"apiRateLimit"`
+	chargeFailedBuild   bool   `json:"chargeFailedBuild"`
+	chargeCacheHit      bool   `json:"chargeCacheHit"`
+	chargeRetryBuild    bool   `json:"chargeRetryBuild"`
+	status              int32  `json:"status"`
+	version             int32  `json:"version"`
+	createTime          int64  `json:"createTime"`
+	updateTime          int64  `json:"updateTime"`
+}
+
+type PlatformTenantSubscription {
+	id                     int64  `json:"id"`
+	tenantId               int64  `json:"tenantId"`
+	planId                 int64  `json:"planId"`
+	planVersion            int32  `json:"planVersion"`
+	status                 int32  `json:"status"`
+	source                 int32  `json:"source"`
+	externalCustomerId     string `json:"externalCustomerId,optional"`
+	externalSubscriptionId string `json:"externalSubscriptionId,optional"`
+	currentPeriodStart     int64  `json:"currentPeriodStart"`
+	currentPeriodEnd       int64  `json:"currentPeriodEnd"`
+	cancelAtPeriodEnd      bool   `json:"cancelAtPeriodEnd"`
+	graceUntil             int64  `json:"graceUntil,optional"`
+	pendingPlanId          int64  `json:"pendingPlanId"`
+	pendingPlanVersion     int32  `json:"pendingPlanVersion"`
+	createTime             int64  `json:"createTime"`
+	updateTime             int64  `json:"updateTime"`
+}
+
+type PlatformTenantEntitlement {
+	id                  int64  `json:"id"`
+	tenantId            int64  `json:"tenantId"`
+	planId              int64  `json:"planId"`
+	planVersion         int32  `json:"planVersion"`
+	buildsPerCycle      int64  `json:"buildsPerCycle"`
+	maxBuildConcurrency int32  `json:"maxBuildConcurrency"`
+	storageBytes        int64  `json:"storageBytes"`
+	maxUploadBytes      int64  `json:"maxUploadBytes"`
+	teamSeats           int32  `json:"teamSeats"`
+	apiRateLimit        int32  `json:"apiRateLimit"`
+	chargeFailedBuild   bool   `json:"chargeFailedBuild"`
+	chargeCacheHit      bool   `json:"chargeCacheHit"`
+	chargeRetryBuild    bool   `json:"chargeRetryBuild"`
+	overrideJson        string `json:"overrideJson,optional"`
+	validFrom           int64  `json:"validFrom"`
+	validUntil          int64  `json:"validUntil"`
+	status              int32  `json:"status"`
+	revision            int64  `json:"revision"`
+}
+
+type PlatformUsageMetricSummary {
+	metric           int32 `json:"metric"`
+	usedQuantity     int64 `json:"usedQuantity"`
+	reservedQuantity int64 `json:"reservedQuantity"`
+	limitQuantity    int64 `json:"limitQuantity"`
+	usagePercent     int32 `json:"usagePercent"`
+}
+
+type PlatformInvoiceItem {
+	id          int64  `json:"id"`
+	invoiceId   int64  `json:"invoiceId"`
+	lineKey     string `json:"lineKey"`
+	itemType    int32  `json:"itemType"`
+	description string `json:"description"`
+	metric      int32  `json:"metric"`
+	quantity    int64  `json:"quantity"`
+	unitAmount  int64  `json:"unitAmount"`
+	amount      int64  `json:"amount"`
+}
+
+type PlatformInvoice {
+	id                int64                 `json:"id"`
+	tenantId          int64                 `json:"tenantId"`
+	invoiceNo         string                `json:"invoiceNo"`
+	externalInvoiceId string                `json:"externalInvoiceId,optional"`
+	status            int32                 `json:"status"`
+	currency          string                `json:"currency"`
+	subtotalAmount    int64                 `json:"subtotalAmount"`
+	discountAmount    int64                 `json:"discountAmount"`
+	taxAmount         int64                 `json:"taxAmount"`
+	totalAmount       int64                 `json:"totalAmount"`
+	paidAmount        int64                 `json:"paidAmount"`
+	refundedAmount    int64                 `json:"refundedAmount"`
+	periodStart       int64                 `json:"periodStart"`
+	periodEnd         int64                 `json:"periodEnd"`
+	dueAt             int64                 `json:"dueAt,optional"`
+	paidAt            int64                 `json:"paidAt,optional"`
+	items             []PlatformInvoiceItem `json:"items"`
+	createTime        int64                 `json:"createTime"`
+}
+
+type PlatformBillingPlanResp {
+	RespBase
+	data PlatformBillingPlan `json:"data"`
+}
+
+type PlatformBillingPlanListResp {
+	RespBase
+	data  []PlatformBillingPlan `json:"data"`
+	total int64                 `json:"total"`
+}
+
+type PlatformTenantBillingResp {
+	RespBase
+	subscription PlatformTenantSubscription `json:"subscription"`
+	entitlement  PlatformTenantEntitlement  `json:"entitlement"`
+	plan         PlatformBillingPlan        `json:"plan"`
+}
+
+type PlatformBillingUsageResp {
+	RespBase
+	periodKey string                       `json:"periodKey"`
+	data      []PlatformUsageMetricSummary `json:"data"`
+}
+
+type PlatformInvoiceListResp {
+	RespBase
+	data  []PlatformInvoice `json:"data"`
+	total int64             `json:"total"`
+}
+
+type PlatformBillingCheckoutResp {
+	RespBase
+	checkoutUrl string `json:"checkoutUrl"`
+	sessionId   string `json:"sessionId"`
+}
+
+type CreatePlatformBillingPlanReq {
+	planCode            string `json:"planCode"`
+	planName            string `json:"planName"`
+	billingCycle        int32  `json:"billingCycle"`
+	priceAmount         int64  `json:"priceAmount"`
+	currency            string `json:"currency"`
+	featureJson         string `json:"featureJson"`
+	buildsPerCycle      int64  `json:"buildsPerCycle"`
+	maxBuildConcurrency int32  `json:"maxBuildConcurrency"`
+	storageBytes        int64  `json:"storageBytes"`
+	maxUploadBytes      int64  `json:"maxUploadBytes"`
+	teamSeats           int32  `json:"teamSeats"`
+	apiRateLimit        int32  `json:"apiRateLimit"`
+	chargeFailedBuild   bool   `json:"chargeFailedBuild"`
+	chargeCacheHit      bool   `json:"chargeCacheHit"`
+	chargeRetryBuild    bool   `json:"chargeRetryBuild"`
+}
+
+type ListPlatformBillingPlansReq {
+	page     int32 `form:"page,optional"`
+	pageSize int32 `form:"pageSize,optional"`
+	status   int32 `form:"status,optional"`
+}
+
+type PlatformBillingPlanIdReq {
+	id int64 `path:"id"`
+}
+
+type PlatformTenantBillingReq {
+	tenantId int64 `form:"tenantId,optional"`
+}
+
+type UpsertPlatformManualSubscriptionReq {
+	tenantId          int64  `json:"tenantId"`
+	planId            int64  `json:"planId"`
+	periodStart       int64  `json:"periodStart"`
+	periodEnd         int64  `json:"periodEnd"`
+	graceUntil        int64  `json:"graceUntil,optional"`
+	overrideJson      string `json:"overrideJson,optional"`
+	contractReference string `json:"contractReference"`
+}
+
+type ChangePlatformSubscriptionReq {
+	tenantId int64 `json:"tenantId,optional"`
+	planId   int64 `json:"planId"`
+	mode     int32 `json:"mode"`
+}
+
+type CancelPlatformSubscriptionReq {
+	tenantId    int64 `json:"tenantId,optional"`
+	immediately bool  `json:"immediately"`
+}
+
+type PlatformBillingUsageReq {
+	tenantId  int64  `form:"tenantId,optional"`
+	periodKey string `form:"periodKey,optional"`
+}
+
+type ListPlatformInvoicesReq {
+	tenantId int64 `form:"tenantId,optional"`
+	status   int32 `form:"status,optional"`
+	page     int32 `form:"page,optional"`
+	pageSize int32 `form:"pageSize,optional"`
+}
+
+type CreatePlatformBillingCheckoutReq {
+	planId int64 `json:"planId"`
+}
+
+// V7 Local Builder Agent管理模型。
+type PlatformLocalAgentCapability {
+	capabilityKey   string `json:"capabilityKey"`
+	capabilityValue string `json:"capabilityValue"`
+}
+
+type PlatformLocalAgent {
+	id                  int64                          `json:"id"`
+	tenantId            int64                          `json:"tenantId"`
+	agentCode           string                         `json:"agentCode"`
+	agentName           string                         `json:"agentName"`
+	poolCode            string                         `json:"poolCode"`
+	status              int32                          `json:"status"`
+	drainStatus         int32                          `json:"drainStatus"`
+	protocolVersion     int32                          `json:"protocolVersion"`
+	agentVersion        string                         `json:"agentVersion"`
+	artifactMode        int32                          `json:"artifactMode"`
+	customerStorageRef  string                         `json:"customerStorageRef,optional"`
+	allowedAppIds       []int64                        `json:"allowedAppIds"`
+	capabilities        []PlatformLocalAgentCapability `json:"capabilities"`
+	certificateSerial   string                         `json:"certificateSerial,optional"`
+	certificateNotAfter int64                          `json:"certificateNotAfter,optional"`
+	lastHeartbeatAt     int64                          `json:"lastHeartbeatAt,optional"`
+	createTime          int64                          `json:"createTime"`
+	updateTime          int64                          `json:"updateTime"`
+}
+
+type PlatformLocalAgentResp {
+	RespBase
+	data PlatformLocalAgent `json:"data"`
+}
+
+type PlatformLocalAgentListResp {
+	RespBase
+	data  []PlatformLocalAgent `json:"data"`
+	total int64                `json:"total"`
+}
+
+type PlatformLocalAgentRegistrationResp {
+	RespBase
+	data              PlatformLocalAgent `json:"data"`
+	registrationToken string             `json:"registrationToken"`
+	expiresAt         int64              `json:"expiresAt"`
+}
+
+type CreatePlatformLocalAgentRegistrationReq {
+	tenantId           int64                          `json:"tenantId,optional"`
+	agentCode          string                         `json:"agentCode"`
+	agentName          string                         `json:"agentName"`
+	poolCode           string                         `json:"poolCode"`
+	artifactMode       int32                          `json:"artifactMode"`
+	customerStorageRef string                         `json:"customerStorageRef,optional"`
+	allowedAppIds      []int64                        `json:"allowedAppIds"`
+	capabilities       []PlatformLocalAgentCapability `json:"capabilities"`
+	expiresSeconds     int64                          `json:"expiresSeconds,optional"`
+}
+
+type ListPlatformLocalAgentsReq {
+	PageReq
+	tenantId int64 `form:"tenantId,optional"`
+	status   int32 `form:"status,optional"`
+}
+
+type PlatformLocalAgentIdReq {
+	id       int64 `path:"id"`
+	tenantId int64 `json:"tenantId,optional" form:"tenantId,optional"`
+}
+
+type DrainPlatformLocalAgentReq {
+	id          int64 `path:"id"`
+	tenantId    int64 `json:"tenantId,optional"`
+	drainStatus int32 `json:"drainStatus"`
+}
+
+type RevokePlatformLocalAgentReq {
+	id       int64  `path:"id"`
+	tenantId int64  `json:"tenantId,optional"`
+	reason   string `json:"reason"`
 }
 
 @server (
@@ -805,6 +1733,168 @@ service admin {
 
 	@handler ListPlatformBuildTasks
 	get /build-tasks (ListPlatformBuildTasksReq) returns (PlatformBuildTaskListResp)
+
+	@handler CancelPlatformBuildTask
+	post /build-tasks/:id/cancel (CancelPlatformBuildTaskReq) returns (PlatformBuildTaskResp)
+
+	@handler RetryPlatformBuildTask
+	post /build-tasks/:id/retry (RetryPlatformBuildTaskReq) returns (PlatformBuildTaskResp)
+
+	@handler GetPlatformBuildClusterMetrics
+	get /build-cluster/metrics (GetPlatformBuildClusterMetricsReq) returns (PlatformBuildClusterMetricsResp)
+
+	@handler ListPlatformBuilderNodes
+	get /build-cluster/nodes (ListPlatformBuilderNodesReq) returns (PlatformBuilderNodeListResp)
+
+	@handler DrainPlatformBuilderNode
+	post /build-cluster/nodes/:id/drain (DrainPlatformBuilderNodeReq) returns (PlatformBuilderNodeResp)
+
+	@handler RecoverPlatformBuilderNode
+	post /build-cluster/nodes/:id/recover (RecoverPlatformBuilderNodeReq) returns (PlatformBuilderNodeResp)
+
+	@handler ListPlatformBuildConcurrencyPolicies
+	get /build-cluster/policies (ListPlatformBuildConcurrencyPoliciesReq) returns (PlatformBuildConcurrencyPolicyListResp)
+
+	@handler UpsertPlatformBuildConcurrencyPolicy
+	post /build-cluster/policies (UpsertPlatformBuildConcurrencyPolicyReq) returns (PlatformBuildConcurrencyPolicyResp)
+
+	@handler ListPlatformBuildCacheEntries
+	get /build-cluster/cache (ListPlatformBuildCacheEntriesReq) returns (PlatformBuildCacheEntryListResp)
+
+	@handler InvalidatePlatformBuildCache
+	post /build-cluster/cache/:id/invalidate (InvalidatePlatformBuildCacheReq) returns (PlatformBuildCacheEntryResp)
+
+	@handler CleanupPlatformBuildCache
+	post /build-cluster/cache/cleanup (CleanupPlatformBuildCacheReq) returns (PlatformBuildCacheCleanupResp)
+
+	@handler ListPlatformBuildSchedulerEvents
+	get /build-cluster/events (ListPlatformBuildSchedulerEventsReq) returns (PlatformBuildSchedulerEventListResp)
+
+	@handler CreatePlatformOpenApiCredential
+	post /developer/credentials (CreatePlatformOpenApiCredentialReq) returns (PlatformOpenApiCredentialSecretResp)
+
+	@handler ListPlatformOpenApiCredentials
+	get /developer/credentials (ListPlatformOpenApiCredentialsReq) returns (PlatformOpenApiCredentialListResp)
+
+	@handler RotatePlatformOpenApiCredential
+	post /developer/credentials/:id/rotate (RotatePlatformOpenApiCredentialReq) returns (PlatformOpenApiCredentialSecretResp)
+
+	@handler RevokePlatformOpenApiCredential
+	post /developer/credentials/:id/revoke (RevokePlatformOpenApiCredentialReq) returns (PlatformOpenApiCredentialResp)
+
+	@handler CreatePlatformWebhookEndpoint
+	post /developer/webhooks (CreatePlatformWebhookEndpointReq) returns (PlatformWebhookEndpointSecretResp)
+
+	@handler ListPlatformWebhookEndpoints
+	get /developer/webhooks (ListPlatformWebhookEndpointsReq) returns (PlatformWebhookEndpointListResp)
+
+	@handler GetPlatformWebhookEndpoint
+	get /developer/webhooks/:id (PlatformIdReq) returns (PlatformWebhookEndpointResp)
+
+	@handler UpdatePlatformWebhookEndpoint
+	put /developer/webhooks/:id (UpdatePlatformWebhookEndpointReq) returns (PlatformWebhookEndpointResp)
+
+	@handler RotatePlatformWebhookEndpointSecret
+	post /developer/webhooks/:id/rotate-secret (PlatformIdReq) returns (PlatformWebhookEndpointSecretResp)
+
+	@handler TestPlatformWebhookEndpoint
+	post /developer/webhooks/:id/test (PlatformIdReq) returns (RespBase)
+
+	@handler ListPlatformWebhookDeliveries
+	get /developer/webhook-deliveries (ListPlatformWebhookDeliveriesReq) returns (PlatformWebhookDeliveryListResp)
+
+	@handler ReplayPlatformWebhookDelivery
+	post /developer/webhook-deliveries/:id/replay (PlatformIdReq) returns (PlatformWebhookDeliveryResp)
+
+	@handler ListPlatformSourceIntegrations
+	get /developer/source-integrations (ListPlatformSourceIntegrationsReq) returns (PlatformSourceIntegrationListResp)
+
+	@handler CreatePlatformSourceOAuthAuthorization
+	post /developer/source-integrations/:platform/authorize (CreatePlatformSourceOAuthAuthorizationReq) returns (PlatformSourceOAuthAuthorizationResp)
+
+	@handler GetPlatformSourceIntegration
+	get /developer/source-integrations/:id (PlatformIdReq) returns (PlatformSourceIntegrationResp)
+
+	@handler ListPlatformSourceAvailableRepositories
+	get /developer/source-integrations/:id/available-repositories (ListPlatformSourceAvailableRepositoriesReq) returns (PlatformSourceAvailableRepositoryListResp)
+
+	@handler AuthorizePlatformSourceRepository
+	post /developer/source-integrations/:id/repositories/:repositoryId/authorize (AuthorizePlatformSourceRepositoryReq) returns (PlatformSourceRepositoryResp)
+
+	@handler DisconnectPlatformSourceIntegration
+	post /developer/source-integrations/:id/disconnect (PlatformIdReq) returns (PlatformSourceIntegrationResp)
+
+	@handler ListPlatformSourceRepositories
+	get /developer/source-repositories (ListPlatformSourceRepositoriesReq) returns (PlatformSourceRepositoryListResp)
+
+	@handler RevokePlatformSourceRepository
+	post /developer/source-repositories/:id/revoke (PlatformIdReq) returns (PlatformSourceRepositoryResp)
+
+	@handler ImportPlatformSourceArtifact
+	post /developer/source-artifacts/import (ImportPlatformSourceArtifactReq) returns (PlatformSourceArtifactImportResp)
+
+	@handler CreatePlatformSourceBuildTrigger
+	post /developer/source-build-triggers (CreatePlatformSourceBuildTriggerReq) returns (PlatformSourceBuildTriggerSecretResp)
+
+	@handler ListPlatformSourceBuildTriggers
+	get /developer/source-build-triggers (ListPlatformSourceBuildTriggersReq) returns (PlatformSourceBuildTriggerListResp)
+
+	@handler GetPlatformSourceBuildTrigger
+	get /developer/source-build-triggers/:id (PlatformIdReq) returns (PlatformSourceBuildTriggerResp)
+
+	@handler UpdatePlatformSourceBuildTrigger
+	put /developer/source-build-triggers/:id (UpdatePlatformSourceBuildTriggerReq) returns (PlatformSourceBuildTriggerResp)
+
+	@handler RotatePlatformSourceBuildTriggerSecret
+	post /developer/source-build-triggers/:id/rotate-secret (PlatformIdReq) returns (PlatformSourceBuildTriggerSecretResp)
+
+	@handler ListPlatformSourceWebhookEvents
+	get /developer/source-webhook-events (ListPlatformSourceWebhookEventsReq) returns (PlatformSourceWebhookEventListResp)
+
+	@handler CreatePlatformBillingPlan
+	post /billing/plans (CreatePlatformBillingPlanReq) returns (PlatformBillingPlanResp)
+
+	@handler ListPlatformBillingPlans
+	get /billing/plans (ListPlatformBillingPlansReq) returns (PlatformBillingPlanListResp)
+
+	@handler RetirePlatformBillingPlan
+	post /billing/plans/:id/retire (PlatformBillingPlanIdReq) returns (PlatformBillingPlanResp)
+
+	@handler GetPlatformTenantBilling
+	get /billing/subscription (PlatformTenantBillingReq) returns (PlatformTenantBillingResp)
+
+	@handler UpsertPlatformManualSubscription
+	post /billing/contracts (UpsertPlatformManualSubscriptionReq) returns (PlatformTenantBillingResp)
+
+	@handler ChangePlatformSubscription
+	post /billing/subscription/change (ChangePlatformSubscriptionReq) returns (PlatformTenantBillingResp)
+
+	@handler CancelPlatformSubscription
+	post /billing/subscription/cancel (CancelPlatformSubscriptionReq) returns (PlatformTenantBillingResp)
+
+	@handler GetPlatformBillingUsage
+	get /billing/usage (PlatformBillingUsageReq) returns (PlatformBillingUsageResp)
+
+	@handler ListPlatformInvoices
+	get /billing/invoices (ListPlatformInvoicesReq) returns (PlatformInvoiceListResp)
+
+	@handler CreatePlatformBillingCheckout
+	post /billing/checkout (CreatePlatformBillingCheckoutReq) returns (PlatformBillingCheckoutResp)
+
+	@handler CreatePlatformLocalAgentRegistration
+	post /enterprise/local-agents (CreatePlatformLocalAgentRegistrationReq) returns (PlatformLocalAgentRegistrationResp)
+
+	@handler ListPlatformLocalAgents
+	get /enterprise/local-agents (ListPlatformLocalAgentsReq) returns (PlatformLocalAgentListResp)
+
+	@handler GetPlatformLocalAgent
+	get /enterprise/local-agents/:id (PlatformLocalAgentIdReq) returns (PlatformLocalAgentResp)
+
+	@handler DrainPlatformLocalAgent
+	post /enterprise/local-agents/:id/drain (DrainPlatformLocalAgentReq) returns (PlatformLocalAgentResp)
+
+	@handler RevokePlatformLocalAgent
+	post /enterprise/local-agents/:id/revoke (RevokePlatformLocalAgentReq) returns (PlatformLocalAgentResp)
 
 	@handler GetPlatformChannelStats
 	get /channel-stats (GetPlatformChannelStatsReq) returns (PlatformChannelStatsResp)

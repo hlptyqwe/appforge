@@ -19,6 +19,30 @@ enum BuildTaskStatus {
   BUILD_TASK_STATUS_UPLOADING = 4; // 上传中
   BUILD_TASK_STATUS_SUCCESS = 5; // 成功
   BUILD_TASK_STATUS_FAILED = 6; // 失败
+  BUILD_TASK_STATUS_CANCELLED = 7; // 已取消
+}
+
+// V4 Builder节点状态。
+enum BuilderNodeStatus {
+  BUILDER_NODE_STATUS_UNKNOWN = 0; // 未知状态
+  BUILDER_NODE_STATUS_ONLINE = 1; // 在线且健康
+  BUILDER_NODE_STATUS_OFFLINE = 2; // 心跳超时离线
+  BUILDER_NODE_STATUS_ISOLATED = 3; // 被隔离
+}
+
+// V4 Builder节点排空状态。
+enum BuilderDrainStatus {
+  BUILDER_DRAIN_STATUS_UNKNOWN = 0; // 未知状态
+  BUILDER_DRAIN_STATUS_ACCEPTING = 1; // 接收新任务
+  BUILDER_DRAIN_STATUS_DRAINING = 2; // 排空中
+}
+
+// V4 构建缓存状态。
+enum BuildCacheStatus {
+  BUILD_CACHE_STATUS_UNKNOWN = 0; // 未知状态
+  BUILD_CACHE_STATUS_ACTIVE = 1; // 有效
+  BUILD_CACHE_STATUS_INVALIDATED = 2; // 已失效
+  BUILD_CACHE_STATUS_EXPIRED = 3; // 已过期
 }
 
 message BuildTask {
@@ -37,6 +61,171 @@ message BuildTask {
   string source_apk_url = 13;
   string build_config_json = 14;
   int64 source_apk_object_id = 15; // 原始APK私有对象ID
+  string pool_code = 16; // V4目标构建池编码
+  string cache_key = 17; // V4不可变输入缓存键
+  int64 cache_entry_id = 18; // V4命中的缓存条目ID
+  bool cache_hit = 19; // V4是否命中缓存
+  int64 retry_of_task_id = 20; // V4重试来源任务ID
+}
+
+// V4 Builder节点内部视图。
+message BuilderNode {
+  int64 id = 1; // 节点ID
+  string node_code = 2; // 节点唯一编码
+  string pool_code = 3; // 构建池编码
+  string endpoint = 4; // 节点端点或实例标识
+  BuilderNodeStatus status = 5; // 节点健康状态
+  BuilderDrainStatus drain_status = 6; // 节点排空状态
+  int32 max_concurrency = 7; // 最大并发数
+  int32 running_count = 8; // 当前运行数
+  int64 disk_free = 9; // 构建磁盘剩余字节数
+  string toolchain_version = 10; // 工具链版本
+  int32 build_protocol_version = 11; // 构建协议版本
+  string capability_json = 12; // 能力白名单JSON
+  int64 last_heartbeat_at = 13; // 最近心跳时间，Unix毫秒
+}
+
+// V4 Builder节点响应。
+message BuilderNodeResp {
+  common.RespBase base = 1; // 通用响应
+  BuilderNode data = 2; // Builder节点
+}
+
+// V4 构建缓存条目内部视图。
+message BuildCacheEntry {
+  int64 id = 1; // 缓存条目ID
+  int64 tenant_id = 2; // 所属租户ID
+  string cache_key = 3; // 缓存键
+  string toolchain_version = 4; // 工具链版本
+  int32 build_protocol_version = 5; // 构建协议版本
+  int64 artifact_object_id = 6; // 缓存产物对象ID
+  string artifact_sha256 = 7; // 缓存产物SHA-256
+  int64 size_bytes = 8; // 缓存产物大小
+  BuildCacheStatus status = 9; // 缓存状态
+  int64 expires_at = 10; // 过期时间，Unix毫秒
+}
+
+// V4 构建缓存条目响应。
+message BuildCacheEntryResp {
+  common.RespBase base = 1; // 通用响应
+  BuildCacheEntry data = 2; // 构建缓存条目
+}
+
+// V4 缓存产物内部元数据。
+message BuildCacheArtifact {
+  int64 id = 1; // 存储对象ID
+  string object_key = 2; // 私有对象Key
+  string original_name = 3; // 原始文件名
+  string content_type = 4; // MIME类型
+  int64 size_bytes = 5; // 对象大小
+  string sha256 = 6; // 对象SHA-256
+}
+
+// V4 构建缓存解析结果。
+message BuildCacheResolution {
+  bool hit = 1; // 是否命中有效缓存
+  BuildCacheEntry entry = 2; // 缓存条目
+  BuildCacheArtifact artifact = 3; // 待校验缓存产物
+}
+
+// V4 构建缓存解析响应。
+message BuildCacheResolutionResp {
+  common.RespBase base = 1; // 通用响应
+  BuildCacheResolution data = 2; // 缓存解析结果
+}
+
+// V4 构建缓存清理结果。
+message CleanupBuildCacheResult {
+  int32 invalidated_count = 1; // 失效条目数
+  int64 reclaimable_bytes = 2; // 可回收字节数
+  repeated int64 object_ids = 3; // 可删除对象ID列表
+}
+
+// V4 构建缓存清理响应。
+message CleanupBuildCacheResp {
+  common.RespBase base = 1; // 通用响应
+  CleanupBuildCacheResult data = 2; // 缓存清理结果
+}
+
+// V4 注册Builder节点请求。
+message RegisterBuilderNodeReq {
+  string node_code = 1; // 节点唯一编码
+  string pool_code = 2; // 构建池编码
+  string endpoint = 3; // 节点端点或实例标识
+  int32 max_concurrency = 4; // 最大并发数
+  int32 cpu_capacity = 5; // CPU容量，单位毫核
+  int64 memory_capacity = 6; // 内存容量，单位字节
+  int64 disk_capacity = 7; // 构建磁盘总容量，单位字节
+  int64 disk_free = 8; // 构建磁盘剩余容量，单位字节
+  string toolchain_version = 9; // 工具链版本
+  int32 build_protocol_version = 10; // 构建协议版本
+  string capability_json = 11; // 能力白名单JSON
+}
+
+// V4 Builder节点心跳请求。
+message BuilderNodeHeartbeatReq {
+  string node_code = 1; // 节点唯一编码
+  int32 running_count = 2; // 当前运行任务数
+  int64 disk_free = 3; // 构建磁盘剩余容量，单位字节
+  repeated int64 running_task_ids = 4; // 当前运行任务ID列表
+  string last_error_message = 5; // 最近错误摘要
+}
+
+// V4 原子领取调度任务请求。
+message ClaimScheduledBuildTaskReq {
+  string node_code = 1; // 已注册节点编码
+  int32 lease_seconds = 2; // 任务和槽位租约秒数
+}
+
+// V4 修改Builder节点排空状态请求。
+message DrainBuilderNodeReq {
+  int64 id = 1; // 节点ID
+  string node_code = 2; // 节点编码
+  BuilderDrainStatus drain_status = 3; // 目标排空状态
+}
+
+// V4 取消构建执行请求。
+message CancelBuildExecutionReq {
+  int64 id = 1; // 构建任务ID
+  string reason = 2; // 取消原因
+}
+
+// V4 解析构建缓存请求。
+message ResolveBuildCacheReq {
+  int64 task_id = 1; // 当前构建任务ID
+  string node_code = 2; // 当前节点编码
+  int32 builder_attempt = 3; // 当前领取代次
+  string toolchain_version = 4; // 当前工具链版本
+  int32 build_protocol_version = 5; // 当前构建协议版本
+  bool confirm_hit = 6; // Worker完成对象字节校验后确认命中；false仅解析候选缓存
+}
+
+// V4 发布构建缓存请求。
+message PublishBuildCacheReq {
+  int64 task_id = 1; // 已成功构建任务ID
+  string node_code = 2; // 当前节点编码
+  int32 builder_attempt = 3; // 构建领取代次
+  string toolchain_version = 4; // 工具链版本
+  int32 build_protocol_version = 5; // 构建协议版本
+  int64 artifact_object_id = 6; // 独立缓存产物对象ID
+  string artifact_sha256 = 7; // 缓存产物SHA-256
+  int64 size_bytes = 8; // 缓存产物大小
+  int64 ttl_seconds = 9; // 缓存TTL秒数
+  string artifact_object_key = 10; // 缓存中间APK私有对象Key，artifact_object_id为0时由Core登记
+}
+
+// V4 失效构建缓存请求。
+message InvalidateBuildCacheReq {
+  int64 id = 1; // 缓存条目ID
+  int64 task_id = 2; // 发现损坏的任务ID
+  string node_code = 3; // 发现损坏的节点编码
+  string reason = 4; // 失效原因
+}
+
+// V4 清理构建缓存请求。
+message CleanupBuildCacheReq {
+  int32 limit = 1; // 单次最多清理条目数
+  int64 target_free_bytes = 2; // 目标释放字节数
 }
 
 message ClaimBuildTaskReq {
@@ -117,4 +306,22 @@ service Builder {
   rpc ReportBuildProgress(ReportBuildProgressReq) returns (RespBase);
   rpc CompleteBuildTask(CompleteBuildTaskReq) returns (RespBase);
   rpc FailBuildTask(FailBuildTaskReq) returns (RespBase);
+  // 注册或刷新V4 Builder节点及能力。
+  rpc RegisterBuilderNode(RegisterBuilderNodeReq) returns (BuilderNodeResp);
+  // 上报V4 Builder节点心跳和容量。
+  rpc BuilderNodeHeartbeat(BuilderNodeHeartbeatReq) returns (BuilderNodeResp);
+  // 结合节点能力、公平队列和并发槽位领取V4构建任务。
+  rpc ClaimScheduledBuildTask(ClaimScheduledBuildTaskReq) returns (BuildTaskResp);
+  // 修改V4 Builder节点排空状态。
+  rpc DrainBuilderNode(DrainBuilderNodeReq) returns (BuilderNodeResp);
+  // 取消V4构建执行并推进fencing代次。
+  rpc CancelBuildExecution(CancelBuildExecutionReq) returns (BuildTaskResp);
+  // 解析V4输入可寻址构建缓存。
+  rpc ResolveBuildCache(ResolveBuildCacheReq) returns (BuildCacheResolutionResp);
+  // 发布V4独立构建缓存产物。
+  rpc PublishBuildCache(PublishBuildCacheReq) returns (BuildCacheEntryResp);
+  // 失效损坏或不再可信的V4构建缓存。
+  rpc InvalidateBuildCache(InvalidateBuildCacheReq) returns (BuildCacheEntryResp);
+  // 执行V4构建缓存TTL/LRU清理。
+  rpc CleanupBuildCache(CleanupBuildCacheReq) returns (CleanupBuildCacheResp);
 }

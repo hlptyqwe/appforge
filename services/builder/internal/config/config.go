@@ -15,10 +15,18 @@ type Config struct {
 	CoreRpc    zrpc.RpcClientConf `json:"CoreRpc" yaml:"CoreRpc"`
 	BuilderRpc zrpc.RpcClientConf `json:"BuilderRpc" yaml:"BuilderRpc"`
 	Builder    struct {
-		Id           string
-		LeaseSeconds int32
-		PollInterval time.Duration
-		TempDir      string
+		Id                   string
+		PoolCode             string
+		Endpoint             string
+		MaxConcurrency       int32
+		LeaseSeconds         int32
+		PollInterval         time.Duration
+		NodeHeartbeat        time.Duration
+		TempDir              string
+		ToolchainVersion     string
+		BuildProtocolVersion int32
+		CapabilityJson       string
+		CacheTtl             time.Duration
 	} `json:"Builder" yaml:"Builder"`
 	ObjectCleanup struct {
 		Interval   time.Duration
@@ -29,6 +37,21 @@ type Config struct {
 	SigningSecrets struct {
 		MasterKeyBase64 string
 	} `json:"SigningSecrets" yaml:"SigningSecrets"`
+	SecretProviders struct {
+		MaxSecretBytes int64
+		LocalRoot      string
+		KubernetesRoot string
+		Vault          struct {
+			Address   string
+			TokenFile string
+			Namespace string
+			AllowHTTP bool
+		} `json:"Vault" yaml:"Vault"`
+		AWS struct {
+			Region   string
+			Endpoint string
+		} `json:"AWS" yaml:"AWS"`
+	} `json:"SecretProviders" yaml:"SecretProviders"`
 	InternalRpc rpcauth.Config
 }
 

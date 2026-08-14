@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled }}
+{{- $root := . -}}
+{{- range $entry := list (dict "host" .Values.ingress.adminHost "ui" "admin-ui" "name" "admin") (dict "host" .Values.ingress.host "ui" "agent-ui" "name" "agent") }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: appforge-{{ $entry.name }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "2g"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: {{ $root.Values.ingress.className }}
+  tls:
+    - hosts: [{{ $entry.host | quote }}]
+      secretName: {{ $root.Values.ingress.tlsSecretName }}
+  rules:
+    - host: {{ $entry.host | quote }}
+      http:
+        paths:
+          {{- range $path := list "/admin" "/agent" "/open" "/public" "/api" "/d" "/healthz" "/readyz" }}
+          - path: {{ $path }}
+            pathType: Prefix
+            backend: {service: {name: appforge-api, port: {number: 8888}}}
+          {{- end }}
+          - path: /
+            pathType: Prefix
+            backend: {service: {name: appforge-{{ $entry.ui }}, port: {number: 8080}}}
+{{- end }}
+{{- end }}

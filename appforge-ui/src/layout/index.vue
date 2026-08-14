@@ -52,7 +52,7 @@ function onDragEnd() {
 }
 
 onBeforeUnmount(() => {
-	document.removeEventListener('mousemove', onDragMove)
+  document.removeEventListener('mousemove', onDragMove)
   document.removeEventListener('mouseup', onDragEnd)
 })
 </script>

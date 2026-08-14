@@ -46,7 +46,13 @@ async function loadList() {
 
 function openCreate() {
   editing.value = false
-  Object.assign(form, { id: 0, tenantId: query.tenantId, configKey: '', configValue: '{}', remark: '' })
+  Object.assign(form, {
+    id: 0,
+    tenantId: query.tenantId,
+    configKey: '',
+    configValue: '{}',
+    remark: '',
+  })
   dialogVisible.value = true
 }
 
@@ -91,7 +97,9 @@ async function submit() {
 
 async function remove(row: SysConfigItem) {
   try {
-    await ElMessageBox.confirm(`确定删除配置“${row.configKey}”吗？`, '删除配置', { type: 'warning' })
+    await ElMessageBox.confirm(`确定删除配置“${row.configKey}”吗？`, '删除配置', {
+      type: 'warning',
+    })
     const response = await configService.delete(row.id)
     if (response.code !== 200) throw new Error(response.msg)
     ElMessage.success('配置已删除')
@@ -129,15 +137,24 @@ onMounted(loadList)
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="tenantId" label="租户 ID" width="100" />
         <el-table-column prop="configKey" label="配置键" min-width="180" />
-        <el-table-column prop="configValue" label="JSON 配置值" min-width="320" show-overflow-tooltip />
+        <el-table-column
+          prop="configValue"
+          label="JSON 配置值"
+          min-width="320"
+          show-overflow-tooltip
+        />
         <el-table-column prop="remark" label="备注" min-width="140" />
         <el-table-column label="更新时间" width="180">
           <template #default="{ row }">{{ formatDate(row.updateTimes) }}</template>
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button v-perm="'sys:config:update'" link type="primary" @click="openEdit(row)">编辑</el-button>
-            <el-button v-perm="'sys:config:delete'" link type="danger" @click="remove(row)">删除</el-button>
+            <el-button v-perm="'sys:config:update'" link type="primary" @click="openEdit(row)"
+              >编辑</el-button
+            >
+            <el-button v-perm="'sys:config:delete'" link type="danger" @click="remove(row)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -157,10 +174,18 @@ onMounted(loadList)
         <el-form-item label="租户">
           <TenantSelect v-model="form.tenantId" include-system :disabled="editing" />
         </el-form-item>
-        <el-form-item label="配置键" prop="configKey" :rules="[{ required: true, message: '请输入配置键' }]">
+        <el-form-item
+          label="配置键"
+          prop="configKey"
+          :rules="[{ required: true, message: '请输入配置键' }]"
+        >
           <el-input v-model="form.configKey" />
         </el-form-item>
-        <el-form-item label="JSON 值" prop="configValue" :rules="[{ required: true, message: '请输入配置值' }]">
+        <el-form-item
+          label="JSON 值"
+          prop="configValue"
+          :rules="[{ required: true, message: '请输入配置值' }]"
+        >
           <el-input v-model="form.configValue" type="textarea" :rows="12" />
         </el-form-item>
         <el-form-item label="备注"><el-input v-model="form.remark" /></el-form-item>

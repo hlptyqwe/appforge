@@ -118,12 +118,7 @@ onMounted(loadGoogle2fa)
             </div>
           </el-form-item>
 
-          <el-button
-            type="primary"
-            :loading="loading"
-            class="submit-button"
-            @click="submit"
-          >
+          <el-button type="primary" :loading="loading" class="submit-button" @click="submit">
             {{ t('auth.bindGoogle2fa') }}
           </el-button>
         </el-form>
@@ -134,7 +129,7 @@ onMounted(loadGoogle2fa)
           {{ t('common.qrCode') }}
         </div>
         <div v-loading="initLoading" class="qr-box">
-          <img v-if="initData.qrCode" :src="initData.qrCode" alt="Google 2FA QR code">
+          <img v-if="initData.qrCode" :src="initData.qrCode" alt="Google 2FA QR code" />
           <span v-else>{{ t('common.click2faBindGenerateQrCode') }}</span>
         </div>
         <div class="qr-tip">

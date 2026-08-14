@@ -1,0 +1,6 @@
+{{- if or (eq .Values.global.imageRegistry "") (eq .Values.image.tag "") (eq .Values.global.publicOrigin "") (eq .Values.ingress.host "") (eq .Values.ingress.adminHost "") (eq .Values.offlineLicense.deploymentId "") (eq .Values.offlineLicense.existingStateClaim "") (eq .Values.observability.siemWebhook "") -}}
+{{- fail "image settings, public/admin hosts, offline license settings and observability.siemWebhook are required" -}}
+{{- end -}}
+{{- if and .Values.global.offline (ne .Values.image.pullPolicy "Never") -}}
+{{- fail "offline deployment requires image.pullPolicy=Never" -}}
+{{- end -}}

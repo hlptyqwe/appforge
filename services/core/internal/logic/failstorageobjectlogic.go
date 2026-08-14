@@ -5,8 +5,10 @@ import (
 
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
+	"appforge/services/core/models"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -34,19 +36,27 @@ func (l *FailStorageObjectLogic) FailStorageObject(in *core.FailStorageObjectReq
 	if in == nil || in.Id <= 0 {
 		return nil, status.Error(codes.InvalidArgument, "storage object id is required")
 	}
-	item, err := l.svcCtx.StorageObjectModel.FindOne(l.ctx, in.Id)
+	err = l.svcCtx.DB.TransactCtx(l.ctx, func(txCtx context.Context, session sqlx.Session) error {
+		var item models.TStorageObject
+		if err := session.QueryRowCtx(txCtx, &item, storageObjectSelect+` WHERE id=? AND tenant_id=? FOR UPDATE`, in.Id, tenant); err != nil {
+			return notFoundOrInternal(err, "storage object")
+		}
+		if item.Status == storageStatusBound || item.Status == storageStatusDeleted {
+			return status.Error(codes.FailedPrecondition, "bound or deleted storage object cannot be failed")
+		}
+		if item.Status == storageStatusUploading {
+			if err := releaseQuotaInSession(txCtx, session, tenant, "storage.bytes", storageQuotaKey(item.ObjectKey)); err != nil {
+				return err
+			}
+		}
+		item.Status = storageStatusFailed
+		if err := l.svcCtx.StorageObjectModel.WithSession(session).Update(txCtx, &item); err != nil {
+			return status.Errorf(codes.Internal, "fail storage object failed: %v", err)
+		}
+		return nil
+	})
 	if err != nil {
-		return nil, notFoundOrInternal(err, "storage object")
-	}
-	if err := ensureTenant(item.TenantId, tenant); err != nil {
 		return nil, err
-	}
-	if item.Status == storageStatusBound || item.Status == storageStatusDeleted {
-		return nil, status.Error(codes.FailedPrecondition, "bound or deleted storage object cannot be failed")
-	}
-	item.Status = storageStatusFailed
-	if err := l.svcCtx.StorageObjectModel.Update(l.ctx, item); err != nil {
-		return nil, status.Errorf(codes.Internal, "fail storage object failed: %v", err)
 	}
 	return &core.RespBase{Base: okBase()}, nil
 }

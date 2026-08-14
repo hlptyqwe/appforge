@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["global", "image", "external", "secrets", "ingress"],
+  "properties": {
+    "global": {
+      "type": "object",
+      "required": ["deploymentMode", "imageRegistry", "publicOrigin"],
+      "properties": {
+        "deploymentMode": {"enum": ["dedicated", "private", "hybrid"]},
+        "imageRegistry": {"type": "string", "minLength": 3},
+        "publicOrigin": {"type": "string", "pattern": "^https://"},
+        "offline": {"type": "boolean"},
+        "imagePullSecrets": {"type": "array"},
+        "storageClass": {"type": "string"}
+      }
+    },
+    "image": {
+      "type": "object",
+      "required": ["tag"],
+      "properties": {
+        "tag": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$"},
+        "pullPolicy": {"enum": ["Always", "IfNotPresent", "Never"]}
+      }
+    },
+    "replicas": {
+      "type": "object",
+      "properties": {
+        "api": {"type": "integer", "minimum": 2},
+        "system": {"type": "integer", "minimum": 2},
+        "core": {"type": "integer", "minimum": 2},
+        "builder": {"type": "integer", "minimum": 1},
+        "builderWorker": {"type": "integer", "minimum": 1},
+        "worker": {"type": "integer", "minimum": 1},
+        "sourceWorker": {"type": "integer", "minimum": 1},
+        "ui": {"type": "integer", "minimum": 2}
+      }
+    },
+    "external": {
+      "type": "object",
+      "required": ["etcdEndpoints", "etcdAuthSecret", "runtimeConfigSecret", "migrationSecret"],
+      "properties": {
+        "etcdEndpoints": {"type": "string", "minLength": 3},
+        "etcdAuthSecret": {"type": "string", "minLength": 1},
+        "runtimeConfigSecret": {"type": "string", "minLength": 1},
+        "migrationSecret": {"type": "string", "minLength": 1}
+      }
+    },
+    "secrets": {
+      "type": "object",
+      "required": ["localAgentCaSecret", "offlineLicenseSecret", "siemSecret"],
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "offlineLicense": {
+      "type": "object",
+      "required": ["enabled", "deploymentId", "existingStateClaim"],
+      "properties": {
+        "enabled": {"const": true},
+        "deploymentId": {"type": "string", "minLength": 3},
+        "existingStateClaim": {"type": "string", "minLength": 1}
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "required": ["host", "adminHost", "tlsSecretName"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "className": {"type": "string"},
+        "host": {"type": "string", "minLength": 3},
+        "adminHost": {"type": "string", "minLength": 3},
+        "tlsSecretName": {"type": "string", "minLength": 1}
+      }
+    },
+    "observability": {
+      "type": "object",
+      "required": ["siemWebhook"],
+      "properties": {
+        "prometheus": {"type": "boolean"},
+        "otlpEndpoint": {"type": "string"},
+        "siemWebhook": {"type": "string", "pattern": "^https://", "minLength": 9}
+      }
+    }
+  }
+}

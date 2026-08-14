@@ -12,6 +12,7 @@ type (
 	// and implement the added methods in customTAppVersionModel.
 	TAppVersionModel interface {
 		tAppVersionModel
+		WithSession(session sqlx.Session) TAppVersionModel
 	}
 
 	customTAppVersionModel struct {
@@ -24,4 +25,8 @@ func NewTAppVersionModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Opt
 	return &customTAppVersionModel{
 		defaultTAppVersionModel: newTAppVersionModel(conn, c, opts...),
 	}
+}
+
+func (m *customTAppVersionModel) WithSession(session sqlx.Session) TAppVersionModel {
+	return &customTAppVersionModel{defaultTAppVersionModel: &defaultTAppVersionModel{CachedConn: m.CachedConn.WithSession(session), table: m.table}}
 }

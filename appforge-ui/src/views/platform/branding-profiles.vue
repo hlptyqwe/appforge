@@ -3,7 +3,11 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type UploadFile } from 'element-plus'
 import CursorPagination from '@/components/common/CursorPagination.vue'
 import { usePagination } from '@/composables/usePagination'
-import { platformService, type PlatformBrandingPreflight, type PlatformBrandingProfile } from '@/services'
+import {
+  platformService,
+  type PlatformBrandingPreflight,
+  type PlatformBrandingProfile,
+} from '@/services'
 
 const rows = ref<PlatformBrandingProfile[]>([])
 const loading = ref(false)
@@ -32,11 +36,13 @@ const form = reactive({
   logoObjectId: 0,
   splashObjectId: 0,
 })
-const { pagination, updateFromResponse, resetAndLoad, nextAndLoad, prevAndLoad } = usePagination<number>(20)
+const { pagination, updateFromResponse, resetAndLoad, nextAndLoad, prevAndLoad } =
+  usePagination<number>(20)
 
 const dialogTitle = computed(() => (editingId.value ? '编辑品牌配置' : '新增品牌配置'))
 const statusText = (status: number) => ({ 1: '草稿', 2: '启用', 3: '停用' })[status] || '未知'
-const preflightStatusText = (status: number) => ({ 1: '处理中', 2: '兼容', 3: '不兼容', 4: '执行失败' })[status] || '未知'
+const preflightStatusText = (status: number) =>
+  ({ 1: '处理中', 2: '兼容', 3: '不兼容', 4: '执行失败' })[status] || '未知'
 
 async function loadData() {
   loading.value = true
@@ -138,13 +144,17 @@ async function submit() {
 async function changeStatus(row: PlatformBrandingProfile) {
   const status = row.status === 2 ? 3 : 2
   try {
-    await ElMessageBox.confirm(`确定${status === 2 ? '启用' : '停用'}“${row.profileName}”吗？`, '状态确认')
+    await ElMessageBox.confirm(
+      `确定${status === 2 ? '启用' : '停用'}“${row.profileName}”吗？`,
+      '状态确认',
+    )
     const response = await platformService.changeBrandingProfileStatus(row.id, status)
     if (response.code !== 200) throw new Error(response.msg)
     ElMessage.success('状态已更新')
     await loadData()
   } catch (error) {
-    if (error !== 'cancel' && error !== 'close') ElMessage.error(error instanceof Error ? error.message : '状态更新失败')
+    if (error !== 'cancel' && error !== 'close')
+      ElMessage.error(error instanceof Error ? error.message : '状态更新失败')
   }
 }
 
@@ -159,14 +169,18 @@ async function startPreflight(row: PlatformBrandingProfile) {
     ElMessage.success('预检已提交，Builder 将异步处理')
     await showPreflights(row)
   } catch (error) {
-    if (error !== 'cancel' && error !== 'close') ElMessage.error(error instanceof Error ? error.message : '创建预检失败')
+    if (error !== 'cancel' && error !== 'close')
+      ElMessage.error(error instanceof Error ? error.message : '创建预检失败')
   }
 }
 
 async function loadPreflights() {
   preflightLoading.value = true
   try {
-    const response = await platformService.listBrandingPreflights({ brandingProfileId: preflightProfileId.value, limit: 100 })
+    const response = await platformService.listBrandingPreflights({
+      brandingProfileId: preflightProfileId.value,
+      limit: 100,
+    })
     if (response.code !== 200) throw new Error(response.msg)
     preflights.value = response.data || []
   } catch (error) {
@@ -198,10 +212,22 @@ onMounted(loadData)
   <div class="module-page">
     <el-card shadow="never" class="query-card">
       <el-form inline>
-        <el-form-item label="应用 ID"><el-input-number v-model="query.appId" :min="0" /></el-form-item>
+        <el-form-item label="应用 ID"
+          ><el-input-number v-model="query.appId" :min="0"
+        /></el-form-item>
         <el-form-item label="关键词"><el-input v-model="query.keyword" clearable /></el-form-item>
-        <el-form-item label="状态"><el-select v-model="query.status" style="width: 120px"><el-option label="全部" :value="0" /><el-option label="草稿" :value="1" /><el-option label="启用" :value="2" /><el-option label="停用" :value="3" /></el-select></el-form-item>
-        <el-form-item><el-button type="primary" @click="resetAndLoad(loadData)">查询</el-button><el-button v-perm="'core:branding:add'" @click="openForm()">新增</el-button></el-form-item>
+        <el-form-item label="状态"
+          ><el-select v-model="query.status" style="width: 120px"
+            ><el-option label="全部" :value="0" /><el-option label="草稿" :value="1" /><el-option
+              label="启用"
+              :value="2" /><el-option label="停用" :value="3" /></el-select
+        ></el-form-item>
+        <el-form-item
+          ><el-button type="primary" @click="resetAndLoad(loadData)">查询</el-button
+          ><el-button v-perm="'core:branding:add'" @click="openForm()"
+            >新增</el-button
+          ></el-form-item
+        >
       </el-form>
     </el-card>
 
@@ -213,52 +239,179 @@ onMounted(loadData)
         <el-table-column prop="appName" label="AppName" min-width="140" />
         <el-table-column prop="apiHost" label="API Host" min-width="220" show-overflow-tooltip />
         <el-table-column prop="revision" label="修订" width="80" />
-        <el-table-column label="模式" width="110"><template #default="scope">{{ scope.row.rewriteMode === 2 ? '运行时契约' : '资源重建' }}</template></el-table-column>
-        <el-table-column label="状态" width="90"><template #default="scope">{{ statusText(scope.row.status) }}</template></el-table-column>
+        <el-table-column label="模式" width="110"
+          ><template #default="scope">{{
+            scope.row.rewriteMode === 2 ? '运行时契约' : '资源重建'
+          }}</template></el-table-column
+        >
+        <el-table-column label="状态" width="90"
+          ><template #default="scope">{{ statusText(scope.row.status) }}</template></el-table-column
+        >
         <el-table-column label="操作" width="300" fixed="right">
           <template #default="scope">
-            <el-button v-perm="'core:branding:update'" link type="primary" @click="openForm(scope.row)">编辑</el-button>
-            <el-button v-perm="'core:branding:status'" link @click="changeStatus(scope.row)">{{ scope.row.status === 2 ? '停用' : '启用' }}</el-button>
-            <el-button v-perm="'core:branding:preflight'" link type="success" @click="startPreflight(scope.row)">预检</el-button>
-            <el-button v-perm="'core:branding:view'" link @click="showPreflights(scope.row)">记录</el-button>
+            <el-button
+              v-perm="'core:branding:update'"
+              link
+              type="primary"
+              @click="openForm(scope.row)"
+              >编辑</el-button
+            >
+            <el-button v-perm="'core:branding:status'" link @click="changeStatus(scope.row)">{{
+              scope.row.status === 2 ? '停用' : '启用'
+            }}</el-button>
+            <el-button
+              v-perm="'core:branding:preflight'"
+              link
+              type="success"
+              @click="startPreflight(scope.row)"
+              >预检</el-button
+            >
+            <el-button v-perm="'core:branding:view'" link @click="showPreflights(scope.row)"
+              >记录</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
-      <CursorPagination v-model:limit="pagination.limit" :total="pagination.total" :has-prev="pagination.hasPrev" :has-next="pagination.hasNext" @prev="prevAndLoad(loadData)" @next="nextAndLoad(loadData)" @limit-change="resetAndLoad(loadData)" />
+      <CursorPagination
+        v-model:limit="pagination.limit"
+        :total="pagination.total"
+        :has-prev="pagination.hasPrev"
+        :has-next="pagination.hasNext"
+        @prev="prevAndLoad(loadData)"
+        @next="nextAndLoad(loadData)"
+        @limit-change="resetAndLoad(loadData)"
+      />
     </el-card>
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="700px" @closed="clearPreviews">
       <el-form ref="formRef" :model="form" label-width="150px">
-        <el-form-item label="应用 ID" prop="appId" :rules="[{ required: true, message: '请输入应用 ID' }]"><el-input-number v-model="form.appId" :min="1" :disabled="Boolean(editingId)" style="width: 100%" /></el-form-item>
-        <el-form-item label="配置名称" prop="profileName" :rules="[{ required: true, message: '请输入配置名称' }]"><el-input v-model="form.profileName" /></el-form-item>
-        <el-form-item label="AppName" prop="appName" :rules="[{ required: true, message: '请输入 AppName' }]"><el-input v-model="form.appName" /></el-form-item>
-        <el-form-item label="API Host" prop="apiHost" :rules="[{ required: true, message: '请输入 HTTPS API Host' }]"><el-input v-model="form.apiHost" placeholder="https://api.example.com" /></el-form-item>
-        <el-form-item label="改写模式"><el-radio-group v-model="form.rewriteMode"><el-radio :value="1">资源重建</el-radio><el-radio :value="2">运行时契约</el-radio></el-radio-group></el-form-item>
-        <el-form-item label="Launcher 资源"><el-input v-model="form.launcherIconTarget" placeholder="mipmap/ic_launcher" /></el-form-item>
-        <el-form-item v-if="form.rewriteMode === 1" label="启动图资源"><el-input v-model="form.splashResourceTarget" placeholder="drawable/splash_logo" /></el-form-item>
-        <el-form-item label="运行时扩展 JSON"><el-input v-model="form.runtimeConfigJson" type="textarea" :rows="3" /></el-form-item>
-        <el-form-item label="Logo"><el-upload :auto-upload="false" :limit="1" accept=".png,.webp" :on-change="(file: UploadFile) => selectImage('logo', file)"><el-button>选择 Logo</el-button><template #tip><div class="el-upload__tip">正方形 512–2048 px，最大 5 MiB；编辑时不选则保留原对象 {{ form.logoObjectId || '' }}</div></template></el-upload><img v-if="logoPreview" :src="logoPreview" class="image-preview" alt="Logo 预览" /></el-form-item>
-        <el-form-item label="启动图"><el-upload :auto-upload="false" :limit="1" accept=".png,.webp" :on-change="(file: UploadFile) => selectImage('splash', file)"><el-button>选择启动图</el-button><template #tip><div class="el-upload__tip">最小短边 720 px，最大 10 MiB；编辑时不选则保留原对象 {{ form.splashObjectId || '' }}</div></template></el-upload><img v-if="splashPreview" :src="splashPreview" class="image-preview splash" alt="启动图预览" /></el-form-item>
+        <el-form-item
+          label="应用 ID"
+          prop="appId"
+          :rules="[{ required: true, message: '请输入应用 ID' }]"
+          ><el-input-number
+            v-model="form.appId"
+            :min="1"
+            :disabled="Boolean(editingId)"
+            style="width: 100%"
+        /></el-form-item>
+        <el-form-item
+          label="配置名称"
+          prop="profileName"
+          :rules="[{ required: true, message: '请输入配置名称' }]"
+          ><el-input v-model="form.profileName"
+        /></el-form-item>
+        <el-form-item
+          label="AppName"
+          prop="appName"
+          :rules="[{ required: true, message: '请输入 AppName' }]"
+          ><el-input v-model="form.appName"
+        /></el-form-item>
+        <el-form-item
+          label="API Host"
+          prop="apiHost"
+          :rules="[{ required: true, message: '请输入 HTTPS API Host' }]"
+          ><el-input v-model="form.apiHost" placeholder="https://api.example.com"
+        /></el-form-item>
+        <el-form-item label="改写模式"
+          ><el-radio-group v-model="form.rewriteMode"
+            ><el-radio :value="1">资源重建</el-radio
+            ><el-radio :value="2">运行时契约</el-radio></el-radio-group
+          ></el-form-item
+        >
+        <el-form-item label="Launcher 资源"
+          ><el-input v-model="form.launcherIconTarget" placeholder="mipmap/ic_launcher"
+        /></el-form-item>
+        <el-form-item v-if="form.rewriteMode === 1" label="启动图资源"
+          ><el-input v-model="form.splashResourceTarget" placeholder="drawable/splash_logo"
+        /></el-form-item>
+        <el-form-item label="运行时扩展 JSON"
+          ><el-input v-model="form.runtimeConfigJson" type="textarea" :rows="3"
+        /></el-form-item>
+        <el-form-item label="Logo"
+          ><el-upload
+            :auto-upload="false"
+            :limit="1"
+            accept=".png,.webp"
+            :on-change="(file: UploadFile) => selectImage('logo', file)"
+            ><el-button>选择 Logo</el-button
+            ><template #tip
+              ><div class="el-upload__tip">
+                正方形 512–2048 px，最大 5 MiB；编辑时不选则保留原对象 {{ form.logoObjectId || '' }}
+              </div></template
+            ></el-upload
+          ><img v-if="logoPreview" :src="logoPreview" class="image-preview" alt="Logo 预览"
+        /></el-form-item>
+        <el-form-item label="启动图"
+          ><el-upload
+            :auto-upload="false"
+            :limit="1"
+            accept=".png,.webp"
+            :on-change="(file: UploadFile) => selectImage('splash', file)"
+            ><el-button>选择启动图</el-button
+            ><template #tip
+              ><div class="el-upload__tip">
+                最小短边 720 px，最大 10 MiB；编辑时不选则保留原对象 {{ form.splashObjectId || '' }}
+              </div></template
+            ></el-upload
+          ><img
+            v-if="splashPreview"
+            :src="splashPreview"
+            class="image-preview splash"
+            alt="启动图预览"
+        /></el-form-item>
       </el-form>
-      <template #footer><el-button @click="dialogVisible = false">取消</el-button><el-button type="primary" :loading="submitting" @click="submit">保存</el-button></template>
+      <template #footer
+        ><el-button @click="dialogVisible = false">取消</el-button
+        ><el-button type="primary" :loading="submitting" @click="submit">保存</el-button></template
+      >
     </el-dialog>
 
     <el-dialog v-model="preflightVisible" title="兼容性预检记录" width="820px">
-      <div class="preflight-toolbar"><el-button :loading="preflightLoading" @click="loadPreflights">刷新</el-button></div>
+      <div class="preflight-toolbar">
+        <el-button :loading="preflightLoading" @click="loadPreflights">刷新</el-button>
+      </div>
       <el-table v-loading="preflightLoading" :data="preflights" max-height="520">
         <el-table-column prop="versionId" label="版本 ID" width="100" />
         <el-table-column prop="brandingRevision" label="品牌修订" width="100" />
-        <el-table-column label="状态" width="100"><template #default="scope">{{ preflightStatusText(scope.row.status) }}</template></el-table-column>
+        <el-table-column label="状态" width="100"
+          ><template #default="scope">{{
+            preflightStatusText(scope.row.status)
+          }}</template></el-table-column
+        >
         <el-table-column prop="toolchainVersion" label="工具链" width="150" />
-        <el-table-column label="报告" min-width="340"><template #default="scope"><pre class="report-json">{{ formattedReport(scope.row.reportJson) }}</pre></template></el-table-column>
+        <el-table-column label="报告" min-width="340"
+          ><template #default="scope">
+            <pre class="report-json">{{ formattedReport(scope.row.reportJson) }}</pre>
+          </template></el-table-column
+        >
       </el-table>
     </el-dialog>
   </div>
 </template>
 
 <style scoped>
-.image-preview { width: 80px; height: 80px; margin-left: 16px; object-fit: contain; border: 1px solid var(--el-border-color); border-radius: 8px; }
-.image-preview.splash { width: 120px; }
-.preflight-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
-.report-json { margin: 0; max-height: 180px; overflow: auto; white-space: pre-wrap; font-size: 12px; }
+.image-preview {
+  width: 80px;
+  height: 80px;
+  margin-left: 16px;
+  object-fit: contain;
+  border: 1px solid var(--el-border-color);
+  border-radius: 8px;
+}
+.image-preview.splash {
+  width: 120px;
+}
+.preflight-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.report-json {
+  margin: 0;
+  max-height: 180px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-size: 12px;
+}
 </style>

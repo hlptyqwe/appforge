@@ -1,0 +1,78 @@
+global:
+  deploymentMode: private
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+  publicOrigin: ""
+  offline: false
+
+image:
+  tag: ""
+  pullPolicy: IfNotPresent
+
+replicas:
+  api: 2
+  system: 2
+  core: 2
+  builder: 2
+  builderWorker: 2
+  worker: 2
+  sourceWorker: 1
+  ui: 2
+
+external:
+  etcdEndpoints: https://etcd-client.database.svc:2379
+  etcdAuthSecret: appforge-etcd-client
+  runtimeConfigSecret: appforge-runtime-config
+  migrationSecret: appforge-migration
+
+secrets:
+  localAgentCaSecret: appforge-local-agent-ca
+  offlineLicenseSecret: appforge-offline-license
+  siemSecret: appforge-siem
+
+offlineLicense:
+  enabled: true
+  deploymentId: ""
+  # 多副本共享的RWX持久卷；保存防时钟/许可证回退状态。
+  existingStateClaim: ""
+
+ingress:
+  enabled: true
+  className: nginx
+  host: ""
+  adminHost: ""
+  tlsSecretName: appforge-tls
+
+localAgentGateway:
+  enabled: true
+  serviceType: LoadBalancer
+  port: 9443
+
+resources:
+  api: {requests: {cpu: 250m, memory: 256Mi}, limits: {cpu: "2", memory: 1Gi}}
+  rpc: {requests: {cpu: 250m, memory: 256Mi}, limits: {cpu: "2", memory: 1Gi}}
+  worker: {requests: {cpu: "1", memory: 1Gi}, limits: {cpu: "4", memory: 4Gi}}
+  ui: {requests: {cpu: 50m, memory: 64Mi}, limits: {cpu: 500m, memory: 256Mi}}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  seccompProfile: {type: RuntimeDefault}
+
+networkPolicy:
+  enabled: true
+  ingressNamespaceLabels:
+    kubernetes.io/metadata.name: ingress-nginx
+  egressCIDRs: []
+
+observability:
+  prometheus: true
+  otlpEndpoint: ""
+  siemWebhook: ""
+
+upgrade:
+  schemaVersion: "20260814_109_v7_enterprise_menu"
+  maxVersionSkew: 1

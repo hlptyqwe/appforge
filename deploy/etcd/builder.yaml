@@ -13,9 +13,17 @@ BuilderRpc:
   Target: builder-rpc:8082
 Builder:
   Id: builder-dev-01
+  PoolCode: default
+  Endpoint: docker
+  MaxConcurrency: 2
   LeaseSeconds: 120
   PollInterval: 2s
+  NodeHeartbeat: 15s
   TempDir: /tmp/appforge-builder
+  ToolchainVersion: android-debian-v4
+  BuildProtocolVersion: 1
+  CapabilityJson: '{"apk":true,"branding":true,"whiteLabel":true,"cache":true}'
+  CacheTtl: 168h
 
 ObjectCleanup:
   Interval: 10s
@@ -34,3 +42,16 @@ ObjectStorage:
 # 仅用于本地开发，必须与 admin-api 使用同一密钥；生产环境由 Secret Manager 注入。
 SigningSecrets:
   MasterKeyBase64: YXBwZm9yZ2UtZGV2LXNpZ25pbmcta2V5LTAwMDAwMSE=
+
+SecretProviders:
+  MaxSecretBytes: 65536
+  LocalRoot: ""
+  KubernetesRoot: ""
+  Vault:
+    Address: ""
+    TokenFile: ""
+    Namespace: ""
+    AllowHTTP: false
+  AWS:
+    Region: ""
+    Endpoint: ""

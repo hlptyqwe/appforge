@@ -19,6 +19,17 @@ type (
 	ApplicationListReq                    = core.ApplicationListReq
 	ApplicationListResp                   = core.ApplicationListResp
 	ApplicationResp                       = core.ApplicationResp
+	ApplyBillingWebhookReq                = core.ApplyBillingWebhookReq
+	AuthenticateOpenApiCredentialReq      = core.AuthenticateOpenApiCredentialReq
+	AuthorizeSourceRepositoryReq          = core.AuthorizeSourceRepositoryReq
+	BeginOpenApiIdempotencyReq            = core.BeginOpenApiIdempotencyReq
+	BillingPlan                           = core.BillingPlan
+	BillingPlanIdReq                      = core.BillingPlanIdReq
+	BillingPlanListReq                    = core.BillingPlanListReq
+	BillingPlanListResp                   = core.BillingPlanListResp
+	BillingPlanResp                       = core.BillingPlanResp
+	BillingUsageReq                       = core.BillingUsageReq
+	BillingUsageResp                      = core.BillingUsageResp
 	BrandingPreflight                     = core.BrandingPreflight
 	BrandingPreflightExecutionContext     = core.BrandingPreflightExecutionContext
 	BrandingPreflightExecutionContextResp = core.BrandingPreflightExecutionContextResp
@@ -31,14 +42,40 @@ type (
 	BrandingProfileListReq                = core.BrandingProfileListReq
 	BrandingProfileListResp               = core.BrandingProfileListResp
 	BrandingProfileResp                   = core.BrandingProfileResp
+	BuildCacheEntry                       = core.BuildCacheEntry
+	BuildCacheEntryIdReq                  = core.BuildCacheEntryIdReq
+	BuildCacheEntryListReq                = core.BuildCacheEntryListReq
+	BuildCacheEntryListResp               = core.BuildCacheEntryListResp
+	BuildCacheEntryResp                   = core.BuildCacheEntryResp
+	BuildCacheResolution                  = core.BuildCacheResolution
+	BuildCacheResolutionResp              = core.BuildCacheResolutionResp
+	BuildClusterMetrics                   = core.BuildClusterMetrics
+	BuildClusterMetricsReq                = core.BuildClusterMetricsReq
+	BuildClusterMetricsResp               = core.BuildClusterMetricsResp
+	BuildConcurrencyPolicy                = core.BuildConcurrencyPolicy
+	BuildConcurrencyPolicyListReq         = core.BuildConcurrencyPolicyListReq
+	BuildConcurrencyPolicyListResp        = core.BuildConcurrencyPolicyListResp
+	BuildConcurrencyPolicyResp            = core.BuildConcurrencyPolicyResp
 	BuildExecutionContext                 = core.BuildExecutionContext
 	BuildExecutionContextResp             = core.BuildExecutionContextResp
+	BuildSchedulerEvent                   = core.BuildSchedulerEvent
+	BuildSchedulerEventListReq            = core.BuildSchedulerEventListReq
+	BuildSchedulerEventListResp           = core.BuildSchedulerEventListResp
 	BuildTask                             = core.BuildTask
 	BuildTaskIdReq                        = core.BuildTaskIdReq
 	BuildTaskListReq                      = core.BuildTaskListReq
 	BuildTaskListResp                     = core.BuildTaskListResp
 	BuildTaskResp                         = core.BuildTaskResp
+	BuilderNode                           = core.BuilderNode
+	BuilderNodeHeartbeatReq               = core.BuilderNodeHeartbeatReq
+	BuilderNodeIdReq                      = core.BuilderNodeIdReq
+	BuilderNodeListReq                    = core.BuilderNodeListReq
+	BuilderNodeListResp                   = core.BuilderNodeListResp
+	BuilderNodeResp                       = core.BuilderNodeResp
+	CancelBuildTaskReq                    = core.CancelBuildTaskReq
+	CancelTenantSubscriptionReq           = core.CancelTenantSubscriptionReq
 	ChangeBrandingProfileStatusReq        = core.ChangeBrandingProfileStatusReq
+	ChangeTenantSubscriptionReq           = core.ChangeTenantSubscriptionReq
 	ChangeWhiteLabelProductStatusReq      = core.ChangeWhiteLabelProductStatusReq
 	ChangeWhiteLabelTemplateStatusReq     = core.ChangeWhiteLabelTemplateStatusReq
 	Channel                               = core.Channel
@@ -55,50 +92,173 @@ type (
 	ClaimBuildTaskReq                     = core.ClaimBuildTaskReq
 	ClaimExpiredStorageObjectsReq         = core.ClaimExpiredStorageObjectsReq
 	ClaimExpiredStorageObjectsResp        = core.ClaimExpiredStorageObjectsResp
+	ClaimLocalAgentBuildTaskReq           = core.ClaimLocalAgentBuildTaskReq
+	ClaimScheduledBuildTaskReq            = core.ClaimScheduledBuildTaskReq
+	ClaimSourceWebhookEventReq            = core.ClaimSourceWebhookEventReq
+	ClaimSourceWebhookEventResp           = core.ClaimSourceWebhookEventResp
+	ClaimedSourceWebhookEvent             = core.ClaimedSourceWebhookEvent
+	CleanupBuildCacheReq                  = core.CleanupBuildCacheReq
+	CleanupBuildCacheResp                 = core.CleanupBuildCacheResp
+	CleanupBuildCacheResult               = core.CleanupBuildCacheResult
 	CompleteBrandingPreflightReq          = core.CompleteBrandingPreflightReq
 	CompleteBuildTaskReq                  = core.CompleteBuildTaskReq
+	CompleteLocalAgentBuildTaskReq        = core.CompleteLocalAgentBuildTaskReq
+	CompleteOpenApiIdempotencyReq         = core.CompleteOpenApiIdempotencyReq
+	CompleteSourceIntegrationReq          = core.CompleteSourceIntegrationReq
+	CompleteSourceWebhookEventReq         = core.CompleteSourceWebhookEventReq
 	CompleteStorageObjectReq              = core.CompleteStorageObjectReq
 	CopyWhiteLabelTemplateReq             = core.CopyWhiteLabelTemplateReq
 	CreateApplicationReq                  = core.CreateApplicationReq
+	CreateBillingPlanReq                  = core.CreateBillingPlanReq
 	CreateBrandingPreflightReq            = core.CreateBrandingPreflightReq
 	CreateBrandingProfileReq              = core.CreateBrandingProfileReq
 	CreateBuildTaskReq                    = core.CreateBuildTaskReq
 	CreateChannelReq                      = core.CreateChannelReq
+	CreateLocalAgentRegistrationReq       = core.CreateLocalAgentRegistrationReq
+	CreateOpenApiCredentialReq            = core.CreateOpenApiCredentialReq
 	CreateSigningConfigReq                = core.CreateSigningConfigReq
+	CreateSourceBuildTriggerReq           = core.CreateSourceBuildTriggerReq
 	CreateStorageObjectReq                = core.CreateStorageObjectReq
+	CreateTestWebhookEventReq             = core.CreateTestWebhookEventReq
 	CreateVersionReq                      = core.CreateVersionReq
+	CreateWebhookEndpointReq              = core.CreateWebhookEndpointReq
 	CreateWhiteLabelProductReq            = core.CreateWhiteLabelProductReq
 	CreateWhiteLabelTemplateReq           = core.CreateWhiteLabelTemplateReq
 	CreateWhiteLabelTemplateRevisionReq   = core.CreateWhiteLabelTemplateRevisionReq
+	DrainBuilderNodeReq                   = core.DrainBuilderNodeReq
+	DrainLocalAgentReq                    = core.DrainLocalAgentReq
+	EnqueueSourceWebhookEventReq          = core.EnqueueSourceWebhookEventReq
+	EnqueueSourceWebhookEventResp         = core.EnqueueSourceWebhookEventResp
+	EnqueueSourceWebhookEventResult       = core.EnqueueSourceWebhookEventResult
 	ExpiredStorageObject                  = core.ExpiredStorageObject
 	FailBuildTaskReq                      = core.FailBuildTaskReq
+	FailLocalAgentBuildTaskReq            = core.FailLocalAgentBuildTaskReq
+	FailSourceWebhookEventReq             = core.FailSourceWebhookEventReq
 	FailStorageObjectReq                  = core.FailStorageObjectReq
 	GetBuildExecutionContextReq           = core.GetBuildExecutionContextReq
 	HeartbeatBuildTaskReq                 = core.HeartbeatBuildTaskReq
+	HeartbeatLocalAgentReq                = core.HeartbeatLocalAgentReq
+	ImportSourceArtifactReq               = core.ImportSourceArtifactReq
 	InstallReportReq                      = core.InstallReportReq
+	InvalidateBuildCacheReq               = core.InvalidateBuildCacheReq
+	Invoice                               = core.Invoice
+	InvoiceItem                           = core.InvoiceItem
+	InvoiceListReq                        = core.InvoiceListReq
+	InvoiceListResp                       = core.InvoiceListResp
+	LocalAgent                            = core.LocalAgent
+	LocalAgentAuth                        = core.LocalAgentAuth
+	LocalAgentBuildTaskResp               = core.LocalAgentBuildTaskResp
+	LocalAgentCapability                  = core.LocalAgentCapability
+	LocalAgentCertificate                 = core.LocalAgentCertificate
+	LocalAgentIdReq                       = core.LocalAgentIdReq
+	LocalAgentListReq                     = core.LocalAgentListReq
+	LocalAgentListResp                    = core.LocalAgentListResp
+	LocalAgentRegistrationResp            = core.LocalAgentRegistrationResp
+	LocalAgentResp                        = core.LocalAgentResp
 	MarkStorageObjectDeletedReq           = core.MarkStorageObjectDeletedReq
+	OpenApiAuthContext                    = core.OpenApiAuthContext
+	OpenApiAuthContextResp                = core.OpenApiAuthContextResp
+	OpenApiCredential                     = core.OpenApiCredential
+	OpenApiCredentialIdReq                = core.OpenApiCredentialIdReq
+	OpenApiCredentialListReq              = core.OpenApiCredentialListReq
+	OpenApiCredentialListResp             = core.OpenApiCredentialListResp
+	OpenApiCredentialResp                 = core.OpenApiCredentialResp
+	OpenApiCredentialSecret               = core.OpenApiCredentialSecret
+	OpenApiCredentialSecretResp           = core.OpenApiCredentialSecretResp
+	OpenApiIdempotencyResp                = core.OpenApiIdempotencyResp
+	OpenApiIdempotencyResult              = core.OpenApiIdempotencyResult
+	PublishBuildCacheReq                  = core.PublishBuildCacheReq
 	PublishWhiteLabelTemplateReq          = core.PublishWhiteLabelTemplateReq
+	QuotaReservation                      = core.QuotaReservation
+	QuotaReservationActionReq             = core.QuotaReservationActionReq
+	QuotaReservationResp                  = core.QuotaReservationResp
+	RecordOpenApiAuditReq                 = core.RecordOpenApiAuditReq
+	RecordSourceArtifactReq               = core.RecordSourceArtifactReq
+	RecordUsageReq                        = core.RecordUsageReq
+	RecoverBuilderNodeReq                 = core.RecoverBuilderNodeReq
+	RegisterBuilderNodeReq                = core.RegisterBuilderNodeReq
+	RegisterLocalAgentReq                 = core.RegisterLocalAgentReq
+	RegisterLocalAgentResp                = core.RegisterLocalAgentResp
+	RenewLocalAgentTaskLeaseReq           = core.RenewLocalAgentTaskLeaseReq
 	ReportBuildProgressReq                = core.ReportBuildProgressReq
 	ReportChannelEventReq                 = core.ReportChannelEventReq
+	ReportLocalAgentBuildProgressReq      = core.ReportLocalAgentBuildProgressReq
+	ReserveQuotaReq                       = core.ReserveQuotaReq
+	ResolveBuildCacheReq                  = core.ResolveBuildCacheReq
 	ResolveChannelDownloadReq             = core.ResolveChannelDownloadReq
+	ResolveSourceBuildTriggerReq          = core.ResolveSourceBuildTriggerReq
 	RespBase                              = core.RespBase
+	RetryBuildTaskReq                     = core.RetryBuildTaskReq
+	RevokeLocalAgentReq                   = core.RevokeLocalAgentReq
+	RotateLocalAgentCertificateReq        = core.RotateLocalAgentCertificateReq
+	RotateOpenApiCredentialReq            = core.RotateOpenApiCredentialReq
 	SigningConfig                         = core.SigningConfig
 	SigningConfigIdReq                    = core.SigningConfigIdReq
 	SigningConfigListReq                  = core.SigningConfigListReq
 	SigningConfigListResp                 = core.SigningConfigListResp
 	SigningConfigResp                     = core.SigningConfigResp
+	SourceArtifact                        = core.SourceArtifact
+	SourceArtifactImportResp              = core.SourceArtifactImportResp
+	SourceArtifactImportResult            = core.SourceArtifactImportResult
+	SourceArtifactResp                    = core.SourceArtifactResp
+	SourceBuildTrigger                    = core.SourceBuildTrigger
+	SourceBuildTriggerCredential          = core.SourceBuildTriggerCredential
+	SourceBuildTriggerCredentialResp      = core.SourceBuildTriggerCredentialResp
+	SourceBuildTriggerIdReq               = core.SourceBuildTriggerIdReq
+	SourceBuildTriggerListReq             = core.SourceBuildTriggerListReq
+	SourceBuildTriggerListResp            = core.SourceBuildTriggerListResp
+	SourceBuildTriggerResp                = core.SourceBuildTriggerResp
+	SourceBuildTriggerSecret              = core.SourceBuildTriggerSecret
+	SourceBuildTriggerSecretResp          = core.SourceBuildTriggerSecretResp
+	SourceIntegration                     = core.SourceIntegration
+	SourceIntegrationCredential           = core.SourceIntegrationCredential
+	SourceIntegrationCredentialResp       = core.SourceIntegrationCredentialResp
+	SourceIntegrationIdReq                = core.SourceIntegrationIdReq
+	SourceIntegrationListReq              = core.SourceIntegrationListReq
+	SourceIntegrationListResp             = core.SourceIntegrationListResp
+	SourceIntegrationResp                 = core.SourceIntegrationResp
+	SourceRepository                      = core.SourceRepository
+	SourceRepositoryIdReq                 = core.SourceRepositoryIdReq
+	SourceRepositoryListReq               = core.SourceRepositoryListReq
+	SourceRepositoryListResp              = core.SourceRepositoryListResp
+	SourceRepositoryResp                  = core.SourceRepositoryResp
+	SourceWebhookEvent                    = core.SourceWebhookEvent
+	SourceWebhookEventListReq             = core.SourceWebhookEventListReq
+	SourceWebhookEventListResp            = core.SourceWebhookEventListResp
 	StorageObject                         = core.StorageObject
 	StorageObjectIdReq                    = core.StorageObjectIdReq
 	StorageObjectResp                     = core.StorageObjectResp
+	TenantBillingReq                      = core.TenantBillingReq
+	TenantBillingResp                     = core.TenantBillingResp
+	TenantEntitlement                     = core.TenantEntitlement
+	TenantSubscription                    = core.TenantSubscription
 	UpdateBrandingProfileReq              = core.UpdateBrandingProfileReq
+	UpdateSourceBuildTriggerReq           = core.UpdateSourceBuildTriggerReq
+	UpdateWebhookEndpointReq              = core.UpdateWebhookEndpointReq
 	UpdateWhiteLabelProductReq            = core.UpdateWhiteLabelProductReq
 	UpdateWhiteLabelTemplateReq           = core.UpdateWhiteLabelTemplateReq
 	UpdateWhiteLabelTemplateRevisionReq   = core.UpdateWhiteLabelTemplateRevisionReq
+	UpsertBuildConcurrencyPolicyReq       = core.UpsertBuildConcurrencyPolicyReq
+	UpsertManualSubscriptionReq           = core.UpsertManualSubscriptionReq
+	UsageMetricSummary                    = core.UsageMetricSummary
+	VerifyHybridArtifactReq               = core.VerifyHybridArtifactReq
 	Version                               = core.Version
 	VersionIdReq                          = core.VersionIdReq
 	VersionListReq                        = core.VersionListReq
 	VersionListResp                       = core.VersionListResp
 	VersionResp                           = core.VersionResp
+	WebhookDelivery                       = core.WebhookDelivery
+	WebhookDeliveryIdReq                  = core.WebhookDeliveryIdReq
+	WebhookDeliveryListReq                = core.WebhookDeliveryListReq
+	WebhookDeliveryListResp               = core.WebhookDeliveryListResp
+	WebhookDeliveryResp                   = core.WebhookDeliveryResp
+	WebhookEndpoint                       = core.WebhookEndpoint
+	WebhookEndpointIdReq                  = core.WebhookEndpointIdReq
+	WebhookEndpointListReq                = core.WebhookEndpointListReq
+	WebhookEndpointListResp               = core.WebhookEndpointListResp
+	WebhookEndpointResp                   = core.WebhookEndpointResp
+	WebhookEndpointSecret                 = core.WebhookEndpointSecret
+	WebhookEndpointSecretResp             = core.WebhookEndpointSecretResp
 	WhiteLabelProduct                     = core.WhiteLabelProduct
 	WhiteLabelProductIdReq                = core.WhiteLabelProductIdReq
 	WhiteLabelProductListReq              = core.WhiteLabelProductListReq
@@ -204,12 +364,182 @@ type (
 		CreateBuildTask(ctx context.Context, in *CreateBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 		GetBuildTask(ctx context.Context, in *BuildTaskIdReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 		ListBuildTasks(ctx context.Context, in *BuildTaskListReq, opts ...grpc.CallOption) (*BuildTaskListResp, error)
+		// 取消待处理或执行中的V4构建任务并立即推进fencing代次。
+		CancelBuildTask(ctx context.Context, in *CancelBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+		// 根据不可变历史快照创建V4重试任务。
+		RetryBuildTask(ctx context.Context, in *RetryBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+		// 查询V4 Builder节点详情。
+		GetBuilderNode(ctx context.Context, in *BuilderNodeIdReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+		// 分页查询V4 Builder集群节点。
+		ListBuilderNodes(ctx context.Context, in *BuilderNodeListReq, opts ...grpc.CallOption) (*BuilderNodeListResp, error)
+		// 修改V4 Builder节点排空状态。
+		DrainBuilderNode(ctx context.Context, in *DrainBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+		// 在心跳、失败次数和磁盘容量均恢复后人工解除V4 Builder节点隔离。
+		RecoverBuilderNode(ctx context.Context, in *RecoverBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+		// 创建或更新V4构建并发与公平调度策略。
+		UpsertBuildConcurrencyPolicy(ctx context.Context, in *UpsertBuildConcurrencyPolicyReq, opts ...grpc.CallOption) (*BuildConcurrencyPolicyResp, error)
+		// 分页查询V4构建并发与公平调度策略。
+		ListBuildConcurrencyPolicies(ctx context.Context, in *BuildConcurrencyPolicyListReq, opts ...grpc.CallOption) (*BuildConcurrencyPolicyListResp, error)
+		// 分页查询V4构建缓存条目。
+		ListBuildCacheEntries(ctx context.Context, in *BuildCacheEntryListReq, opts ...grpc.CallOption) (*BuildCacheEntryListResp, error)
+		// 管理端失效V4构建缓存条目。
+		InvalidateBuildCache(ctx context.Context, in *InvalidateBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error)
+		// 分页查询V4结构化调度事件。
+		ListBuildSchedulerEvents(ctx context.Context, in *BuildSchedulerEventListReq, opts ...grpc.CallOption) (*BuildSchedulerEventListResp, error)
+		// 查询V4构建集群运行指标与告警摘要。
+		GetBuildClusterMetrics(ctx context.Context, in *BuildClusterMetricsReq, opts ...grpc.CallOption) (*BuildClusterMetricsResp, error)
+		// 创建V5 Open API凭证并一次性返回Secret。
+		CreateOpenApiCredential(ctx context.Context, in *CreateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiCredentialSecretResp, error)
+		// 分页查询V5 Open API凭证。
+		ListOpenApiCredentials(ctx context.Context, in *OpenApiCredentialListReq, opts ...grpc.CallOption) (*OpenApiCredentialListResp, error)
+		// 轮换V5 Open API凭证并一次性返回新Secret。
+		RotateOpenApiCredential(ctx context.Context, in *RotateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiCredentialSecretResp, error)
+		// 立即吊销V5 Open API凭证。
+		RevokeOpenApiCredential(ctx context.Context, in *OpenApiCredentialIdReq, opts ...grpc.CallOption) (*OpenApiCredentialResp, error)
+		// 验证V5 Open API凭证、IP、状态和有效期。
+		AuthenticateOpenApiCredential(ctx context.Context, in *AuthenticateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiAuthContextResp, error)
+		// 申请或读取Open API幂等执行记录。
+		BeginOpenApiIdempotency(ctx context.Context, in *BeginOpenApiIdempotencyReq, opts ...grpc.CallOption) (*OpenApiIdempotencyResp, error)
+		// 保存Open API幂等请求的最终响应。
+		CompleteOpenApiIdempotency(ctx context.Context, in *CompleteOpenApiIdempotencyReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 写入Open API调用审计。
+		RecordOpenApiAudit(ctx context.Context, in *RecordOpenApiAuditReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 创建Webhook订阅端点并一次性返回签名Secret。
+		CreateWebhookEndpoint(ctx context.Context, in *CreateWebhookEndpointReq, opts ...grpc.CallOption) (*WebhookEndpointSecretResp, error)
+		// 更新Webhook订阅端点。
+		UpdateWebhookEndpoint(ctx context.Context, in *UpdateWebhookEndpointReq, opts ...grpc.CallOption) (*WebhookEndpointResp, error)
+		// 查询Webhook订阅端点。
+		GetWebhookEndpoint(ctx context.Context, in *WebhookEndpointIdReq, opts ...grpc.CallOption) (*WebhookEndpointResp, error)
+		// 查询Webhook订阅端点列表。
+		ListWebhookEndpoints(ctx context.Context, in *WebhookEndpointListReq, opts ...grpc.CallOption) (*WebhookEndpointListResp, error)
+		// 重置Webhook签名Secret并一次性返回新Secret。
+		RotateWebhookEndpointSecret(ctx context.Context, in *WebhookEndpointIdReq, opts ...grpc.CallOption) (*WebhookEndpointSecretResp, error)
+		// 查询Webhook投递日志。
+		ListWebhookDeliveries(ctx context.Context, in *WebhookDeliveryListReq, opts ...grpc.CallOption) (*WebhookDeliveryListResp, error)
+		// 重放失败或死信的Webhook投递。
+		ReplayWebhookDelivery(ctx context.Context, in *WebhookDeliveryIdReq, opts ...grpc.CallOption) (*WebhookDeliveryResp, error)
+		// 创建只投递到指定端点的测试事件。
+		CreateTestWebhookEvent(ctx context.Context, in *CreateTestWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 完成受信任的GitHub/GitLab OAuth回调或App安装同步，并加密保存令牌。
+		CompleteSourceIntegration(ctx context.Context, in *CompleteSourceIntegrationReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error)
+		// 查询代码平台集成。
+		GetSourceIntegration(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error)
+		// 分页查询代码平台集成。
+		ListSourceIntegrations(ctx context.Context, in *SourceIntegrationListReq, opts ...grpc.CallOption) (*SourceIntegrationListResp, error)
+		// 读取有效集成令牌，仅供受内部认证保护的供应商客户端调用，禁止暴露到HTTP。
+		GetSourceIntegrationCredential(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationCredentialResp, error)
+		// 断开集成并使令牌立即不可用。
+		DisconnectSourceIntegration(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error)
+		// 同步OAuth/App明确授权的只读仓库。
+		AuthorizeSourceRepository(ctx context.Context, in *AuthorizeSourceRepositoryReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error)
+		// 查询单个授权仓库。
+		GetSourceRepository(ctx context.Context, in *SourceRepositoryIdReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error)
+		// 分页查询授权仓库。
+		ListSourceRepositories(ctx context.Context, in *SourceRepositoryListReq, opts ...grpc.CallOption) (*SourceRepositoryListResp, error)
+		// 撤销仓库授权。
+		RevokeSourceRepository(ctx context.Context, in *SourceRepositoryIdReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error)
+		// 记录从授权仓库导入并完成校验的APK Artifact来源。
+		RecordSourceArtifact(ctx context.Context, in *RecordSourceArtifactReq, opts ...grpc.CallOption) (*SourceArtifactResp, error)
+		// 在同一数据库事务中创建版本、绑定存储对象并记录供应商Artifact来源。
+		ImportSourceArtifact(ctx context.Context, in *ImportSourceArtifactReq, opts ...grpc.CallOption) (*SourceArtifactImportResp, error)
+		// 创建预定义源码平台构建触发策略并一次性返回回调令牌和签名Secret。
+		CreateSourceBuildTrigger(ctx context.Context, in *CreateSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerSecretResp, error)
+		// 更新预定义源码平台构建触发策略，不能修改授权仓库和应用。
+		UpdateSourceBuildTrigger(ctx context.Context, in *UpdateSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerResp, error)
+		// 查询预定义源码平台构建触发策略。
+		GetSourceBuildTrigger(ctx context.Context, in *SourceBuildTriggerIdReq, opts ...grpc.CallOption) (*SourceBuildTriggerResp, error)
+		// 分页查询预定义源码平台构建触发策略。
+		ListSourceBuildTriggers(ctx context.Context, in *SourceBuildTriggerListReq, opts ...grpc.CallOption) (*SourceBuildTriggerListResp, error)
+		// 轮换回调随机令牌和供应商签名Secret并一次性返回。
+		RotateSourceBuildTriggerSecret(ctx context.Context, in *SourceBuildTriggerIdReq, opts ...grpc.CallOption) (*SourceBuildTriggerSecretResp, error)
+		// 解析回调随机令牌和内部签名材料，仅供受内部认证保护的公开入口调用。
+		ResolveSourceBuildTrigger(ctx context.Context, in *ResolveSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerCredentialResp, error)
+		// 将已完成供应商签名验证的标准化事件可靠且幂等地写入队列。
+		EnqueueSourceWebhookEvent(ctx context.Context, in *EnqueueSourceWebhookEventReq, opts ...grpc.CallOption) (*EnqueueSourceWebhookEventResp, error)
+		// Worker使用租约原子领取待处理或超时事件。
+		ClaimSourceWebhookEvent(ctx context.Context, in *ClaimSourceWebhookEventReq, opts ...grpc.CallOption) (*ClaimSourceWebhookEventResp, error)
+		// Worker记录Artifact导入和构建任务创建成功。
+		CompleteSourceWebhookEvent(ctx context.Context, in *CompleteSourceWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error)
+		// Worker按可重试性记录失败、指数退避或最终失败。
+		FailSourceWebhookEvent(ctx context.Context, in *FailSourceWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 分页查询源码平台入站事件审计记录。
+		ListSourceWebhookEvents(ctx context.Context, in *SourceWebhookEventListReq, opts ...grpc.CallOption) (*SourceWebhookEventListResp, error)
+		// 创建V6不可变套餐版本，同编码自动分配下一版本号。
+		CreateBillingPlan(ctx context.Context, in *CreateBillingPlanReq, opts ...grpc.CallOption) (*BillingPlanResp, error)
+		// 查询V6套餐版本。
+		GetBillingPlan(ctx context.Context, in *BillingPlanIdReq, opts ...grpc.CallOption) (*BillingPlanResp, error)
+		// 查询V6套餐版本列表。
+		ListBillingPlans(ctx context.Context, in *BillingPlanListReq, opts ...grpc.CallOption) (*BillingPlanListResp, error)
+		// 退役V6套餐版本，不影响历史订阅。
+		RetireBillingPlan(ctx context.Context, in *BillingPlanIdReq, opts ...grpc.CallOption) (*BillingPlanResp, error)
+		// 查询租户当前订阅、权益和固化套餐版本。
+		GetTenantBilling(ctx context.Context, in *TenantBillingReq, opts ...grpc.CallOption) (*TenantBillingResp, error)
+		// 创建或更新人工合同订阅并原子刷新权益。
+		UpsertManualSubscription(ctx context.Context, in *UpsertManualSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error)
+		// 立即或周期末变更套餐。
+		ChangeTenantSubscription(ctx context.Context, in *ChangeTenantSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error)
+		// 立即或周期末取消订阅。
+		CancelTenantSubscription(ctx context.Context, in *CancelTenantSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error)
+		// 并发安全地预占构建、存储或席位额度。
+		ReserveQuota(ctx context.Context, in *ReserveQuotaReq, opts ...grpc.CallOption) (*QuotaReservationResp, error)
+		// 幂等确认额度预占并写不可变用量账本。
+		ConfirmQuota(ctx context.Context, in *QuotaReservationActionReq, opts ...grpc.CallOption) (*QuotaReservationResp, error)
+		// 幂等释放未使用额度预占。
+		ReleaseQuota(ctx context.Context, in *QuotaReservationActionReq, opts ...grpc.CallOption) (*QuotaReservationResp, error)
+		// 追加一条幂等不可变用量记录。
+		RecordUsage(ctx context.Context, in *RecordUsageReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 查询周期用量、预占和当前限额。
+		GetBillingUsage(ctx context.Context, in *BillingUsageReq, opts ...grpc.CallOption) (*BillingUsageResp, error)
+		// 查询租户不可变账单及账单项。
+		ListInvoices(ctx context.Context, in *InvoiceListReq, opts ...grpc.CallOption) (*InvoiceListResp, error)
+		// 应用已验签支付事件，事件幂等且拒绝乱序覆盖新状态。
+		ApplyBillingWebhook(ctx context.Context, in *ApplyBillingWebhookReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 创建V7 Local Agent并一次性返回注册码。
+		CreateLocalAgentRegistration(ctx context.Context, in *CreateLocalAgentRegistrationReq, opts ...grpc.CallOption) (*LocalAgentRegistrationResp, error)
+		// Agent使用一次性注册码和本地CSR完成首次注册。
+		RegisterLocalAgent(ctx context.Context, in *RegisterLocalAgentReq, opts ...grpc.CallOption) (*RegisterLocalAgentResp, error)
+		// 查询V7 Local Agent详情。
+		GetLocalAgent(ctx context.Context, in *LocalAgentIdReq, opts ...grpc.CallOption) (*LocalAgentResp, error)
+		// 分页查询V7 Local Agent。
+		ListLocalAgents(ctx context.Context, in *LocalAgentListReq, opts ...grpc.CallOption) (*LocalAgentListResp, error)
+		// Agent通过mTLS出站连接上报心跳和预定义能力。
+		HeartbeatLocalAgent(ctx context.Context, in *HeartbeatLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error)
+		// 管理员远程设置Agent Drain状态。
+		DrainLocalAgent(ctx context.Context, in *DrainLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error)
+		// 管理员吊销Agent及其全部有效证书。
+		RevokeLocalAgent(ctx context.Context, in *RevokeLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error)
+		// Agent使用当前有效证书和新CSR轮换客户端证书。
+		RotateLocalAgentCertificate(ctx context.Context, in *RotateLocalAgentCertificateReq, opts ...grpc.CallOption) (*RegisterLocalAgentResp, error)
+		// Agent领取经过租户、应用、能力和协议范围校验的构建任务。
+		ClaimLocalAgentBuildTask(ctx context.Context, in *ClaimLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*LocalAgentBuildTaskResp, error)
+		// Agent按任务attempt续租，旧进程不能回写。
+		RenewLocalAgentTaskLease(ctx context.Context, in *RenewLocalAgentTaskLeaseReq, opts ...grpc.CallOption) (*RespBase, error)
+		// Agent回报预定义构建阶段，不支持任意命令。
+		ReportLocalAgentBuildProgress(ctx context.Context, in *ReportLocalAgentBuildProgressReq, opts ...grpc.CallOption) (*RespBase, error)
+		// Agent校验Artifact后完成构建任务。
+		CompleteLocalAgentBuildTask(ctx context.Context, in *CompleteLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
+		// Agent记录脱敏失败摘要并结束任务。
+		FailLocalAgentBuildTask(ctx context.Context, in *FailLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 校验并登记三种存储模式下的Artifact引用。
+		VerifyHybridArtifact(ctx context.Context, in *VerifyHybridArtifactReq, opts ...grpc.CallOption) (*RespBase, error)
 		ReportInstall(ctx context.Context, in *InstallReportReq, opts ...grpc.CallOption) (*RespBase, error)
 		ReportChannelEvent(ctx context.Context, in *ReportChannelEventReq, opts ...grpc.CallOption) (*RespBase, error)
 		GetChannelStats(ctx context.Context, in *ChannelStatsReq, opts ...grpc.CallOption) (*ChannelStatsResp, error)
 		// 解析渠道最新成功产物并幂等记录点击、下载事件。
 		ResolveChannelDownload(ctx context.Context, in *ResolveChannelDownloadReq, opts ...grpc.CallOption) (*ChannelDownloadArtifactResp, error)
 		ClaimBuildTask(ctx context.Context, in *ClaimBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+		// 注册或刷新V4 Builder节点能力。
+		RegisterBuilderNode(ctx context.Context, in *RegisterBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+		// 上报V4 Builder节点心跳、容量和运行任务。
+		BuilderNodeHeartbeat(ctx context.Context, in *BuilderNodeHeartbeatReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+		// 结合节点能力、公平队列和并发槽位原子领取V4构建任务。
+		ClaimScheduledBuildTask(ctx context.Context, in *ClaimScheduledBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+		// 解析并记录V4输入可寻址构建缓存命中。
+		ResolveBuildCache(ctx context.Context, in *ResolveBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheResolutionResp, error)
+		// 发布独立V4构建缓存产物。
+		PublishBuildCache(ctx context.Context, in *PublishBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error)
+		// 执行V4构建缓存TTL/LRU清理并返回可物理删除对象。
+		CleanupBuildCache(ctx context.Context, in *CleanupBuildCacheReq, opts ...grpc.CallOption) (*CleanupBuildCacheResp, error)
 		// 读取当前Builder已领取任务的内部执行上下文。
 		GetBuildExecutionContext(ctx context.Context, in *GetBuildExecutionContextReq, opts ...grpc.CallOption) (*BuildExecutionContextResp, error)
 		HeartbeatBuildTask(ctx context.Context, in *HeartbeatBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
@@ -520,6 +850,480 @@ func (m *defaultCore) ListBuildTasks(ctx context.Context, in *BuildTaskListReq, 
 	return client.ListBuildTasks(ctx, in, opts...)
 }
 
+// 取消待处理或执行中的V4构建任务并立即推进fencing代次。
+func (m *defaultCore) CancelBuildTask(ctx context.Context, in *CancelBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CancelBuildTask(ctx, in, opts...)
+}
+
+// 根据不可变历史快照创建V4重试任务。
+func (m *defaultCore) RetryBuildTask(ctx context.Context, in *RetryBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RetryBuildTask(ctx, in, opts...)
+}
+
+// 查询V4 Builder节点详情。
+func (m *defaultCore) GetBuilderNode(ctx context.Context, in *BuilderNodeIdReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetBuilderNode(ctx, in, opts...)
+}
+
+// 分页查询V4 Builder集群节点。
+func (m *defaultCore) ListBuilderNodes(ctx context.Context, in *BuilderNodeListReq, opts ...grpc.CallOption) (*BuilderNodeListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListBuilderNodes(ctx, in, opts...)
+}
+
+// 修改V4 Builder节点排空状态。
+func (m *defaultCore) DrainBuilderNode(ctx context.Context, in *DrainBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.DrainBuilderNode(ctx, in, opts...)
+}
+
+// 在心跳、失败次数和磁盘容量均恢复后人工解除V4 Builder节点隔离。
+func (m *defaultCore) RecoverBuilderNode(ctx context.Context, in *RecoverBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RecoverBuilderNode(ctx, in, opts...)
+}
+
+// 创建或更新V4构建并发与公平调度策略。
+func (m *defaultCore) UpsertBuildConcurrencyPolicy(ctx context.Context, in *UpsertBuildConcurrencyPolicyReq, opts ...grpc.CallOption) (*BuildConcurrencyPolicyResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.UpsertBuildConcurrencyPolicy(ctx, in, opts...)
+}
+
+// 分页查询V4构建并发与公平调度策略。
+func (m *defaultCore) ListBuildConcurrencyPolicies(ctx context.Context, in *BuildConcurrencyPolicyListReq, opts ...grpc.CallOption) (*BuildConcurrencyPolicyListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListBuildConcurrencyPolicies(ctx, in, opts...)
+}
+
+// 分页查询V4构建缓存条目。
+func (m *defaultCore) ListBuildCacheEntries(ctx context.Context, in *BuildCacheEntryListReq, opts ...grpc.CallOption) (*BuildCacheEntryListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListBuildCacheEntries(ctx, in, opts...)
+}
+
+// 管理端失效V4构建缓存条目。
+func (m *defaultCore) InvalidateBuildCache(ctx context.Context, in *InvalidateBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.InvalidateBuildCache(ctx, in, opts...)
+}
+
+// 分页查询V4结构化调度事件。
+func (m *defaultCore) ListBuildSchedulerEvents(ctx context.Context, in *BuildSchedulerEventListReq, opts ...grpc.CallOption) (*BuildSchedulerEventListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListBuildSchedulerEvents(ctx, in, opts...)
+}
+
+// 查询V4构建集群运行指标与告警摘要。
+func (m *defaultCore) GetBuildClusterMetrics(ctx context.Context, in *BuildClusterMetricsReq, opts ...grpc.CallOption) (*BuildClusterMetricsResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetBuildClusterMetrics(ctx, in, opts...)
+}
+
+// 创建V5 Open API凭证并一次性返回Secret。
+func (m *defaultCore) CreateOpenApiCredential(ctx context.Context, in *CreateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiCredentialSecretResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateOpenApiCredential(ctx, in, opts...)
+}
+
+// 分页查询V5 Open API凭证。
+func (m *defaultCore) ListOpenApiCredentials(ctx context.Context, in *OpenApiCredentialListReq, opts ...grpc.CallOption) (*OpenApiCredentialListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListOpenApiCredentials(ctx, in, opts...)
+}
+
+// 轮换V5 Open API凭证并一次性返回新Secret。
+func (m *defaultCore) RotateOpenApiCredential(ctx context.Context, in *RotateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiCredentialSecretResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RotateOpenApiCredential(ctx, in, opts...)
+}
+
+// 立即吊销V5 Open API凭证。
+func (m *defaultCore) RevokeOpenApiCredential(ctx context.Context, in *OpenApiCredentialIdReq, opts ...grpc.CallOption) (*OpenApiCredentialResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RevokeOpenApiCredential(ctx, in, opts...)
+}
+
+// 验证V5 Open API凭证、IP、状态和有效期。
+func (m *defaultCore) AuthenticateOpenApiCredential(ctx context.Context, in *AuthenticateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiAuthContextResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.AuthenticateOpenApiCredential(ctx, in, opts...)
+}
+
+// 申请或读取Open API幂等执行记录。
+func (m *defaultCore) BeginOpenApiIdempotency(ctx context.Context, in *BeginOpenApiIdempotencyReq, opts ...grpc.CallOption) (*OpenApiIdempotencyResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.BeginOpenApiIdempotency(ctx, in, opts...)
+}
+
+// 保存Open API幂等请求的最终响应。
+func (m *defaultCore) CompleteOpenApiIdempotency(ctx context.Context, in *CompleteOpenApiIdempotencyReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CompleteOpenApiIdempotency(ctx, in, opts...)
+}
+
+// 写入Open API调用审计。
+func (m *defaultCore) RecordOpenApiAudit(ctx context.Context, in *RecordOpenApiAuditReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RecordOpenApiAudit(ctx, in, opts...)
+}
+
+// 创建Webhook订阅端点并一次性返回签名Secret。
+func (m *defaultCore) CreateWebhookEndpoint(ctx context.Context, in *CreateWebhookEndpointReq, opts ...grpc.CallOption) (*WebhookEndpointSecretResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateWebhookEndpoint(ctx, in, opts...)
+}
+
+// 更新Webhook订阅端点。
+func (m *defaultCore) UpdateWebhookEndpoint(ctx context.Context, in *UpdateWebhookEndpointReq, opts ...grpc.CallOption) (*WebhookEndpointResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.UpdateWebhookEndpoint(ctx, in, opts...)
+}
+
+// 查询Webhook订阅端点。
+func (m *defaultCore) GetWebhookEndpoint(ctx context.Context, in *WebhookEndpointIdReq, opts ...grpc.CallOption) (*WebhookEndpointResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetWebhookEndpoint(ctx, in, opts...)
+}
+
+// 查询Webhook订阅端点列表。
+func (m *defaultCore) ListWebhookEndpoints(ctx context.Context, in *WebhookEndpointListReq, opts ...grpc.CallOption) (*WebhookEndpointListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListWebhookEndpoints(ctx, in, opts...)
+}
+
+// 重置Webhook签名Secret并一次性返回新Secret。
+func (m *defaultCore) RotateWebhookEndpointSecret(ctx context.Context, in *WebhookEndpointIdReq, opts ...grpc.CallOption) (*WebhookEndpointSecretResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RotateWebhookEndpointSecret(ctx, in, opts...)
+}
+
+// 查询Webhook投递日志。
+func (m *defaultCore) ListWebhookDeliveries(ctx context.Context, in *WebhookDeliveryListReq, opts ...grpc.CallOption) (*WebhookDeliveryListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListWebhookDeliveries(ctx, in, opts...)
+}
+
+// 重放失败或死信的Webhook投递。
+func (m *defaultCore) ReplayWebhookDelivery(ctx context.Context, in *WebhookDeliveryIdReq, opts ...grpc.CallOption) (*WebhookDeliveryResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ReplayWebhookDelivery(ctx, in, opts...)
+}
+
+// 创建只投递到指定端点的测试事件。
+func (m *defaultCore) CreateTestWebhookEvent(ctx context.Context, in *CreateTestWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateTestWebhookEvent(ctx, in, opts...)
+}
+
+// 完成受信任的GitHub/GitLab OAuth回调或App安装同步，并加密保存令牌。
+func (m *defaultCore) CompleteSourceIntegration(ctx context.Context, in *CompleteSourceIntegrationReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CompleteSourceIntegration(ctx, in, opts...)
+}
+
+// 查询代码平台集成。
+func (m *defaultCore) GetSourceIntegration(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetSourceIntegration(ctx, in, opts...)
+}
+
+// 分页查询代码平台集成。
+func (m *defaultCore) ListSourceIntegrations(ctx context.Context, in *SourceIntegrationListReq, opts ...grpc.CallOption) (*SourceIntegrationListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListSourceIntegrations(ctx, in, opts...)
+}
+
+// 读取有效集成令牌，仅供受内部认证保护的供应商客户端调用，禁止暴露到HTTP。
+func (m *defaultCore) GetSourceIntegrationCredential(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationCredentialResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetSourceIntegrationCredential(ctx, in, opts...)
+}
+
+// 断开集成并使令牌立即不可用。
+func (m *defaultCore) DisconnectSourceIntegration(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.DisconnectSourceIntegration(ctx, in, opts...)
+}
+
+// 同步OAuth/App明确授权的只读仓库。
+func (m *defaultCore) AuthorizeSourceRepository(ctx context.Context, in *AuthorizeSourceRepositoryReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.AuthorizeSourceRepository(ctx, in, opts...)
+}
+
+// 查询单个授权仓库。
+func (m *defaultCore) GetSourceRepository(ctx context.Context, in *SourceRepositoryIdReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetSourceRepository(ctx, in, opts...)
+}
+
+// 分页查询授权仓库。
+func (m *defaultCore) ListSourceRepositories(ctx context.Context, in *SourceRepositoryListReq, opts ...grpc.CallOption) (*SourceRepositoryListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListSourceRepositories(ctx, in, opts...)
+}
+
+// 撤销仓库授权。
+func (m *defaultCore) RevokeSourceRepository(ctx context.Context, in *SourceRepositoryIdReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RevokeSourceRepository(ctx, in, opts...)
+}
+
+// 记录从授权仓库导入并完成校验的APK Artifact来源。
+func (m *defaultCore) RecordSourceArtifact(ctx context.Context, in *RecordSourceArtifactReq, opts ...grpc.CallOption) (*SourceArtifactResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RecordSourceArtifact(ctx, in, opts...)
+}
+
+// 在同一数据库事务中创建版本、绑定存储对象并记录供应商Artifact来源。
+func (m *defaultCore) ImportSourceArtifact(ctx context.Context, in *ImportSourceArtifactReq, opts ...grpc.CallOption) (*SourceArtifactImportResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ImportSourceArtifact(ctx, in, opts...)
+}
+
+// 创建预定义源码平台构建触发策略并一次性返回回调令牌和签名Secret。
+func (m *defaultCore) CreateSourceBuildTrigger(ctx context.Context, in *CreateSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerSecretResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateSourceBuildTrigger(ctx, in, opts...)
+}
+
+// 更新预定义源码平台构建触发策略，不能修改授权仓库和应用。
+func (m *defaultCore) UpdateSourceBuildTrigger(ctx context.Context, in *UpdateSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.UpdateSourceBuildTrigger(ctx, in, opts...)
+}
+
+// 查询预定义源码平台构建触发策略。
+func (m *defaultCore) GetSourceBuildTrigger(ctx context.Context, in *SourceBuildTriggerIdReq, opts ...grpc.CallOption) (*SourceBuildTriggerResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetSourceBuildTrigger(ctx, in, opts...)
+}
+
+// 分页查询预定义源码平台构建触发策略。
+func (m *defaultCore) ListSourceBuildTriggers(ctx context.Context, in *SourceBuildTriggerListReq, opts ...grpc.CallOption) (*SourceBuildTriggerListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListSourceBuildTriggers(ctx, in, opts...)
+}
+
+// 轮换回调随机令牌和供应商签名Secret并一次性返回。
+func (m *defaultCore) RotateSourceBuildTriggerSecret(ctx context.Context, in *SourceBuildTriggerIdReq, opts ...grpc.CallOption) (*SourceBuildTriggerSecretResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RotateSourceBuildTriggerSecret(ctx, in, opts...)
+}
+
+// 解析回调随机令牌和内部签名材料，仅供受内部认证保护的公开入口调用。
+func (m *defaultCore) ResolveSourceBuildTrigger(ctx context.Context, in *ResolveSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerCredentialResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ResolveSourceBuildTrigger(ctx, in, opts...)
+}
+
+// 将已完成供应商签名验证的标准化事件可靠且幂等地写入队列。
+func (m *defaultCore) EnqueueSourceWebhookEvent(ctx context.Context, in *EnqueueSourceWebhookEventReq, opts ...grpc.CallOption) (*EnqueueSourceWebhookEventResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.EnqueueSourceWebhookEvent(ctx, in, opts...)
+}
+
+// Worker使用租约原子领取待处理或超时事件。
+func (m *defaultCore) ClaimSourceWebhookEvent(ctx context.Context, in *ClaimSourceWebhookEventReq, opts ...grpc.CallOption) (*ClaimSourceWebhookEventResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ClaimSourceWebhookEvent(ctx, in, opts...)
+}
+
+// Worker记录Artifact导入和构建任务创建成功。
+func (m *defaultCore) CompleteSourceWebhookEvent(ctx context.Context, in *CompleteSourceWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CompleteSourceWebhookEvent(ctx, in, opts...)
+}
+
+// Worker按可重试性记录失败、指数退避或最终失败。
+func (m *defaultCore) FailSourceWebhookEvent(ctx context.Context, in *FailSourceWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.FailSourceWebhookEvent(ctx, in, opts...)
+}
+
+// 分页查询源码平台入站事件审计记录。
+func (m *defaultCore) ListSourceWebhookEvents(ctx context.Context, in *SourceWebhookEventListReq, opts ...grpc.CallOption) (*SourceWebhookEventListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListSourceWebhookEvents(ctx, in, opts...)
+}
+
+// 创建V6不可变套餐版本，同编码自动分配下一版本号。
+func (m *defaultCore) CreateBillingPlan(ctx context.Context, in *CreateBillingPlanReq, opts ...grpc.CallOption) (*BillingPlanResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateBillingPlan(ctx, in, opts...)
+}
+
+// 查询V6套餐版本。
+func (m *defaultCore) GetBillingPlan(ctx context.Context, in *BillingPlanIdReq, opts ...grpc.CallOption) (*BillingPlanResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetBillingPlan(ctx, in, opts...)
+}
+
+// 查询V6套餐版本列表。
+func (m *defaultCore) ListBillingPlans(ctx context.Context, in *BillingPlanListReq, opts ...grpc.CallOption) (*BillingPlanListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListBillingPlans(ctx, in, opts...)
+}
+
+// 退役V6套餐版本，不影响历史订阅。
+func (m *defaultCore) RetireBillingPlan(ctx context.Context, in *BillingPlanIdReq, opts ...grpc.CallOption) (*BillingPlanResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RetireBillingPlan(ctx, in, opts...)
+}
+
+// 查询租户当前订阅、权益和固化套餐版本。
+func (m *defaultCore) GetTenantBilling(ctx context.Context, in *TenantBillingReq, opts ...grpc.CallOption) (*TenantBillingResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetTenantBilling(ctx, in, opts...)
+}
+
+// 创建或更新人工合同订阅并原子刷新权益。
+func (m *defaultCore) UpsertManualSubscription(ctx context.Context, in *UpsertManualSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.UpsertManualSubscription(ctx, in, opts...)
+}
+
+// 立即或周期末变更套餐。
+func (m *defaultCore) ChangeTenantSubscription(ctx context.Context, in *ChangeTenantSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ChangeTenantSubscription(ctx, in, opts...)
+}
+
+// 立即或周期末取消订阅。
+func (m *defaultCore) CancelTenantSubscription(ctx context.Context, in *CancelTenantSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CancelTenantSubscription(ctx, in, opts...)
+}
+
+// 并发安全地预占构建、存储或席位额度。
+func (m *defaultCore) ReserveQuota(ctx context.Context, in *ReserveQuotaReq, opts ...grpc.CallOption) (*QuotaReservationResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ReserveQuota(ctx, in, opts...)
+}
+
+// 幂等确认额度预占并写不可变用量账本。
+func (m *defaultCore) ConfirmQuota(ctx context.Context, in *QuotaReservationActionReq, opts ...grpc.CallOption) (*QuotaReservationResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ConfirmQuota(ctx, in, opts...)
+}
+
+// 幂等释放未使用额度预占。
+func (m *defaultCore) ReleaseQuota(ctx context.Context, in *QuotaReservationActionReq, opts ...grpc.CallOption) (*QuotaReservationResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ReleaseQuota(ctx, in, opts...)
+}
+
+// 追加一条幂等不可变用量记录。
+func (m *defaultCore) RecordUsage(ctx context.Context, in *RecordUsageReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RecordUsage(ctx, in, opts...)
+}
+
+// 查询周期用量、预占和当前限额。
+func (m *defaultCore) GetBillingUsage(ctx context.Context, in *BillingUsageReq, opts ...grpc.CallOption) (*BillingUsageResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetBillingUsage(ctx, in, opts...)
+}
+
+// 查询租户不可变账单及账单项。
+func (m *defaultCore) ListInvoices(ctx context.Context, in *InvoiceListReq, opts ...grpc.CallOption) (*InvoiceListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListInvoices(ctx, in, opts...)
+}
+
+// 应用已验签支付事件，事件幂等且拒绝乱序覆盖新状态。
+func (m *defaultCore) ApplyBillingWebhook(ctx context.Context, in *ApplyBillingWebhookReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ApplyBillingWebhook(ctx, in, opts...)
+}
+
+// 创建V7 Local Agent并一次性返回注册码。
+func (m *defaultCore) CreateLocalAgentRegistration(ctx context.Context, in *CreateLocalAgentRegistrationReq, opts ...grpc.CallOption) (*LocalAgentRegistrationResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateLocalAgentRegistration(ctx, in, opts...)
+}
+
+// Agent使用一次性注册码和本地CSR完成首次注册。
+func (m *defaultCore) RegisterLocalAgent(ctx context.Context, in *RegisterLocalAgentReq, opts ...grpc.CallOption) (*RegisterLocalAgentResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RegisterLocalAgent(ctx, in, opts...)
+}
+
+// 查询V7 Local Agent详情。
+func (m *defaultCore) GetLocalAgent(ctx context.Context, in *LocalAgentIdReq, opts ...grpc.CallOption) (*LocalAgentResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetLocalAgent(ctx, in, opts...)
+}
+
+// 分页查询V7 Local Agent。
+func (m *defaultCore) ListLocalAgents(ctx context.Context, in *LocalAgentListReq, opts ...grpc.CallOption) (*LocalAgentListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListLocalAgents(ctx, in, opts...)
+}
+
+// Agent通过mTLS出站连接上报心跳和预定义能力。
+func (m *defaultCore) HeartbeatLocalAgent(ctx context.Context, in *HeartbeatLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.HeartbeatLocalAgent(ctx, in, opts...)
+}
+
+// 管理员远程设置Agent Drain状态。
+func (m *defaultCore) DrainLocalAgent(ctx context.Context, in *DrainLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.DrainLocalAgent(ctx, in, opts...)
+}
+
+// 管理员吊销Agent及其全部有效证书。
+func (m *defaultCore) RevokeLocalAgent(ctx context.Context, in *RevokeLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RevokeLocalAgent(ctx, in, opts...)
+}
+
+// Agent使用当前有效证书和新CSR轮换客户端证书。
+func (m *defaultCore) RotateLocalAgentCertificate(ctx context.Context, in *RotateLocalAgentCertificateReq, opts ...grpc.CallOption) (*RegisterLocalAgentResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RotateLocalAgentCertificate(ctx, in, opts...)
+}
+
+// Agent领取经过租户、应用、能力和协议范围校验的构建任务。
+func (m *defaultCore) ClaimLocalAgentBuildTask(ctx context.Context, in *ClaimLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*LocalAgentBuildTaskResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ClaimLocalAgentBuildTask(ctx, in, opts...)
+}
+
+// Agent按任务attempt续租，旧进程不能回写。
+func (m *defaultCore) RenewLocalAgentTaskLease(ctx context.Context, in *RenewLocalAgentTaskLeaseReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RenewLocalAgentTaskLease(ctx, in, opts...)
+}
+
+// Agent回报预定义构建阶段，不支持任意命令。
+func (m *defaultCore) ReportLocalAgentBuildProgress(ctx context.Context, in *ReportLocalAgentBuildProgressReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ReportLocalAgentBuildProgress(ctx, in, opts...)
+}
+
+// Agent校验Artifact后完成构建任务。
+func (m *defaultCore) CompleteLocalAgentBuildTask(ctx context.Context, in *CompleteLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CompleteLocalAgentBuildTask(ctx, in, opts...)
+}
+
+// Agent记录脱敏失败摘要并结束任务。
+func (m *defaultCore) FailLocalAgentBuildTask(ctx context.Context, in *FailLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.FailLocalAgentBuildTask(ctx, in, opts...)
+}
+
+// 校验并登记三种存储模式下的Artifact引用。
+func (m *defaultCore) VerifyHybridArtifact(ctx context.Context, in *VerifyHybridArtifactReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.VerifyHybridArtifact(ctx, in, opts...)
+}
+
 func (m *defaultCore) ReportInstall(ctx context.Context, in *InstallReportReq, opts ...grpc.CallOption) (*RespBase, error) {
 	client := core.NewCoreClient(m.cli.Conn())
 	return client.ReportInstall(ctx, in, opts...)
@@ -544,6 +1348,42 @@ func (m *defaultCore) ResolveChannelDownload(ctx context.Context, in *ResolveCha
 func (m *defaultCore) ClaimBuildTask(ctx context.Context, in *ClaimBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
 	client := core.NewCoreClient(m.cli.Conn())
 	return client.ClaimBuildTask(ctx, in, opts...)
+}
+
+// 注册或刷新V4 Builder节点能力。
+func (m *defaultCore) RegisterBuilderNode(ctx context.Context, in *RegisterBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RegisterBuilderNode(ctx, in, opts...)
+}
+
+// 上报V4 Builder节点心跳、容量和运行任务。
+func (m *defaultCore) BuilderNodeHeartbeat(ctx context.Context, in *BuilderNodeHeartbeatReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.BuilderNodeHeartbeat(ctx, in, opts...)
+}
+
+// 结合节点能力、公平队列和并发槽位原子领取V4构建任务。
+func (m *defaultCore) ClaimScheduledBuildTask(ctx context.Context, in *ClaimScheduledBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ClaimScheduledBuildTask(ctx, in, opts...)
+}
+
+// 解析并记录V4输入可寻址构建缓存命中。
+func (m *defaultCore) ResolveBuildCache(ctx context.Context, in *ResolveBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheResolutionResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ResolveBuildCache(ctx, in, opts...)
+}
+
+// 发布独立V4构建缓存产物。
+func (m *defaultCore) PublishBuildCache(ctx context.Context, in *PublishBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.PublishBuildCache(ctx, in, opts...)
+}
+
+// 执行V4构建缓存TTL/LRU清理并返回可物理删除对象。
+func (m *defaultCore) CleanupBuildCache(ctx context.Context, in *CleanupBuildCacheReq, opts ...grpc.CallOption) (*CleanupBuildCacheResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CleanupBuildCache(ctx, in, opts...)
 }
 
 // 读取当前Builder已领取任务的内部执行上下文。

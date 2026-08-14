@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { computed } from 'vue'
 import type { MenuNode } from '@/stores/auth'
 import { useRouter } from 'vue-router'

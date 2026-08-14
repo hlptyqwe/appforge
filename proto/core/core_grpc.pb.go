@@ -70,11 +70,96 @@ const (
 	Core_CreateBuildTask_FullMethodName                  = "/core.Core/CreateBuildTask"
 	Core_GetBuildTask_FullMethodName                     = "/core.Core/GetBuildTask"
 	Core_ListBuildTasks_FullMethodName                   = "/core.Core/ListBuildTasks"
+	Core_CancelBuildTask_FullMethodName                  = "/core.Core/CancelBuildTask"
+	Core_RetryBuildTask_FullMethodName                   = "/core.Core/RetryBuildTask"
+	Core_GetBuilderNode_FullMethodName                   = "/core.Core/GetBuilderNode"
+	Core_ListBuilderNodes_FullMethodName                 = "/core.Core/ListBuilderNodes"
+	Core_DrainBuilderNode_FullMethodName                 = "/core.Core/DrainBuilderNode"
+	Core_RecoverBuilderNode_FullMethodName               = "/core.Core/RecoverBuilderNode"
+	Core_UpsertBuildConcurrencyPolicy_FullMethodName     = "/core.Core/UpsertBuildConcurrencyPolicy"
+	Core_ListBuildConcurrencyPolicies_FullMethodName     = "/core.Core/ListBuildConcurrencyPolicies"
+	Core_ListBuildCacheEntries_FullMethodName            = "/core.Core/ListBuildCacheEntries"
+	Core_InvalidateBuildCache_FullMethodName             = "/core.Core/InvalidateBuildCache"
+	Core_ListBuildSchedulerEvents_FullMethodName         = "/core.Core/ListBuildSchedulerEvents"
+	Core_GetBuildClusterMetrics_FullMethodName           = "/core.Core/GetBuildClusterMetrics"
+	Core_CreateOpenApiCredential_FullMethodName          = "/core.Core/CreateOpenApiCredential"
+	Core_ListOpenApiCredentials_FullMethodName           = "/core.Core/ListOpenApiCredentials"
+	Core_RotateOpenApiCredential_FullMethodName          = "/core.Core/RotateOpenApiCredential"
+	Core_RevokeOpenApiCredential_FullMethodName          = "/core.Core/RevokeOpenApiCredential"
+	Core_AuthenticateOpenApiCredential_FullMethodName    = "/core.Core/AuthenticateOpenApiCredential"
+	Core_BeginOpenApiIdempotency_FullMethodName          = "/core.Core/BeginOpenApiIdempotency"
+	Core_CompleteOpenApiIdempotency_FullMethodName       = "/core.Core/CompleteOpenApiIdempotency"
+	Core_RecordOpenApiAudit_FullMethodName               = "/core.Core/RecordOpenApiAudit"
+	Core_CreateWebhookEndpoint_FullMethodName            = "/core.Core/CreateWebhookEndpoint"
+	Core_UpdateWebhookEndpoint_FullMethodName            = "/core.Core/UpdateWebhookEndpoint"
+	Core_GetWebhookEndpoint_FullMethodName               = "/core.Core/GetWebhookEndpoint"
+	Core_ListWebhookEndpoints_FullMethodName             = "/core.Core/ListWebhookEndpoints"
+	Core_RotateWebhookEndpointSecret_FullMethodName      = "/core.Core/RotateWebhookEndpointSecret"
+	Core_ListWebhookDeliveries_FullMethodName            = "/core.Core/ListWebhookDeliveries"
+	Core_ReplayWebhookDelivery_FullMethodName            = "/core.Core/ReplayWebhookDelivery"
+	Core_CreateTestWebhookEvent_FullMethodName           = "/core.Core/CreateTestWebhookEvent"
+	Core_CompleteSourceIntegration_FullMethodName        = "/core.Core/CompleteSourceIntegration"
+	Core_GetSourceIntegration_FullMethodName             = "/core.Core/GetSourceIntegration"
+	Core_ListSourceIntegrations_FullMethodName           = "/core.Core/ListSourceIntegrations"
+	Core_GetSourceIntegrationCredential_FullMethodName   = "/core.Core/GetSourceIntegrationCredential"
+	Core_DisconnectSourceIntegration_FullMethodName      = "/core.Core/DisconnectSourceIntegration"
+	Core_AuthorizeSourceRepository_FullMethodName        = "/core.Core/AuthorizeSourceRepository"
+	Core_GetSourceRepository_FullMethodName              = "/core.Core/GetSourceRepository"
+	Core_ListSourceRepositories_FullMethodName           = "/core.Core/ListSourceRepositories"
+	Core_RevokeSourceRepository_FullMethodName           = "/core.Core/RevokeSourceRepository"
+	Core_RecordSourceArtifact_FullMethodName             = "/core.Core/RecordSourceArtifact"
+	Core_ImportSourceArtifact_FullMethodName             = "/core.Core/ImportSourceArtifact"
+	Core_CreateSourceBuildTrigger_FullMethodName         = "/core.Core/CreateSourceBuildTrigger"
+	Core_UpdateSourceBuildTrigger_FullMethodName         = "/core.Core/UpdateSourceBuildTrigger"
+	Core_GetSourceBuildTrigger_FullMethodName            = "/core.Core/GetSourceBuildTrigger"
+	Core_ListSourceBuildTriggers_FullMethodName          = "/core.Core/ListSourceBuildTriggers"
+	Core_RotateSourceBuildTriggerSecret_FullMethodName   = "/core.Core/RotateSourceBuildTriggerSecret"
+	Core_ResolveSourceBuildTrigger_FullMethodName        = "/core.Core/ResolveSourceBuildTrigger"
+	Core_EnqueueSourceWebhookEvent_FullMethodName        = "/core.Core/EnqueueSourceWebhookEvent"
+	Core_ClaimSourceWebhookEvent_FullMethodName          = "/core.Core/ClaimSourceWebhookEvent"
+	Core_CompleteSourceWebhookEvent_FullMethodName       = "/core.Core/CompleteSourceWebhookEvent"
+	Core_FailSourceWebhookEvent_FullMethodName           = "/core.Core/FailSourceWebhookEvent"
+	Core_ListSourceWebhookEvents_FullMethodName          = "/core.Core/ListSourceWebhookEvents"
+	Core_CreateBillingPlan_FullMethodName                = "/core.Core/CreateBillingPlan"
+	Core_GetBillingPlan_FullMethodName                   = "/core.Core/GetBillingPlan"
+	Core_ListBillingPlans_FullMethodName                 = "/core.Core/ListBillingPlans"
+	Core_RetireBillingPlan_FullMethodName                = "/core.Core/RetireBillingPlan"
+	Core_GetTenantBilling_FullMethodName                 = "/core.Core/GetTenantBilling"
+	Core_UpsertManualSubscription_FullMethodName         = "/core.Core/UpsertManualSubscription"
+	Core_ChangeTenantSubscription_FullMethodName         = "/core.Core/ChangeTenantSubscription"
+	Core_CancelTenantSubscription_FullMethodName         = "/core.Core/CancelTenantSubscription"
+	Core_ReserveQuota_FullMethodName                     = "/core.Core/ReserveQuota"
+	Core_ConfirmQuota_FullMethodName                     = "/core.Core/ConfirmQuota"
+	Core_ReleaseQuota_FullMethodName                     = "/core.Core/ReleaseQuota"
+	Core_RecordUsage_FullMethodName                      = "/core.Core/RecordUsage"
+	Core_GetBillingUsage_FullMethodName                  = "/core.Core/GetBillingUsage"
+	Core_ListInvoices_FullMethodName                     = "/core.Core/ListInvoices"
+	Core_ApplyBillingWebhook_FullMethodName              = "/core.Core/ApplyBillingWebhook"
+	Core_CreateLocalAgentRegistration_FullMethodName     = "/core.Core/CreateLocalAgentRegistration"
+	Core_RegisterLocalAgent_FullMethodName               = "/core.Core/RegisterLocalAgent"
+	Core_GetLocalAgent_FullMethodName                    = "/core.Core/GetLocalAgent"
+	Core_ListLocalAgents_FullMethodName                  = "/core.Core/ListLocalAgents"
+	Core_HeartbeatLocalAgent_FullMethodName              = "/core.Core/HeartbeatLocalAgent"
+	Core_DrainLocalAgent_FullMethodName                  = "/core.Core/DrainLocalAgent"
+	Core_RevokeLocalAgent_FullMethodName                 = "/core.Core/RevokeLocalAgent"
+	Core_RotateLocalAgentCertificate_FullMethodName      = "/core.Core/RotateLocalAgentCertificate"
+	Core_ClaimLocalAgentBuildTask_FullMethodName         = "/core.Core/ClaimLocalAgentBuildTask"
+	Core_RenewLocalAgentTaskLease_FullMethodName         = "/core.Core/RenewLocalAgentTaskLease"
+	Core_ReportLocalAgentBuildProgress_FullMethodName    = "/core.Core/ReportLocalAgentBuildProgress"
+	Core_CompleteLocalAgentBuildTask_FullMethodName      = "/core.Core/CompleteLocalAgentBuildTask"
+	Core_FailLocalAgentBuildTask_FullMethodName          = "/core.Core/FailLocalAgentBuildTask"
+	Core_VerifyHybridArtifact_FullMethodName             = "/core.Core/VerifyHybridArtifact"
 	Core_ReportInstall_FullMethodName                    = "/core.Core/ReportInstall"
 	Core_ReportChannelEvent_FullMethodName               = "/core.Core/ReportChannelEvent"
 	Core_GetChannelStats_FullMethodName                  = "/core.Core/GetChannelStats"
 	Core_ResolveChannelDownload_FullMethodName           = "/core.Core/ResolveChannelDownload"
 	Core_ClaimBuildTask_FullMethodName                   = "/core.Core/ClaimBuildTask"
+	Core_RegisterBuilderNode_FullMethodName              = "/core.Core/RegisterBuilderNode"
+	Core_BuilderNodeHeartbeat_FullMethodName             = "/core.Core/BuilderNodeHeartbeat"
+	Core_ClaimScheduledBuildTask_FullMethodName          = "/core.Core/ClaimScheduledBuildTask"
+	Core_ResolveBuildCache_FullMethodName                = "/core.Core/ResolveBuildCache"
+	Core_PublishBuildCache_FullMethodName                = "/core.Core/PublishBuildCache"
+	Core_CleanupBuildCache_FullMethodName                = "/core.Core/CleanupBuildCache"
 	Core_GetBuildExecutionContext_FullMethodName         = "/core.Core/GetBuildExecutionContext"
 	Core_HeartbeatBuildTask_FullMethodName               = "/core.Core/HeartbeatBuildTask"
 	Core_ReportBuildProgress_FullMethodName              = "/core.Core/ReportBuildProgress"
@@ -173,12 +258,182 @@ type CoreClient interface {
 	CreateBuildTask(ctx context.Context, in *CreateBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 	GetBuildTask(ctx context.Context, in *BuildTaskIdReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 	ListBuildTasks(ctx context.Context, in *BuildTaskListReq, opts ...grpc.CallOption) (*BuildTaskListResp, error)
+	// 取消待处理或执行中的V4构建任务并立即推进fencing代次。
+	CancelBuildTask(ctx context.Context, in *CancelBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+	// 根据不可变历史快照创建V4重试任务。
+	RetryBuildTask(ctx context.Context, in *RetryBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+	// 查询V4 Builder节点详情。
+	GetBuilderNode(ctx context.Context, in *BuilderNodeIdReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+	// 分页查询V4 Builder集群节点。
+	ListBuilderNodes(ctx context.Context, in *BuilderNodeListReq, opts ...grpc.CallOption) (*BuilderNodeListResp, error)
+	// 修改V4 Builder节点排空状态。
+	DrainBuilderNode(ctx context.Context, in *DrainBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+	// 在心跳、失败次数和磁盘容量均恢复后人工解除V4 Builder节点隔离。
+	RecoverBuilderNode(ctx context.Context, in *RecoverBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+	// 创建或更新V4构建并发与公平调度策略。
+	UpsertBuildConcurrencyPolicy(ctx context.Context, in *UpsertBuildConcurrencyPolicyReq, opts ...grpc.CallOption) (*BuildConcurrencyPolicyResp, error)
+	// 分页查询V4构建并发与公平调度策略。
+	ListBuildConcurrencyPolicies(ctx context.Context, in *BuildConcurrencyPolicyListReq, opts ...grpc.CallOption) (*BuildConcurrencyPolicyListResp, error)
+	// 分页查询V4构建缓存条目。
+	ListBuildCacheEntries(ctx context.Context, in *BuildCacheEntryListReq, opts ...grpc.CallOption) (*BuildCacheEntryListResp, error)
+	// 管理端失效V4构建缓存条目。
+	InvalidateBuildCache(ctx context.Context, in *InvalidateBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error)
+	// 分页查询V4结构化调度事件。
+	ListBuildSchedulerEvents(ctx context.Context, in *BuildSchedulerEventListReq, opts ...grpc.CallOption) (*BuildSchedulerEventListResp, error)
+	// 查询V4构建集群运行指标与告警摘要。
+	GetBuildClusterMetrics(ctx context.Context, in *BuildClusterMetricsReq, opts ...grpc.CallOption) (*BuildClusterMetricsResp, error)
+	// 创建V5 Open API凭证并一次性返回Secret。
+	CreateOpenApiCredential(ctx context.Context, in *CreateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiCredentialSecretResp, error)
+	// 分页查询V5 Open API凭证。
+	ListOpenApiCredentials(ctx context.Context, in *OpenApiCredentialListReq, opts ...grpc.CallOption) (*OpenApiCredentialListResp, error)
+	// 轮换V5 Open API凭证并一次性返回新Secret。
+	RotateOpenApiCredential(ctx context.Context, in *RotateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiCredentialSecretResp, error)
+	// 立即吊销V5 Open API凭证。
+	RevokeOpenApiCredential(ctx context.Context, in *OpenApiCredentialIdReq, opts ...grpc.CallOption) (*OpenApiCredentialResp, error)
+	// 验证V5 Open API凭证、IP、状态和有效期。
+	AuthenticateOpenApiCredential(ctx context.Context, in *AuthenticateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiAuthContextResp, error)
+	// 申请或读取Open API幂等执行记录。
+	BeginOpenApiIdempotency(ctx context.Context, in *BeginOpenApiIdempotencyReq, opts ...grpc.CallOption) (*OpenApiIdempotencyResp, error)
+	// 保存Open API幂等请求的最终响应。
+	CompleteOpenApiIdempotency(ctx context.Context, in *CompleteOpenApiIdempotencyReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 写入Open API调用审计。
+	RecordOpenApiAudit(ctx context.Context, in *RecordOpenApiAuditReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 创建Webhook订阅端点并一次性返回签名Secret。
+	CreateWebhookEndpoint(ctx context.Context, in *CreateWebhookEndpointReq, opts ...grpc.CallOption) (*WebhookEndpointSecretResp, error)
+	// 更新Webhook订阅端点。
+	UpdateWebhookEndpoint(ctx context.Context, in *UpdateWebhookEndpointReq, opts ...grpc.CallOption) (*WebhookEndpointResp, error)
+	// 查询Webhook订阅端点。
+	GetWebhookEndpoint(ctx context.Context, in *WebhookEndpointIdReq, opts ...grpc.CallOption) (*WebhookEndpointResp, error)
+	// 查询Webhook订阅端点列表。
+	ListWebhookEndpoints(ctx context.Context, in *WebhookEndpointListReq, opts ...grpc.CallOption) (*WebhookEndpointListResp, error)
+	// 重置Webhook签名Secret并一次性返回新Secret。
+	RotateWebhookEndpointSecret(ctx context.Context, in *WebhookEndpointIdReq, opts ...grpc.CallOption) (*WebhookEndpointSecretResp, error)
+	// 查询Webhook投递日志。
+	ListWebhookDeliveries(ctx context.Context, in *WebhookDeliveryListReq, opts ...grpc.CallOption) (*WebhookDeliveryListResp, error)
+	// 重放失败或死信的Webhook投递。
+	ReplayWebhookDelivery(ctx context.Context, in *WebhookDeliveryIdReq, opts ...grpc.CallOption) (*WebhookDeliveryResp, error)
+	// 创建只投递到指定端点的测试事件。
+	CreateTestWebhookEvent(ctx context.Context, in *CreateTestWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 完成受信任的GitHub/GitLab OAuth回调或App安装同步，并加密保存令牌。
+	CompleteSourceIntegration(ctx context.Context, in *CompleteSourceIntegrationReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error)
+	// 查询代码平台集成。
+	GetSourceIntegration(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error)
+	// 分页查询代码平台集成。
+	ListSourceIntegrations(ctx context.Context, in *SourceIntegrationListReq, opts ...grpc.CallOption) (*SourceIntegrationListResp, error)
+	// 读取有效集成令牌，仅供受内部认证保护的供应商客户端调用，禁止暴露到HTTP。
+	GetSourceIntegrationCredential(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationCredentialResp, error)
+	// 断开集成并使令牌立即不可用。
+	DisconnectSourceIntegration(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error)
+	// 同步OAuth/App明确授权的只读仓库。
+	AuthorizeSourceRepository(ctx context.Context, in *AuthorizeSourceRepositoryReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error)
+	// 查询单个授权仓库。
+	GetSourceRepository(ctx context.Context, in *SourceRepositoryIdReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error)
+	// 分页查询授权仓库。
+	ListSourceRepositories(ctx context.Context, in *SourceRepositoryListReq, opts ...grpc.CallOption) (*SourceRepositoryListResp, error)
+	// 撤销仓库授权。
+	RevokeSourceRepository(ctx context.Context, in *SourceRepositoryIdReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error)
+	// 记录从授权仓库导入并完成校验的APK Artifact来源。
+	RecordSourceArtifact(ctx context.Context, in *RecordSourceArtifactReq, opts ...grpc.CallOption) (*SourceArtifactResp, error)
+	// 在同一数据库事务中创建版本、绑定存储对象并记录供应商Artifact来源。
+	ImportSourceArtifact(ctx context.Context, in *ImportSourceArtifactReq, opts ...grpc.CallOption) (*SourceArtifactImportResp, error)
+	// 创建预定义源码平台构建触发策略并一次性返回回调令牌和签名Secret。
+	CreateSourceBuildTrigger(ctx context.Context, in *CreateSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerSecretResp, error)
+	// 更新预定义源码平台构建触发策略，不能修改授权仓库和应用。
+	UpdateSourceBuildTrigger(ctx context.Context, in *UpdateSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerResp, error)
+	// 查询预定义源码平台构建触发策略。
+	GetSourceBuildTrigger(ctx context.Context, in *SourceBuildTriggerIdReq, opts ...grpc.CallOption) (*SourceBuildTriggerResp, error)
+	// 分页查询预定义源码平台构建触发策略。
+	ListSourceBuildTriggers(ctx context.Context, in *SourceBuildTriggerListReq, opts ...grpc.CallOption) (*SourceBuildTriggerListResp, error)
+	// 轮换回调随机令牌和供应商签名Secret并一次性返回。
+	RotateSourceBuildTriggerSecret(ctx context.Context, in *SourceBuildTriggerIdReq, opts ...grpc.CallOption) (*SourceBuildTriggerSecretResp, error)
+	// 解析回调随机令牌和内部签名材料，仅供受内部认证保护的公开入口调用。
+	ResolveSourceBuildTrigger(ctx context.Context, in *ResolveSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerCredentialResp, error)
+	// 将已完成供应商签名验证的标准化事件可靠且幂等地写入队列。
+	EnqueueSourceWebhookEvent(ctx context.Context, in *EnqueueSourceWebhookEventReq, opts ...grpc.CallOption) (*EnqueueSourceWebhookEventResp, error)
+	// Worker使用租约原子领取待处理或超时事件。
+	ClaimSourceWebhookEvent(ctx context.Context, in *ClaimSourceWebhookEventReq, opts ...grpc.CallOption) (*ClaimSourceWebhookEventResp, error)
+	// Worker记录Artifact导入和构建任务创建成功。
+	CompleteSourceWebhookEvent(ctx context.Context, in *CompleteSourceWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error)
+	// Worker按可重试性记录失败、指数退避或最终失败。
+	FailSourceWebhookEvent(ctx context.Context, in *FailSourceWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 分页查询源码平台入站事件审计记录。
+	ListSourceWebhookEvents(ctx context.Context, in *SourceWebhookEventListReq, opts ...grpc.CallOption) (*SourceWebhookEventListResp, error)
+	// 创建V6不可变套餐版本，同编码自动分配下一版本号。
+	CreateBillingPlan(ctx context.Context, in *CreateBillingPlanReq, opts ...grpc.CallOption) (*BillingPlanResp, error)
+	// 查询V6套餐版本。
+	GetBillingPlan(ctx context.Context, in *BillingPlanIdReq, opts ...grpc.CallOption) (*BillingPlanResp, error)
+	// 查询V6套餐版本列表。
+	ListBillingPlans(ctx context.Context, in *BillingPlanListReq, opts ...grpc.CallOption) (*BillingPlanListResp, error)
+	// 退役V6套餐版本，不影响历史订阅。
+	RetireBillingPlan(ctx context.Context, in *BillingPlanIdReq, opts ...grpc.CallOption) (*BillingPlanResp, error)
+	// 查询租户当前订阅、权益和固化套餐版本。
+	GetTenantBilling(ctx context.Context, in *TenantBillingReq, opts ...grpc.CallOption) (*TenantBillingResp, error)
+	// 创建或更新人工合同订阅并原子刷新权益。
+	UpsertManualSubscription(ctx context.Context, in *UpsertManualSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error)
+	// 立即或周期末变更套餐。
+	ChangeTenantSubscription(ctx context.Context, in *ChangeTenantSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error)
+	// 立即或周期末取消订阅。
+	CancelTenantSubscription(ctx context.Context, in *CancelTenantSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error)
+	// 并发安全地预占构建、存储或席位额度。
+	ReserveQuota(ctx context.Context, in *ReserveQuotaReq, opts ...grpc.CallOption) (*QuotaReservationResp, error)
+	// 幂等确认额度预占并写不可变用量账本。
+	ConfirmQuota(ctx context.Context, in *QuotaReservationActionReq, opts ...grpc.CallOption) (*QuotaReservationResp, error)
+	// 幂等释放未使用额度预占。
+	ReleaseQuota(ctx context.Context, in *QuotaReservationActionReq, opts ...grpc.CallOption) (*QuotaReservationResp, error)
+	// 追加一条幂等不可变用量记录。
+	RecordUsage(ctx context.Context, in *RecordUsageReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 查询周期用量、预占和当前限额。
+	GetBillingUsage(ctx context.Context, in *BillingUsageReq, opts ...grpc.CallOption) (*BillingUsageResp, error)
+	// 查询租户不可变账单及账单项。
+	ListInvoices(ctx context.Context, in *InvoiceListReq, opts ...grpc.CallOption) (*InvoiceListResp, error)
+	// 应用已验签支付事件，事件幂等且拒绝乱序覆盖新状态。
+	ApplyBillingWebhook(ctx context.Context, in *ApplyBillingWebhookReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 创建V7 Local Agent并一次性返回注册码。
+	CreateLocalAgentRegistration(ctx context.Context, in *CreateLocalAgentRegistrationReq, opts ...grpc.CallOption) (*LocalAgentRegistrationResp, error)
+	// Agent使用一次性注册码和本地CSR完成首次注册。
+	RegisterLocalAgent(ctx context.Context, in *RegisterLocalAgentReq, opts ...grpc.CallOption) (*RegisterLocalAgentResp, error)
+	// 查询V7 Local Agent详情。
+	GetLocalAgent(ctx context.Context, in *LocalAgentIdReq, opts ...grpc.CallOption) (*LocalAgentResp, error)
+	// 分页查询V7 Local Agent。
+	ListLocalAgents(ctx context.Context, in *LocalAgentListReq, opts ...grpc.CallOption) (*LocalAgentListResp, error)
+	// Agent通过mTLS出站连接上报心跳和预定义能力。
+	HeartbeatLocalAgent(ctx context.Context, in *HeartbeatLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error)
+	// 管理员远程设置Agent Drain状态。
+	DrainLocalAgent(ctx context.Context, in *DrainLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error)
+	// 管理员吊销Agent及其全部有效证书。
+	RevokeLocalAgent(ctx context.Context, in *RevokeLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error)
+	// Agent使用当前有效证书和新CSR轮换客户端证书。
+	RotateLocalAgentCertificate(ctx context.Context, in *RotateLocalAgentCertificateReq, opts ...grpc.CallOption) (*RegisterLocalAgentResp, error)
+	// Agent领取经过租户、应用、能力和协议范围校验的构建任务。
+	ClaimLocalAgentBuildTask(ctx context.Context, in *ClaimLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*LocalAgentBuildTaskResp, error)
+	// Agent按任务attempt续租，旧进程不能回写。
+	RenewLocalAgentTaskLease(ctx context.Context, in *RenewLocalAgentTaskLeaseReq, opts ...grpc.CallOption) (*RespBase, error)
+	// Agent回报预定义构建阶段，不支持任意命令。
+	ReportLocalAgentBuildProgress(ctx context.Context, in *ReportLocalAgentBuildProgressReq, opts ...grpc.CallOption) (*RespBase, error)
+	// Agent校验Artifact后完成构建任务。
+	CompleteLocalAgentBuildTask(ctx context.Context, in *CompleteLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
+	// Agent记录脱敏失败摘要并结束任务。
+	FailLocalAgentBuildTask(ctx context.Context, in *FailLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 校验并登记三种存储模式下的Artifact引用。
+	VerifyHybridArtifact(ctx context.Context, in *VerifyHybridArtifactReq, opts ...grpc.CallOption) (*RespBase, error)
 	ReportInstall(ctx context.Context, in *InstallReportReq, opts ...grpc.CallOption) (*RespBase, error)
 	ReportChannelEvent(ctx context.Context, in *ReportChannelEventReq, opts ...grpc.CallOption) (*RespBase, error)
 	GetChannelStats(ctx context.Context, in *ChannelStatsReq, opts ...grpc.CallOption) (*ChannelStatsResp, error)
 	// 解析渠道最新成功产物并幂等记录点击、下载事件。
 	ResolveChannelDownload(ctx context.Context, in *ResolveChannelDownloadReq, opts ...grpc.CallOption) (*ChannelDownloadArtifactResp, error)
 	ClaimBuildTask(ctx context.Context, in *ClaimBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+	// 注册或刷新V4 Builder节点能力。
+	RegisterBuilderNode(ctx context.Context, in *RegisterBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+	// 上报V4 Builder节点心跳、容量和运行任务。
+	BuilderNodeHeartbeat(ctx context.Context, in *BuilderNodeHeartbeatReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+	// 结合节点能力、公平队列和并发槽位原子领取V4构建任务。
+	ClaimScheduledBuildTask(ctx context.Context, in *ClaimScheduledBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+	// 解析并记录V4输入可寻址构建缓存命中。
+	ResolveBuildCache(ctx context.Context, in *ResolveBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheResolutionResp, error)
+	// 发布独立V4构建缓存产物。
+	PublishBuildCache(ctx context.Context, in *PublishBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error)
+	// 执行V4构建缓存TTL/LRU清理并返回可物理删除对象。
+	CleanupBuildCache(ctx context.Context, in *CleanupBuildCacheReq, opts ...grpc.CallOption) (*CleanupBuildCacheResp, error)
 	// 读取当前Builder已领取任务的内部执行上下文。
 	GetBuildExecutionContext(ctx context.Context, in *GetBuildExecutionContextReq, opts ...grpc.CallOption) (*BuildExecutionContextResp, error)
 	HeartbeatBuildTask(ctx context.Context, in *HeartbeatBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
@@ -705,6 +960,796 @@ func (c *coreClient) ListBuildTasks(ctx context.Context, in *BuildTaskListReq, o
 	return out, nil
 }
 
+func (c *coreClient) CancelBuildTask(ctx context.Context, in *CancelBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildTaskResp)
+	err := c.cc.Invoke(ctx, Core_CancelBuildTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RetryBuildTask(ctx context.Context, in *RetryBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildTaskResp)
+	err := c.cc.Invoke(ctx, Core_RetryBuildTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetBuilderNode(ctx context.Context, in *BuilderNodeIdReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuilderNodeResp)
+	err := c.cc.Invoke(ctx, Core_GetBuilderNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListBuilderNodes(ctx context.Context, in *BuilderNodeListReq, opts ...grpc.CallOption) (*BuilderNodeListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuilderNodeListResp)
+	err := c.cc.Invoke(ctx, Core_ListBuilderNodes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) DrainBuilderNode(ctx context.Context, in *DrainBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuilderNodeResp)
+	err := c.cc.Invoke(ctx, Core_DrainBuilderNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RecoverBuilderNode(ctx context.Context, in *RecoverBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuilderNodeResp)
+	err := c.cc.Invoke(ctx, Core_RecoverBuilderNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) UpsertBuildConcurrencyPolicy(ctx context.Context, in *UpsertBuildConcurrencyPolicyReq, opts ...grpc.CallOption) (*BuildConcurrencyPolicyResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildConcurrencyPolicyResp)
+	err := c.cc.Invoke(ctx, Core_UpsertBuildConcurrencyPolicy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListBuildConcurrencyPolicies(ctx context.Context, in *BuildConcurrencyPolicyListReq, opts ...grpc.CallOption) (*BuildConcurrencyPolicyListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildConcurrencyPolicyListResp)
+	err := c.cc.Invoke(ctx, Core_ListBuildConcurrencyPolicies_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListBuildCacheEntries(ctx context.Context, in *BuildCacheEntryListReq, opts ...grpc.CallOption) (*BuildCacheEntryListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildCacheEntryListResp)
+	err := c.cc.Invoke(ctx, Core_ListBuildCacheEntries_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) InvalidateBuildCache(ctx context.Context, in *InvalidateBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildCacheEntryResp)
+	err := c.cc.Invoke(ctx, Core_InvalidateBuildCache_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListBuildSchedulerEvents(ctx context.Context, in *BuildSchedulerEventListReq, opts ...grpc.CallOption) (*BuildSchedulerEventListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildSchedulerEventListResp)
+	err := c.cc.Invoke(ctx, Core_ListBuildSchedulerEvents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetBuildClusterMetrics(ctx context.Context, in *BuildClusterMetricsReq, opts ...grpc.CallOption) (*BuildClusterMetricsResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildClusterMetricsResp)
+	err := c.cc.Invoke(ctx, Core_GetBuildClusterMetrics_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateOpenApiCredential(ctx context.Context, in *CreateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiCredentialSecretResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OpenApiCredentialSecretResp)
+	err := c.cc.Invoke(ctx, Core_CreateOpenApiCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListOpenApiCredentials(ctx context.Context, in *OpenApiCredentialListReq, opts ...grpc.CallOption) (*OpenApiCredentialListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OpenApiCredentialListResp)
+	err := c.cc.Invoke(ctx, Core_ListOpenApiCredentials_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RotateOpenApiCredential(ctx context.Context, in *RotateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiCredentialSecretResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OpenApiCredentialSecretResp)
+	err := c.cc.Invoke(ctx, Core_RotateOpenApiCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RevokeOpenApiCredential(ctx context.Context, in *OpenApiCredentialIdReq, opts ...grpc.CallOption) (*OpenApiCredentialResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OpenApiCredentialResp)
+	err := c.cc.Invoke(ctx, Core_RevokeOpenApiCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) AuthenticateOpenApiCredential(ctx context.Context, in *AuthenticateOpenApiCredentialReq, opts ...grpc.CallOption) (*OpenApiAuthContextResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OpenApiAuthContextResp)
+	err := c.cc.Invoke(ctx, Core_AuthenticateOpenApiCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) BeginOpenApiIdempotency(ctx context.Context, in *BeginOpenApiIdempotencyReq, opts ...grpc.CallOption) (*OpenApiIdempotencyResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(OpenApiIdempotencyResp)
+	err := c.cc.Invoke(ctx, Core_BeginOpenApiIdempotency_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CompleteOpenApiIdempotency(ctx context.Context, in *CompleteOpenApiIdempotencyReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_CompleteOpenApiIdempotency_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RecordOpenApiAudit(ctx context.Context, in *RecordOpenApiAuditReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_RecordOpenApiAudit_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateWebhookEndpoint(ctx context.Context, in *CreateWebhookEndpointReq, opts ...grpc.CallOption) (*WebhookEndpointSecretResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WebhookEndpointSecretResp)
+	err := c.cc.Invoke(ctx, Core_CreateWebhookEndpoint_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) UpdateWebhookEndpoint(ctx context.Context, in *UpdateWebhookEndpointReq, opts ...grpc.CallOption) (*WebhookEndpointResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WebhookEndpointResp)
+	err := c.cc.Invoke(ctx, Core_UpdateWebhookEndpoint_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetWebhookEndpoint(ctx context.Context, in *WebhookEndpointIdReq, opts ...grpc.CallOption) (*WebhookEndpointResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WebhookEndpointResp)
+	err := c.cc.Invoke(ctx, Core_GetWebhookEndpoint_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListWebhookEndpoints(ctx context.Context, in *WebhookEndpointListReq, opts ...grpc.CallOption) (*WebhookEndpointListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WebhookEndpointListResp)
+	err := c.cc.Invoke(ctx, Core_ListWebhookEndpoints_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RotateWebhookEndpointSecret(ctx context.Context, in *WebhookEndpointIdReq, opts ...grpc.CallOption) (*WebhookEndpointSecretResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WebhookEndpointSecretResp)
+	err := c.cc.Invoke(ctx, Core_RotateWebhookEndpointSecret_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListWebhookDeliveries(ctx context.Context, in *WebhookDeliveryListReq, opts ...grpc.CallOption) (*WebhookDeliveryListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WebhookDeliveryListResp)
+	err := c.cc.Invoke(ctx, Core_ListWebhookDeliveries_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ReplayWebhookDelivery(ctx context.Context, in *WebhookDeliveryIdReq, opts ...grpc.CallOption) (*WebhookDeliveryResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WebhookDeliveryResp)
+	err := c.cc.Invoke(ctx, Core_ReplayWebhookDelivery_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateTestWebhookEvent(ctx context.Context, in *CreateTestWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_CreateTestWebhookEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CompleteSourceIntegration(ctx context.Context, in *CompleteSourceIntegrationReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceIntegrationResp)
+	err := c.cc.Invoke(ctx, Core_CompleteSourceIntegration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetSourceIntegration(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceIntegrationResp)
+	err := c.cc.Invoke(ctx, Core_GetSourceIntegration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListSourceIntegrations(ctx context.Context, in *SourceIntegrationListReq, opts ...grpc.CallOption) (*SourceIntegrationListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceIntegrationListResp)
+	err := c.cc.Invoke(ctx, Core_ListSourceIntegrations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetSourceIntegrationCredential(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationCredentialResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceIntegrationCredentialResp)
+	err := c.cc.Invoke(ctx, Core_GetSourceIntegrationCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) DisconnectSourceIntegration(ctx context.Context, in *SourceIntegrationIdReq, opts ...grpc.CallOption) (*SourceIntegrationResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceIntegrationResp)
+	err := c.cc.Invoke(ctx, Core_DisconnectSourceIntegration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) AuthorizeSourceRepository(ctx context.Context, in *AuthorizeSourceRepositoryReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceRepositoryResp)
+	err := c.cc.Invoke(ctx, Core_AuthorizeSourceRepository_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetSourceRepository(ctx context.Context, in *SourceRepositoryIdReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceRepositoryResp)
+	err := c.cc.Invoke(ctx, Core_GetSourceRepository_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListSourceRepositories(ctx context.Context, in *SourceRepositoryListReq, opts ...grpc.CallOption) (*SourceRepositoryListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceRepositoryListResp)
+	err := c.cc.Invoke(ctx, Core_ListSourceRepositories_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RevokeSourceRepository(ctx context.Context, in *SourceRepositoryIdReq, opts ...grpc.CallOption) (*SourceRepositoryResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceRepositoryResp)
+	err := c.cc.Invoke(ctx, Core_RevokeSourceRepository_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RecordSourceArtifact(ctx context.Context, in *RecordSourceArtifactReq, opts ...grpc.CallOption) (*SourceArtifactResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceArtifactResp)
+	err := c.cc.Invoke(ctx, Core_RecordSourceArtifact_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ImportSourceArtifact(ctx context.Context, in *ImportSourceArtifactReq, opts ...grpc.CallOption) (*SourceArtifactImportResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceArtifactImportResp)
+	err := c.cc.Invoke(ctx, Core_ImportSourceArtifact_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateSourceBuildTrigger(ctx context.Context, in *CreateSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerSecretResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceBuildTriggerSecretResp)
+	err := c.cc.Invoke(ctx, Core_CreateSourceBuildTrigger_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) UpdateSourceBuildTrigger(ctx context.Context, in *UpdateSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceBuildTriggerResp)
+	err := c.cc.Invoke(ctx, Core_UpdateSourceBuildTrigger_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetSourceBuildTrigger(ctx context.Context, in *SourceBuildTriggerIdReq, opts ...grpc.CallOption) (*SourceBuildTriggerResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceBuildTriggerResp)
+	err := c.cc.Invoke(ctx, Core_GetSourceBuildTrigger_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListSourceBuildTriggers(ctx context.Context, in *SourceBuildTriggerListReq, opts ...grpc.CallOption) (*SourceBuildTriggerListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceBuildTriggerListResp)
+	err := c.cc.Invoke(ctx, Core_ListSourceBuildTriggers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RotateSourceBuildTriggerSecret(ctx context.Context, in *SourceBuildTriggerIdReq, opts ...grpc.CallOption) (*SourceBuildTriggerSecretResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceBuildTriggerSecretResp)
+	err := c.cc.Invoke(ctx, Core_RotateSourceBuildTriggerSecret_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ResolveSourceBuildTrigger(ctx context.Context, in *ResolveSourceBuildTriggerReq, opts ...grpc.CallOption) (*SourceBuildTriggerCredentialResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceBuildTriggerCredentialResp)
+	err := c.cc.Invoke(ctx, Core_ResolveSourceBuildTrigger_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) EnqueueSourceWebhookEvent(ctx context.Context, in *EnqueueSourceWebhookEventReq, opts ...grpc.CallOption) (*EnqueueSourceWebhookEventResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EnqueueSourceWebhookEventResp)
+	err := c.cc.Invoke(ctx, Core_EnqueueSourceWebhookEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ClaimSourceWebhookEvent(ctx context.Context, in *ClaimSourceWebhookEventReq, opts ...grpc.CallOption) (*ClaimSourceWebhookEventResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ClaimSourceWebhookEventResp)
+	err := c.cc.Invoke(ctx, Core_ClaimSourceWebhookEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CompleteSourceWebhookEvent(ctx context.Context, in *CompleteSourceWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_CompleteSourceWebhookEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) FailSourceWebhookEvent(ctx context.Context, in *FailSourceWebhookEventReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_FailSourceWebhookEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListSourceWebhookEvents(ctx context.Context, in *SourceWebhookEventListReq, opts ...grpc.CallOption) (*SourceWebhookEventListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SourceWebhookEventListResp)
+	err := c.cc.Invoke(ctx, Core_ListSourceWebhookEvents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateBillingPlan(ctx context.Context, in *CreateBillingPlanReq, opts ...grpc.CallOption) (*BillingPlanResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BillingPlanResp)
+	err := c.cc.Invoke(ctx, Core_CreateBillingPlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetBillingPlan(ctx context.Context, in *BillingPlanIdReq, opts ...grpc.CallOption) (*BillingPlanResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BillingPlanResp)
+	err := c.cc.Invoke(ctx, Core_GetBillingPlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListBillingPlans(ctx context.Context, in *BillingPlanListReq, opts ...grpc.CallOption) (*BillingPlanListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BillingPlanListResp)
+	err := c.cc.Invoke(ctx, Core_ListBillingPlans_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RetireBillingPlan(ctx context.Context, in *BillingPlanIdReq, opts ...grpc.CallOption) (*BillingPlanResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BillingPlanResp)
+	err := c.cc.Invoke(ctx, Core_RetireBillingPlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetTenantBilling(ctx context.Context, in *TenantBillingReq, opts ...grpc.CallOption) (*TenantBillingResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TenantBillingResp)
+	err := c.cc.Invoke(ctx, Core_GetTenantBilling_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) UpsertManualSubscription(ctx context.Context, in *UpsertManualSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TenantBillingResp)
+	err := c.cc.Invoke(ctx, Core_UpsertManualSubscription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ChangeTenantSubscription(ctx context.Context, in *ChangeTenantSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TenantBillingResp)
+	err := c.cc.Invoke(ctx, Core_ChangeTenantSubscription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CancelTenantSubscription(ctx context.Context, in *CancelTenantSubscriptionReq, opts ...grpc.CallOption) (*TenantBillingResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TenantBillingResp)
+	err := c.cc.Invoke(ctx, Core_CancelTenantSubscription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ReserveQuota(ctx context.Context, in *ReserveQuotaReq, opts ...grpc.CallOption) (*QuotaReservationResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QuotaReservationResp)
+	err := c.cc.Invoke(ctx, Core_ReserveQuota_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ConfirmQuota(ctx context.Context, in *QuotaReservationActionReq, opts ...grpc.CallOption) (*QuotaReservationResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QuotaReservationResp)
+	err := c.cc.Invoke(ctx, Core_ConfirmQuota_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ReleaseQuota(ctx context.Context, in *QuotaReservationActionReq, opts ...grpc.CallOption) (*QuotaReservationResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QuotaReservationResp)
+	err := c.cc.Invoke(ctx, Core_ReleaseQuota_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RecordUsage(ctx context.Context, in *RecordUsageReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_RecordUsage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetBillingUsage(ctx context.Context, in *BillingUsageReq, opts ...grpc.CallOption) (*BillingUsageResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BillingUsageResp)
+	err := c.cc.Invoke(ctx, Core_GetBillingUsage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListInvoices(ctx context.Context, in *InvoiceListReq, opts ...grpc.CallOption) (*InvoiceListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InvoiceListResp)
+	err := c.cc.Invoke(ctx, Core_ListInvoices_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ApplyBillingWebhook(ctx context.Context, in *ApplyBillingWebhookReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_ApplyBillingWebhook_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateLocalAgentRegistration(ctx context.Context, in *CreateLocalAgentRegistrationReq, opts ...grpc.CallOption) (*LocalAgentRegistrationResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LocalAgentRegistrationResp)
+	err := c.cc.Invoke(ctx, Core_CreateLocalAgentRegistration_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RegisterLocalAgent(ctx context.Context, in *RegisterLocalAgentReq, opts ...grpc.CallOption) (*RegisterLocalAgentResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RegisterLocalAgentResp)
+	err := c.cc.Invoke(ctx, Core_RegisterLocalAgent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetLocalAgent(ctx context.Context, in *LocalAgentIdReq, opts ...grpc.CallOption) (*LocalAgentResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LocalAgentResp)
+	err := c.cc.Invoke(ctx, Core_GetLocalAgent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListLocalAgents(ctx context.Context, in *LocalAgentListReq, opts ...grpc.CallOption) (*LocalAgentListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LocalAgentListResp)
+	err := c.cc.Invoke(ctx, Core_ListLocalAgents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) HeartbeatLocalAgent(ctx context.Context, in *HeartbeatLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LocalAgentResp)
+	err := c.cc.Invoke(ctx, Core_HeartbeatLocalAgent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) DrainLocalAgent(ctx context.Context, in *DrainLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LocalAgentResp)
+	err := c.cc.Invoke(ctx, Core_DrainLocalAgent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RevokeLocalAgent(ctx context.Context, in *RevokeLocalAgentReq, opts ...grpc.CallOption) (*LocalAgentResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LocalAgentResp)
+	err := c.cc.Invoke(ctx, Core_RevokeLocalAgent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RotateLocalAgentCertificate(ctx context.Context, in *RotateLocalAgentCertificateReq, opts ...grpc.CallOption) (*RegisterLocalAgentResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RegisterLocalAgentResp)
+	err := c.cc.Invoke(ctx, Core_RotateLocalAgentCertificate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ClaimLocalAgentBuildTask(ctx context.Context, in *ClaimLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*LocalAgentBuildTaskResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LocalAgentBuildTaskResp)
+	err := c.cc.Invoke(ctx, Core_ClaimLocalAgentBuildTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RenewLocalAgentTaskLease(ctx context.Context, in *RenewLocalAgentTaskLeaseReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_RenewLocalAgentTaskLease_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ReportLocalAgentBuildProgress(ctx context.Context, in *ReportLocalAgentBuildProgressReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_ReportLocalAgentBuildProgress_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CompleteLocalAgentBuildTask(ctx context.Context, in *CompleteLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_CompleteLocalAgentBuildTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) FailLocalAgentBuildTask(ctx context.Context, in *FailLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_FailLocalAgentBuildTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) VerifyHybridArtifact(ctx context.Context, in *VerifyHybridArtifactReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_VerifyHybridArtifact_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *coreClient) ReportInstall(ctx context.Context, in *InstallReportReq, opts ...grpc.CallOption) (*RespBase, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RespBase)
@@ -749,6 +1794,66 @@ func (c *coreClient) ClaimBuildTask(ctx context.Context, in *ClaimBuildTaskReq, 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BuildTaskResp)
 	err := c.cc.Invoke(ctx, Core_ClaimBuildTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) RegisterBuilderNode(ctx context.Context, in *RegisterBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuilderNodeResp)
+	err := c.cc.Invoke(ctx, Core_RegisterBuilderNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) BuilderNodeHeartbeat(ctx context.Context, in *BuilderNodeHeartbeatReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuilderNodeResp)
+	err := c.cc.Invoke(ctx, Core_BuilderNodeHeartbeat_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ClaimScheduledBuildTask(ctx context.Context, in *ClaimScheduledBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildTaskResp)
+	err := c.cc.Invoke(ctx, Core_ClaimScheduledBuildTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ResolveBuildCache(ctx context.Context, in *ResolveBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheResolutionResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildCacheResolutionResp)
+	err := c.cc.Invoke(ctx, Core_ResolveBuildCache_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) PublishBuildCache(ctx context.Context, in *PublishBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildCacheEntryResp)
+	err := c.cc.Invoke(ctx, Core_PublishBuildCache_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CleanupBuildCache(ctx context.Context, in *CleanupBuildCacheReq, opts ...grpc.CallOption) (*CleanupBuildCacheResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CleanupBuildCacheResp)
+	err := c.cc.Invoke(ctx, Core_CleanupBuildCache_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -896,12 +2001,182 @@ type CoreServer interface {
 	CreateBuildTask(context.Context, *CreateBuildTaskReq) (*BuildTaskResp, error)
 	GetBuildTask(context.Context, *BuildTaskIdReq) (*BuildTaskResp, error)
 	ListBuildTasks(context.Context, *BuildTaskListReq) (*BuildTaskListResp, error)
+	// 取消待处理或执行中的V4构建任务并立即推进fencing代次。
+	CancelBuildTask(context.Context, *CancelBuildTaskReq) (*BuildTaskResp, error)
+	// 根据不可变历史快照创建V4重试任务。
+	RetryBuildTask(context.Context, *RetryBuildTaskReq) (*BuildTaskResp, error)
+	// 查询V4 Builder节点详情。
+	GetBuilderNode(context.Context, *BuilderNodeIdReq) (*BuilderNodeResp, error)
+	// 分页查询V4 Builder集群节点。
+	ListBuilderNodes(context.Context, *BuilderNodeListReq) (*BuilderNodeListResp, error)
+	// 修改V4 Builder节点排空状态。
+	DrainBuilderNode(context.Context, *DrainBuilderNodeReq) (*BuilderNodeResp, error)
+	// 在心跳、失败次数和磁盘容量均恢复后人工解除V4 Builder节点隔离。
+	RecoverBuilderNode(context.Context, *RecoverBuilderNodeReq) (*BuilderNodeResp, error)
+	// 创建或更新V4构建并发与公平调度策略。
+	UpsertBuildConcurrencyPolicy(context.Context, *UpsertBuildConcurrencyPolicyReq) (*BuildConcurrencyPolicyResp, error)
+	// 分页查询V4构建并发与公平调度策略。
+	ListBuildConcurrencyPolicies(context.Context, *BuildConcurrencyPolicyListReq) (*BuildConcurrencyPolicyListResp, error)
+	// 分页查询V4构建缓存条目。
+	ListBuildCacheEntries(context.Context, *BuildCacheEntryListReq) (*BuildCacheEntryListResp, error)
+	// 管理端失效V4构建缓存条目。
+	InvalidateBuildCache(context.Context, *InvalidateBuildCacheReq) (*BuildCacheEntryResp, error)
+	// 分页查询V4结构化调度事件。
+	ListBuildSchedulerEvents(context.Context, *BuildSchedulerEventListReq) (*BuildSchedulerEventListResp, error)
+	// 查询V4构建集群运行指标与告警摘要。
+	GetBuildClusterMetrics(context.Context, *BuildClusterMetricsReq) (*BuildClusterMetricsResp, error)
+	// 创建V5 Open API凭证并一次性返回Secret。
+	CreateOpenApiCredential(context.Context, *CreateOpenApiCredentialReq) (*OpenApiCredentialSecretResp, error)
+	// 分页查询V5 Open API凭证。
+	ListOpenApiCredentials(context.Context, *OpenApiCredentialListReq) (*OpenApiCredentialListResp, error)
+	// 轮换V5 Open API凭证并一次性返回新Secret。
+	RotateOpenApiCredential(context.Context, *RotateOpenApiCredentialReq) (*OpenApiCredentialSecretResp, error)
+	// 立即吊销V5 Open API凭证。
+	RevokeOpenApiCredential(context.Context, *OpenApiCredentialIdReq) (*OpenApiCredentialResp, error)
+	// 验证V5 Open API凭证、IP、状态和有效期。
+	AuthenticateOpenApiCredential(context.Context, *AuthenticateOpenApiCredentialReq) (*OpenApiAuthContextResp, error)
+	// 申请或读取Open API幂等执行记录。
+	BeginOpenApiIdempotency(context.Context, *BeginOpenApiIdempotencyReq) (*OpenApiIdempotencyResp, error)
+	// 保存Open API幂等请求的最终响应。
+	CompleteOpenApiIdempotency(context.Context, *CompleteOpenApiIdempotencyReq) (*RespBase, error)
+	// 写入Open API调用审计。
+	RecordOpenApiAudit(context.Context, *RecordOpenApiAuditReq) (*RespBase, error)
+	// 创建Webhook订阅端点并一次性返回签名Secret。
+	CreateWebhookEndpoint(context.Context, *CreateWebhookEndpointReq) (*WebhookEndpointSecretResp, error)
+	// 更新Webhook订阅端点。
+	UpdateWebhookEndpoint(context.Context, *UpdateWebhookEndpointReq) (*WebhookEndpointResp, error)
+	// 查询Webhook订阅端点。
+	GetWebhookEndpoint(context.Context, *WebhookEndpointIdReq) (*WebhookEndpointResp, error)
+	// 查询Webhook订阅端点列表。
+	ListWebhookEndpoints(context.Context, *WebhookEndpointListReq) (*WebhookEndpointListResp, error)
+	// 重置Webhook签名Secret并一次性返回新Secret。
+	RotateWebhookEndpointSecret(context.Context, *WebhookEndpointIdReq) (*WebhookEndpointSecretResp, error)
+	// 查询Webhook投递日志。
+	ListWebhookDeliveries(context.Context, *WebhookDeliveryListReq) (*WebhookDeliveryListResp, error)
+	// 重放失败或死信的Webhook投递。
+	ReplayWebhookDelivery(context.Context, *WebhookDeliveryIdReq) (*WebhookDeliveryResp, error)
+	// 创建只投递到指定端点的测试事件。
+	CreateTestWebhookEvent(context.Context, *CreateTestWebhookEventReq) (*RespBase, error)
+	// 完成受信任的GitHub/GitLab OAuth回调或App安装同步，并加密保存令牌。
+	CompleteSourceIntegration(context.Context, *CompleteSourceIntegrationReq) (*SourceIntegrationResp, error)
+	// 查询代码平台集成。
+	GetSourceIntegration(context.Context, *SourceIntegrationIdReq) (*SourceIntegrationResp, error)
+	// 分页查询代码平台集成。
+	ListSourceIntegrations(context.Context, *SourceIntegrationListReq) (*SourceIntegrationListResp, error)
+	// 读取有效集成令牌，仅供受内部认证保护的供应商客户端调用，禁止暴露到HTTP。
+	GetSourceIntegrationCredential(context.Context, *SourceIntegrationIdReq) (*SourceIntegrationCredentialResp, error)
+	// 断开集成并使令牌立即不可用。
+	DisconnectSourceIntegration(context.Context, *SourceIntegrationIdReq) (*SourceIntegrationResp, error)
+	// 同步OAuth/App明确授权的只读仓库。
+	AuthorizeSourceRepository(context.Context, *AuthorizeSourceRepositoryReq) (*SourceRepositoryResp, error)
+	// 查询单个授权仓库。
+	GetSourceRepository(context.Context, *SourceRepositoryIdReq) (*SourceRepositoryResp, error)
+	// 分页查询授权仓库。
+	ListSourceRepositories(context.Context, *SourceRepositoryListReq) (*SourceRepositoryListResp, error)
+	// 撤销仓库授权。
+	RevokeSourceRepository(context.Context, *SourceRepositoryIdReq) (*SourceRepositoryResp, error)
+	// 记录从授权仓库导入并完成校验的APK Artifact来源。
+	RecordSourceArtifact(context.Context, *RecordSourceArtifactReq) (*SourceArtifactResp, error)
+	// 在同一数据库事务中创建版本、绑定存储对象并记录供应商Artifact来源。
+	ImportSourceArtifact(context.Context, *ImportSourceArtifactReq) (*SourceArtifactImportResp, error)
+	// 创建预定义源码平台构建触发策略并一次性返回回调令牌和签名Secret。
+	CreateSourceBuildTrigger(context.Context, *CreateSourceBuildTriggerReq) (*SourceBuildTriggerSecretResp, error)
+	// 更新预定义源码平台构建触发策略，不能修改授权仓库和应用。
+	UpdateSourceBuildTrigger(context.Context, *UpdateSourceBuildTriggerReq) (*SourceBuildTriggerResp, error)
+	// 查询预定义源码平台构建触发策略。
+	GetSourceBuildTrigger(context.Context, *SourceBuildTriggerIdReq) (*SourceBuildTriggerResp, error)
+	// 分页查询预定义源码平台构建触发策略。
+	ListSourceBuildTriggers(context.Context, *SourceBuildTriggerListReq) (*SourceBuildTriggerListResp, error)
+	// 轮换回调随机令牌和供应商签名Secret并一次性返回。
+	RotateSourceBuildTriggerSecret(context.Context, *SourceBuildTriggerIdReq) (*SourceBuildTriggerSecretResp, error)
+	// 解析回调随机令牌和内部签名材料，仅供受内部认证保护的公开入口调用。
+	ResolveSourceBuildTrigger(context.Context, *ResolveSourceBuildTriggerReq) (*SourceBuildTriggerCredentialResp, error)
+	// 将已完成供应商签名验证的标准化事件可靠且幂等地写入队列。
+	EnqueueSourceWebhookEvent(context.Context, *EnqueueSourceWebhookEventReq) (*EnqueueSourceWebhookEventResp, error)
+	// Worker使用租约原子领取待处理或超时事件。
+	ClaimSourceWebhookEvent(context.Context, *ClaimSourceWebhookEventReq) (*ClaimSourceWebhookEventResp, error)
+	// Worker记录Artifact导入和构建任务创建成功。
+	CompleteSourceWebhookEvent(context.Context, *CompleteSourceWebhookEventReq) (*RespBase, error)
+	// Worker按可重试性记录失败、指数退避或最终失败。
+	FailSourceWebhookEvent(context.Context, *FailSourceWebhookEventReq) (*RespBase, error)
+	// 分页查询源码平台入站事件审计记录。
+	ListSourceWebhookEvents(context.Context, *SourceWebhookEventListReq) (*SourceWebhookEventListResp, error)
+	// 创建V6不可变套餐版本，同编码自动分配下一版本号。
+	CreateBillingPlan(context.Context, *CreateBillingPlanReq) (*BillingPlanResp, error)
+	// 查询V6套餐版本。
+	GetBillingPlan(context.Context, *BillingPlanIdReq) (*BillingPlanResp, error)
+	// 查询V6套餐版本列表。
+	ListBillingPlans(context.Context, *BillingPlanListReq) (*BillingPlanListResp, error)
+	// 退役V6套餐版本，不影响历史订阅。
+	RetireBillingPlan(context.Context, *BillingPlanIdReq) (*BillingPlanResp, error)
+	// 查询租户当前订阅、权益和固化套餐版本。
+	GetTenantBilling(context.Context, *TenantBillingReq) (*TenantBillingResp, error)
+	// 创建或更新人工合同订阅并原子刷新权益。
+	UpsertManualSubscription(context.Context, *UpsertManualSubscriptionReq) (*TenantBillingResp, error)
+	// 立即或周期末变更套餐。
+	ChangeTenantSubscription(context.Context, *ChangeTenantSubscriptionReq) (*TenantBillingResp, error)
+	// 立即或周期末取消订阅。
+	CancelTenantSubscription(context.Context, *CancelTenantSubscriptionReq) (*TenantBillingResp, error)
+	// 并发安全地预占构建、存储或席位额度。
+	ReserveQuota(context.Context, *ReserveQuotaReq) (*QuotaReservationResp, error)
+	// 幂等确认额度预占并写不可变用量账本。
+	ConfirmQuota(context.Context, *QuotaReservationActionReq) (*QuotaReservationResp, error)
+	// 幂等释放未使用额度预占。
+	ReleaseQuota(context.Context, *QuotaReservationActionReq) (*QuotaReservationResp, error)
+	// 追加一条幂等不可变用量记录。
+	RecordUsage(context.Context, *RecordUsageReq) (*RespBase, error)
+	// 查询周期用量、预占和当前限额。
+	GetBillingUsage(context.Context, *BillingUsageReq) (*BillingUsageResp, error)
+	// 查询租户不可变账单及账单项。
+	ListInvoices(context.Context, *InvoiceListReq) (*InvoiceListResp, error)
+	// 应用已验签支付事件，事件幂等且拒绝乱序覆盖新状态。
+	ApplyBillingWebhook(context.Context, *ApplyBillingWebhookReq) (*RespBase, error)
+	// 创建V7 Local Agent并一次性返回注册码。
+	CreateLocalAgentRegistration(context.Context, *CreateLocalAgentRegistrationReq) (*LocalAgentRegistrationResp, error)
+	// Agent使用一次性注册码和本地CSR完成首次注册。
+	RegisterLocalAgent(context.Context, *RegisterLocalAgentReq) (*RegisterLocalAgentResp, error)
+	// 查询V7 Local Agent详情。
+	GetLocalAgent(context.Context, *LocalAgentIdReq) (*LocalAgentResp, error)
+	// 分页查询V7 Local Agent。
+	ListLocalAgents(context.Context, *LocalAgentListReq) (*LocalAgentListResp, error)
+	// Agent通过mTLS出站连接上报心跳和预定义能力。
+	HeartbeatLocalAgent(context.Context, *HeartbeatLocalAgentReq) (*LocalAgentResp, error)
+	// 管理员远程设置Agent Drain状态。
+	DrainLocalAgent(context.Context, *DrainLocalAgentReq) (*LocalAgentResp, error)
+	// 管理员吊销Agent及其全部有效证书。
+	RevokeLocalAgent(context.Context, *RevokeLocalAgentReq) (*LocalAgentResp, error)
+	// Agent使用当前有效证书和新CSR轮换客户端证书。
+	RotateLocalAgentCertificate(context.Context, *RotateLocalAgentCertificateReq) (*RegisterLocalAgentResp, error)
+	// Agent领取经过租户、应用、能力和协议范围校验的构建任务。
+	ClaimLocalAgentBuildTask(context.Context, *ClaimLocalAgentBuildTaskReq) (*LocalAgentBuildTaskResp, error)
+	// Agent按任务attempt续租，旧进程不能回写。
+	RenewLocalAgentTaskLease(context.Context, *RenewLocalAgentTaskLeaseReq) (*RespBase, error)
+	// Agent回报预定义构建阶段，不支持任意命令。
+	ReportLocalAgentBuildProgress(context.Context, *ReportLocalAgentBuildProgressReq) (*RespBase, error)
+	// Agent校验Artifact后完成构建任务。
+	CompleteLocalAgentBuildTask(context.Context, *CompleteLocalAgentBuildTaskReq) (*RespBase, error)
+	// Agent记录脱敏失败摘要并结束任务。
+	FailLocalAgentBuildTask(context.Context, *FailLocalAgentBuildTaskReq) (*RespBase, error)
+	// 校验并登记三种存储模式下的Artifact引用。
+	VerifyHybridArtifact(context.Context, *VerifyHybridArtifactReq) (*RespBase, error)
 	ReportInstall(context.Context, *InstallReportReq) (*RespBase, error)
 	ReportChannelEvent(context.Context, *ReportChannelEventReq) (*RespBase, error)
 	GetChannelStats(context.Context, *ChannelStatsReq) (*ChannelStatsResp, error)
 	// 解析渠道最新成功产物并幂等记录点击、下载事件。
 	ResolveChannelDownload(context.Context, *ResolveChannelDownloadReq) (*ChannelDownloadArtifactResp, error)
 	ClaimBuildTask(context.Context, *ClaimBuildTaskReq) (*BuildTaskResp, error)
+	// 注册或刷新V4 Builder节点能力。
+	RegisterBuilderNode(context.Context, *RegisterBuilderNodeReq) (*BuilderNodeResp, error)
+	// 上报V4 Builder节点心跳、容量和运行任务。
+	BuilderNodeHeartbeat(context.Context, *BuilderNodeHeartbeatReq) (*BuilderNodeResp, error)
+	// 结合节点能力、公平队列和并发槽位原子领取V4构建任务。
+	ClaimScheduledBuildTask(context.Context, *ClaimScheduledBuildTaskReq) (*BuildTaskResp, error)
+	// 解析并记录V4输入可寻址构建缓存命中。
+	ResolveBuildCache(context.Context, *ResolveBuildCacheReq) (*BuildCacheResolutionResp, error)
+	// 发布独立V4构建缓存产物。
+	PublishBuildCache(context.Context, *PublishBuildCacheReq) (*BuildCacheEntryResp, error)
+	// 执行V4构建缓存TTL/LRU清理并返回可物理删除对象。
+	CleanupBuildCache(context.Context, *CleanupBuildCacheReq) (*CleanupBuildCacheResp, error)
 	// 读取当前Builder已领取任务的内部执行上下文。
 	GetBuildExecutionContext(context.Context, *GetBuildExecutionContextReq) (*BuildExecutionContextResp, error)
 	HeartbeatBuildTask(context.Context, *HeartbeatBuildTaskReq) (*RespBase, error)
@@ -1071,6 +2346,243 @@ func (UnimplementedCoreServer) GetBuildTask(context.Context, *BuildTaskIdReq) (*
 func (UnimplementedCoreServer) ListBuildTasks(context.Context, *BuildTaskListReq) (*BuildTaskListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListBuildTasks not implemented")
 }
+func (UnimplementedCoreServer) CancelBuildTask(context.Context, *CancelBuildTaskReq) (*BuildTaskResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelBuildTask not implemented")
+}
+func (UnimplementedCoreServer) RetryBuildTask(context.Context, *RetryBuildTaskReq) (*BuildTaskResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RetryBuildTask not implemented")
+}
+func (UnimplementedCoreServer) GetBuilderNode(context.Context, *BuilderNodeIdReq) (*BuilderNodeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBuilderNode not implemented")
+}
+func (UnimplementedCoreServer) ListBuilderNodes(context.Context, *BuilderNodeListReq) (*BuilderNodeListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListBuilderNodes not implemented")
+}
+func (UnimplementedCoreServer) DrainBuilderNode(context.Context, *DrainBuilderNodeReq) (*BuilderNodeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method DrainBuilderNode not implemented")
+}
+func (UnimplementedCoreServer) RecoverBuilderNode(context.Context, *RecoverBuilderNodeReq) (*BuilderNodeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecoverBuilderNode not implemented")
+}
+func (UnimplementedCoreServer) UpsertBuildConcurrencyPolicy(context.Context, *UpsertBuildConcurrencyPolicyReq) (*BuildConcurrencyPolicyResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpsertBuildConcurrencyPolicy not implemented")
+}
+func (UnimplementedCoreServer) ListBuildConcurrencyPolicies(context.Context, *BuildConcurrencyPolicyListReq) (*BuildConcurrencyPolicyListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListBuildConcurrencyPolicies not implemented")
+}
+func (UnimplementedCoreServer) ListBuildCacheEntries(context.Context, *BuildCacheEntryListReq) (*BuildCacheEntryListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListBuildCacheEntries not implemented")
+}
+func (UnimplementedCoreServer) InvalidateBuildCache(context.Context, *InvalidateBuildCacheReq) (*BuildCacheEntryResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method InvalidateBuildCache not implemented")
+}
+func (UnimplementedCoreServer) ListBuildSchedulerEvents(context.Context, *BuildSchedulerEventListReq) (*BuildSchedulerEventListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListBuildSchedulerEvents not implemented")
+}
+func (UnimplementedCoreServer) GetBuildClusterMetrics(context.Context, *BuildClusterMetricsReq) (*BuildClusterMetricsResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBuildClusterMetrics not implemented")
+}
+func (UnimplementedCoreServer) CreateOpenApiCredential(context.Context, *CreateOpenApiCredentialReq) (*OpenApiCredentialSecretResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateOpenApiCredential not implemented")
+}
+func (UnimplementedCoreServer) ListOpenApiCredentials(context.Context, *OpenApiCredentialListReq) (*OpenApiCredentialListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListOpenApiCredentials not implemented")
+}
+func (UnimplementedCoreServer) RotateOpenApiCredential(context.Context, *RotateOpenApiCredentialReq) (*OpenApiCredentialSecretResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RotateOpenApiCredential not implemented")
+}
+func (UnimplementedCoreServer) RevokeOpenApiCredential(context.Context, *OpenApiCredentialIdReq) (*OpenApiCredentialResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RevokeOpenApiCredential not implemented")
+}
+func (UnimplementedCoreServer) AuthenticateOpenApiCredential(context.Context, *AuthenticateOpenApiCredentialReq) (*OpenApiAuthContextResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method AuthenticateOpenApiCredential not implemented")
+}
+func (UnimplementedCoreServer) BeginOpenApiIdempotency(context.Context, *BeginOpenApiIdempotencyReq) (*OpenApiIdempotencyResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method BeginOpenApiIdempotency not implemented")
+}
+func (UnimplementedCoreServer) CompleteOpenApiIdempotency(context.Context, *CompleteOpenApiIdempotencyReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method CompleteOpenApiIdempotency not implemented")
+}
+func (UnimplementedCoreServer) RecordOpenApiAudit(context.Context, *RecordOpenApiAuditReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecordOpenApiAudit not implemented")
+}
+func (UnimplementedCoreServer) CreateWebhookEndpoint(context.Context, *CreateWebhookEndpointReq) (*WebhookEndpointSecretResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateWebhookEndpoint not implemented")
+}
+func (UnimplementedCoreServer) UpdateWebhookEndpoint(context.Context, *UpdateWebhookEndpointReq) (*WebhookEndpointResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateWebhookEndpoint not implemented")
+}
+func (UnimplementedCoreServer) GetWebhookEndpoint(context.Context, *WebhookEndpointIdReq) (*WebhookEndpointResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWebhookEndpoint not implemented")
+}
+func (UnimplementedCoreServer) ListWebhookEndpoints(context.Context, *WebhookEndpointListReq) (*WebhookEndpointListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListWebhookEndpoints not implemented")
+}
+func (UnimplementedCoreServer) RotateWebhookEndpointSecret(context.Context, *WebhookEndpointIdReq) (*WebhookEndpointSecretResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RotateWebhookEndpointSecret not implemented")
+}
+func (UnimplementedCoreServer) ListWebhookDeliveries(context.Context, *WebhookDeliveryListReq) (*WebhookDeliveryListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListWebhookDeliveries not implemented")
+}
+func (UnimplementedCoreServer) ReplayWebhookDelivery(context.Context, *WebhookDeliveryIdReq) (*WebhookDeliveryResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReplayWebhookDelivery not implemented")
+}
+func (UnimplementedCoreServer) CreateTestWebhookEvent(context.Context, *CreateTestWebhookEventReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateTestWebhookEvent not implemented")
+}
+func (UnimplementedCoreServer) CompleteSourceIntegration(context.Context, *CompleteSourceIntegrationReq) (*SourceIntegrationResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CompleteSourceIntegration not implemented")
+}
+func (UnimplementedCoreServer) GetSourceIntegration(context.Context, *SourceIntegrationIdReq) (*SourceIntegrationResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSourceIntegration not implemented")
+}
+func (UnimplementedCoreServer) ListSourceIntegrations(context.Context, *SourceIntegrationListReq) (*SourceIntegrationListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSourceIntegrations not implemented")
+}
+func (UnimplementedCoreServer) GetSourceIntegrationCredential(context.Context, *SourceIntegrationIdReq) (*SourceIntegrationCredentialResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSourceIntegrationCredential not implemented")
+}
+func (UnimplementedCoreServer) DisconnectSourceIntegration(context.Context, *SourceIntegrationIdReq) (*SourceIntegrationResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method DisconnectSourceIntegration not implemented")
+}
+func (UnimplementedCoreServer) AuthorizeSourceRepository(context.Context, *AuthorizeSourceRepositoryReq) (*SourceRepositoryResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method AuthorizeSourceRepository not implemented")
+}
+func (UnimplementedCoreServer) GetSourceRepository(context.Context, *SourceRepositoryIdReq) (*SourceRepositoryResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSourceRepository not implemented")
+}
+func (UnimplementedCoreServer) ListSourceRepositories(context.Context, *SourceRepositoryListReq) (*SourceRepositoryListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSourceRepositories not implemented")
+}
+func (UnimplementedCoreServer) RevokeSourceRepository(context.Context, *SourceRepositoryIdReq) (*SourceRepositoryResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RevokeSourceRepository not implemented")
+}
+func (UnimplementedCoreServer) RecordSourceArtifact(context.Context, *RecordSourceArtifactReq) (*SourceArtifactResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecordSourceArtifact not implemented")
+}
+func (UnimplementedCoreServer) ImportSourceArtifact(context.Context, *ImportSourceArtifactReq) (*SourceArtifactImportResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ImportSourceArtifact not implemented")
+}
+func (UnimplementedCoreServer) CreateSourceBuildTrigger(context.Context, *CreateSourceBuildTriggerReq) (*SourceBuildTriggerSecretResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateSourceBuildTrigger not implemented")
+}
+func (UnimplementedCoreServer) UpdateSourceBuildTrigger(context.Context, *UpdateSourceBuildTriggerReq) (*SourceBuildTriggerResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateSourceBuildTrigger not implemented")
+}
+func (UnimplementedCoreServer) GetSourceBuildTrigger(context.Context, *SourceBuildTriggerIdReq) (*SourceBuildTriggerResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSourceBuildTrigger not implemented")
+}
+func (UnimplementedCoreServer) ListSourceBuildTriggers(context.Context, *SourceBuildTriggerListReq) (*SourceBuildTriggerListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSourceBuildTriggers not implemented")
+}
+func (UnimplementedCoreServer) RotateSourceBuildTriggerSecret(context.Context, *SourceBuildTriggerIdReq) (*SourceBuildTriggerSecretResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RotateSourceBuildTriggerSecret not implemented")
+}
+func (UnimplementedCoreServer) ResolveSourceBuildTrigger(context.Context, *ResolveSourceBuildTriggerReq) (*SourceBuildTriggerCredentialResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResolveSourceBuildTrigger not implemented")
+}
+func (UnimplementedCoreServer) EnqueueSourceWebhookEvent(context.Context, *EnqueueSourceWebhookEventReq) (*EnqueueSourceWebhookEventResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method EnqueueSourceWebhookEvent not implemented")
+}
+func (UnimplementedCoreServer) ClaimSourceWebhookEvent(context.Context, *ClaimSourceWebhookEventReq) (*ClaimSourceWebhookEventResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ClaimSourceWebhookEvent not implemented")
+}
+func (UnimplementedCoreServer) CompleteSourceWebhookEvent(context.Context, *CompleteSourceWebhookEventReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method CompleteSourceWebhookEvent not implemented")
+}
+func (UnimplementedCoreServer) FailSourceWebhookEvent(context.Context, *FailSourceWebhookEventReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method FailSourceWebhookEvent not implemented")
+}
+func (UnimplementedCoreServer) ListSourceWebhookEvents(context.Context, *SourceWebhookEventListReq) (*SourceWebhookEventListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListSourceWebhookEvents not implemented")
+}
+func (UnimplementedCoreServer) CreateBillingPlan(context.Context, *CreateBillingPlanReq) (*BillingPlanResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateBillingPlan not implemented")
+}
+func (UnimplementedCoreServer) GetBillingPlan(context.Context, *BillingPlanIdReq) (*BillingPlanResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBillingPlan not implemented")
+}
+func (UnimplementedCoreServer) ListBillingPlans(context.Context, *BillingPlanListReq) (*BillingPlanListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListBillingPlans not implemented")
+}
+func (UnimplementedCoreServer) RetireBillingPlan(context.Context, *BillingPlanIdReq) (*BillingPlanResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RetireBillingPlan not implemented")
+}
+func (UnimplementedCoreServer) GetTenantBilling(context.Context, *TenantBillingReq) (*TenantBillingResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetTenantBilling not implemented")
+}
+func (UnimplementedCoreServer) UpsertManualSubscription(context.Context, *UpsertManualSubscriptionReq) (*TenantBillingResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpsertManualSubscription not implemented")
+}
+func (UnimplementedCoreServer) ChangeTenantSubscription(context.Context, *ChangeTenantSubscriptionReq) (*TenantBillingResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ChangeTenantSubscription not implemented")
+}
+func (UnimplementedCoreServer) CancelTenantSubscription(context.Context, *CancelTenantSubscriptionReq) (*TenantBillingResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelTenantSubscription not implemented")
+}
+func (UnimplementedCoreServer) ReserveQuota(context.Context, *ReserveQuotaReq) (*QuotaReservationResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReserveQuota not implemented")
+}
+func (UnimplementedCoreServer) ConfirmQuota(context.Context, *QuotaReservationActionReq) (*QuotaReservationResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ConfirmQuota not implemented")
+}
+func (UnimplementedCoreServer) ReleaseQuota(context.Context, *QuotaReservationActionReq) (*QuotaReservationResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReleaseQuota not implemented")
+}
+func (UnimplementedCoreServer) RecordUsage(context.Context, *RecordUsageReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method RecordUsage not implemented")
+}
+func (UnimplementedCoreServer) GetBillingUsage(context.Context, *BillingUsageReq) (*BillingUsageResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBillingUsage not implemented")
+}
+func (UnimplementedCoreServer) ListInvoices(context.Context, *InvoiceListReq) (*InvoiceListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListInvoices not implemented")
+}
+func (UnimplementedCoreServer) ApplyBillingWebhook(context.Context, *ApplyBillingWebhookReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method ApplyBillingWebhook not implemented")
+}
+func (UnimplementedCoreServer) CreateLocalAgentRegistration(context.Context, *CreateLocalAgentRegistrationReq) (*LocalAgentRegistrationResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateLocalAgentRegistration not implemented")
+}
+func (UnimplementedCoreServer) RegisterLocalAgent(context.Context, *RegisterLocalAgentReq) (*RegisterLocalAgentResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegisterLocalAgent not implemented")
+}
+func (UnimplementedCoreServer) GetLocalAgent(context.Context, *LocalAgentIdReq) (*LocalAgentResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLocalAgent not implemented")
+}
+func (UnimplementedCoreServer) ListLocalAgents(context.Context, *LocalAgentListReq) (*LocalAgentListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListLocalAgents not implemented")
+}
+func (UnimplementedCoreServer) HeartbeatLocalAgent(context.Context, *HeartbeatLocalAgentReq) (*LocalAgentResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method HeartbeatLocalAgent not implemented")
+}
+func (UnimplementedCoreServer) DrainLocalAgent(context.Context, *DrainLocalAgentReq) (*LocalAgentResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method DrainLocalAgent not implemented")
+}
+func (UnimplementedCoreServer) RevokeLocalAgent(context.Context, *RevokeLocalAgentReq) (*LocalAgentResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RevokeLocalAgent not implemented")
+}
+func (UnimplementedCoreServer) RotateLocalAgentCertificate(context.Context, *RotateLocalAgentCertificateReq) (*RegisterLocalAgentResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RotateLocalAgentCertificate not implemented")
+}
+func (UnimplementedCoreServer) ClaimLocalAgentBuildTask(context.Context, *ClaimLocalAgentBuildTaskReq) (*LocalAgentBuildTaskResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ClaimLocalAgentBuildTask not implemented")
+}
+func (UnimplementedCoreServer) RenewLocalAgentTaskLease(context.Context, *RenewLocalAgentTaskLeaseReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method RenewLocalAgentTaskLease not implemented")
+}
+func (UnimplementedCoreServer) ReportLocalAgentBuildProgress(context.Context, *ReportLocalAgentBuildProgressReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReportLocalAgentBuildProgress not implemented")
+}
+func (UnimplementedCoreServer) CompleteLocalAgentBuildTask(context.Context, *CompleteLocalAgentBuildTaskReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method CompleteLocalAgentBuildTask not implemented")
+}
+func (UnimplementedCoreServer) FailLocalAgentBuildTask(context.Context, *FailLocalAgentBuildTaskReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method FailLocalAgentBuildTask not implemented")
+}
+func (UnimplementedCoreServer) VerifyHybridArtifact(context.Context, *VerifyHybridArtifactReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifyHybridArtifact not implemented")
+}
 func (UnimplementedCoreServer) ReportInstall(context.Context, *InstallReportReq) (*RespBase, error) {
 	return nil, status.Error(codes.Unimplemented, "method ReportInstall not implemented")
 }
@@ -1085,6 +2597,24 @@ func (UnimplementedCoreServer) ResolveChannelDownload(context.Context, *ResolveC
 }
 func (UnimplementedCoreServer) ClaimBuildTask(context.Context, *ClaimBuildTaskReq) (*BuildTaskResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ClaimBuildTask not implemented")
+}
+func (UnimplementedCoreServer) RegisterBuilderNode(context.Context, *RegisterBuilderNodeReq) (*BuilderNodeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegisterBuilderNode not implemented")
+}
+func (UnimplementedCoreServer) BuilderNodeHeartbeat(context.Context, *BuilderNodeHeartbeatReq) (*BuilderNodeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method BuilderNodeHeartbeat not implemented")
+}
+func (UnimplementedCoreServer) ClaimScheduledBuildTask(context.Context, *ClaimScheduledBuildTaskReq) (*BuildTaskResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ClaimScheduledBuildTask not implemented")
+}
+func (UnimplementedCoreServer) ResolveBuildCache(context.Context, *ResolveBuildCacheReq) (*BuildCacheResolutionResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResolveBuildCache not implemented")
+}
+func (UnimplementedCoreServer) PublishBuildCache(context.Context, *PublishBuildCacheReq) (*BuildCacheEntryResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method PublishBuildCache not implemented")
+}
+func (UnimplementedCoreServer) CleanupBuildCache(context.Context, *CleanupBuildCacheReq) (*CleanupBuildCacheResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CleanupBuildCache not implemented")
 }
 func (UnimplementedCoreServer) GetBuildExecutionContext(context.Context, *GetBuildExecutionContextReq) (*BuildExecutionContextResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetBuildExecutionContext not implemented")
@@ -2040,6 +3570,1428 @@ func _Core_ListBuildTasks_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Core_CancelBuildTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelBuildTaskReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CancelBuildTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CancelBuildTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CancelBuildTask(ctx, req.(*CancelBuildTaskReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RetryBuildTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RetryBuildTaskReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RetryBuildTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RetryBuildTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RetryBuildTask(ctx, req.(*RetryBuildTaskReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetBuilderNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuilderNodeIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetBuilderNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetBuilderNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetBuilderNode(ctx, req.(*BuilderNodeIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListBuilderNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuilderNodeListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListBuilderNodes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListBuilderNodes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListBuilderNodes(ctx, req.(*BuilderNodeListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_DrainBuilderNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DrainBuilderNodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).DrainBuilderNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_DrainBuilderNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).DrainBuilderNode(ctx, req.(*DrainBuilderNodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RecoverBuilderNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecoverBuilderNodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RecoverBuilderNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RecoverBuilderNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RecoverBuilderNode(ctx, req.(*RecoverBuilderNodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_UpsertBuildConcurrencyPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertBuildConcurrencyPolicyReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).UpsertBuildConcurrencyPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_UpsertBuildConcurrencyPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).UpsertBuildConcurrencyPolicy(ctx, req.(*UpsertBuildConcurrencyPolicyReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListBuildConcurrencyPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuildConcurrencyPolicyListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListBuildConcurrencyPolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListBuildConcurrencyPolicies_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListBuildConcurrencyPolicies(ctx, req.(*BuildConcurrencyPolicyListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListBuildCacheEntries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuildCacheEntryListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListBuildCacheEntries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListBuildCacheEntries_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListBuildCacheEntries(ctx, req.(*BuildCacheEntryListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_InvalidateBuildCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InvalidateBuildCacheReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).InvalidateBuildCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_InvalidateBuildCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).InvalidateBuildCache(ctx, req.(*InvalidateBuildCacheReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListBuildSchedulerEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuildSchedulerEventListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListBuildSchedulerEvents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListBuildSchedulerEvents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListBuildSchedulerEvents(ctx, req.(*BuildSchedulerEventListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetBuildClusterMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuildClusterMetricsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetBuildClusterMetrics(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetBuildClusterMetrics_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetBuildClusterMetrics(ctx, req.(*BuildClusterMetricsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateOpenApiCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateOpenApiCredentialReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateOpenApiCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateOpenApiCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateOpenApiCredential(ctx, req.(*CreateOpenApiCredentialReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListOpenApiCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpenApiCredentialListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListOpenApiCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListOpenApiCredentials_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListOpenApiCredentials(ctx, req.(*OpenApiCredentialListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RotateOpenApiCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RotateOpenApiCredentialReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RotateOpenApiCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RotateOpenApiCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RotateOpenApiCredential(ctx, req.(*RotateOpenApiCredentialReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RevokeOpenApiCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OpenApiCredentialIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RevokeOpenApiCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RevokeOpenApiCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RevokeOpenApiCredential(ctx, req.(*OpenApiCredentialIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_AuthenticateOpenApiCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthenticateOpenApiCredentialReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).AuthenticateOpenApiCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_AuthenticateOpenApiCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).AuthenticateOpenApiCredential(ctx, req.(*AuthenticateOpenApiCredentialReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_BeginOpenApiIdempotency_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BeginOpenApiIdempotencyReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).BeginOpenApiIdempotency(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_BeginOpenApiIdempotency_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).BeginOpenApiIdempotency(ctx, req.(*BeginOpenApiIdempotencyReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CompleteOpenApiIdempotency_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompleteOpenApiIdempotencyReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CompleteOpenApiIdempotency(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CompleteOpenApiIdempotency_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CompleteOpenApiIdempotency(ctx, req.(*CompleteOpenApiIdempotencyReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RecordOpenApiAudit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecordOpenApiAuditReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RecordOpenApiAudit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RecordOpenApiAudit_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RecordOpenApiAudit(ctx, req.(*RecordOpenApiAuditReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateWebhookEndpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateWebhookEndpointReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateWebhookEndpoint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateWebhookEndpoint_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateWebhookEndpoint(ctx, req.(*CreateWebhookEndpointReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_UpdateWebhookEndpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateWebhookEndpointReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).UpdateWebhookEndpoint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_UpdateWebhookEndpoint_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).UpdateWebhookEndpoint(ctx, req.(*UpdateWebhookEndpointReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetWebhookEndpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WebhookEndpointIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetWebhookEndpoint(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetWebhookEndpoint_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetWebhookEndpoint(ctx, req.(*WebhookEndpointIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListWebhookEndpoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WebhookEndpointListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListWebhookEndpoints(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListWebhookEndpoints_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListWebhookEndpoints(ctx, req.(*WebhookEndpointListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RotateWebhookEndpointSecret_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WebhookEndpointIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RotateWebhookEndpointSecret(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RotateWebhookEndpointSecret_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RotateWebhookEndpointSecret(ctx, req.(*WebhookEndpointIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListWebhookDeliveries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WebhookDeliveryListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListWebhookDeliveries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListWebhookDeliveries_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListWebhookDeliveries(ctx, req.(*WebhookDeliveryListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ReplayWebhookDelivery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WebhookDeliveryIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ReplayWebhookDelivery(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ReplayWebhookDelivery_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ReplayWebhookDelivery(ctx, req.(*WebhookDeliveryIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateTestWebhookEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTestWebhookEventReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateTestWebhookEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateTestWebhookEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateTestWebhookEvent(ctx, req.(*CreateTestWebhookEventReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CompleteSourceIntegration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompleteSourceIntegrationReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CompleteSourceIntegration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CompleteSourceIntegration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CompleteSourceIntegration(ctx, req.(*CompleteSourceIntegrationReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetSourceIntegration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceIntegrationIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetSourceIntegration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetSourceIntegration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetSourceIntegration(ctx, req.(*SourceIntegrationIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListSourceIntegrations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceIntegrationListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListSourceIntegrations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListSourceIntegrations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListSourceIntegrations(ctx, req.(*SourceIntegrationListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetSourceIntegrationCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceIntegrationIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetSourceIntegrationCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetSourceIntegrationCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetSourceIntegrationCredential(ctx, req.(*SourceIntegrationIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_DisconnectSourceIntegration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceIntegrationIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).DisconnectSourceIntegration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_DisconnectSourceIntegration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).DisconnectSourceIntegration(ctx, req.(*SourceIntegrationIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_AuthorizeSourceRepository_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthorizeSourceRepositoryReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).AuthorizeSourceRepository(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_AuthorizeSourceRepository_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).AuthorizeSourceRepository(ctx, req.(*AuthorizeSourceRepositoryReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetSourceRepository_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceRepositoryIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetSourceRepository(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetSourceRepository_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetSourceRepository(ctx, req.(*SourceRepositoryIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListSourceRepositories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceRepositoryListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListSourceRepositories(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListSourceRepositories_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListSourceRepositories(ctx, req.(*SourceRepositoryListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RevokeSourceRepository_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceRepositoryIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RevokeSourceRepository(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RevokeSourceRepository_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RevokeSourceRepository(ctx, req.(*SourceRepositoryIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RecordSourceArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecordSourceArtifactReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RecordSourceArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RecordSourceArtifact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RecordSourceArtifact(ctx, req.(*RecordSourceArtifactReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ImportSourceArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImportSourceArtifactReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ImportSourceArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ImportSourceArtifact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ImportSourceArtifact(ctx, req.(*ImportSourceArtifactReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateSourceBuildTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSourceBuildTriggerReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateSourceBuildTrigger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateSourceBuildTrigger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateSourceBuildTrigger(ctx, req.(*CreateSourceBuildTriggerReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_UpdateSourceBuildTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateSourceBuildTriggerReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).UpdateSourceBuildTrigger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_UpdateSourceBuildTrigger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).UpdateSourceBuildTrigger(ctx, req.(*UpdateSourceBuildTriggerReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetSourceBuildTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceBuildTriggerIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetSourceBuildTrigger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetSourceBuildTrigger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetSourceBuildTrigger(ctx, req.(*SourceBuildTriggerIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListSourceBuildTriggers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceBuildTriggerListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListSourceBuildTriggers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListSourceBuildTriggers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListSourceBuildTriggers(ctx, req.(*SourceBuildTriggerListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RotateSourceBuildTriggerSecret_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceBuildTriggerIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RotateSourceBuildTriggerSecret(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RotateSourceBuildTriggerSecret_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RotateSourceBuildTriggerSecret(ctx, req.(*SourceBuildTriggerIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ResolveSourceBuildTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveSourceBuildTriggerReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ResolveSourceBuildTrigger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ResolveSourceBuildTrigger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ResolveSourceBuildTrigger(ctx, req.(*ResolveSourceBuildTriggerReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_EnqueueSourceWebhookEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnqueueSourceWebhookEventReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).EnqueueSourceWebhookEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_EnqueueSourceWebhookEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).EnqueueSourceWebhookEvent(ctx, req.(*EnqueueSourceWebhookEventReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ClaimSourceWebhookEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClaimSourceWebhookEventReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ClaimSourceWebhookEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ClaimSourceWebhookEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ClaimSourceWebhookEvent(ctx, req.(*ClaimSourceWebhookEventReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CompleteSourceWebhookEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompleteSourceWebhookEventReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CompleteSourceWebhookEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CompleteSourceWebhookEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CompleteSourceWebhookEvent(ctx, req.(*CompleteSourceWebhookEventReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_FailSourceWebhookEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FailSourceWebhookEventReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).FailSourceWebhookEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_FailSourceWebhookEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).FailSourceWebhookEvent(ctx, req.(*FailSourceWebhookEventReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListSourceWebhookEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourceWebhookEventListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListSourceWebhookEvents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListSourceWebhookEvents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListSourceWebhookEvents(ctx, req.(*SourceWebhookEventListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateBillingPlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateBillingPlanReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateBillingPlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateBillingPlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateBillingPlan(ctx, req.(*CreateBillingPlanReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetBillingPlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BillingPlanIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetBillingPlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetBillingPlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetBillingPlan(ctx, req.(*BillingPlanIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListBillingPlans_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BillingPlanListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListBillingPlans(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListBillingPlans_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListBillingPlans(ctx, req.(*BillingPlanListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RetireBillingPlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BillingPlanIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RetireBillingPlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RetireBillingPlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RetireBillingPlan(ctx, req.(*BillingPlanIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetTenantBilling_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TenantBillingReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetTenantBilling(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetTenantBilling_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetTenantBilling(ctx, req.(*TenantBillingReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_UpsertManualSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertManualSubscriptionReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).UpsertManualSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_UpsertManualSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).UpsertManualSubscription(ctx, req.(*UpsertManualSubscriptionReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ChangeTenantSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangeTenantSubscriptionReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ChangeTenantSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ChangeTenantSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ChangeTenantSubscription(ctx, req.(*ChangeTenantSubscriptionReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CancelTenantSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelTenantSubscriptionReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CancelTenantSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CancelTenantSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CancelTenantSubscription(ctx, req.(*CancelTenantSubscriptionReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ReserveQuota_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReserveQuotaReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ReserveQuota(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ReserveQuota_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ReserveQuota(ctx, req.(*ReserveQuotaReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ConfirmQuota_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QuotaReservationActionReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ConfirmQuota(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ConfirmQuota_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ConfirmQuota(ctx, req.(*QuotaReservationActionReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ReleaseQuota_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QuotaReservationActionReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ReleaseQuota(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ReleaseQuota_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ReleaseQuota(ctx, req.(*QuotaReservationActionReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RecordUsage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecordUsageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RecordUsage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RecordUsage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RecordUsage(ctx, req.(*RecordUsageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetBillingUsage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BillingUsageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetBillingUsage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetBillingUsage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetBillingUsage(ctx, req.(*BillingUsageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListInvoices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InvoiceListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListInvoices(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListInvoices_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListInvoices(ctx, req.(*InvoiceListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ApplyBillingWebhook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ApplyBillingWebhookReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ApplyBillingWebhook(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ApplyBillingWebhook_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ApplyBillingWebhook(ctx, req.(*ApplyBillingWebhookReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateLocalAgentRegistration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateLocalAgentRegistrationReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateLocalAgentRegistration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateLocalAgentRegistration_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateLocalAgentRegistration(ctx, req.(*CreateLocalAgentRegistrationReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RegisterLocalAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterLocalAgentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RegisterLocalAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RegisterLocalAgent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RegisterLocalAgent(ctx, req.(*RegisterLocalAgentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetLocalAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LocalAgentIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetLocalAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetLocalAgent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetLocalAgent(ctx, req.(*LocalAgentIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListLocalAgents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LocalAgentListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListLocalAgents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListLocalAgents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListLocalAgents(ctx, req.(*LocalAgentListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_HeartbeatLocalAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HeartbeatLocalAgentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).HeartbeatLocalAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_HeartbeatLocalAgent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).HeartbeatLocalAgent(ctx, req.(*HeartbeatLocalAgentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_DrainLocalAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DrainLocalAgentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).DrainLocalAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_DrainLocalAgent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).DrainLocalAgent(ctx, req.(*DrainLocalAgentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RevokeLocalAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevokeLocalAgentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RevokeLocalAgent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RevokeLocalAgent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RevokeLocalAgent(ctx, req.(*RevokeLocalAgentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RotateLocalAgentCertificate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RotateLocalAgentCertificateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RotateLocalAgentCertificate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RotateLocalAgentCertificate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RotateLocalAgentCertificate(ctx, req.(*RotateLocalAgentCertificateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ClaimLocalAgentBuildTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClaimLocalAgentBuildTaskReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ClaimLocalAgentBuildTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ClaimLocalAgentBuildTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ClaimLocalAgentBuildTask(ctx, req.(*ClaimLocalAgentBuildTaskReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RenewLocalAgentTaskLease_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenewLocalAgentTaskLeaseReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RenewLocalAgentTaskLease(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RenewLocalAgentTaskLease_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RenewLocalAgentTaskLease(ctx, req.(*RenewLocalAgentTaskLeaseReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ReportLocalAgentBuildProgress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReportLocalAgentBuildProgressReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ReportLocalAgentBuildProgress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ReportLocalAgentBuildProgress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ReportLocalAgentBuildProgress(ctx, req.(*ReportLocalAgentBuildProgressReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CompleteLocalAgentBuildTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompleteLocalAgentBuildTaskReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CompleteLocalAgentBuildTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CompleteLocalAgentBuildTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CompleteLocalAgentBuildTask(ctx, req.(*CompleteLocalAgentBuildTaskReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_FailLocalAgentBuildTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FailLocalAgentBuildTaskReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).FailLocalAgentBuildTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_FailLocalAgentBuildTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).FailLocalAgentBuildTask(ctx, req.(*FailLocalAgentBuildTaskReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_VerifyHybridArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyHybridArtifactReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).VerifyHybridArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_VerifyHybridArtifact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).VerifyHybridArtifact(ctx, req.(*VerifyHybridArtifactReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Core_ReportInstall_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(InstallReportReq)
 	if err := dec(in); err != nil {
@@ -2126,6 +5078,114 @@ func _Core_ClaimBuildTask_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CoreServer).ClaimBuildTask(ctx, req.(*ClaimBuildTaskReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_RegisterBuilderNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterBuilderNodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RegisterBuilderNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RegisterBuilderNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RegisterBuilderNode(ctx, req.(*RegisterBuilderNodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_BuilderNodeHeartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuilderNodeHeartbeatReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).BuilderNodeHeartbeat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_BuilderNodeHeartbeat_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).BuilderNodeHeartbeat(ctx, req.(*BuilderNodeHeartbeatReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ClaimScheduledBuildTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClaimScheduledBuildTaskReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ClaimScheduledBuildTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ClaimScheduledBuildTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ClaimScheduledBuildTask(ctx, req.(*ClaimScheduledBuildTaskReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ResolveBuildCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveBuildCacheReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ResolveBuildCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ResolveBuildCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ResolveBuildCache(ctx, req.(*ResolveBuildCacheReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_PublishBuildCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PublishBuildCacheReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).PublishBuildCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_PublishBuildCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).PublishBuildCache(ctx, req.(*PublishBuildCacheReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CleanupBuildCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CleanupBuildCacheReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CleanupBuildCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CleanupBuildCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CleanupBuildCache(ctx, req.(*CleanupBuildCacheReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2432,6 +5492,322 @@ var Core_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Core_ListBuildTasks_Handler,
 		},
 		{
+			MethodName: "CancelBuildTask",
+			Handler:    _Core_CancelBuildTask_Handler,
+		},
+		{
+			MethodName: "RetryBuildTask",
+			Handler:    _Core_RetryBuildTask_Handler,
+		},
+		{
+			MethodName: "GetBuilderNode",
+			Handler:    _Core_GetBuilderNode_Handler,
+		},
+		{
+			MethodName: "ListBuilderNodes",
+			Handler:    _Core_ListBuilderNodes_Handler,
+		},
+		{
+			MethodName: "DrainBuilderNode",
+			Handler:    _Core_DrainBuilderNode_Handler,
+		},
+		{
+			MethodName: "RecoverBuilderNode",
+			Handler:    _Core_RecoverBuilderNode_Handler,
+		},
+		{
+			MethodName: "UpsertBuildConcurrencyPolicy",
+			Handler:    _Core_UpsertBuildConcurrencyPolicy_Handler,
+		},
+		{
+			MethodName: "ListBuildConcurrencyPolicies",
+			Handler:    _Core_ListBuildConcurrencyPolicies_Handler,
+		},
+		{
+			MethodName: "ListBuildCacheEntries",
+			Handler:    _Core_ListBuildCacheEntries_Handler,
+		},
+		{
+			MethodName: "InvalidateBuildCache",
+			Handler:    _Core_InvalidateBuildCache_Handler,
+		},
+		{
+			MethodName: "ListBuildSchedulerEvents",
+			Handler:    _Core_ListBuildSchedulerEvents_Handler,
+		},
+		{
+			MethodName: "GetBuildClusterMetrics",
+			Handler:    _Core_GetBuildClusterMetrics_Handler,
+		},
+		{
+			MethodName: "CreateOpenApiCredential",
+			Handler:    _Core_CreateOpenApiCredential_Handler,
+		},
+		{
+			MethodName: "ListOpenApiCredentials",
+			Handler:    _Core_ListOpenApiCredentials_Handler,
+		},
+		{
+			MethodName: "RotateOpenApiCredential",
+			Handler:    _Core_RotateOpenApiCredential_Handler,
+		},
+		{
+			MethodName: "RevokeOpenApiCredential",
+			Handler:    _Core_RevokeOpenApiCredential_Handler,
+		},
+		{
+			MethodName: "AuthenticateOpenApiCredential",
+			Handler:    _Core_AuthenticateOpenApiCredential_Handler,
+		},
+		{
+			MethodName: "BeginOpenApiIdempotency",
+			Handler:    _Core_BeginOpenApiIdempotency_Handler,
+		},
+		{
+			MethodName: "CompleteOpenApiIdempotency",
+			Handler:    _Core_CompleteOpenApiIdempotency_Handler,
+		},
+		{
+			MethodName: "RecordOpenApiAudit",
+			Handler:    _Core_RecordOpenApiAudit_Handler,
+		},
+		{
+			MethodName: "CreateWebhookEndpoint",
+			Handler:    _Core_CreateWebhookEndpoint_Handler,
+		},
+		{
+			MethodName: "UpdateWebhookEndpoint",
+			Handler:    _Core_UpdateWebhookEndpoint_Handler,
+		},
+		{
+			MethodName: "GetWebhookEndpoint",
+			Handler:    _Core_GetWebhookEndpoint_Handler,
+		},
+		{
+			MethodName: "ListWebhookEndpoints",
+			Handler:    _Core_ListWebhookEndpoints_Handler,
+		},
+		{
+			MethodName: "RotateWebhookEndpointSecret",
+			Handler:    _Core_RotateWebhookEndpointSecret_Handler,
+		},
+		{
+			MethodName: "ListWebhookDeliveries",
+			Handler:    _Core_ListWebhookDeliveries_Handler,
+		},
+		{
+			MethodName: "ReplayWebhookDelivery",
+			Handler:    _Core_ReplayWebhookDelivery_Handler,
+		},
+		{
+			MethodName: "CreateTestWebhookEvent",
+			Handler:    _Core_CreateTestWebhookEvent_Handler,
+		},
+		{
+			MethodName: "CompleteSourceIntegration",
+			Handler:    _Core_CompleteSourceIntegration_Handler,
+		},
+		{
+			MethodName: "GetSourceIntegration",
+			Handler:    _Core_GetSourceIntegration_Handler,
+		},
+		{
+			MethodName: "ListSourceIntegrations",
+			Handler:    _Core_ListSourceIntegrations_Handler,
+		},
+		{
+			MethodName: "GetSourceIntegrationCredential",
+			Handler:    _Core_GetSourceIntegrationCredential_Handler,
+		},
+		{
+			MethodName: "DisconnectSourceIntegration",
+			Handler:    _Core_DisconnectSourceIntegration_Handler,
+		},
+		{
+			MethodName: "AuthorizeSourceRepository",
+			Handler:    _Core_AuthorizeSourceRepository_Handler,
+		},
+		{
+			MethodName: "GetSourceRepository",
+			Handler:    _Core_GetSourceRepository_Handler,
+		},
+		{
+			MethodName: "ListSourceRepositories",
+			Handler:    _Core_ListSourceRepositories_Handler,
+		},
+		{
+			MethodName: "RevokeSourceRepository",
+			Handler:    _Core_RevokeSourceRepository_Handler,
+		},
+		{
+			MethodName: "RecordSourceArtifact",
+			Handler:    _Core_RecordSourceArtifact_Handler,
+		},
+		{
+			MethodName: "ImportSourceArtifact",
+			Handler:    _Core_ImportSourceArtifact_Handler,
+		},
+		{
+			MethodName: "CreateSourceBuildTrigger",
+			Handler:    _Core_CreateSourceBuildTrigger_Handler,
+		},
+		{
+			MethodName: "UpdateSourceBuildTrigger",
+			Handler:    _Core_UpdateSourceBuildTrigger_Handler,
+		},
+		{
+			MethodName: "GetSourceBuildTrigger",
+			Handler:    _Core_GetSourceBuildTrigger_Handler,
+		},
+		{
+			MethodName: "ListSourceBuildTriggers",
+			Handler:    _Core_ListSourceBuildTriggers_Handler,
+		},
+		{
+			MethodName: "RotateSourceBuildTriggerSecret",
+			Handler:    _Core_RotateSourceBuildTriggerSecret_Handler,
+		},
+		{
+			MethodName: "ResolveSourceBuildTrigger",
+			Handler:    _Core_ResolveSourceBuildTrigger_Handler,
+		},
+		{
+			MethodName: "EnqueueSourceWebhookEvent",
+			Handler:    _Core_EnqueueSourceWebhookEvent_Handler,
+		},
+		{
+			MethodName: "ClaimSourceWebhookEvent",
+			Handler:    _Core_ClaimSourceWebhookEvent_Handler,
+		},
+		{
+			MethodName: "CompleteSourceWebhookEvent",
+			Handler:    _Core_CompleteSourceWebhookEvent_Handler,
+		},
+		{
+			MethodName: "FailSourceWebhookEvent",
+			Handler:    _Core_FailSourceWebhookEvent_Handler,
+		},
+		{
+			MethodName: "ListSourceWebhookEvents",
+			Handler:    _Core_ListSourceWebhookEvents_Handler,
+		},
+		{
+			MethodName: "CreateBillingPlan",
+			Handler:    _Core_CreateBillingPlan_Handler,
+		},
+		{
+			MethodName: "GetBillingPlan",
+			Handler:    _Core_GetBillingPlan_Handler,
+		},
+		{
+			MethodName: "ListBillingPlans",
+			Handler:    _Core_ListBillingPlans_Handler,
+		},
+		{
+			MethodName: "RetireBillingPlan",
+			Handler:    _Core_RetireBillingPlan_Handler,
+		},
+		{
+			MethodName: "GetTenantBilling",
+			Handler:    _Core_GetTenantBilling_Handler,
+		},
+		{
+			MethodName: "UpsertManualSubscription",
+			Handler:    _Core_UpsertManualSubscription_Handler,
+		},
+		{
+			MethodName: "ChangeTenantSubscription",
+			Handler:    _Core_ChangeTenantSubscription_Handler,
+		},
+		{
+			MethodName: "CancelTenantSubscription",
+			Handler:    _Core_CancelTenantSubscription_Handler,
+		},
+		{
+			MethodName: "ReserveQuota",
+			Handler:    _Core_ReserveQuota_Handler,
+		},
+		{
+			MethodName: "ConfirmQuota",
+			Handler:    _Core_ConfirmQuota_Handler,
+		},
+		{
+			MethodName: "ReleaseQuota",
+			Handler:    _Core_ReleaseQuota_Handler,
+		},
+		{
+			MethodName: "RecordUsage",
+			Handler:    _Core_RecordUsage_Handler,
+		},
+		{
+			MethodName: "GetBillingUsage",
+			Handler:    _Core_GetBillingUsage_Handler,
+		},
+		{
+			MethodName: "ListInvoices",
+			Handler:    _Core_ListInvoices_Handler,
+		},
+		{
+			MethodName: "ApplyBillingWebhook",
+			Handler:    _Core_ApplyBillingWebhook_Handler,
+		},
+		{
+			MethodName: "CreateLocalAgentRegistration",
+			Handler:    _Core_CreateLocalAgentRegistration_Handler,
+		},
+		{
+			MethodName: "RegisterLocalAgent",
+			Handler:    _Core_RegisterLocalAgent_Handler,
+		},
+		{
+			MethodName: "GetLocalAgent",
+			Handler:    _Core_GetLocalAgent_Handler,
+		},
+		{
+			MethodName: "ListLocalAgents",
+			Handler:    _Core_ListLocalAgents_Handler,
+		},
+		{
+			MethodName: "HeartbeatLocalAgent",
+			Handler:    _Core_HeartbeatLocalAgent_Handler,
+		},
+		{
+			MethodName: "DrainLocalAgent",
+			Handler:    _Core_DrainLocalAgent_Handler,
+		},
+		{
+			MethodName: "RevokeLocalAgent",
+			Handler:    _Core_RevokeLocalAgent_Handler,
+		},
+		{
+			MethodName: "RotateLocalAgentCertificate",
+			Handler:    _Core_RotateLocalAgentCertificate_Handler,
+		},
+		{
+			MethodName: "ClaimLocalAgentBuildTask",
+			Handler:    _Core_ClaimLocalAgentBuildTask_Handler,
+		},
+		{
+			MethodName: "RenewLocalAgentTaskLease",
+			Handler:    _Core_RenewLocalAgentTaskLease_Handler,
+		},
+		{
+			MethodName: "ReportLocalAgentBuildProgress",
+			Handler:    _Core_ReportLocalAgentBuildProgress_Handler,
+		},
+		{
+			MethodName: "CompleteLocalAgentBuildTask",
+			Handler:    _Core_CompleteLocalAgentBuildTask_Handler,
+		},
+		{
+			MethodName: "FailLocalAgentBuildTask",
+			Handler:    _Core_FailLocalAgentBuildTask_Handler,
+		},
+		{
+			MethodName: "VerifyHybridArtifact",
+			Handler:    _Core_VerifyHybridArtifact_Handler,
+		},
+		{
 			MethodName: "ReportInstall",
 			Handler:    _Core_ReportInstall_Handler,
 		},
@@ -2450,6 +5826,30 @@ var Core_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ClaimBuildTask",
 			Handler:    _Core_ClaimBuildTask_Handler,
+		},
+		{
+			MethodName: "RegisterBuilderNode",
+			Handler:    _Core_RegisterBuilderNode_Handler,
+		},
+		{
+			MethodName: "BuilderNodeHeartbeat",
+			Handler:    _Core_BuilderNodeHeartbeat_Handler,
+		},
+		{
+			MethodName: "ClaimScheduledBuildTask",
+			Handler:    _Core_ClaimScheduledBuildTask_Handler,
+		},
+		{
+			MethodName: "ResolveBuildCache",
+			Handler:    _Core_ResolveBuildCache_Handler,
+		},
+		{
+			MethodName: "PublishBuildCache",
+			Handler:    _Core_PublishBuildCache_Handler,
+		},
+		{
+			MethodName: "CleanupBuildCache",
+			Handler:    _Core_CleanupBuildCache_Handler,
 		},
 		{
 			MethodName: "GetBuildExecutionContext",

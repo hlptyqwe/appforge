@@ -115,20 +115,40 @@ onMounted(loadList)
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button v-perm="'sys:tenant-domain:update'" link type="primary" @click="openEdit(row)">编辑</el-button>
-            <el-button v-perm="'sys:tenant-domain:delete'" link type="danger" @click="remove(row)">删除</el-button>
+            <el-button
+              v-perm="'sys:tenant-domain:update'"
+              link
+              type="primary"
+              @click="openEdit(row)"
+              >编辑</el-button
+            >
+            <el-button v-perm="'sys:tenant-domain:delete'" link type="danger" @click="remove(row)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
     </el-card>
 
-    <el-dialog v-model="dialogVisible" :title="editing ? '编辑租户域名' : '新增租户域名'" width="560px">
+    <el-dialog
+      v-model="dialogVisible"
+      :title="editing ? '编辑租户域名' : '新增租户域名'"
+      width="560px"
+    >
       <el-form ref="formRef" :model="form" label-width="100px">
-        <el-form-item label="Origin" prop="origin" :rules="[{ required: true, message: '请输入域名 Origin' }]">
+        <el-form-item
+          label="Origin"
+          prop="origin"
+          :rules="[{ required: true, message: '请输入域名 Origin' }]"
+        >
           <el-input v-model="form.origin" placeholder="https://example.com" />
         </el-form-item>
-        <el-form-item label="状态"><el-input-number v-model="form.status" :min="1" :max="3" /></el-form-item>
-        <el-form-item label="优先级"><el-input-number v-model="form.priority" :min="0" /></el-form-item>
+        <el-form-item label="状态"
+          ><el-input-number v-model="form.status" :min="1" :max="3"
+        /></el-form-item>
+        <el-form-item label="优先级"
+          ><el-input-number v-model="form.priority" :min="0"
+        /></el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>

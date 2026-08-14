@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, useSlots } from 'vue'
 import { ElMessage, type FormInstance, type UploadFile, type UploadFiles } from 'element-plus'
 import CursorPagination from '@/components/common/CursorPagination.vue'
 import { usePagination } from '@/composables/usePagination'
@@ -32,6 +32,7 @@ const props = defineProps<{
   list: PlatformListCall
   create: PlatformCreateCall
 }>()
+const slots = useSlots()
 
 const rows = ref<Record<string, any>[]>([])
 const loading = ref(false)
@@ -70,17 +71,17 @@ function removeFile(field: ResourceField) {
 }
 
 async function downloadObject(objectId: unknown) {
-	const id = Number(objectId || 0)
-	if (!id) return
-	try {
-		const response = await platformService.getStorageDownload(id)
-		if (response.code !== 200 || !response.data?.downloadUrl) {
-			throw new Error(response.msg || '生成下载地址失败')
-		}
-		window.location.assign(response.data.downloadUrl)
-	} catch (error) {
-		ElMessage.error(error instanceof Error ? error.message : '下载失败')
-	}
+  const id = Number(objectId || 0)
+  if (!id) return
+  try {
+    const response = await platformService.getStorageDownload(id)
+    if (response.code !== 200 || !response.data?.downloadUrl) {
+      throw new Error(response.msg || '生成下载地址失败')
+    }
+    window.location.assign(response.data.downloadUrl)
+  } catch (error) {
+    ElMessage.error(error instanceof Error ? error.message : '下载失败')
+  }
 }
 
 function resetValues(target: Record<string, any>, fields: ResourceField[]) {
@@ -127,7 +128,8 @@ async function submit() {
         Number(payload.appId || 0),
         (percent) => (uploadProgress.value[field.prop] = percent),
       )
-      if (upload.code !== 200 || !upload.data) throw new Error(upload.msg || `${field.label}上传失败`)
+      if (upload.code !== 200 || !upload.data)
+        throw new Error(upload.msg || `${field.label}上传失败`)
       payload[field.prop] = upload.data.objectId
     }
     const response = await props.create(payload)
@@ -144,6 +146,7 @@ async function submit() {
 
 resetValues(query, props.queryFields || [])
 onMounted(loadData)
+defineExpose({ loadData })
 </script>
 
 <template>
@@ -198,6 +201,9 @@ onMounted(loadData)
             <span v-else>{{ scope.row[column.prop] ?? '' }}</span>
           </template>
         </el-table-column>
+        <el-table-column v-if="slots.actions" label="操作" min-width="150" fixed="right">
+          <template #default="scope"><slot name="actions" :row="scope.row" /></template>
+        </el-table-column>
       </el-table>
       <CursorPagination
         v-model:limit="pagination.limit"
@@ -247,7 +253,13 @@ onMounted(loadData)
           <el-input
             v-else
             v-model="form[field.prop]"
-            :type="field.type === 'textarea' ? 'textarea' : field.type === 'password' ? 'password' : 'text'"
+            :type="
+              field.type === 'textarea'
+                ? 'textarea'
+                : field.type === 'password'
+                  ? 'password'
+                  : 'text'
+            "
             :rows="field.type === 'textarea' ? 5 : undefined"
             show-password
           />

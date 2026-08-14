@@ -1,0 +1,21 @@
+.appforge-build:
+  stage: deploy
+  image: alpine:3.22
+  variables:
+    APPFORGE_CLI: ./appforgectl
+    APPFORGE_OUTPUT: channel.apk
+  before_script:
+    - set +x
+    - apk add --no-cache jq
+    - test -x "${APPFORGE_CLI}"
+  script:
+    - ./docs/ci/appforge-build.sh
+  artifacts:
+    paths:
+      - channel.apk
+    expire_in: 7 days
+
+# 通过 include 引入后继承 `.appforge-build`。下列变量必须使用受保护变量：
+# APPFORGE_BASE_URL、APPFORGE_API_KEY、APPFORGE_APP_ID、APPFORGE_CHANNEL_ID、
+# APPFORGE_SIGNING_CONFIG_ID、APPFORGE_APK、APPFORGE_VERSION_CODE、APPFORGE_VERSION_NAME。
+

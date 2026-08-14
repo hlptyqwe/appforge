@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"appforge/admin-api/internal/config"
+	"appforge/common/siem"
 	"appforge/common/utils"
 	"appforge/proto/system"
 
@@ -26,8 +27,13 @@ type opLogWriter interface {
 }
 
 type AuditMiddleware struct {
-	writer opLogWriter
-	routes []auditRouteSpec
+	writer   opLogWriter
+	routes   []auditRouteSpec
+	exporter auditSIEMExporter
+}
+
+type auditSIEMExporter interface {
+	Export(event siem.Event) bool
 }
 
 type auditContextKey struct{}
@@ -39,12 +45,16 @@ type auditState struct {
 	permission string
 }
 
-func NewAuditMiddleware(writer opLogWriter, configuredRoutes []config.AuditRoute) (*AuditMiddleware, error) {
+func NewAuditMiddleware(writer opLogWriter, configuredRoutes []config.AuditRoute, exporters ...auditSIEMExporter) (*AuditMiddleware, error) {
 	routes, err := buildSensitiveAuditRoutes(configuredRoutes)
 	if err != nil {
 		return nil, err
 	}
-	return &AuditMiddleware{writer: writer, routes: routes}, nil
+	var exporter auditSIEMExporter
+	if len(exporters) > 0 {
+		exporter = exporters[0]
+	}
+	return &AuditMiddleware{writer: writer, routes: routes, exporter: exporter}, nil
 }
 
 func (m *AuditMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
@@ -81,7 +91,7 @@ func (m *AuditMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		writeCtx = context.WithValue(writeCtx, utils.CtxKeyUsername, state.username)
 		writeCtx = context.WithValue(writeCtx, utils.CtxKeyTenantId, state.tenantID)
 
-		_, err := m.writer.CreateOpLog(writeCtx, &system.CreateOpLogReq{
+		entry := &system.CreateOpLogReq{
 			TenantId: tenantID,
 			UserId:   state.userID,
 			Username: state.username,
@@ -93,9 +103,17 @@ func (m *AuditMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			Resp:     auditResponseSummary(response.status, response.Bytes(), response.truncated),
 			Ip:       utils.GetClientIP(r),
 			CostMs:   time.Since(startedAt).Milliseconds(),
-		})
+		}
+		_, err := m.writer.CreateOpLog(writeCtx, entry)
 		if err != nil {
 			logx.WithContext(r.Context()).Errorf("create operation audit log failed: method=%s path=%s err=%v", r.Method, r.URL.Path, err)
+		}
+		if m.exporter != nil && !m.exporter.Export(siem.Event{
+			Timestamp: startedAt.UnixMilli(), TenantID: entry.TenantId, UserID: entry.UserId, Username: entry.Username,
+			Module: entry.Module, Action: entry.Action, Method: r.Method, Path: entry.Path,
+			Request: entry.Req, Response: entry.Resp, IP: entry.Ip, CostMS: entry.CostMs,
+		}) {
+			logx.WithContext(r.Context()).Errorf("SIEM audit queue is full: method=%s path=%s", r.Method, r.URL.Path)
 		}
 	}
 }
@@ -246,7 +264,9 @@ func decodeAndRedactAuditJSON(data []byte) any {
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.UseNumber()
 	if err := decoder.Decode(&value); err != nil {
-		return truncateAuditString(string(data), 8192)
+		// Audit logs are not a payload archive. Keeping malformed or non-JSON
+		// bodies would allow credentials to bypass the structured redactor.
+		return "[REDACTED_NON_JSON_BODY]"
 	}
 	return redactAuditValue(value)
 }
@@ -267,6 +287,22 @@ func redactAuditValue(value any) any {
 			v[i] = redactAuditValue(v[i])
 		}
 		return v
+	case string:
+		// Some API fields contain JSON encoded as a string. Redact the nested
+		// structure too, while preserving ordinary non-JSON strings.
+		trimmed := strings.TrimSpace(v)
+		if strings.HasPrefix(trimmed, "{") || strings.HasPrefix(trimmed, "[") {
+			var nested any
+			decoder := json.NewDecoder(strings.NewReader(trimmed))
+			decoder.UseNumber()
+			if decoder.Decode(&nested) == nil {
+				redacted, err := json.Marshal(redactAuditValue(nested))
+				if err == nil {
+					return string(redacted)
+				}
+			}
+		}
+		return value
 	default:
 		return value
 	}
@@ -291,7 +327,8 @@ func isAuditSecretKey(key string) bool {
 	switch normalized {
 	case "pwd", "token", "accesstoken", "refreshtoken",
 		"authorization", "cookie", "secret", "apikey", "accesskey", "secretkey",
-		"sessionkey", "googlecode", "otp", "verificationcode", "parametervaluesjson":
+		"sessionkey", "googlecode", "otp", "verificationcode", "parametervaluesjson",
+		"webhookurl", "callbackurl", "downloadurl", "uploadurl", "presignedurl":
 		return true
 	default:
 		return false

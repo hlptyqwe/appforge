@@ -23,8 +23,68 @@ BuilderRpc:
 SigningSecrets:
   MasterKeyBase64: YXBwZm9yZ2UtZGV2LXNpZ25pbmcta2V5LTAwMDAwMSE=
 
+# ClientId和ClientSecret必须由部署环境的Secret Manager覆盖；留空时连接按钮不可用。
+SourceOAuth:
+  SuccessRedirect: http://localhost:5174/platform/developer?tab=source
+  WebhookBaseURL: http://localhost:8888/public/v1/source-webhooks
+  GitHub:
+    ClientId: ""
+    ClientSecret: ""
+    AuthorizeURL: https://github.com/login/oauth/authorize
+    TokenURL: https://github.com/login/oauth/access_token
+    ApiBaseURL: https://api.github.com
+    RedirectURL: http://localhost:8888/public/v1/source-oauth/callback
+
+  GitLab:
+    ClientId: ""
+    ClientSecret: ""
+    AuthorizeURL: https://gitlab.com/oauth/authorize
+    TokenURL: https://gitlab.com/oauth/token
+    ApiBaseURL: https://gitlab.com/api/v4
+    RedirectURL: http://localhost:8888/public/v1/source-oauth/callback
+
+SourceTriggerWorker:
+  Enabled: true
+  WorkerId: source-trigger-worker-docker
+  PollInterval: 2s
+  LeaseSeconds: 600
+
+# 生产环境在写入etcd前由Secret Manager注入；开发环境留空会禁用在线结账与支付回调。
+Billing:
+  StripeSecretKey: ""
+  StripeWebhookSecret: whsec_appforge_dev_only_change_before_production
+  StripeAPIBaseURL: https://api.stripe.com
+  SuccessURL: http://localhost:5174/platform/billing?checkout=success
+  CancelURL: http://localhost:5174/platform/billing?checkout=cancelled
+
+# 生产环境启用独立9443监听，并配置服务端证书与Local Agent客户CA。
+LocalAgentGateway:
+  Enabled: false
+  ListenOn: 0.0.0.0:9443
+  ServerCertificate: ""
+  ServerPrivateKey: ""
+  ClientCACertificate: ""
+
+# Dedicated/Private交付启用；状态文件必须位于持久卷。
+OfflineLicense:
+  Enabled: false
+  LicenseFile: ""
+  PublicKeyFile: ""
+  StateFile: ""
+  DeploymentId: ""
+  DeploymentMode: ""
+  ClockRollbackTolerance: 5m
+
 # 仅记录会修改数据的后台操作；查询请求不写操作日志。
 Audit:
+  SIEM:
+    Enabled: false
+    Endpoint: ""
+    BearerTokenFile: ""
+    CACertificate: ""
+    Timeout: 10s
+    QueueSize: 1000
+    AllowHTTP: false
   Routes:
     - Method: POST
       Path: /admin/system/users
@@ -80,6 +140,8 @@ Audit:
       Path: /admin/core/signing-configs
     - Method: POST
       Path: /admin/core/build-tasks
+    - Method: POST
+      Path: /admin/core/build-cluster/nodes/:id/recover
     - Method: POST
       Path: /admin/core/branding-profiles
     - Method: PUT
@@ -190,3 +252,97 @@ Audit:
       Path: /admin/core/uploads/initiate
     - Method: POST
       Path: /admin/core/uploads/:id/complete
+    - Method: POST
+      Path: /admin/core/developer/credentials
+    - Method: POST
+      Path: /admin/core/developer/credentials/:id/rotate
+    - Method: POST
+      Path: /admin/core/developer/credentials/:id/revoke
+    - Method: POST
+      Path: /admin/core/developer/webhooks
+    - Method: PUT
+      Path: /admin/core/developer/webhooks/:id
+    - Method: POST
+      Path: /admin/core/developer/webhooks/:id/rotate-secret
+    - Method: POST
+      Path: /admin/core/developer/webhooks/:id/test
+    - Method: POST
+      Path: /admin/core/developer/webhook-deliveries/:id/replay
+    - Method: POST
+      Path: /admin/core/developer/source-integrations/:platform/authorize
+    - Method: POST
+      Path: /admin/core/developer/source-integrations/:id/repositories/:repositoryId/authorize
+    - Method: POST
+      Path: /admin/core/developer/source-integrations/:id/disconnect
+    - Method: POST
+      Path: /admin/core/developer/source-repositories/:id/revoke
+    - Method: POST
+      Path: /admin/core/developer/source-artifacts/import
+    - Method: POST
+      Path: /admin/core/developer/source-build-triggers
+    - Method: PUT
+      Path: /admin/core/developer/source-build-triggers/:id
+    - Method: POST
+      Path: /admin/core/developer/source-build-triggers/:id/rotate-secret
+    - Method: POST
+      Path: /agent/core/developer/credentials
+    - Method: POST
+      Path: /agent/core/developer/credentials/:id/rotate
+    - Method: POST
+      Path: /agent/core/developer/credentials/:id/revoke
+    - Method: POST
+      Path: /agent/core/developer/webhooks
+    - Method: PUT
+      Path: /agent/core/developer/webhooks/:id
+    - Method: POST
+      Path: /agent/core/developer/webhooks/:id/rotate-secret
+    - Method: POST
+      Path: /agent/core/developer/webhooks/:id/test
+    - Method: POST
+      Path: /agent/core/developer/webhook-deliveries/:id/replay
+    - Method: POST
+      Path: /agent/core/developer/source-integrations/:platform/authorize
+    - Method: POST
+      Path: /agent/core/developer/source-integrations/:id/repositories/:repositoryId/authorize
+    - Method: POST
+      Path: /agent/core/developer/source-integrations/:id/disconnect
+    - Method: POST
+      Path: /agent/core/developer/source-repositories/:id/revoke
+    - Method: POST
+      Path: /agent/core/developer/source-artifacts/import
+    - Method: POST
+      Path: /agent/core/developer/source-build-triggers
+    - Method: PUT
+      Path: /agent/core/developer/source-build-triggers/:id
+    - Method: POST
+      Path: /agent/core/developer/source-build-triggers/:id/rotate-secret
+    - Method: POST
+      Path: /admin/core/billing/plans
+    - Method: POST
+      Path: /admin/core/billing/plans/:id/retire
+    - Method: POST
+      Path: /admin/core/billing/contracts
+    - Method: POST
+      Path: /admin/core/billing/subscription/change
+    - Method: POST
+      Path: /admin/core/billing/subscription/cancel
+    - Method: POST
+      Path: /admin/core/billing/checkout
+    - Method: POST
+      Path: /agent/core/billing/checkout
+    - Method: POST
+      Path: /agent/core/billing/subscription/change
+    - Method: POST
+      Path: /agent/core/billing/subscription/cancel
+    - Method: POST
+      Path: /admin/core/enterprise/local-agents
+    - Method: POST
+      Path: /admin/core/enterprise/local-agents/:id/drain
+    - Method: POST
+      Path: /admin/core/enterprise/local-agents/:id/revoke
+    - Method: POST
+      Path: /agent/core/enterprise/local-agents
+    - Method: POST
+      Path: /agent/core/enterprise/local-agents/:id/drain
+    - Method: POST
+      Path: /agent/core/enterprise/local-agents/:id/revoke

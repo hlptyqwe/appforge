@@ -2,7 +2,11 @@ package etcd
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -12,10 +16,11 @@ import (
 )
 
 func LoadFromEtcdAndMerge(hosts []string, keys []string, c any) error {
-	cli, err := v3.New(v3.Config{
-		Endpoints:   hosts,
-		DialTimeout: 3 * time.Second,
-	})
+	cfg, err := clientConfig(hosts)
+	if err != nil {
+		return err
+	}
+	cli, err := v3.New(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to connect etcd: %w", err)
 	}
@@ -72,10 +77,12 @@ func WatcherConfig[T any](
 	listeners ...func(T),
 ) {
 	go func() {
-		cli, err := v3.New(v3.Config{
-			Endpoints:   hosts,
-			DialTimeout: 3 * time.Second,
-		})
+		cfg, err := clientConfig(hosts)
+		if err != nil {
+			logx.Errorf("load etcd client security config failed key=%s err=%v", key, err)
+			return
+		}
+		cli, err := v3.New(cfg)
 		if err != nil {
 			logx.Errorf("create etcd watcher failed key=%s err=%v", key, err)
 			return
@@ -118,4 +125,43 @@ func WatcherConfig[T any](
 			}
 		}
 	}()
+}
+
+func clientConfig(hosts []string) (v3.Config, error) {
+	cfg := v3.Config{
+		Endpoints:   hosts,
+		DialTimeout: 3 * time.Second,
+		Username:    strings.TrimSpace(os.Getenv("APPFORGE_ETCD_USERNAME")),
+		Password:    os.Getenv("APPFORGE_ETCD_PASSWORD"),
+	}
+	caFile := strings.TrimSpace(os.Getenv("APPFORGE_ETCD_CA_FILE"))
+	certFile := strings.TrimSpace(os.Getenv("APPFORGE_ETCD_CERT_FILE"))
+	keyFile := strings.TrimSpace(os.Getenv("APPFORGE_ETCD_KEY_FILE"))
+	if caFile == "" && certFile == "" && keyFile == "" {
+		return cfg, nil
+	}
+	tlsConfig := &tls.Config{MinVersion: tls.VersionTLS12}
+	if caFile != "" {
+		caPEM, err := os.ReadFile(caFile)
+		if err != nil {
+			return v3.Config{}, fmt.Errorf("read etcd CA: %w", err)
+		}
+		roots := x509.NewCertPool()
+		if !roots.AppendCertsFromPEM(caPEM) {
+			return v3.Config{}, fmt.Errorf("parse etcd CA: no certificate found")
+		}
+		tlsConfig.RootCAs = roots
+	}
+	if (certFile == "") != (keyFile == "") {
+		return v3.Config{}, fmt.Errorf("etcd client certificate and private key must be configured together")
+	}
+	if certFile != "" {
+		certificate, err := tls.LoadX509KeyPair(certFile, keyFile)
+		if err != nil {
+			return v3.Config{}, fmt.Errorf("load etcd client certificate: %w", err)
+		}
+		tlsConfig.Certificates = []tls.Certificate{certificate}
+	}
+	cfg.TLS = tlsConfig
+	return cfg, nil
 }

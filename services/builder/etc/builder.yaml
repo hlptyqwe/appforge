@@ -11,9 +11,17 @@ BuilderRpc:
   Target: 127.0.0.1:8082
 Builder:
   Id: builder-local
+  PoolCode: default
+  Endpoint: local
+  MaxConcurrency: 2
   LeaseSeconds: 120
   PollInterval: 2s
+  NodeHeartbeat: 15s
   TempDir: /tmp/appforge-builder
+  ToolchainVersion: android-debian-v4
+  BuildProtocolVersion: 1
+  CapabilityJson: '{"apk":true,"branding":true,"whiteLabel":true,"cache":true}'
+  CacheTtl: 168h
 
 ObjectCleanup:
   Interval: 5m
@@ -31,3 +39,16 @@ ObjectStorage:
 
 SigningSecrets:
   MasterKeyBase64: YXBwZm9yZ2UtZGV2LXNpZ25pbmcta2V5LTAwMDAwMSE=
+
+SecretProviders:
+  MaxSecretBytes: 65536
+  LocalRoot: ""
+  KubernetesRoot: ""
+  Vault:
+    Address: ""
+    TokenFile: ""
+    Namespace: ""
+    AllowHTTP: false
+  AWS:
+    Region: ""
+    Endpoint: ""

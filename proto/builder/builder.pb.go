@@ -33,6 +33,7 @@ const (
 	BuildTaskStatus_BUILD_TASK_STATUS_UPLOADING BuildTaskStatus = 4 // 上传中
 	BuildTaskStatus_BUILD_TASK_STATUS_SUCCESS   BuildTaskStatus = 5 // 成功
 	BuildTaskStatus_BUILD_TASK_STATUS_FAILED    BuildTaskStatus = 6 // 失败
+	BuildTaskStatus_BUILD_TASK_STATUS_CANCELLED BuildTaskStatus = 7 // 已取消
 )
 
 // Enum value maps for BuildTaskStatus.
@@ -45,6 +46,7 @@ var (
 		4: "BUILD_TASK_STATUS_UPLOADING",
 		5: "BUILD_TASK_STATUS_SUCCESS",
 		6: "BUILD_TASK_STATUS_FAILED",
+		7: "BUILD_TASK_STATUS_CANCELLED",
 	}
 	BuildTaskStatus_value = map[string]int32{
 		"BUILD_TASK_STATUS_UNKNOWN":   0,
@@ -54,6 +56,7 @@ var (
 		"BUILD_TASK_STATUS_UPLOADING": 4,
 		"BUILD_TASK_STATUS_SUCCESS":   5,
 		"BUILD_TASK_STATUS_FAILED":    6,
+		"BUILD_TASK_STATUS_CANCELLED": 7,
 	}
 )
 
@@ -82,6 +85,162 @@ func (x BuildTaskStatus) Number() protoreflect.EnumNumber {
 // Deprecated: Use BuildTaskStatus.Descriptor instead.
 func (BuildTaskStatus) EnumDescriptor() ([]byte, []int) {
 	return file_proto_builder_builder_proto_rawDescGZIP(), []int{0}
+}
+
+// V4 Builder节点状态。
+type BuilderNodeStatus int32
+
+const (
+	BuilderNodeStatus_BUILDER_NODE_STATUS_UNKNOWN  BuilderNodeStatus = 0 // 未知状态
+	BuilderNodeStatus_BUILDER_NODE_STATUS_ONLINE   BuilderNodeStatus = 1 // 在线且健康
+	BuilderNodeStatus_BUILDER_NODE_STATUS_OFFLINE  BuilderNodeStatus = 2 // 心跳超时离线
+	BuilderNodeStatus_BUILDER_NODE_STATUS_ISOLATED BuilderNodeStatus = 3 // 被隔离
+)
+
+// Enum value maps for BuilderNodeStatus.
+var (
+	BuilderNodeStatus_name = map[int32]string{
+		0: "BUILDER_NODE_STATUS_UNKNOWN",
+		1: "BUILDER_NODE_STATUS_ONLINE",
+		2: "BUILDER_NODE_STATUS_OFFLINE",
+		3: "BUILDER_NODE_STATUS_ISOLATED",
+	}
+	BuilderNodeStatus_value = map[string]int32{
+		"BUILDER_NODE_STATUS_UNKNOWN":  0,
+		"BUILDER_NODE_STATUS_ONLINE":   1,
+		"BUILDER_NODE_STATUS_OFFLINE":  2,
+		"BUILDER_NODE_STATUS_ISOLATED": 3,
+	}
+)
+
+func (x BuilderNodeStatus) Enum() *BuilderNodeStatus {
+	p := new(BuilderNodeStatus)
+	*p = x
+	return p
+}
+
+func (x BuilderNodeStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BuilderNodeStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_builder_builder_proto_enumTypes[1].Descriptor()
+}
+
+func (BuilderNodeStatus) Type() protoreflect.EnumType {
+	return &file_proto_builder_builder_proto_enumTypes[1]
+}
+
+func (x BuilderNodeStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BuilderNodeStatus.Descriptor instead.
+func (BuilderNodeStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{1}
+}
+
+// V4 Builder节点排空状态。
+type BuilderDrainStatus int32
+
+const (
+	BuilderDrainStatus_BUILDER_DRAIN_STATUS_UNKNOWN   BuilderDrainStatus = 0 // 未知状态
+	BuilderDrainStatus_BUILDER_DRAIN_STATUS_ACCEPTING BuilderDrainStatus = 1 // 接收新任务
+	BuilderDrainStatus_BUILDER_DRAIN_STATUS_DRAINING  BuilderDrainStatus = 2 // 排空中
+)
+
+// Enum value maps for BuilderDrainStatus.
+var (
+	BuilderDrainStatus_name = map[int32]string{
+		0: "BUILDER_DRAIN_STATUS_UNKNOWN",
+		1: "BUILDER_DRAIN_STATUS_ACCEPTING",
+		2: "BUILDER_DRAIN_STATUS_DRAINING",
+	}
+	BuilderDrainStatus_value = map[string]int32{
+		"BUILDER_DRAIN_STATUS_UNKNOWN":   0,
+		"BUILDER_DRAIN_STATUS_ACCEPTING": 1,
+		"BUILDER_DRAIN_STATUS_DRAINING":  2,
+	}
+)
+
+func (x BuilderDrainStatus) Enum() *BuilderDrainStatus {
+	p := new(BuilderDrainStatus)
+	*p = x
+	return p
+}
+
+func (x BuilderDrainStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BuilderDrainStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_builder_builder_proto_enumTypes[2].Descriptor()
+}
+
+func (BuilderDrainStatus) Type() protoreflect.EnumType {
+	return &file_proto_builder_builder_proto_enumTypes[2]
+}
+
+func (x BuilderDrainStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BuilderDrainStatus.Descriptor instead.
+func (BuilderDrainStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{2}
+}
+
+// V4 构建缓存状态。
+type BuildCacheStatus int32
+
+const (
+	BuildCacheStatus_BUILD_CACHE_STATUS_UNKNOWN     BuildCacheStatus = 0 // 未知状态
+	BuildCacheStatus_BUILD_CACHE_STATUS_ACTIVE      BuildCacheStatus = 1 // 有效
+	BuildCacheStatus_BUILD_CACHE_STATUS_INVALIDATED BuildCacheStatus = 2 // 已失效
+	BuildCacheStatus_BUILD_CACHE_STATUS_EXPIRED     BuildCacheStatus = 3 // 已过期
+)
+
+// Enum value maps for BuildCacheStatus.
+var (
+	BuildCacheStatus_name = map[int32]string{
+		0: "BUILD_CACHE_STATUS_UNKNOWN",
+		1: "BUILD_CACHE_STATUS_ACTIVE",
+		2: "BUILD_CACHE_STATUS_INVALIDATED",
+		3: "BUILD_CACHE_STATUS_EXPIRED",
+	}
+	BuildCacheStatus_value = map[string]int32{
+		"BUILD_CACHE_STATUS_UNKNOWN":     0,
+		"BUILD_CACHE_STATUS_ACTIVE":      1,
+		"BUILD_CACHE_STATUS_INVALIDATED": 2,
+		"BUILD_CACHE_STATUS_EXPIRED":     3,
+	}
+)
+
+func (x BuildCacheStatus) Enum() *BuildCacheStatus {
+	p := new(BuildCacheStatus)
+	*p = x
+	return p
+}
+
+func (x BuildCacheStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BuildCacheStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_builder_builder_proto_enumTypes[3].Descriptor()
+}
+
+func (BuildCacheStatus) Type() protoreflect.EnumType {
+	return &file_proto_builder_builder_proto_enumTypes[3]
+}
+
+func (x BuildCacheStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BuildCacheStatus.Descriptor instead.
+func (BuildCacheStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{3}
 }
 
 type RespBase struct {
@@ -145,6 +304,11 @@ type BuildTask struct {
 	SourceApkUrl      string                 `protobuf:"bytes,13,opt,name=source_apk_url,json=sourceApkUrl,proto3" json:"source_apk_url,omitempty"`
 	BuildConfigJson   string                 `protobuf:"bytes,14,opt,name=build_config_json,json=buildConfigJson,proto3" json:"build_config_json,omitempty"`
 	SourceApkObjectId int64                  `protobuf:"varint,15,opt,name=source_apk_object_id,json=sourceApkObjectId,proto3" json:"source_apk_object_id,omitempty"` // 原始APK私有对象ID
+	PoolCode          string                 `protobuf:"bytes,16,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                 // V4目标构建池编码
+	CacheKey          string                 `protobuf:"bytes,17,opt,name=cache_key,json=cacheKey,proto3" json:"cache_key,omitempty"`                                 // V4不可变输入缓存键
+	CacheEntryId      int64                  `protobuf:"varint,18,opt,name=cache_entry_id,json=cacheEntryId,proto3" json:"cache_entry_id,omitempty"`                  // V4命中的缓存条目ID
+	CacheHit          bool                   `protobuf:"varint,19,opt,name=cache_hit,json=cacheHit,proto3" json:"cache_hit,omitempty"`                                // V4是否命中缓存
+	RetryOfTaskId     int64                  `protobuf:"varint,20,opt,name=retry_of_task_id,json=retryOfTaskId,proto3" json:"retry_of_task_id,omitempty"`             // V4重试来源任务ID
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -284,6 +448,1411 @@ func (x *BuildTask) GetSourceApkObjectId() int64 {
 	return 0
 }
 
+func (x *BuildTask) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuildTask) GetCacheKey() string {
+	if x != nil {
+		return x.CacheKey
+	}
+	return ""
+}
+
+func (x *BuildTask) GetCacheEntryId() int64 {
+	if x != nil {
+		return x.CacheEntryId
+	}
+	return 0
+}
+
+func (x *BuildTask) GetCacheHit() bool {
+	if x != nil {
+		return x.CacheHit
+	}
+	return false
+}
+
+func (x *BuildTask) GetRetryOfTaskId() int64 {
+	if x != nil {
+		return x.RetryOfTaskId
+	}
+	return 0
+}
+
+// V4 Builder节点内部视图。
+type BuilderNode struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Id                   int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                      // 节点ID
+	NodeCode             string                 `protobuf:"bytes,2,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                           // 节点唯一编码
+	PoolCode             string                 `protobuf:"bytes,3,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                           // 构建池编码
+	Endpoint             string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`                                                           // 节点端点或实例标识
+	Status               BuilderNodeStatus      `protobuf:"varint,5,opt,name=status,proto3,enum=builder.BuilderNodeStatus" json:"status,omitempty"`                               // 节点健康状态
+	DrainStatus          BuilderDrainStatus     `protobuf:"varint,6,opt,name=drain_status,json=drainStatus,proto3,enum=builder.BuilderDrainStatus" json:"drain_status,omitempty"` // 节点排空状态
+	MaxConcurrency       int32                  `protobuf:"varint,7,opt,name=max_concurrency,json=maxConcurrency,proto3" json:"max_concurrency,omitempty"`                        // 最大并发数
+	RunningCount         int32                  `protobuf:"varint,8,opt,name=running_count,json=runningCount,proto3" json:"running_count,omitempty"`                              // 当前运行数
+	DiskFree             int64                  `protobuf:"varint,9,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                                          // 构建磁盘剩余字节数
+	ToolchainVersion     string                 `protobuf:"bytes,10,opt,name=toolchain_version,json=toolchainVersion,proto3" json:"toolchain_version,omitempty"`                  // 工具链版本
+	BuildProtocolVersion int32                  `protobuf:"varint,11,opt,name=build_protocol_version,json=buildProtocolVersion,proto3" json:"build_protocol_version,omitempty"`   // 构建协议版本
+	CapabilityJson       string                 `protobuf:"bytes,12,opt,name=capability_json,json=capabilityJson,proto3" json:"capability_json,omitempty"`                        // 能力白名单JSON
+	LastHeartbeatAt      int64                  `protobuf:"varint,13,opt,name=last_heartbeat_at,json=lastHeartbeatAt,proto3" json:"last_heartbeat_at,omitempty"`                  // 最近心跳时间，Unix毫秒
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *BuilderNode) Reset() {
+	*x = BuilderNode{}
+	mi := &file_proto_builder_builder_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuilderNode) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuilderNode) ProtoMessage() {}
+
+func (x *BuilderNode) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuilderNode.ProtoReflect.Descriptor instead.
+func (*BuilderNode) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *BuilderNode) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetStatus() BuilderNodeStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BuilderNodeStatus_BUILDER_NODE_STATUS_UNKNOWN
+}
+
+func (x *BuilderNode) GetDrainStatus() BuilderDrainStatus {
+	if x != nil {
+		return x.DrainStatus
+	}
+	return BuilderDrainStatus_BUILDER_DRAIN_STATUS_UNKNOWN
+}
+
+func (x *BuilderNode) GetMaxConcurrency() int32 {
+	if x != nil {
+		return x.MaxConcurrency
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetRunningCount() int32 {
+	if x != nil {
+		return x.RunningCount
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetDiskFree() int64 {
+	if x != nil {
+		return x.DiskFree
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetToolchainVersion() string {
+	if x != nil {
+		return x.ToolchainVersion
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetBuildProtocolVersion() int32 {
+	if x != nil {
+		return x.BuildProtocolVersion
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetCapabilityJson() string {
+	if x != nil {
+		return x.CapabilityJson
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetLastHeartbeatAt() int64 {
+	if x != nil {
+		return x.LastHeartbeatAt
+	}
+	return 0
+}
+
+// V4 Builder节点响应。
+type BuilderNodeResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *BuilderNode           `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // Builder节点
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuilderNodeResp) Reset() {
+	*x = BuilderNodeResp{}
+	mi := &file_proto_builder_builder_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuilderNodeResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuilderNodeResp) ProtoMessage() {}
+
+func (x *BuilderNodeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuilderNodeResp.ProtoReflect.Descriptor instead.
+func (*BuilderNodeResp) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *BuilderNodeResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuilderNodeResp) GetData() *BuilderNode {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 构建缓存条目内部视图。
+type BuildCacheEntry struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Id                   int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                   // 缓存条目ID
+	TenantId             int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                       // 所属租户ID
+	CacheKey             string                 `protobuf:"bytes,3,opt,name=cache_key,json=cacheKey,proto3" json:"cache_key,omitempty"`                                        // 缓存键
+	ToolchainVersion     string                 `protobuf:"bytes,4,opt,name=toolchain_version,json=toolchainVersion,proto3" json:"toolchain_version,omitempty"`                // 工具链版本
+	BuildProtocolVersion int32                  `protobuf:"varint,5,opt,name=build_protocol_version,json=buildProtocolVersion,proto3" json:"build_protocol_version,omitempty"` // 构建协议版本
+	ArtifactObjectId     int64                  `protobuf:"varint,6,opt,name=artifact_object_id,json=artifactObjectId,proto3" json:"artifact_object_id,omitempty"`             // 缓存产物对象ID
+	ArtifactSha256       string                 `protobuf:"bytes,7,opt,name=artifact_sha256,json=artifactSha256,proto3" json:"artifact_sha256,omitempty"`                      // 缓存产物SHA-256
+	SizeBytes            int64                  `protobuf:"varint,8,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`                                    // 缓存产物大小
+	Status               BuildCacheStatus       `protobuf:"varint,9,opt,name=status,proto3,enum=builder.BuildCacheStatus" json:"status,omitempty"`                             // 缓存状态
+	ExpiresAt            int64                  `protobuf:"varint,10,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`                                   // 过期时间，Unix毫秒
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *BuildCacheEntry) Reset() {
+	*x = BuildCacheEntry{}
+	mi := &file_proto_builder_builder_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheEntry) ProtoMessage() {}
+
+func (x *BuildCacheEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheEntry.ProtoReflect.Descriptor instead.
+func (*BuildCacheEntry) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *BuildCacheEntry) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetCacheKey() string {
+	if x != nil {
+		return x.CacheKey
+	}
+	return ""
+}
+
+func (x *BuildCacheEntry) GetToolchainVersion() string {
+	if x != nil {
+		return x.ToolchainVersion
+	}
+	return ""
+}
+
+func (x *BuildCacheEntry) GetBuildProtocolVersion() int32 {
+	if x != nil {
+		return x.BuildProtocolVersion
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetArtifactObjectId() int64 {
+	if x != nil {
+		return x.ArtifactObjectId
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetArtifactSha256() string {
+	if x != nil {
+		return x.ArtifactSha256
+	}
+	return ""
+}
+
+func (x *BuildCacheEntry) GetSizeBytes() int64 {
+	if x != nil {
+		return x.SizeBytes
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetStatus() BuildCacheStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BuildCacheStatus_BUILD_CACHE_STATUS_UNKNOWN
+}
+
+func (x *BuildCacheEntry) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
+// V4 构建缓存条目响应。
+type BuildCacheEntryResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *BuildCacheEntry       `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 构建缓存条目
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildCacheEntryResp) Reset() {
+	*x = BuildCacheEntryResp{}
+	mi := &file_proto_builder_builder_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheEntryResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheEntryResp) ProtoMessage() {}
+
+func (x *BuildCacheEntryResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheEntryResp.ProtoReflect.Descriptor instead.
+func (*BuildCacheEntryResp) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *BuildCacheEntryResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuildCacheEntryResp) GetData() *BuildCacheEntry {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 缓存产物内部元数据。
+type BuildCacheArtifact struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                        // 存储对象ID
+	ObjectKey     string                 `protobuf:"bytes,2,opt,name=object_key,json=objectKey,proto3" json:"object_key,omitempty"`          // 私有对象Key
+	OriginalName  string                 `protobuf:"bytes,3,opt,name=original_name,json=originalName,proto3" json:"original_name,omitempty"` // 原始文件名
+	ContentType   string                 `protobuf:"bytes,4,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`    // MIME类型
+	SizeBytes     int64                  `protobuf:"varint,5,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`         // 对象大小
+	Sha256        string                 `protobuf:"bytes,6,opt,name=sha256,proto3" json:"sha256,omitempty"`                                 // 对象SHA-256
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildCacheArtifact) Reset() {
+	*x = BuildCacheArtifact{}
+	mi := &file_proto_builder_builder_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheArtifact) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheArtifact) ProtoMessage() {}
+
+func (x *BuildCacheArtifact) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheArtifact.ProtoReflect.Descriptor instead.
+func (*BuildCacheArtifact) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *BuildCacheArtifact) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BuildCacheArtifact) GetObjectKey() string {
+	if x != nil {
+		return x.ObjectKey
+	}
+	return ""
+}
+
+func (x *BuildCacheArtifact) GetOriginalName() string {
+	if x != nil {
+		return x.OriginalName
+	}
+	return ""
+}
+
+func (x *BuildCacheArtifact) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
+func (x *BuildCacheArtifact) GetSizeBytes() int64 {
+	if x != nil {
+		return x.SizeBytes
+	}
+	return 0
+}
+
+func (x *BuildCacheArtifact) GetSha256() string {
+	if x != nil {
+		return x.Sha256
+	}
+	return ""
+}
+
+// V4 构建缓存解析结果。
+type BuildCacheResolution struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Hit           bool                   `protobuf:"varint,1,opt,name=hit,proto3" json:"hit,omitempty"`          // 是否命中有效缓存
+	Entry         *BuildCacheEntry       `protobuf:"bytes,2,opt,name=entry,proto3" json:"entry,omitempty"`       // 缓存条目
+	Artifact      *BuildCacheArtifact    `protobuf:"bytes,3,opt,name=artifact,proto3" json:"artifact,omitempty"` // 待校验缓存产物
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildCacheResolution) Reset() {
+	*x = BuildCacheResolution{}
+	mi := &file_proto_builder_builder_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheResolution) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheResolution) ProtoMessage() {}
+
+func (x *BuildCacheResolution) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheResolution.ProtoReflect.Descriptor instead.
+func (*BuildCacheResolution) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *BuildCacheResolution) GetHit() bool {
+	if x != nil {
+		return x.Hit
+	}
+	return false
+}
+
+func (x *BuildCacheResolution) GetEntry() *BuildCacheEntry {
+	if x != nil {
+		return x.Entry
+	}
+	return nil
+}
+
+func (x *BuildCacheResolution) GetArtifact() *BuildCacheArtifact {
+	if x != nil {
+		return x.Artifact
+	}
+	return nil
+}
+
+// V4 构建缓存解析响应。
+type BuildCacheResolutionResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *BuildCacheResolution  `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 缓存解析结果
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildCacheResolutionResp) Reset() {
+	*x = BuildCacheResolutionResp{}
+	mi := &file_proto_builder_builder_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheResolutionResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheResolutionResp) ProtoMessage() {}
+
+func (x *BuildCacheResolutionResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheResolutionResp.ProtoReflect.Descriptor instead.
+func (*BuildCacheResolutionResp) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *BuildCacheResolutionResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuildCacheResolutionResp) GetData() *BuildCacheResolution {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 构建缓存清理结果。
+type CleanupBuildCacheResult struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	InvalidatedCount int32                  `protobuf:"varint,1,opt,name=invalidated_count,json=invalidatedCount,proto3" json:"invalidated_count,omitempty"` // 失效条目数
+	ReclaimableBytes int64                  `protobuf:"varint,2,opt,name=reclaimable_bytes,json=reclaimableBytes,proto3" json:"reclaimable_bytes,omitempty"` // 可回收字节数
+	ObjectIds        []int64                `protobuf:"varint,3,rep,packed,name=object_ids,json=objectIds,proto3" json:"object_ids,omitempty"`               // 可删除对象ID列表
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *CleanupBuildCacheResult) Reset() {
+	*x = CleanupBuildCacheResult{}
+	mi := &file_proto_builder_builder_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CleanupBuildCacheResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CleanupBuildCacheResult) ProtoMessage() {}
+
+func (x *CleanupBuildCacheResult) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CleanupBuildCacheResult.ProtoReflect.Descriptor instead.
+func (*CleanupBuildCacheResult) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CleanupBuildCacheResult) GetInvalidatedCount() int32 {
+	if x != nil {
+		return x.InvalidatedCount
+	}
+	return 0
+}
+
+func (x *CleanupBuildCacheResult) GetReclaimableBytes() int64 {
+	if x != nil {
+		return x.ReclaimableBytes
+	}
+	return 0
+}
+
+func (x *CleanupBuildCacheResult) GetObjectIds() []int64 {
+	if x != nil {
+		return x.ObjectIds
+	}
+	return nil
+}
+
+// V4 构建缓存清理响应。
+type CleanupBuildCacheResp struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Base          *common.RespBase         `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *CleanupBuildCacheResult `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 缓存清理结果
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CleanupBuildCacheResp) Reset() {
+	*x = CleanupBuildCacheResp{}
+	mi := &file_proto_builder_builder_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CleanupBuildCacheResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CleanupBuildCacheResp) ProtoMessage() {}
+
+func (x *CleanupBuildCacheResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CleanupBuildCacheResp.ProtoReflect.Descriptor instead.
+func (*CleanupBuildCacheResp) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CleanupBuildCacheResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CleanupBuildCacheResp) GetData() *CleanupBuildCacheResult {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 注册Builder节点请求。
+type RegisterBuilderNodeReq struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	NodeCode             string                 `protobuf:"bytes,1,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                         // 节点唯一编码
+	PoolCode             string                 `protobuf:"bytes,2,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                         // 构建池编码
+	Endpoint             string                 `protobuf:"bytes,3,opt,name=endpoint,proto3" json:"endpoint,omitempty"`                                                         // 节点端点或实例标识
+	MaxConcurrency       int32                  `protobuf:"varint,4,opt,name=max_concurrency,json=maxConcurrency,proto3" json:"max_concurrency,omitempty"`                      // 最大并发数
+	CpuCapacity          int32                  `protobuf:"varint,5,opt,name=cpu_capacity,json=cpuCapacity,proto3" json:"cpu_capacity,omitempty"`                               // CPU容量，单位毫核
+	MemoryCapacity       int64                  `protobuf:"varint,6,opt,name=memory_capacity,json=memoryCapacity,proto3" json:"memory_capacity,omitempty"`                      // 内存容量，单位字节
+	DiskCapacity         int64                  `protobuf:"varint,7,opt,name=disk_capacity,json=diskCapacity,proto3" json:"disk_capacity,omitempty"`                            // 构建磁盘总容量，单位字节
+	DiskFree             int64                  `protobuf:"varint,8,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                                        // 构建磁盘剩余容量，单位字节
+	ToolchainVersion     string                 `protobuf:"bytes,9,opt,name=toolchain_version,json=toolchainVersion,proto3" json:"toolchain_version,omitempty"`                 // 工具链版本
+	BuildProtocolVersion int32                  `protobuf:"varint,10,opt,name=build_protocol_version,json=buildProtocolVersion,proto3" json:"build_protocol_version,omitempty"` // 构建协议版本
+	CapabilityJson       string                 `protobuf:"bytes,11,opt,name=capability_json,json=capabilityJson,proto3" json:"capability_json,omitempty"`                      // 能力白名单JSON
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *RegisterBuilderNodeReq) Reset() {
+	*x = RegisterBuilderNodeReq{}
+	mi := &file_proto_builder_builder_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterBuilderNodeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterBuilderNodeReq) ProtoMessage() {}
+
+func (x *RegisterBuilderNodeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterBuilderNodeReq.ProtoReflect.Descriptor instead.
+func (*RegisterBuilderNodeReq) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *RegisterBuilderNodeReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *RegisterBuilderNodeReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *RegisterBuilderNodeReq) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *RegisterBuilderNodeReq) GetMaxConcurrency() int32 {
+	if x != nil {
+		return x.MaxConcurrency
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetCpuCapacity() int32 {
+	if x != nil {
+		return x.CpuCapacity
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetMemoryCapacity() int64 {
+	if x != nil {
+		return x.MemoryCapacity
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetDiskCapacity() int64 {
+	if x != nil {
+		return x.DiskCapacity
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetDiskFree() int64 {
+	if x != nil {
+		return x.DiskFree
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetToolchainVersion() string {
+	if x != nil {
+		return x.ToolchainVersion
+	}
+	return ""
+}
+
+func (x *RegisterBuilderNodeReq) GetBuildProtocolVersion() int32 {
+	if x != nil {
+		return x.BuildProtocolVersion
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetCapabilityJson() string {
+	if x != nil {
+		return x.CapabilityJson
+	}
+	return ""
+}
+
+// V4 Builder节点心跳请求。
+type BuilderNodeHeartbeatReq struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	NodeCode         string                 `protobuf:"bytes,1,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                             // 节点唯一编码
+	RunningCount     int32                  `protobuf:"varint,2,opt,name=running_count,json=runningCount,proto3" json:"running_count,omitempty"`                // 当前运行任务数
+	DiskFree         int64                  `protobuf:"varint,3,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                            // 构建磁盘剩余容量，单位字节
+	RunningTaskIds   []int64                `protobuf:"varint,4,rep,packed,name=running_task_ids,json=runningTaskIds,proto3" json:"running_task_ids,omitempty"` // 当前运行任务ID列表
+	LastErrorMessage string                 `protobuf:"bytes,5,opt,name=last_error_message,json=lastErrorMessage,proto3" json:"last_error_message,omitempty"`   // 最近错误摘要
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *BuilderNodeHeartbeatReq) Reset() {
+	*x = BuilderNodeHeartbeatReq{}
+	mi := &file_proto_builder_builder_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuilderNodeHeartbeatReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuilderNodeHeartbeatReq) ProtoMessage() {}
+
+func (x *BuilderNodeHeartbeatReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuilderNodeHeartbeatReq.ProtoReflect.Descriptor instead.
+func (*BuilderNodeHeartbeatReq) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *BuilderNodeHeartbeatReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *BuilderNodeHeartbeatReq) GetRunningCount() int32 {
+	if x != nil {
+		return x.RunningCount
+	}
+	return 0
+}
+
+func (x *BuilderNodeHeartbeatReq) GetDiskFree() int64 {
+	if x != nil {
+		return x.DiskFree
+	}
+	return 0
+}
+
+func (x *BuilderNodeHeartbeatReq) GetRunningTaskIds() []int64 {
+	if x != nil {
+		return x.RunningTaskIds
+	}
+	return nil
+}
+
+func (x *BuilderNodeHeartbeatReq) GetLastErrorMessage() string {
+	if x != nil {
+		return x.LastErrorMessage
+	}
+	return ""
+}
+
+// V4 原子领取调度任务请求。
+type ClaimScheduledBuildTaskReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NodeCode      string                 `protobuf:"bytes,1,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`              // 已注册节点编码
+	LeaseSeconds  int32                  `protobuf:"varint,2,opt,name=lease_seconds,json=leaseSeconds,proto3" json:"lease_seconds,omitempty"` // 任务和槽位租约秒数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClaimScheduledBuildTaskReq) Reset() {
+	*x = ClaimScheduledBuildTaskReq{}
+	mi := &file_proto_builder_builder_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClaimScheduledBuildTaskReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClaimScheduledBuildTaskReq) ProtoMessage() {}
+
+func (x *ClaimScheduledBuildTaskReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClaimScheduledBuildTaskReq.ProtoReflect.Descriptor instead.
+func (*ClaimScheduledBuildTaskReq) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ClaimScheduledBuildTaskReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *ClaimScheduledBuildTaskReq) GetLeaseSeconds() int32 {
+	if x != nil {
+		return x.LeaseSeconds
+	}
+	return 0
+}
+
+// V4 修改Builder节点排空状态请求。
+type DrainBuilderNodeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                      // 节点ID
+	NodeCode      string                 `protobuf:"bytes,2,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                           // 节点编码
+	DrainStatus   BuilderDrainStatus     `protobuf:"varint,3,opt,name=drain_status,json=drainStatus,proto3,enum=builder.BuilderDrainStatus" json:"drain_status,omitempty"` // 目标排空状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DrainBuilderNodeReq) Reset() {
+	*x = DrainBuilderNodeReq{}
+	mi := &file_proto_builder_builder_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DrainBuilderNodeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DrainBuilderNodeReq) ProtoMessage() {}
+
+func (x *DrainBuilderNodeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DrainBuilderNodeReq.ProtoReflect.Descriptor instead.
+func (*DrainBuilderNodeReq) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *DrainBuilderNodeReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *DrainBuilderNodeReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *DrainBuilderNodeReq) GetDrainStatus() BuilderDrainStatus {
+	if x != nil {
+		return x.DrainStatus
+	}
+	return BuilderDrainStatus_BUILDER_DRAIN_STATUS_UNKNOWN
+}
+
+// V4 取消构建执行请求。
+type CancelBuildExecutionReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`        // 构建任务ID
+	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"` // 取消原因
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CancelBuildExecutionReq) Reset() {
+	*x = CancelBuildExecutionReq{}
+	mi := &file_proto_builder_builder_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancelBuildExecutionReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancelBuildExecutionReq) ProtoMessage() {}
+
+func (x *CancelBuildExecutionReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancelBuildExecutionReq.ProtoReflect.Descriptor instead.
+func (*CancelBuildExecutionReq) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *CancelBuildExecutionReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *CancelBuildExecutionReq) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+// V4 解析构建缓存请求。
+type ResolveBuildCacheReq struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	TaskId               int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                                             // 当前构建任务ID
+	NodeCode             string                 `protobuf:"bytes,2,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                        // 当前节点编码
+	BuilderAttempt       int32                  `protobuf:"varint,3,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"`                     // 当前领取代次
+	ToolchainVersion     string                 `protobuf:"bytes,4,opt,name=toolchain_version,json=toolchainVersion,proto3" json:"toolchain_version,omitempty"`                // 当前工具链版本
+	BuildProtocolVersion int32                  `protobuf:"varint,5,opt,name=build_protocol_version,json=buildProtocolVersion,proto3" json:"build_protocol_version,omitempty"` // 当前构建协议版本
+	ConfirmHit           bool                   `protobuf:"varint,6,opt,name=confirm_hit,json=confirmHit,proto3" json:"confirm_hit,omitempty"`                                 // Worker完成对象字节校验后确认命中；false仅解析候选缓存
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *ResolveBuildCacheReq) Reset() {
+	*x = ResolveBuildCacheReq{}
+	mi := &file_proto_builder_builder_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResolveBuildCacheReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResolveBuildCacheReq) ProtoMessage() {}
+
+func (x *ResolveBuildCacheReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResolveBuildCacheReq.ProtoReflect.Descriptor instead.
+func (*ResolveBuildCacheReq) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ResolveBuildCacheReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *ResolveBuildCacheReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *ResolveBuildCacheReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+func (x *ResolveBuildCacheReq) GetToolchainVersion() string {
+	if x != nil {
+		return x.ToolchainVersion
+	}
+	return ""
+}
+
+func (x *ResolveBuildCacheReq) GetBuildProtocolVersion() int32 {
+	if x != nil {
+		return x.BuildProtocolVersion
+	}
+	return 0
+}
+
+func (x *ResolveBuildCacheReq) GetConfirmHit() bool {
+	if x != nil {
+		return x.ConfirmHit
+	}
+	return false
+}
+
+// V4 发布构建缓存请求。
+type PublishBuildCacheReq struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	TaskId               int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                                             // 已成功构建任务ID
+	NodeCode             string                 `protobuf:"bytes,2,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                        // 当前节点编码
+	BuilderAttempt       int32                  `protobuf:"varint,3,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"`                     // 构建领取代次
+	ToolchainVersion     string                 `protobuf:"bytes,4,opt,name=toolchain_version,json=toolchainVersion,proto3" json:"toolchain_version,omitempty"`                // 工具链版本
+	BuildProtocolVersion int32                  `protobuf:"varint,5,opt,name=build_protocol_version,json=buildProtocolVersion,proto3" json:"build_protocol_version,omitempty"` // 构建协议版本
+	ArtifactObjectId     int64                  `protobuf:"varint,6,opt,name=artifact_object_id,json=artifactObjectId,proto3" json:"artifact_object_id,omitempty"`             // 独立缓存产物对象ID
+	ArtifactSha256       string                 `protobuf:"bytes,7,opt,name=artifact_sha256,json=artifactSha256,proto3" json:"artifact_sha256,omitempty"`                      // 缓存产物SHA-256
+	SizeBytes            int64                  `protobuf:"varint,8,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`                                    // 缓存产物大小
+	TtlSeconds           int64                  `protobuf:"varint,9,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`                                 // 缓存TTL秒数
+	ArtifactObjectKey    string                 `protobuf:"bytes,10,opt,name=artifact_object_key,json=artifactObjectKey,proto3" json:"artifact_object_key,omitempty"`          // 缓存中间APK私有对象Key，artifact_object_id为0时由Core登记
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *PublishBuildCacheReq) Reset() {
+	*x = PublishBuildCacheReq{}
+	mi := &file_proto_builder_builder_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublishBuildCacheReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublishBuildCacheReq) ProtoMessage() {}
+
+func (x *PublishBuildCacheReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublishBuildCacheReq.ProtoReflect.Descriptor instead.
+func (*PublishBuildCacheReq) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *PublishBuildCacheReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *PublishBuildCacheReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetToolchainVersion() string {
+	if x != nil {
+		return x.ToolchainVersion
+	}
+	return ""
+}
+
+func (x *PublishBuildCacheReq) GetBuildProtocolVersion() int32 {
+	if x != nil {
+		return x.BuildProtocolVersion
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetArtifactObjectId() int64 {
+	if x != nil {
+		return x.ArtifactObjectId
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetArtifactSha256() string {
+	if x != nil {
+		return x.ArtifactSha256
+	}
+	return ""
+}
+
+func (x *PublishBuildCacheReq) GetSizeBytes() int64 {
+	if x != nil {
+		return x.SizeBytes
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetTtlSeconds() int64 {
+	if x != nil {
+		return x.TtlSeconds
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetArtifactObjectKey() string {
+	if x != nil {
+		return x.ArtifactObjectKey
+	}
+	return ""
+}
+
+// V4 失效构建缓存请求。
+type InvalidateBuildCacheReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                            // 缓存条目ID
+	TaskId        int64                  `protobuf:"varint,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`      // 发现损坏的任务ID
+	NodeCode      string                 `protobuf:"bytes,3,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"` // 发现损坏的节点编码
+	Reason        string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`                     // 失效原因
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvalidateBuildCacheReq) Reset() {
+	*x = InvalidateBuildCacheReq{}
+	mi := &file_proto_builder_builder_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvalidateBuildCacheReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvalidateBuildCacheReq) ProtoMessage() {}
+
+func (x *InvalidateBuildCacheReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvalidateBuildCacheReq.ProtoReflect.Descriptor instead.
+func (*InvalidateBuildCacheReq) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *InvalidateBuildCacheReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *InvalidateBuildCacheReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *InvalidateBuildCacheReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *InvalidateBuildCacheReq) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+// V4 清理构建缓存请求。
+type CleanupBuildCacheReq struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Limit           int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`                                              // 单次最多清理条目数
+	TargetFreeBytes int64                  `protobuf:"varint,2,opt,name=target_free_bytes,json=targetFreeBytes,proto3" json:"target_free_bytes,omitempty"` // 目标释放字节数
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *CleanupBuildCacheReq) Reset() {
+	*x = CleanupBuildCacheReq{}
+	mi := &file_proto_builder_builder_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CleanupBuildCacheReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CleanupBuildCacheReq) ProtoMessage() {}
+
+func (x *CleanupBuildCacheReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CleanupBuildCacheReq.ProtoReflect.Descriptor instead.
+func (*CleanupBuildCacheReq) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *CleanupBuildCacheReq) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *CleanupBuildCacheReq) GetTargetFreeBytes() int64 {
+	if x != nil {
+		return x.TargetFreeBytes
+	}
+	return 0
+}
+
 type ClaimBuildTaskReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	BuilderId     string                 `protobuf:"bytes,1,opt,name=builder_id,json=builderId,proto3" json:"builder_id,omitempty"`
@@ -294,7 +1863,7 @@ type ClaimBuildTaskReq struct {
 
 func (x *ClaimBuildTaskReq) Reset() {
 	*x = ClaimBuildTaskReq{}
-	mi := &file_proto_builder_builder_proto_msgTypes[2]
+	mi := &file_proto_builder_builder_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -306,7 +1875,7 @@ func (x *ClaimBuildTaskReq) String() string {
 func (*ClaimBuildTaskReq) ProtoMessage() {}
 
 func (x *ClaimBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_builder_builder_proto_msgTypes[2]
+	mi := &file_proto_builder_builder_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -319,7 +1888,7 @@ func (x *ClaimBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClaimBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*ClaimBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_builder_builder_proto_rawDescGZIP(), []int{2}
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ClaimBuildTaskReq) GetBuilderId() string {
@@ -346,7 +1915,7 @@ type BuildTaskResp struct {
 
 func (x *BuildTaskResp) Reset() {
 	*x = BuildTaskResp{}
-	mi := &file_proto_builder_builder_proto_msgTypes[3]
+	mi := &file_proto_builder_builder_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -358,7 +1927,7 @@ func (x *BuildTaskResp) String() string {
 func (*BuildTaskResp) ProtoMessage() {}
 
 func (x *BuildTaskResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_builder_builder_proto_msgTypes[3]
+	mi := &file_proto_builder_builder_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -371,7 +1940,7 @@ func (x *BuildTaskResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildTaskResp.ProtoReflect.Descriptor instead.
 func (*BuildTaskResp) Descriptor() ([]byte, []int) {
-	return file_proto_builder_builder_proto_rawDescGZIP(), []int{3}
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *BuildTaskResp) GetBase() *common.RespBase {
@@ -400,7 +1969,7 @@ type HeartbeatBuildTaskReq struct {
 
 func (x *HeartbeatBuildTaskReq) Reset() {
 	*x = HeartbeatBuildTaskReq{}
-	mi := &file_proto_builder_builder_proto_msgTypes[4]
+	mi := &file_proto_builder_builder_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -412,7 +1981,7 @@ func (x *HeartbeatBuildTaskReq) String() string {
 func (*HeartbeatBuildTaskReq) ProtoMessage() {}
 
 func (x *HeartbeatBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_builder_builder_proto_msgTypes[4]
+	mi := &file_proto_builder_builder_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -425,7 +1994,7 @@ func (x *HeartbeatBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HeartbeatBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*HeartbeatBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_builder_builder_proto_rawDescGZIP(), []int{4}
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *HeartbeatBuildTaskReq) GetTaskId() int64 {
@@ -470,7 +2039,7 @@ type ReportBuildProgressReq struct {
 
 func (x *ReportBuildProgressReq) Reset() {
 	*x = ReportBuildProgressReq{}
-	mi := &file_proto_builder_builder_proto_msgTypes[5]
+	mi := &file_proto_builder_builder_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -482,7 +2051,7 @@ func (x *ReportBuildProgressReq) String() string {
 func (*ReportBuildProgressReq) ProtoMessage() {}
 
 func (x *ReportBuildProgressReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_builder_builder_proto_msgTypes[5]
+	mi := &file_proto_builder_builder_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -495,7 +2064,7 @@ func (x *ReportBuildProgressReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportBuildProgressReq.ProtoReflect.Descriptor instead.
 func (*ReportBuildProgressReq) Descriptor() ([]byte, []int) {
-	return file_proto_builder_builder_proto_rawDescGZIP(), []int{5}
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ReportBuildProgressReq) GetTaskId() int64 {
@@ -559,7 +2128,7 @@ type CompleteBuildTaskReq struct {
 
 func (x *CompleteBuildTaskReq) Reset() {
 	*x = CompleteBuildTaskReq{}
-	mi := &file_proto_builder_builder_proto_msgTypes[6]
+	mi := &file_proto_builder_builder_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -571,7 +2140,7 @@ func (x *CompleteBuildTaskReq) String() string {
 func (*CompleteBuildTaskReq) ProtoMessage() {}
 
 func (x *CompleteBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_builder_builder_proto_msgTypes[6]
+	mi := &file_proto_builder_builder_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -584,7 +2153,7 @@ func (x *CompleteBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*CompleteBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_builder_builder_proto_rawDescGZIP(), []int{6}
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *CompleteBuildTaskReq) GetTaskId() int64 {
@@ -680,7 +2249,7 @@ type FailBuildTaskReq struct {
 
 func (x *FailBuildTaskReq) Reset() {
 	*x = FailBuildTaskReq{}
-	mi := &file_proto_builder_builder_proto_msgTypes[7]
+	mi := &file_proto_builder_builder_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -692,7 +2261,7 @@ func (x *FailBuildTaskReq) String() string {
 func (*FailBuildTaskReq) ProtoMessage() {}
 
 func (x *FailBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_builder_builder_proto_msgTypes[7]
+	mi := &file_proto_builder_builder_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -705,7 +2274,7 @@ func (x *FailBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FailBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*FailBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_builder_builder_proto_rawDescGZIP(), []int{7}
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *FailBuildTaskReq) GetTaskId() int64 {
@@ -777,7 +2346,7 @@ type ValidateSigningMaterialReq struct {
 
 func (x *ValidateSigningMaterialReq) Reset() {
 	*x = ValidateSigningMaterialReq{}
-	mi := &file_proto_builder_builder_proto_msgTypes[8]
+	mi := &file_proto_builder_builder_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -789,7 +2358,7 @@ func (x *ValidateSigningMaterialReq) String() string {
 func (*ValidateSigningMaterialReq) ProtoMessage() {}
 
 func (x *ValidateSigningMaterialReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_builder_builder_proto_msgTypes[8]
+	mi := &file_proto_builder_builder_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -802,7 +2371,7 @@ func (x *ValidateSigningMaterialReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidateSigningMaterialReq.ProtoReflect.Descriptor instead.
 func (*ValidateSigningMaterialReq) Descriptor() ([]byte, []int) {
-	return file_proto_builder_builder_proto_rawDescGZIP(), []int{8}
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ValidateSigningMaterialReq) GetKeystoreObjectKey() string {
@@ -843,7 +2412,7 @@ type SigningMaterialValidation struct {
 
 func (x *SigningMaterialValidation) Reset() {
 	*x = SigningMaterialValidation{}
-	mi := &file_proto_builder_builder_proto_msgTypes[9]
+	mi := &file_proto_builder_builder_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -855,7 +2424,7 @@ func (x *SigningMaterialValidation) String() string {
 func (*SigningMaterialValidation) ProtoMessage() {}
 
 func (x *SigningMaterialValidation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_builder_builder_proto_msgTypes[9]
+	mi := &file_proto_builder_builder_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -868,7 +2437,7 @@ func (x *SigningMaterialValidation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SigningMaterialValidation.ProtoReflect.Descriptor instead.
 func (*SigningMaterialValidation) Descriptor() ([]byte, []int) {
-	return file_proto_builder_builder_proto_rawDescGZIP(), []int{9}
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *SigningMaterialValidation) GetCertificateSha256() string {
@@ -889,7 +2458,7 @@ type ValidateSigningMaterialResp struct {
 
 func (x *ValidateSigningMaterialResp) Reset() {
 	*x = ValidateSigningMaterialResp{}
-	mi := &file_proto_builder_builder_proto_msgTypes[10]
+	mi := &file_proto_builder_builder_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -901,7 +2470,7 @@ func (x *ValidateSigningMaterialResp) String() string {
 func (*ValidateSigningMaterialResp) ProtoMessage() {}
 
 func (x *ValidateSigningMaterialResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_builder_builder_proto_msgTypes[10]
+	mi := &file_proto_builder_builder_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -914,7 +2483,7 @@ func (x *ValidateSigningMaterialResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidateSigningMaterialResp.ProtoReflect.Descriptor instead.
 func (*ValidateSigningMaterialResp) Descriptor() ([]byte, []int) {
-	return file_proto_builder_builder_proto_rawDescGZIP(), []int{10}
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ValidateSigningMaterialResp) GetBase() *common.RespBase {
@@ -937,7 +2506,7 @@ const file_proto_builder_builder_proto_rawDesc = "" +
 	"\n" +
 	"\x1bproto/builder/builder.proto\x12\abuilder\x1a\x19proto/common/common.proto\"0\n" +
 	"\bRespBase\x12$\n" +
-	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\"\x9c\x04\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\"\xc2\x05\n" +
 	"\tBuildTask\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
 	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
@@ -956,7 +2525,130 @@ const file_proto_builder_builder_proto_rawDesc = "" +
 	"\bpriority\x18\f \x01(\x05R\bpriority\x12$\n" +
 	"\x0esource_apk_url\x18\r \x01(\tR\fsourceApkUrl\x12*\n" +
 	"\x11build_config_json\x18\x0e \x01(\tR\x0fbuildConfigJson\x12/\n" +
-	"\x14source_apk_object_id\x18\x0f \x01(\x03R\x11sourceApkObjectId\"W\n" +
+	"\x14source_apk_object_id\x18\x0f \x01(\x03R\x11sourceApkObjectId\x12\x1b\n" +
+	"\tpool_code\x18\x10 \x01(\tR\bpoolCode\x12\x1b\n" +
+	"\tcache_key\x18\x11 \x01(\tR\bcacheKey\x12$\n" +
+	"\x0ecache_entry_id\x18\x12 \x01(\x03R\fcacheEntryId\x12\x1b\n" +
+	"\tcache_hit\x18\x13 \x01(\bR\bcacheHit\x12'\n" +
+	"\x10retry_of_task_id\x18\x14 \x01(\x03R\rretryOfTaskId\"\x8a\x04\n" +
+	"\vBuilderNode\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\tnode_code\x18\x02 \x01(\tR\bnodeCode\x12\x1b\n" +
+	"\tpool_code\x18\x03 \x01(\tR\bpoolCode\x12\x1a\n" +
+	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x122\n" +
+	"\x06status\x18\x05 \x01(\x0e2\x1a.builder.BuilderNodeStatusR\x06status\x12>\n" +
+	"\fdrain_status\x18\x06 \x01(\x0e2\x1b.builder.BuilderDrainStatusR\vdrainStatus\x12'\n" +
+	"\x0fmax_concurrency\x18\a \x01(\x05R\x0emaxConcurrency\x12#\n" +
+	"\rrunning_count\x18\b \x01(\x05R\frunningCount\x12\x1b\n" +
+	"\tdisk_free\x18\t \x01(\x03R\bdiskFree\x12+\n" +
+	"\x11toolchain_version\x18\n" +
+	" \x01(\tR\x10toolchainVersion\x124\n" +
+	"\x16build_protocol_version\x18\v \x01(\x05R\x14buildProtocolVersion\x12'\n" +
+	"\x0fcapability_json\x18\f \x01(\tR\x0ecapabilityJson\x12*\n" +
+	"\x11last_heartbeat_at\x18\r \x01(\x03R\x0flastHeartbeatAt\"a\n" +
+	"\x0fBuilderNodeResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12(\n" +
+	"\x04data\x18\x02 \x01(\v2\x14.builder.BuilderNodeR\x04data\"\x86\x03\n" +
+	"\x0fBuildCacheEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x1b\n" +
+	"\tcache_key\x18\x03 \x01(\tR\bcacheKey\x12+\n" +
+	"\x11toolchain_version\x18\x04 \x01(\tR\x10toolchainVersion\x124\n" +
+	"\x16build_protocol_version\x18\x05 \x01(\x05R\x14buildProtocolVersion\x12,\n" +
+	"\x12artifact_object_id\x18\x06 \x01(\x03R\x10artifactObjectId\x12'\n" +
+	"\x0fartifact_sha256\x18\a \x01(\tR\x0eartifactSha256\x12\x1d\n" +
+	"\n" +
+	"size_bytes\x18\b \x01(\x03R\tsizeBytes\x121\n" +
+	"\x06status\x18\t \x01(\x0e2\x19.builder.BuildCacheStatusR\x06status\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\n" +
+	" \x01(\x03R\texpiresAt\"i\n" +
+	"\x13BuildCacheEntryResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12,\n" +
+	"\x04data\x18\x02 \x01(\v2\x18.builder.BuildCacheEntryR\x04data\"\xc2\x01\n" +
+	"\x12BuildCacheArtifact\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1d\n" +
+	"\n" +
+	"object_key\x18\x02 \x01(\tR\tobjectKey\x12#\n" +
+	"\roriginal_name\x18\x03 \x01(\tR\foriginalName\x12!\n" +
+	"\fcontent_type\x18\x04 \x01(\tR\vcontentType\x12\x1d\n" +
+	"\n" +
+	"size_bytes\x18\x05 \x01(\x03R\tsizeBytes\x12\x16\n" +
+	"\x06sha256\x18\x06 \x01(\tR\x06sha256\"\x91\x01\n" +
+	"\x14BuildCacheResolution\x12\x10\n" +
+	"\x03hit\x18\x01 \x01(\bR\x03hit\x12.\n" +
+	"\x05entry\x18\x02 \x01(\v2\x18.builder.BuildCacheEntryR\x05entry\x127\n" +
+	"\bartifact\x18\x03 \x01(\v2\x1b.builder.BuildCacheArtifactR\bartifact\"s\n" +
+	"\x18BuildCacheResolutionResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x121\n" +
+	"\x04data\x18\x02 \x01(\v2\x1d.builder.BuildCacheResolutionR\x04data\"\x92\x01\n" +
+	"\x17CleanupBuildCacheResult\x12+\n" +
+	"\x11invalidated_count\x18\x01 \x01(\x05R\x10invalidatedCount\x12+\n" +
+	"\x11reclaimable_bytes\x18\x02 \x01(\x03R\x10reclaimableBytes\x12\x1d\n" +
+	"\n" +
+	"object_ids\x18\x03 \x03(\x03R\tobjectIds\"s\n" +
+	"\x15CleanupBuildCacheResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x124\n" +
+	"\x04data\x18\x02 \x01(\v2 .builder.CleanupBuildCacheResultR\x04data\"\xb1\x03\n" +
+	"\x16RegisterBuilderNodeReq\x12\x1b\n" +
+	"\tnode_code\x18\x01 \x01(\tR\bnodeCode\x12\x1b\n" +
+	"\tpool_code\x18\x02 \x01(\tR\bpoolCode\x12\x1a\n" +
+	"\bendpoint\x18\x03 \x01(\tR\bendpoint\x12'\n" +
+	"\x0fmax_concurrency\x18\x04 \x01(\x05R\x0emaxConcurrency\x12!\n" +
+	"\fcpu_capacity\x18\x05 \x01(\x05R\vcpuCapacity\x12'\n" +
+	"\x0fmemory_capacity\x18\x06 \x01(\x03R\x0ememoryCapacity\x12#\n" +
+	"\rdisk_capacity\x18\a \x01(\x03R\fdiskCapacity\x12\x1b\n" +
+	"\tdisk_free\x18\b \x01(\x03R\bdiskFree\x12+\n" +
+	"\x11toolchain_version\x18\t \x01(\tR\x10toolchainVersion\x124\n" +
+	"\x16build_protocol_version\x18\n" +
+	" \x01(\x05R\x14buildProtocolVersion\x12'\n" +
+	"\x0fcapability_json\x18\v \x01(\tR\x0ecapabilityJson\"\xd0\x01\n" +
+	"\x17BuilderNodeHeartbeatReq\x12\x1b\n" +
+	"\tnode_code\x18\x01 \x01(\tR\bnodeCode\x12#\n" +
+	"\rrunning_count\x18\x02 \x01(\x05R\frunningCount\x12\x1b\n" +
+	"\tdisk_free\x18\x03 \x01(\x03R\bdiskFree\x12(\n" +
+	"\x10running_task_ids\x18\x04 \x03(\x03R\x0erunningTaskIds\x12,\n" +
+	"\x12last_error_message\x18\x05 \x01(\tR\x10lastErrorMessage\"^\n" +
+	"\x1aClaimScheduledBuildTaskReq\x12\x1b\n" +
+	"\tnode_code\x18\x01 \x01(\tR\bnodeCode\x12#\n" +
+	"\rlease_seconds\x18\x02 \x01(\x05R\fleaseSeconds\"\x82\x01\n" +
+	"\x13DrainBuilderNodeReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\tnode_code\x18\x02 \x01(\tR\bnodeCode\x12>\n" +
+	"\fdrain_status\x18\x03 \x01(\x0e2\x1b.builder.BuilderDrainStatusR\vdrainStatus\"A\n" +
+	"\x17CancelBuildExecutionReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason\"\xf9\x01\n" +
+	"\x14ResolveBuildCacheReq\x12\x17\n" +
+	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1b\n" +
+	"\tnode_code\x18\x02 \x01(\tR\bnodeCode\x12'\n" +
+	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\x12+\n" +
+	"\x11toolchain_version\x18\x04 \x01(\tR\x10toolchainVersion\x124\n" +
+	"\x16build_protocol_version\x18\x05 \x01(\x05R\x14buildProtocolVersion\x12\x1f\n" +
+	"\vconfirm_hit\x18\x06 \x01(\bR\n" +
+	"confirmHit\"\x9f\x03\n" +
+	"\x14PublishBuildCacheReq\x12\x17\n" +
+	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1b\n" +
+	"\tnode_code\x18\x02 \x01(\tR\bnodeCode\x12'\n" +
+	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\x12+\n" +
+	"\x11toolchain_version\x18\x04 \x01(\tR\x10toolchainVersion\x124\n" +
+	"\x16build_protocol_version\x18\x05 \x01(\x05R\x14buildProtocolVersion\x12,\n" +
+	"\x12artifact_object_id\x18\x06 \x01(\x03R\x10artifactObjectId\x12'\n" +
+	"\x0fartifact_sha256\x18\a \x01(\tR\x0eartifactSha256\x12\x1d\n" +
+	"\n" +
+	"size_bytes\x18\b \x01(\x03R\tsizeBytes\x12\x1f\n" +
+	"\vttl_seconds\x18\t \x01(\x03R\n" +
+	"ttlSeconds\x12.\n" +
+	"\x13artifact_object_key\x18\n" +
+	" \x01(\tR\x11artifactObjectKey\"w\n" +
+	"\x17InvalidateBuildCacheReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x17\n" +
+	"\atask_id\x18\x02 \x01(\x03R\x06taskId\x12\x1b\n" +
+	"\tnode_code\x18\x03 \x01(\tR\bnodeCode\x12\x16\n" +
+	"\x06reason\x18\x04 \x01(\tR\x06reason\"X\n" +
+	"\x14CleanupBuildCacheReq\x12\x14\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12*\n" +
+	"\x11target_free_bytes\x18\x02 \x01(\x03R\x0ftargetFreeBytes\"W\n" +
 	"\x11ClaimBuildTaskReq\x12\x1d\n" +
 	"\n" +
 	"builder_id\x18\x01 \x01(\tR\tbuilderId\x12#\n" +
@@ -1014,7 +2706,7 @@ const file_proto_builder_builder_proto_rawDesc = "" +
 	"\x12certificate_sha256\x18\x01 \x01(\tR\x11certificateSha256\"{\n" +
 	"\x1bValidateSigningMaterialResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x126\n" +
-	"\x04data\x18\x02 \x01(\v2\".builder.SigningMaterialValidationR\x04data*\xec\x01\n" +
+	"\x04data\x18\x02 \x01(\v2\".builder.SigningMaterialValidationR\x04data*\x8d\x02\n" +
 	"\x0fBuildTaskStatus\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_UNKNOWN\x10\x00\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_PENDING\x10\x01\x12\x1e\n" +
@@ -1022,14 +2714,38 @@ const file_proto_builder_builder_proto_rawDesc = "" +
 	"\x19BUILD_TASK_STATUS_SIGNING\x10\x03\x12\x1f\n" +
 	"\x1bBUILD_TASK_STATUS_UPLOADING\x10\x04\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_SUCCESS\x10\x05\x12\x1c\n" +
-	"\x18BUILD_TASK_STATUS_FAILED\x10\x062\xcf\x03\n" +
+	"\x18BUILD_TASK_STATUS_FAILED\x10\x06\x12\x1f\n" +
+	"\x1bBUILD_TASK_STATUS_CANCELLED\x10\a*\x97\x01\n" +
+	"\x11BuilderNodeStatus\x12\x1f\n" +
+	"\x1bBUILDER_NODE_STATUS_UNKNOWN\x10\x00\x12\x1e\n" +
+	"\x1aBUILDER_NODE_STATUS_ONLINE\x10\x01\x12\x1f\n" +
+	"\x1bBUILDER_NODE_STATUS_OFFLINE\x10\x02\x12 \n" +
+	"\x1cBUILDER_NODE_STATUS_ISOLATED\x10\x03*}\n" +
+	"\x12BuilderDrainStatus\x12 \n" +
+	"\x1cBUILDER_DRAIN_STATUS_UNKNOWN\x10\x00\x12\"\n" +
+	"\x1eBUILDER_DRAIN_STATUS_ACCEPTING\x10\x01\x12!\n" +
+	"\x1dBUILDER_DRAIN_STATUS_DRAINING\x10\x02*\x95\x01\n" +
+	"\x10BuildCacheStatus\x12\x1e\n" +
+	"\x1aBUILD_CACHE_STATUS_UNKNOWN\x10\x00\x12\x1d\n" +
+	"\x19BUILD_CACHE_STATUS_ACTIVE\x10\x01\x12\"\n" +
+	"\x1eBUILD_CACHE_STATUS_INVALIDATED\x10\x02\x12\x1e\n" +
+	"\x1aBUILD_CACHE_STATUS_EXPIRED\x10\x032\xc0\t\n" +
 	"\aBuilder\x12d\n" +
 	"\x17ValidateSigningMaterial\x12#.builder.ValidateSigningMaterialReq\x1a$.builder.ValidateSigningMaterialResp\x12D\n" +
 	"\x0eClaimBuildTask\x12\x1a.builder.ClaimBuildTaskReq\x1a\x16.builder.BuildTaskResp\x12G\n" +
 	"\x12HeartbeatBuildTask\x12\x1e.builder.HeartbeatBuildTaskReq\x1a\x11.builder.RespBase\x12I\n" +
 	"\x13ReportBuildProgress\x12\x1f.builder.ReportBuildProgressReq\x1a\x11.builder.RespBase\x12E\n" +
 	"\x11CompleteBuildTask\x12\x1d.builder.CompleteBuildTaskReq\x1a\x11.builder.RespBase\x12=\n" +
-	"\rFailBuildTask\x12\x19.builder.FailBuildTaskReq\x1a\x11.builder.RespBaseB Z\x1eappforge/proto/builder;builderb\x06proto3"
+	"\rFailBuildTask\x12\x19.builder.FailBuildTaskReq\x1a\x11.builder.RespBase\x12P\n" +
+	"\x13RegisterBuilderNode\x12\x1f.builder.RegisterBuilderNodeReq\x1a\x18.builder.BuilderNodeResp\x12R\n" +
+	"\x14BuilderNodeHeartbeat\x12 .builder.BuilderNodeHeartbeatReq\x1a\x18.builder.BuilderNodeResp\x12V\n" +
+	"\x17ClaimScheduledBuildTask\x12#.builder.ClaimScheduledBuildTaskReq\x1a\x16.builder.BuildTaskResp\x12J\n" +
+	"\x10DrainBuilderNode\x12\x1c.builder.DrainBuilderNodeReq\x1a\x18.builder.BuilderNodeResp\x12P\n" +
+	"\x14CancelBuildExecution\x12 .builder.CancelBuildExecutionReq\x1a\x16.builder.BuildTaskResp\x12U\n" +
+	"\x11ResolveBuildCache\x12\x1d.builder.ResolveBuildCacheReq\x1a!.builder.BuildCacheResolutionResp\x12P\n" +
+	"\x11PublishBuildCache\x12\x1d.builder.PublishBuildCacheReq\x1a\x1c.builder.BuildCacheEntryResp\x12V\n" +
+	"\x14InvalidateBuildCache\x12 .builder.InvalidateBuildCacheReq\x1a\x1c.builder.BuildCacheEntryResp\x12R\n" +
+	"\x11CleanupBuildCache\x12\x1d.builder.CleanupBuildCacheReq\x1a\x1e.builder.CleanupBuildCacheRespB Z\x1eappforge/proto/builder;builderb\x06proto3"
 
 var (
 	file_proto_builder_builder_proto_rawDescOnce sync.Once
@@ -1043,48 +2759,101 @@ func file_proto_builder_builder_proto_rawDescGZIP() []byte {
 	return file_proto_builder_builder_proto_rawDescData
 }
 
-var file_proto_builder_builder_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_builder_builder_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_proto_builder_builder_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_proto_builder_builder_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_proto_builder_builder_proto_goTypes = []any{
 	(BuildTaskStatus)(0),                // 0: builder.BuildTaskStatus
-	(*RespBase)(nil),                    // 1: builder.RespBase
-	(*BuildTask)(nil),                   // 2: builder.BuildTask
-	(*ClaimBuildTaskReq)(nil),           // 3: builder.ClaimBuildTaskReq
-	(*BuildTaskResp)(nil),               // 4: builder.BuildTaskResp
-	(*HeartbeatBuildTaskReq)(nil),       // 5: builder.HeartbeatBuildTaskReq
-	(*ReportBuildProgressReq)(nil),      // 6: builder.ReportBuildProgressReq
-	(*CompleteBuildTaskReq)(nil),        // 7: builder.CompleteBuildTaskReq
-	(*FailBuildTaskReq)(nil),            // 8: builder.FailBuildTaskReq
-	(*ValidateSigningMaterialReq)(nil),  // 9: builder.ValidateSigningMaterialReq
-	(*SigningMaterialValidation)(nil),   // 10: builder.SigningMaterialValidation
-	(*ValidateSigningMaterialResp)(nil), // 11: builder.ValidateSigningMaterialResp
-	(*common.RespBase)(nil),             // 12: common.RespBase
+	(BuilderNodeStatus)(0),              // 1: builder.BuilderNodeStatus
+	(BuilderDrainStatus)(0),             // 2: builder.BuilderDrainStatus
+	(BuildCacheStatus)(0),               // 3: builder.BuildCacheStatus
+	(*RespBase)(nil),                    // 4: builder.RespBase
+	(*BuildTask)(nil),                   // 5: builder.BuildTask
+	(*BuilderNode)(nil),                 // 6: builder.BuilderNode
+	(*BuilderNodeResp)(nil),             // 7: builder.BuilderNodeResp
+	(*BuildCacheEntry)(nil),             // 8: builder.BuildCacheEntry
+	(*BuildCacheEntryResp)(nil),         // 9: builder.BuildCacheEntryResp
+	(*BuildCacheArtifact)(nil),          // 10: builder.BuildCacheArtifact
+	(*BuildCacheResolution)(nil),        // 11: builder.BuildCacheResolution
+	(*BuildCacheResolutionResp)(nil),    // 12: builder.BuildCacheResolutionResp
+	(*CleanupBuildCacheResult)(nil),     // 13: builder.CleanupBuildCacheResult
+	(*CleanupBuildCacheResp)(nil),       // 14: builder.CleanupBuildCacheResp
+	(*RegisterBuilderNodeReq)(nil),      // 15: builder.RegisterBuilderNodeReq
+	(*BuilderNodeHeartbeatReq)(nil),     // 16: builder.BuilderNodeHeartbeatReq
+	(*ClaimScheduledBuildTaskReq)(nil),  // 17: builder.ClaimScheduledBuildTaskReq
+	(*DrainBuilderNodeReq)(nil),         // 18: builder.DrainBuilderNodeReq
+	(*CancelBuildExecutionReq)(nil),     // 19: builder.CancelBuildExecutionReq
+	(*ResolveBuildCacheReq)(nil),        // 20: builder.ResolveBuildCacheReq
+	(*PublishBuildCacheReq)(nil),        // 21: builder.PublishBuildCacheReq
+	(*InvalidateBuildCacheReq)(nil),     // 22: builder.InvalidateBuildCacheReq
+	(*CleanupBuildCacheReq)(nil),        // 23: builder.CleanupBuildCacheReq
+	(*ClaimBuildTaskReq)(nil),           // 24: builder.ClaimBuildTaskReq
+	(*BuildTaskResp)(nil),               // 25: builder.BuildTaskResp
+	(*HeartbeatBuildTaskReq)(nil),       // 26: builder.HeartbeatBuildTaskReq
+	(*ReportBuildProgressReq)(nil),      // 27: builder.ReportBuildProgressReq
+	(*CompleteBuildTaskReq)(nil),        // 28: builder.CompleteBuildTaskReq
+	(*FailBuildTaskReq)(nil),            // 29: builder.FailBuildTaskReq
+	(*ValidateSigningMaterialReq)(nil),  // 30: builder.ValidateSigningMaterialReq
+	(*SigningMaterialValidation)(nil),   // 31: builder.SigningMaterialValidation
+	(*ValidateSigningMaterialResp)(nil), // 32: builder.ValidateSigningMaterialResp
+	(*common.RespBase)(nil),             // 33: common.RespBase
 }
 var file_proto_builder_builder_proto_depIdxs = []int32{
-	12, // 0: builder.RespBase.base:type_name -> common.RespBase
+	33, // 0: builder.RespBase.base:type_name -> common.RespBase
 	0,  // 1: builder.BuildTask.status:type_name -> builder.BuildTaskStatus
-	12, // 2: builder.BuildTaskResp.base:type_name -> common.RespBase
-	2,  // 3: builder.BuildTaskResp.data:type_name -> builder.BuildTask
-	0,  // 4: builder.ReportBuildProgressReq.status:type_name -> builder.BuildTaskStatus
-	12, // 5: builder.ValidateSigningMaterialResp.base:type_name -> common.RespBase
-	10, // 6: builder.ValidateSigningMaterialResp.data:type_name -> builder.SigningMaterialValidation
-	9,  // 7: builder.Builder.ValidateSigningMaterial:input_type -> builder.ValidateSigningMaterialReq
-	3,  // 8: builder.Builder.ClaimBuildTask:input_type -> builder.ClaimBuildTaskReq
-	5,  // 9: builder.Builder.HeartbeatBuildTask:input_type -> builder.HeartbeatBuildTaskReq
-	6,  // 10: builder.Builder.ReportBuildProgress:input_type -> builder.ReportBuildProgressReq
-	7,  // 11: builder.Builder.CompleteBuildTask:input_type -> builder.CompleteBuildTaskReq
-	8,  // 12: builder.Builder.FailBuildTask:input_type -> builder.FailBuildTaskReq
-	11, // 13: builder.Builder.ValidateSigningMaterial:output_type -> builder.ValidateSigningMaterialResp
-	4,  // 14: builder.Builder.ClaimBuildTask:output_type -> builder.BuildTaskResp
-	1,  // 15: builder.Builder.HeartbeatBuildTask:output_type -> builder.RespBase
-	1,  // 16: builder.Builder.ReportBuildProgress:output_type -> builder.RespBase
-	1,  // 17: builder.Builder.CompleteBuildTask:output_type -> builder.RespBase
-	1,  // 18: builder.Builder.FailBuildTask:output_type -> builder.RespBase
-	13, // [13:19] is the sub-list for method output_type
-	7,  // [7:13] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	1,  // 2: builder.BuilderNode.status:type_name -> builder.BuilderNodeStatus
+	2,  // 3: builder.BuilderNode.drain_status:type_name -> builder.BuilderDrainStatus
+	33, // 4: builder.BuilderNodeResp.base:type_name -> common.RespBase
+	6,  // 5: builder.BuilderNodeResp.data:type_name -> builder.BuilderNode
+	3,  // 6: builder.BuildCacheEntry.status:type_name -> builder.BuildCacheStatus
+	33, // 7: builder.BuildCacheEntryResp.base:type_name -> common.RespBase
+	8,  // 8: builder.BuildCacheEntryResp.data:type_name -> builder.BuildCacheEntry
+	8,  // 9: builder.BuildCacheResolution.entry:type_name -> builder.BuildCacheEntry
+	10, // 10: builder.BuildCacheResolution.artifact:type_name -> builder.BuildCacheArtifact
+	33, // 11: builder.BuildCacheResolutionResp.base:type_name -> common.RespBase
+	11, // 12: builder.BuildCacheResolutionResp.data:type_name -> builder.BuildCacheResolution
+	33, // 13: builder.CleanupBuildCacheResp.base:type_name -> common.RespBase
+	13, // 14: builder.CleanupBuildCacheResp.data:type_name -> builder.CleanupBuildCacheResult
+	2,  // 15: builder.DrainBuilderNodeReq.drain_status:type_name -> builder.BuilderDrainStatus
+	33, // 16: builder.BuildTaskResp.base:type_name -> common.RespBase
+	5,  // 17: builder.BuildTaskResp.data:type_name -> builder.BuildTask
+	0,  // 18: builder.ReportBuildProgressReq.status:type_name -> builder.BuildTaskStatus
+	33, // 19: builder.ValidateSigningMaterialResp.base:type_name -> common.RespBase
+	31, // 20: builder.ValidateSigningMaterialResp.data:type_name -> builder.SigningMaterialValidation
+	30, // 21: builder.Builder.ValidateSigningMaterial:input_type -> builder.ValidateSigningMaterialReq
+	24, // 22: builder.Builder.ClaimBuildTask:input_type -> builder.ClaimBuildTaskReq
+	26, // 23: builder.Builder.HeartbeatBuildTask:input_type -> builder.HeartbeatBuildTaskReq
+	27, // 24: builder.Builder.ReportBuildProgress:input_type -> builder.ReportBuildProgressReq
+	28, // 25: builder.Builder.CompleteBuildTask:input_type -> builder.CompleteBuildTaskReq
+	29, // 26: builder.Builder.FailBuildTask:input_type -> builder.FailBuildTaskReq
+	15, // 27: builder.Builder.RegisterBuilderNode:input_type -> builder.RegisterBuilderNodeReq
+	16, // 28: builder.Builder.BuilderNodeHeartbeat:input_type -> builder.BuilderNodeHeartbeatReq
+	17, // 29: builder.Builder.ClaimScheduledBuildTask:input_type -> builder.ClaimScheduledBuildTaskReq
+	18, // 30: builder.Builder.DrainBuilderNode:input_type -> builder.DrainBuilderNodeReq
+	19, // 31: builder.Builder.CancelBuildExecution:input_type -> builder.CancelBuildExecutionReq
+	20, // 32: builder.Builder.ResolveBuildCache:input_type -> builder.ResolveBuildCacheReq
+	21, // 33: builder.Builder.PublishBuildCache:input_type -> builder.PublishBuildCacheReq
+	22, // 34: builder.Builder.InvalidateBuildCache:input_type -> builder.InvalidateBuildCacheReq
+	23, // 35: builder.Builder.CleanupBuildCache:input_type -> builder.CleanupBuildCacheReq
+	32, // 36: builder.Builder.ValidateSigningMaterial:output_type -> builder.ValidateSigningMaterialResp
+	25, // 37: builder.Builder.ClaimBuildTask:output_type -> builder.BuildTaskResp
+	4,  // 38: builder.Builder.HeartbeatBuildTask:output_type -> builder.RespBase
+	4,  // 39: builder.Builder.ReportBuildProgress:output_type -> builder.RespBase
+	4,  // 40: builder.Builder.CompleteBuildTask:output_type -> builder.RespBase
+	4,  // 41: builder.Builder.FailBuildTask:output_type -> builder.RespBase
+	7,  // 42: builder.Builder.RegisterBuilderNode:output_type -> builder.BuilderNodeResp
+	7,  // 43: builder.Builder.BuilderNodeHeartbeat:output_type -> builder.BuilderNodeResp
+	25, // 44: builder.Builder.ClaimScheduledBuildTask:output_type -> builder.BuildTaskResp
+	7,  // 45: builder.Builder.DrainBuilderNode:output_type -> builder.BuilderNodeResp
+	25, // 46: builder.Builder.CancelBuildExecution:output_type -> builder.BuildTaskResp
+	12, // 47: builder.Builder.ResolveBuildCache:output_type -> builder.BuildCacheResolutionResp
+	9,  // 48: builder.Builder.PublishBuildCache:output_type -> builder.BuildCacheEntryResp
+	9,  // 49: builder.Builder.InvalidateBuildCache:output_type -> builder.BuildCacheEntryResp
+	14, // 50: builder.Builder.CleanupBuildCache:output_type -> builder.CleanupBuildCacheResp
+	36, // [36:51] is the sub-list for method output_type
+	21, // [21:36] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_proto_builder_builder_proto_init() }
@@ -1097,8 +2866,8 @@ func file_proto_builder_builder_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_builder_builder_proto_rawDesc), len(file_proto_builder_builder_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   11,
+			NumEnums:      4,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

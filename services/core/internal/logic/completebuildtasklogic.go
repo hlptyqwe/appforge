@@ -3,10 +3,12 @@ package logic
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strings"
 
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
+	"appforge/services/core/models"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
@@ -52,12 +54,9 @@ func (l *CompleteBuildTaskLogic) CompleteBuildTask(in *core.CompleteBuildTaskReq
 	}
 
 	err := l.svcCtx.DB.TransactCtx(l.ctx, func(txCtx context.Context, session sqlx.Session) error {
-		var owner struct {
-			TenantID int64 `db:"tenant_id"`
-			AppID    int64 `db:"app_id"`
-		}
-		if err := session.QueryRowCtx(txCtx, &owner, `SELECT tenant_id, app_id FROM t_build_task
-WHERE id = ? AND builder_id = ? AND builder_attempt = ? AND status IN (?, ?, ?) AND lease_until > CURRENT_TIMESTAMP FOR UPDATE`,
+		var task models.TBuildTask
+		if err := session.QueryRowCtx(txCtx, &task, buildTaskSelect+` WHERE id = ? AND builder_id = ? AND builder_attempt = ?
+AND status IN (?, ?, ?) AND lease_until > CURRENT_TIMESTAMP(3) FOR UPDATE`,
 			in.TaskId, in.BuilderId, in.BuilderAttempt, buildStatusBuilding, buildStatusSigning, buildStatusUploading); err != nil {
 			if err == sql.ErrNoRows || err == sqlx.ErrNotFound {
 				return status.Error(codes.NotFound, "build task is not owned by builder or lease has expired")
@@ -70,10 +69,10 @@ WHERE id = ? AND builder_id = ? AND builder_attempt = ? AND status IN (?, ?, ?) 
 			ContentType: "application/vnd.android.package-archive", Size: in.ApkSize,
 			SHA256: strings.TrimSpace(in.ApkSha256), ObjectType: int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK),
 		}
-		if err := validateBuildArtifact(owner.TenantID, apk, "build-apk"); err != nil {
+		if err := validateBuildArtifact(task.TenantId, apk, "build-apk"); err != nil {
 			return err
 		}
-		apkObjectID, err := insertBuildArtifact(txCtx, session, owner.TenantID, owner.AppID, apk)
+		apkObjectID, err := insertBuildArtifact(txCtx, session, task.TenantId, task.AppId, apk)
 		if err != nil {
 			return err
 		}
@@ -84,10 +83,10 @@ WHERE id = ? AND builder_id = ? AND builder_attempt = ? AND status IN (?, ?, ?) 
 				ObjectKey: in.LogObjectKey, OriginalName: "build.log", ContentType: "text/plain; charset=utf-8",
 				Size: in.LogSize, SHA256: strings.TrimSpace(in.LogSha256), ObjectType: int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG),
 			}
-			if err := validateBuildArtifact(owner.TenantID, logArtifact, "build-log"); err != nil {
+			if err := validateBuildArtifact(task.TenantId, logArtifact, "build-log"); err != nil {
 				return err
 			}
-			logObjectID, err = insertBuildArtifact(txCtx, session, owner.TenantID, owner.AppID, logArtifact)
+			logObjectID, err = insertBuildArtifact(txCtx, session, task.TenantId, task.AppId, logArtifact)
 			if err != nil {
 				return err
 			}
@@ -110,7 +109,55 @@ WHERE id = ? AND builder_id = ? AND builder_attempt = ? AND status IN (?, ?, ?) 
 			}
 			return status.Error(codes.NotFound, "build task ownership changed")
 		}
-		return nil
+		if err := releaseTaskSlot(txCtx, session, task.Id, in.BuilderAttempt, buildSlotReleased); err != nil {
+			return err
+		}
+		_, _ = session.ExecCtx(txCtx, `UPDATE t_builder_node SET running_count = GREATEST(running_count - 1, 0),
+update_time = CURRENT_TIMESTAMP(3) WHERE node_code = ?`, in.BuilderId)
+		task.Status = buildStatusSuccess
+		task.ApkObjectId = apkObjectID
+		task.ApkUrl = nullString(in.ApkObjectKey)
+		task.ApkSha256 = nullString(in.ApkSha256)
+		task.ApkSize = in.ApkSize
+		_, entitlement, _, billingErr := loadTenantBilling(txCtx, session, task.TenantId, false)
+		if billingErr != nil {
+			return billingErr
+		}
+		if err := adjustUsageInSession(txCtx, session, task.TenantId, "build.succeeded", 1,
+			"build", task.Id, fmt.Sprintf("build-succeeded:%d", task.Id),
+			map[string]any{"cacheHit": task.CacheHit == 1, "retry": task.RetryOfTaskId > 0}); err != nil {
+			return err
+		}
+		computeSeconds := int64(0)
+		if task.StartTime.Valid {
+			computeSeconds = int64(billingNow().Sub(task.StartTime.Time).Seconds())
+			if computeSeconds < 0 {
+				computeSeconds = 0
+			}
+		}
+		if computeSeconds > 0 {
+			if err := adjustUsageInSession(txCtx, session, task.TenantId, "build.compute_seconds", computeSeconds,
+				"build", task.Id, fmt.Sprintf("build-compute:%d", task.Id), nil); err != nil {
+				return err
+			}
+		}
+		if task.CacheHit == 1 && entitlement.ChargeCacheHit == 0 &&
+			!(task.RetryOfTaskId > 0 && entitlement.ChargeRetryBuild == 0) {
+			if err := adjustUsageInSession(txCtx, session, task.TenantId, "build.started", -1,
+				"build", task.Id, fmt.Sprintf("build-cache-refund:%d", task.Id),
+				map[string]any{"reason": "cache_hit_not_charged"}); err != nil {
+				return err
+			}
+		}
+		if err := insertSchedulerEvent(txCtx, session, &task, in.BuilderId,
+			core.BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_COMPLETED, "BUILD_COMPLETED",
+			map[string]any{"apkObjectId": apkObjectID, "cacheHit": task.CacheHit == 1}); err != nil {
+			return err
+		}
+		_, _, err = insertOutboxEvent(txCtx, session, task.TenantId, "build.succeeded", "build", task.Id,
+			map[string]any{"buildId": task.Id, "appId": task.AppId, "artifactObjectId": apkObjectID,
+				"apkSha256": in.ApkSha256, "apkSize": in.ApkSize, "cacheHit": task.CacheHit == 1})
+		return err
 	})
 	if err != nil {
 		return nil, err

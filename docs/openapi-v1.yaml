@@ -1,0 +1,249 @@
+openapi: 3.1.0
+info:
+  title: AppForge Open API
+  version: 1.0.0
+  description: Tenant-scoped API for APK upload, channel builds, artifacts and attribution statistics.
+servers:
+  - url: https://appforge.example.com/open/v1
+security:
+  - bearerApiKey: []
+tags:
+  - {name: Apps}
+  - {name: Uploads}
+  - {name: Versions}
+  - {name: Channels}
+  - {name: Branding}
+  - {name: Builds}
+  - {name: Artifacts}
+  - {name: Stats}
+paths:
+  /apps:
+    get:
+      tags: [Apps]
+      operationId: listApps
+      x-appforge-scope: apps:read
+      parameters: [{$ref: '#/components/parameters/Cursor'}, {$ref: '#/components/parameters/Limit'}, {name: keyword, in: query, schema: {type: string}}, {name: status, in: query, schema: {type: integer}}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+    post:
+      tags: [Apps]
+      operationId: createApp
+      x-appforge-scope: apps:write
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /apps/{id}:
+    get:
+      tags: [Apps]
+      operationId: getApp
+      x-appforge-scope: apps:read
+      parameters: [{$ref: '#/components/parameters/Id'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /uploads:
+    post:
+      tags: [Uploads]
+      operationId: initiateUpload
+      x-appforge-scope: versions:write
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /uploads/{id}/complete:
+    post:
+      tags: [Uploads]
+      operationId: completeUpload
+      x-appforge-scope: versions:write
+      parameters: [{$ref: '#/components/parameters/Id'}, {$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /versions:
+    get:
+      tags: [Versions]
+      operationId: listVersions
+      x-appforge-scope: versions:read
+      parameters: [{$ref: '#/components/parameters/Cursor'}, {$ref: '#/components/parameters/Limit'}, {$ref: '#/components/parameters/AppId'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+    post:
+      tags: [Versions]
+      operationId: createVersion
+      x-appforge-scope: versions:write
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /versions/{id}:
+    get:
+      tags: [Versions]
+      operationId: getVersion
+      x-appforge-scope: versions:read
+      parameters: [{$ref: '#/components/parameters/Id'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /channels:
+    get:
+      tags: [Channels]
+      operationId: listChannels
+      x-appforge-scope: channels:read
+      parameters: [{$ref: '#/components/parameters/Cursor'}, {$ref: '#/components/parameters/Limit'}, {$ref: '#/components/parameters/AppId'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+    post:
+      tags: [Channels]
+      operationId: createChannel
+      x-appforge-scope: channels:write
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /channels/{id}:
+    get:
+      tags: [Channels]
+      operationId: getChannel
+      x-appforge-scope: channels:read
+      parameters: [{$ref: '#/components/parameters/Id'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /branding-profiles:
+    get:
+      tags: [Branding]
+      operationId: listBrandingProfiles
+      x-appforge-scope: branding:read
+      parameters: [{$ref: '#/components/parameters/Cursor'}, {$ref: '#/components/parameters/Limit'}, {$ref: '#/components/parameters/AppId'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+    post:
+      tags: [Branding]
+      operationId: createBrandingProfile
+      x-appforge-scope: branding:write
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /branding-profiles/{id}:
+    get:
+      tags: [Branding]
+      operationId: getBrandingProfile
+      x-appforge-scope: branding:read
+      parameters: [{$ref: '#/components/parameters/Id'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+    put:
+      tags: [Branding]
+      operationId: updateBrandingProfile
+      x-appforge-scope: branding:write
+      parameters: [{$ref: '#/components/parameters/Id'}, {$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /white-label/products:
+    get:
+      tags: [Branding]
+      operationId: listWhiteLabelProducts
+      x-appforge-scope: branding:read
+      parameters: [{$ref: '#/components/parameters/Cursor'}, {$ref: '#/components/parameters/Limit'}, {$ref: '#/components/parameters/AppId'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+    post:
+      tags: [Branding]
+      operationId: createWhiteLabelProduct
+      x-appforge-scope: branding:write
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /white-label/products/{id}:
+    get:
+      tags: [Branding]
+      operationId: getWhiteLabelProduct
+      x-appforge-scope: branding:read
+      parameters: [{$ref: '#/components/parameters/Id'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+    put:
+      tags: [Branding]
+      operationId: updateWhiteLabelProduct
+      x-appforge-scope: branding:write
+      parameters: [{$ref: '#/components/parameters/Id'}, {$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /builds:
+    get:
+      tags: [Builds]
+      operationId: listBuilds
+      x-appforge-scope: builds:read
+      parameters: [{$ref: '#/components/parameters/Cursor'}, {$ref: '#/components/parameters/Limit'}, {$ref: '#/components/parameters/AppId'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+    post:
+      tags: [Builds]
+      operationId: createBuild
+      x-appforge-scope: builds:write
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /builds/{id}:
+    get:
+      tags: [Builds]
+      operationId: getBuild
+      x-appforge-scope: builds:read
+      parameters: [{$ref: '#/components/parameters/Id'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /builds/{id}/cancel:
+    post:
+      tags: [Builds]
+      operationId: cancelBuild
+      x-appforge-scope: builds:write
+      parameters: [{$ref: '#/components/parameters/Id'}, {$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /builds/{id}/retry:
+    post:
+      tags: [Builds]
+      operationId: retryBuild
+      x-appforge-scope: builds:write
+      parameters: [{$ref: '#/components/parameters/Id'}, {$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /artifacts/{id}/download:
+    get:
+      tags: [Artifacts]
+      operationId: getArtifactDownload
+      x-appforge-scope: artifacts:read
+      parameters: [{$ref: '#/components/parameters/Id'}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+  /stats/channels:
+    get:
+      tags: [Stats]
+      operationId: getChannelStats
+      x-appforge-scope: stats:read
+      parameters: [{$ref: '#/components/parameters/AppId'}, {name: channelId, in: query, schema: {type: integer, format: int64}}, {name: startTime, in: query, schema: {type: integer, format: int64}}, {name: endTime, in: query, schema: {type: integer, format: int64}}]
+      responses: {'200': {$ref: '#/components/responses/Success'}, default: {$ref: '#/components/responses/Error'}}
+components:
+  securitySchemes:
+    bearerApiKey: {type: http, scheme: bearer, bearerFormat: afk_keyId_secret}
+  parameters:
+    Id: {name: id, in: path, required: true, schema: {type: integer, format: int64, minimum: 1}}
+    AppId: {name: appId, in: query, required: true, schema: {type: integer, format: int64, minimum: 1}}
+    Cursor: {name: cursor, in: query, schema: {type: integer, format: int64, minimum: 0, default: 0}}
+    Limit: {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 200, default: 20}}
+    IdempotencyKey: {name: Idempotency-Key, in: header, required: true, schema: {type: string, minLength: 8, maxLength: 128}}
+  requestBodies:
+    JsonBody:
+      required: true
+      content: {application/json: {schema: {type: object, additionalProperties: true}}}
+  responses:
+    Success:
+      description: Successful response; list operations include cursor fields.
+      headers:
+        X-Request-Id: {schema: {type: string}}
+        X-RateLimit-Limit: {schema: {type: integer}}
+        X-RateLimit-Remaining: {schema: {type: integer}}
+        X-RateLimit-Reset: {schema: {type: integer}}
+        Idempotent-Replayed: {schema: {type: boolean}}
+      content: {application/json: {schema: {$ref: '#/components/schemas/Envelope'}}}
+    Error:
+      description: Structured API error
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+  schemas:
+    Envelope:
+      type: object
+      required: [code, msg, data]
+      properties:
+        code: {type: integer, example: 200}
+        msg: {type: string, example: OK}
+        total: {type: integer, format: int64}
+        hasNext: {type: boolean}
+        nextCursor: {type: integer, format: int64}
+        data: {}
+    Error:
+      type: object
+      required: [code, message, requestId]
+      properties:
+        code: {type: string, example: INVALID_ARGUMENT}
+        message: {type: string}
+        requestId: {type: string}

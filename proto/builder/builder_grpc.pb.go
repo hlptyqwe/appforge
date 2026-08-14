@@ -25,6 +25,15 @@ const (
 	Builder_ReportBuildProgress_FullMethodName     = "/builder.Builder/ReportBuildProgress"
 	Builder_CompleteBuildTask_FullMethodName       = "/builder.Builder/CompleteBuildTask"
 	Builder_FailBuildTask_FullMethodName           = "/builder.Builder/FailBuildTask"
+	Builder_RegisterBuilderNode_FullMethodName     = "/builder.Builder/RegisterBuilderNode"
+	Builder_BuilderNodeHeartbeat_FullMethodName    = "/builder.Builder/BuilderNodeHeartbeat"
+	Builder_ClaimScheduledBuildTask_FullMethodName = "/builder.Builder/ClaimScheduledBuildTask"
+	Builder_DrainBuilderNode_FullMethodName        = "/builder.Builder/DrainBuilderNode"
+	Builder_CancelBuildExecution_FullMethodName    = "/builder.Builder/CancelBuildExecution"
+	Builder_ResolveBuildCache_FullMethodName       = "/builder.Builder/ResolveBuildCache"
+	Builder_PublishBuildCache_FullMethodName       = "/builder.Builder/PublishBuildCache"
+	Builder_InvalidateBuildCache_FullMethodName    = "/builder.Builder/InvalidateBuildCache"
+	Builder_CleanupBuildCache_FullMethodName       = "/builder.Builder/CleanupBuildCache"
 )
 
 // BuilderClient is the client API for Builder service.
@@ -38,6 +47,24 @@ type BuilderClient interface {
 	ReportBuildProgress(ctx context.Context, in *ReportBuildProgressReq, opts ...grpc.CallOption) (*RespBase, error)
 	CompleteBuildTask(ctx context.Context, in *CompleteBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
 	FailBuildTask(ctx context.Context, in *FailBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 注册或刷新V4 Builder节点及能力。
+	RegisterBuilderNode(ctx context.Context, in *RegisterBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+	// 上报V4 Builder节点心跳和容量。
+	BuilderNodeHeartbeat(ctx context.Context, in *BuilderNodeHeartbeatReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+	// 结合节点能力、公平队列和并发槽位领取V4构建任务。
+	ClaimScheduledBuildTask(ctx context.Context, in *ClaimScheduledBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+	// 修改V4 Builder节点排空状态。
+	DrainBuilderNode(ctx context.Context, in *DrainBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error)
+	// 取消V4构建执行并推进fencing代次。
+	CancelBuildExecution(ctx context.Context, in *CancelBuildExecutionReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+	// 解析V4输入可寻址构建缓存。
+	ResolveBuildCache(ctx context.Context, in *ResolveBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheResolutionResp, error)
+	// 发布V4独立构建缓存产物。
+	PublishBuildCache(ctx context.Context, in *PublishBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error)
+	// 失效损坏或不再可信的V4构建缓存。
+	InvalidateBuildCache(ctx context.Context, in *InvalidateBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error)
+	// 执行V4构建缓存TTL/LRU清理。
+	CleanupBuildCache(ctx context.Context, in *CleanupBuildCacheReq, opts ...grpc.CallOption) (*CleanupBuildCacheResp, error)
 }
 
 type builderClient struct {
@@ -108,6 +135,96 @@ func (c *builderClient) FailBuildTask(ctx context.Context, in *FailBuildTaskReq,
 	return out, nil
 }
 
+func (c *builderClient) RegisterBuilderNode(ctx context.Context, in *RegisterBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuilderNodeResp)
+	err := c.cc.Invoke(ctx, Builder_RegisterBuilderNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *builderClient) BuilderNodeHeartbeat(ctx context.Context, in *BuilderNodeHeartbeatReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuilderNodeResp)
+	err := c.cc.Invoke(ctx, Builder_BuilderNodeHeartbeat_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *builderClient) ClaimScheduledBuildTask(ctx context.Context, in *ClaimScheduledBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildTaskResp)
+	err := c.cc.Invoke(ctx, Builder_ClaimScheduledBuildTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *builderClient) DrainBuilderNode(ctx context.Context, in *DrainBuilderNodeReq, opts ...grpc.CallOption) (*BuilderNodeResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuilderNodeResp)
+	err := c.cc.Invoke(ctx, Builder_DrainBuilderNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *builderClient) CancelBuildExecution(ctx context.Context, in *CancelBuildExecutionReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildTaskResp)
+	err := c.cc.Invoke(ctx, Builder_CancelBuildExecution_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *builderClient) ResolveBuildCache(ctx context.Context, in *ResolveBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheResolutionResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildCacheResolutionResp)
+	err := c.cc.Invoke(ctx, Builder_ResolveBuildCache_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *builderClient) PublishBuildCache(ctx context.Context, in *PublishBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildCacheEntryResp)
+	err := c.cc.Invoke(ctx, Builder_PublishBuildCache_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *builderClient) InvalidateBuildCache(ctx context.Context, in *InvalidateBuildCacheReq, opts ...grpc.CallOption) (*BuildCacheEntryResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildCacheEntryResp)
+	err := c.cc.Invoke(ctx, Builder_InvalidateBuildCache_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *builderClient) CleanupBuildCache(ctx context.Context, in *CleanupBuildCacheReq, opts ...grpc.CallOption) (*CleanupBuildCacheResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CleanupBuildCacheResp)
+	err := c.cc.Invoke(ctx, Builder_CleanupBuildCache_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BuilderServer is the server API for Builder service.
 // All implementations must embed UnimplementedBuilderServer
 // for forward compatibility.
@@ -119,6 +236,24 @@ type BuilderServer interface {
 	ReportBuildProgress(context.Context, *ReportBuildProgressReq) (*RespBase, error)
 	CompleteBuildTask(context.Context, *CompleteBuildTaskReq) (*RespBase, error)
 	FailBuildTask(context.Context, *FailBuildTaskReq) (*RespBase, error)
+	// 注册或刷新V4 Builder节点及能力。
+	RegisterBuilderNode(context.Context, *RegisterBuilderNodeReq) (*BuilderNodeResp, error)
+	// 上报V4 Builder节点心跳和容量。
+	BuilderNodeHeartbeat(context.Context, *BuilderNodeHeartbeatReq) (*BuilderNodeResp, error)
+	// 结合节点能力、公平队列和并发槽位领取V4构建任务。
+	ClaimScheduledBuildTask(context.Context, *ClaimScheduledBuildTaskReq) (*BuildTaskResp, error)
+	// 修改V4 Builder节点排空状态。
+	DrainBuilderNode(context.Context, *DrainBuilderNodeReq) (*BuilderNodeResp, error)
+	// 取消V4构建执行并推进fencing代次。
+	CancelBuildExecution(context.Context, *CancelBuildExecutionReq) (*BuildTaskResp, error)
+	// 解析V4输入可寻址构建缓存。
+	ResolveBuildCache(context.Context, *ResolveBuildCacheReq) (*BuildCacheResolutionResp, error)
+	// 发布V4独立构建缓存产物。
+	PublishBuildCache(context.Context, *PublishBuildCacheReq) (*BuildCacheEntryResp, error)
+	// 失效损坏或不再可信的V4构建缓存。
+	InvalidateBuildCache(context.Context, *InvalidateBuildCacheReq) (*BuildCacheEntryResp, error)
+	// 执行V4构建缓存TTL/LRU清理。
+	CleanupBuildCache(context.Context, *CleanupBuildCacheReq) (*CleanupBuildCacheResp, error)
 	mustEmbedUnimplementedBuilderServer()
 }
 
@@ -146,6 +281,33 @@ func (UnimplementedBuilderServer) CompleteBuildTask(context.Context, *CompleteBu
 }
 func (UnimplementedBuilderServer) FailBuildTask(context.Context, *FailBuildTaskReq) (*RespBase, error) {
 	return nil, status.Error(codes.Unimplemented, "method FailBuildTask not implemented")
+}
+func (UnimplementedBuilderServer) RegisterBuilderNode(context.Context, *RegisterBuilderNodeReq) (*BuilderNodeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegisterBuilderNode not implemented")
+}
+func (UnimplementedBuilderServer) BuilderNodeHeartbeat(context.Context, *BuilderNodeHeartbeatReq) (*BuilderNodeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method BuilderNodeHeartbeat not implemented")
+}
+func (UnimplementedBuilderServer) ClaimScheduledBuildTask(context.Context, *ClaimScheduledBuildTaskReq) (*BuildTaskResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ClaimScheduledBuildTask not implemented")
+}
+func (UnimplementedBuilderServer) DrainBuilderNode(context.Context, *DrainBuilderNodeReq) (*BuilderNodeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method DrainBuilderNode not implemented")
+}
+func (UnimplementedBuilderServer) CancelBuildExecution(context.Context, *CancelBuildExecutionReq) (*BuildTaskResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelBuildExecution not implemented")
+}
+func (UnimplementedBuilderServer) ResolveBuildCache(context.Context, *ResolveBuildCacheReq) (*BuildCacheResolutionResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResolveBuildCache not implemented")
+}
+func (UnimplementedBuilderServer) PublishBuildCache(context.Context, *PublishBuildCacheReq) (*BuildCacheEntryResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method PublishBuildCache not implemented")
+}
+func (UnimplementedBuilderServer) InvalidateBuildCache(context.Context, *InvalidateBuildCacheReq) (*BuildCacheEntryResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method InvalidateBuildCache not implemented")
+}
+func (UnimplementedBuilderServer) CleanupBuildCache(context.Context, *CleanupBuildCacheReq) (*CleanupBuildCacheResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CleanupBuildCache not implemented")
 }
 func (UnimplementedBuilderServer) mustEmbedUnimplementedBuilderServer() {}
 func (UnimplementedBuilderServer) testEmbeddedByValue()                 {}
@@ -276,6 +438,168 @@ func _Builder_FailBuildTask_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Builder_RegisterBuilderNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterBuilderNodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuilderServer).RegisterBuilderNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Builder_RegisterBuilderNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuilderServer).RegisterBuilderNode(ctx, req.(*RegisterBuilderNodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Builder_BuilderNodeHeartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuilderNodeHeartbeatReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuilderServer).BuilderNodeHeartbeat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Builder_BuilderNodeHeartbeat_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuilderServer).BuilderNodeHeartbeat(ctx, req.(*BuilderNodeHeartbeatReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Builder_ClaimScheduledBuildTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClaimScheduledBuildTaskReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuilderServer).ClaimScheduledBuildTask(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Builder_ClaimScheduledBuildTask_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuilderServer).ClaimScheduledBuildTask(ctx, req.(*ClaimScheduledBuildTaskReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Builder_DrainBuilderNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DrainBuilderNodeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuilderServer).DrainBuilderNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Builder_DrainBuilderNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuilderServer).DrainBuilderNode(ctx, req.(*DrainBuilderNodeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Builder_CancelBuildExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelBuildExecutionReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuilderServer).CancelBuildExecution(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Builder_CancelBuildExecution_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuilderServer).CancelBuildExecution(ctx, req.(*CancelBuildExecutionReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Builder_ResolveBuildCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveBuildCacheReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuilderServer).ResolveBuildCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Builder_ResolveBuildCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuilderServer).ResolveBuildCache(ctx, req.(*ResolveBuildCacheReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Builder_PublishBuildCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PublishBuildCacheReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuilderServer).PublishBuildCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Builder_PublishBuildCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuilderServer).PublishBuildCache(ctx, req.(*PublishBuildCacheReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Builder_InvalidateBuildCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InvalidateBuildCacheReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuilderServer).InvalidateBuildCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Builder_InvalidateBuildCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuilderServer).InvalidateBuildCache(ctx, req.(*InvalidateBuildCacheReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Builder_CleanupBuildCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CleanupBuildCacheReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuilderServer).CleanupBuildCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Builder_CleanupBuildCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuilderServer).CleanupBuildCache(ctx, req.(*CleanupBuildCacheReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Builder_ServiceDesc is the grpc.ServiceDesc for Builder service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -306,6 +630,42 @@ var Builder_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FailBuildTask",
 			Handler:    _Builder_FailBuildTask_Handler,
+		},
+		{
+			MethodName: "RegisterBuilderNode",
+			Handler:    _Builder_RegisterBuilderNode_Handler,
+		},
+		{
+			MethodName: "BuilderNodeHeartbeat",
+			Handler:    _Builder_BuilderNodeHeartbeat_Handler,
+		},
+		{
+			MethodName: "ClaimScheduledBuildTask",
+			Handler:    _Builder_ClaimScheduledBuildTask_Handler,
+		},
+		{
+			MethodName: "DrainBuilderNode",
+			Handler:    _Builder_DrainBuilderNode_Handler,
+		},
+		{
+			MethodName: "CancelBuildExecution",
+			Handler:    _Builder_CancelBuildExecution_Handler,
+		},
+		{
+			MethodName: "ResolveBuildCache",
+			Handler:    _Builder_ResolveBuildCache_Handler,
+		},
+		{
+			MethodName: "PublishBuildCache",
+			Handler:    _Builder_PublishBuildCache_Handler,
+		},
+		{
+			MethodName: "InvalidateBuildCache",
+			Handler:    _Builder_InvalidateBuildCache_Handler,
+		},
+		{
+			MethodName: "CleanupBuildCache",
+			Handler:    _Builder_CleanupBuildCache_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

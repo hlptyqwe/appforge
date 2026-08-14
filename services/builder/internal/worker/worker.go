@@ -13,24 +13,34 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"appforge/common/secretbox"
+	"appforge/common/secretprovider"
 	"appforge/common/storage"
 	"appforge/proto/builder"
 	"appforge/proto/core"
 	"appforge/services/builder/internal/config"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Worker continuously claims and executes APK repackaging tasks.
 type Worker struct {
-	config  config.Config
-	builder builder.BuilderClient
-	core    core.CoreClient
-	store   storage.ObjectStore
-	secrets *secretbox.Box
+	config   config.Config
+	builder  builder.BuilderClient
+	core     core.CoreClient
+	store    storage.ObjectStore
+	secrets  *secretbox.Box
+	provider *secretprovider.Resolver
+	activeMu sync.RWMutex
+	active   map[int64]struct{}
+	activeWG sync.WaitGroup
 }
 
 func New(c config.Config, builderClient builder.BuilderClient, coreClient core.CoreClient) (*Worker, error) {
@@ -42,6 +52,27 @@ func New(c config.Config, builderClient builder.BuilderClient, coreClient core.C
 	}
 	if c.Builder.PollInterval <= 0 {
 		c.Builder.PollInterval = 2 * time.Second
+	}
+	if strings.TrimSpace(c.Builder.PoolCode) == "" {
+		c.Builder.PoolCode = "default"
+	}
+	if c.Builder.MaxConcurrency <= 0 || c.Builder.MaxConcurrency > 64 {
+		c.Builder.MaxConcurrency = 1
+	}
+	if c.Builder.NodeHeartbeat <= 0 {
+		c.Builder.NodeHeartbeat = 15 * time.Second
+	}
+	if strings.TrimSpace(c.Builder.ToolchainVersion) == "" {
+		c.Builder.ToolchainVersion = "android-builder-v4"
+	}
+	if c.Builder.BuildProtocolVersion <= 0 {
+		c.Builder.BuildProtocolVersion = 1
+	}
+	if strings.TrimSpace(c.Builder.CapabilityJson) == "" {
+		c.Builder.CapabilityJson = `{"apk":true,"branding":true,"whiteLabel":true,"cache":true}`
+	}
+	if c.Builder.CacheTtl <= 0 {
+		c.Builder.CacheTtl = 7 * 24 * time.Hour
 	}
 	if strings.TrimSpace(c.Builder.TempDir) == "" {
 		c.Builder.TempDir = os.TempDir()
@@ -63,7 +94,42 @@ func New(c config.Config, builderClient builder.BuilderClient, coreClient core.C
 	if err != nil {
 		return nil, fmt.Errorf("initialize signing secrets: %w", err)
 	}
-	return &Worker{config: c, builder: builderClient, core: coreClient, store: store, secrets: secrets}, nil
+	providers := make([]secretprovider.Provider, 0, 3)
+	if strings.TrimSpace(c.SecretProviders.LocalRoot) != "" {
+		provider, providerErr := secretprovider.NewLocalFileProvider(c.SecretProviders.LocalRoot)
+		if providerErr != nil {
+			return nil, fmt.Errorf("initialize local Secret provider: %w", providerErr)
+		}
+		providers = append(providers, provider)
+	}
+	if strings.TrimSpace(c.SecretProviders.KubernetesRoot) != "" {
+		provider, providerErr := secretprovider.NewKubernetesFileProvider(c.SecretProviders.KubernetesRoot)
+		if providerErr != nil {
+			return nil, fmt.Errorf("initialize Kubernetes Secret provider: %w", providerErr)
+		}
+		providers = append(providers, provider)
+	}
+	if strings.TrimSpace(c.SecretProviders.Vault.Address) != "" {
+		provider, providerErr := secretprovider.NewVaultProvider(c.SecretProviders.Vault.Address,
+			c.SecretProviders.Vault.TokenFile, c.SecretProviders.Vault.Namespace, nil, c.SecretProviders.Vault.AllowHTTP)
+		if providerErr != nil {
+			return nil, fmt.Errorf("initialize Vault Secret provider: %w", providerErr)
+		}
+		providers = append(providers, provider)
+	}
+	if strings.TrimSpace(c.SecretProviders.AWS.Region) != "" {
+		provider, providerErr := secretprovider.NewAWSSecretsManagerProvider(context.Background(),
+			c.SecretProviders.AWS.Region, c.SecretProviders.AWS.Endpoint)
+		if providerErr != nil {
+			return nil, fmt.Errorf("initialize AWS Secrets Manager provider: %w", providerErr)
+		}
+		providers = append(providers, provider)
+	}
+	resolver, err := secretprovider.New(c.SecretProviders.MaxSecretBytes, providers...)
+	if err != nil {
+		return nil, fmt.Errorf("initialize enterprise Secret resolver: %w", err)
+	}
+	return &Worker{config: c, builder: builderClient, core: coreClient, store: store, secrets: secrets, provider: resolver, active: make(map[int64]struct{})}, nil
 }
 
 // Run blocks until ctx is cancelled.
@@ -71,18 +137,45 @@ func (w *Worker) Run(ctx context.Context) error {
 	if err := os.MkdirAll(w.config.Builder.TempDir, 0o700); err != nil {
 		return fmt.Errorf("create worker temp directory: %w", err)
 	}
-	var cleanup sync.WaitGroup
-	cleanup.Add(1)
-	go func() {
-		defer cleanup.Done()
-		w.cleanupLoop(ctx)
-	}()
-	defer cleanup.Wait()
 	for {
-		if err := ctx.Err(); err != nil {
+		if err := w.registerNode(ctx); err == nil {
+			break
+		} else {
+			log.Printf("register builder node failed, retrying: %v", err)
+		}
+		if !waitContext(ctx, 2*time.Second) {
 			return nil
 		}
-		handledPreflight, preflightErr := w.claimAndExecutePreflight(ctx)
+	}
+	workCtx, cancelWork := context.WithCancel(context.Background())
+	defer cancelWork()
+	var background sync.WaitGroup
+	background.Add(2)
+	go func() {
+		defer background.Done()
+		w.cleanupLoop(ctx)
+	}()
+	go func() {
+		defer background.Done()
+		w.nodeHeartbeatLoop(ctx)
+	}()
+	defer background.Wait()
+	for {
+		if err := ctx.Err(); err != nil {
+			w.gracefulShutdown(cancelWork)
+			return nil
+		}
+		if w.activeCount() >= int(w.config.Builder.MaxConcurrency) {
+			if !waitContext(ctx, w.config.Builder.PollInterval) {
+				continue
+			}
+			continue
+		}
+		handledPreflight := false
+		var preflightErr error
+		if w.activeCount() == 0 {
+			handledPreflight, preflightErr = w.claimAndExecutePreflight(ctx)
+		}
 		if preflightErr != nil {
 			log.Printf("execute branding preflight failed: %v", preflightErr)
 		}
@@ -90,8 +183,8 @@ func (w *Worker) Run(ctx context.Context) error {
 			continue
 		}
 		claimCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
-		response, err := w.builder.ClaimBuildTask(claimCtx, &builder.ClaimBuildTaskReq{
-			BuilderId: w.config.Builder.Id, LeaseSeconds: w.config.Builder.LeaseSeconds,
+		response, err := w.builder.ClaimScheduledBuildTask(claimCtx, &builder.ClaimScheduledBuildTaskReq{
+			NodeCode: w.config.Builder.Id, LeaseSeconds: w.config.Builder.LeaseSeconds,
 		})
 		cancel()
 		if err != nil {
@@ -107,13 +200,124 @@ func (w *Worker) Run(ctx context.Context) error {
 			}
 			continue
 		}
-		if err := w.execute(ctx, response.Data); err != nil {
-			log.Printf("build task %d finished with error: %v", response.Data.Id, err)
+		task := response.Data
+		w.addActive(task.Id)
+		w.activeWG.Add(1)
+		go func() {
+			defer w.activeWG.Done()
+			defer w.removeActive(task.Id)
+			if err := w.execute(workCtx, task); err != nil {
+				log.Printf("build task %d finished with error: %v", task.Id, err)
+			}
+		}()
+	}
+}
+
+func (w *Worker) activeCount() int {
+	w.activeMu.RLock()
+	defer w.activeMu.RUnlock()
+	return len(w.active)
+}
+
+func (w *Worker) activeTaskIDs() []int64 {
+	w.activeMu.RLock()
+	defer w.activeMu.RUnlock()
+	result := make([]int64, 0, len(w.active))
+	for id := range w.active {
+		result = append(result, id)
+	}
+	return result
+}
+
+func (w *Worker) addActive(id int64) {
+	w.activeMu.Lock()
+	defer w.activeMu.Unlock()
+	w.active[id] = struct{}{}
+}
+
+func (w *Worker) removeActive(id int64) {
+	w.activeMu.Lock()
+	defer w.activeMu.Unlock()
+	delete(w.active, id)
+}
+
+func (w *Worker) diskCapacity() (int64, int64) {
+	var info syscall.Statfs_t
+	if err := syscall.Statfs(w.config.Builder.TempDir, &info); err != nil {
+		return 0, 0
+	}
+	return int64(info.Blocks) * int64(info.Bsize), int64(info.Bavail) * int64(info.Bsize)
+}
+
+func (w *Worker) registerNode(ctx context.Context) error {
+	capacity, free := w.diskCapacity()
+	endpoint := strings.TrimSpace(w.config.Builder.Endpoint)
+	if endpoint == "" {
+		endpoint, _ = os.Hostname()
+	}
+	registerCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
+	_, err := w.builder.RegisterBuilderNode(registerCtx, &builder.RegisterBuilderNodeReq{
+		NodeCode: w.config.Builder.Id, PoolCode: w.config.Builder.PoolCode, Endpoint: endpoint,
+		MaxConcurrency: w.config.Builder.MaxConcurrency, CpuCapacity: int32(runtime.NumCPU() * 1000),
+		DiskCapacity: capacity, DiskFree: free, ToolchainVersion: w.config.Builder.ToolchainVersion,
+		BuildProtocolVersion: w.config.Builder.BuildProtocolVersion, CapabilityJson: w.config.Builder.CapabilityJson,
+	})
+	return err
+}
+
+func (w *Worker) nodeHeartbeatLoop(ctx context.Context) {
+	w.sendNodeHeartbeat(ctx)
+	ticker := time.NewTicker(w.config.Builder.NodeHeartbeat)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			w.sendNodeHeartbeat(ctx)
 		}
 	}
 }
 
+func (w *Worker) sendNodeHeartbeat(ctx context.Context) {
+	_, free := w.diskCapacity()
+	heartbeatCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	_, err := w.builder.BuilderNodeHeartbeat(heartbeatCtx, &builder.BuilderNodeHeartbeatReq{
+		NodeCode: w.config.Builder.Id, RunningCount: int32(w.activeCount()), DiskFree: free,
+		RunningTaskIds: w.activeTaskIDs(),
+	})
+	if err != nil && ctx.Err() == nil {
+		log.Printf("builder node heartbeat failed: %v", err)
+	}
+}
+
+func (w *Worker) gracefulShutdown(cancelWork context.CancelFunc) {
+	drainCtx, cancelDrain := context.WithTimeout(context.Background(), 15*time.Second)
+	_, err := w.builder.DrainBuilderNode(drainCtx, &builder.DrainBuilderNodeReq{
+		NodeCode: w.config.Builder.Id, DrainStatus: builder.BuilderDrainStatus_BUILDER_DRAIN_STATUS_DRAINING,
+	})
+	cancelDrain()
+	if err != nil {
+		log.Printf("drain builder node failed: %v", err)
+	}
+	done := make(chan struct{})
+	go func() {
+		w.activeWG.Wait()
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Minute):
+		log.Printf("builder shutdown grace period expired; cancelling %d active tasks", w.activeCount())
+		cancelWork()
+		<-done
+	}
+}
+
 func (w *Worker) cleanupLoop(ctx context.Context) {
+	w.cleanupBuildCaches(ctx)
 	w.cleanupExpiredObjects(ctx)
 	ticker := time.NewTicker(w.config.ObjectCleanup.Interval)
 	defer ticker.Stop()
@@ -122,8 +326,36 @@ func (w *Worker) cleanupLoop(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
+			w.cleanupBuildCaches(ctx)
 			w.cleanupExpiredObjects(ctx)
 		}
+	}
+}
+
+func (w *Worker) cleanupBuildCaches(ctx context.Context) {
+	capacity, free := w.diskCapacity()
+	targetFreeBytes := int64(0)
+	minimumFree := int64(1024 * 1024 * 1024)
+	if capacity > 0 && capacity/10 > minimumFree {
+		minimumFree = capacity / 10
+	}
+	if capacity > 0 && free < minimumFree {
+		targetFreeBytes = minimumFree - free
+	}
+	cleanupCtx, cancel := context.WithTimeout(ctx, time.Minute)
+	defer cancel()
+	response, err := w.builder.CleanupBuildCache(cleanupCtx, &builder.CleanupBuildCacheReq{
+		Limit: w.config.ObjectCleanup.BatchSize, TargetFreeBytes: targetFreeBytes,
+	})
+	if err != nil {
+		if ctx.Err() == nil {
+			log.Printf("cleanup build cache failed: %v", err)
+		}
+		return
+	}
+	if data := response.GetData(); data.GetInvalidatedCount() > 0 {
+		log.Printf("build cache cleanup completed: invalidated=%d reclaimable_bytes=%d released_objects=%d",
+			data.GetInvalidatedCount(), data.GetReclaimableBytes(), len(data.GetObjectIds()))
 	}
 }
 
@@ -218,11 +450,6 @@ func (w *Worker) execute(parent context.Context, task *builder.BuildTask) error 
 		return w.fail(ctx, task, logPath, 0, fmt.Errorf("load execution context: %w", err))
 	}
 	data := execution.Data
-	if strings.TrimSpace(data.SecretRef) != "" {
-		closeLog()
-		return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("external secret references are not configured for this worker"))
-	}
-
 	sourcePath := filepath.Join(workDir, "source.apk")
 	keystorePath := filepath.Join(workDir, "signing.keystore")
 	if err := w.downloadVerified(ctx, data.SourceApk, sourcePath); err != nil {
@@ -299,21 +526,87 @@ func (w *Worker) execute(parent context.Context, task *builder.BuildTask) error 
 		VersionCode: data.Task.VersionCode, VersionName: data.Task.VersionName,
 		BuildTime: time.Now().UTC().Format(time.RFC3339),
 	}
-	unsignedPath := filepath.Join(workDir, "unsigned.apk")
-	if branding == nil {
-		if err := injectChannelAsset(sourcePath, unsignedPath, payload); err != nil {
-			closeLog()
-			return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+	intermediatePath := sourcePath
+	cacheHit := false
+	if branding != nil && strings.TrimSpace(task.CacheKey) != "" {
+		cacheResp, cacheErr := w.builder.ResolveBuildCache(ctx, &builder.ResolveBuildCacheReq{
+			TaskId: task.Id, NodeCode: w.config.Builder.Id, BuilderAttempt: task.BuilderAttempt,
+			ToolchainVersion:     w.config.Builder.ToolchainVersion,
+			BuildProtocolVersion: w.config.Builder.BuildProtocolVersion,
+		})
+		if cacheErr != nil {
+			w.writeLog(logFile, "cache resolve skipped: %v", cacheErr)
+		} else if cacheResp.GetData().GetHit() && cacheResp.GetData().GetArtifact() != nil {
+			entry := cacheResp.GetData().GetEntry()
+			artifact := cacheResp.GetData().GetArtifact()
+			candidate := filepath.Join(workDir, "cached-intermediate.apk")
+			downloadErr := w.downloadVerified(ctx, &core.StorageObject{
+				Id: artifact.GetId(), TenantId: data.Task.TenantId,
+				ObjectType: core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_CACHE,
+				ObjectKey:  artifact.GetObjectKey(), OriginalName: artifact.GetOriginalName(),
+				ContentType: artifact.GetContentType(), SizeBytes: artifact.GetSizeBytes(), Sha256: artifact.GetSha256(),
+			}, candidate)
+			if downloadErr == nil {
+				confirmResp, confirmErr := w.builder.ResolveBuildCache(ctx, &builder.ResolveBuildCacheReq{
+					TaskId: task.Id, NodeCode: w.config.Builder.Id, BuilderAttempt: task.BuilderAttempt,
+					ToolchainVersion:     w.config.Builder.ToolchainVersion,
+					BuildProtocolVersion: w.config.Builder.BuildProtocolVersion,
+					ConfirmHit:           true,
+				})
+				if confirmErr == nil && confirmResp.GetData().GetHit() {
+					intermediatePath = candidate
+					cacheHit = true
+					w.writeLog(logFile, "validated build cache hit: entry=%d", entry.GetId())
+				} else {
+					w.writeLog(logFile, "cache hit confirmation skipped: entry=%d error=%v", entry.GetId(), confirmErr)
+				}
+			} else {
+				w.writeLog(logFile, "build cache artifact invalid: entry=%d error=%v", entry.GetId(), downloadErr)
+				_, _ = w.builder.InvalidateBuildCache(ctx, &builder.InvalidateBuildCacheReq{
+					Id: entry.GetId(), TaskId: task.Id, NodeCode: w.config.Builder.Id, Reason: "CACHE_DOWNLOAD_VALIDATION_FAILED",
+				})
+			}
 		}
-	} else {
-		unsignedPath, err = buildBrandedAPK(ctx, logFile, sourcePath, logoPath, splashPath, workDir,
-			branding, whiteLabel, templateFiles, data.BrandLogo, data.BrandSplash, payload)
+	}
+	if branding != nil && !cacheHit {
+		intermediatePath, err = buildBrandedAPK(ctx, logFile, sourcePath, logoPath, splashPath, workDir,
+			branding, whiteLabel, templateFiles, data.BrandLogo, data.BrandSplash)
 		if err != nil {
 			closeLog()
 			return w.fail(ctx, task, logPath, data.Task.TenantId, err)
 		}
+		cacheSize, cacheSHA, digestErr := fileDigest(intermediatePath)
+		if digestErr == nil {
+			cacheKey, keyErr := storage.GenerateTenantObjectKey(data.Task.TenantId, "build-cache", "branded-intermediate.apk")
+			if keyErr == nil {
+				if uploadErr := w.uploadFile(ctx, intermediatePath, cacheKey, cacheSize, "application/vnd.android.package-archive"); uploadErr == nil {
+					_, publishErr := w.builder.PublishBuildCache(ctx, &builder.PublishBuildCacheReq{
+						TaskId: task.Id, NodeCode: w.config.Builder.Id, BuilderAttempt: task.BuilderAttempt,
+						ToolchainVersion:     w.config.Builder.ToolchainVersion,
+						BuildProtocolVersion: w.config.Builder.BuildProtocolVersion,
+						ArtifactObjectKey:    cacheKey, ArtifactSha256: cacheSHA, SizeBytes: cacheSize,
+						TtlSeconds: int64(w.config.Builder.CacheTtl / time.Second),
+					})
+					if publishErr != nil {
+						if isDefinitiveOwnershipError(publishErr) {
+							_ = w.store.DeleteObject(context.WithoutCancel(ctx), cacheKey)
+						}
+						w.writeLog(logFile, "cache publish skipped: %v", publishErr)
+					} else {
+						w.writeLog(logFile, "build cache published: sha256=%s", cacheSHA)
+					}
+				} else {
+					w.writeLog(logFile, "cache upload skipped: %v", uploadErr)
+				}
+			}
+		}
 	}
-	w.writeLog(logFile, "channel and branding assets injected: channel=%s branding_revision=%d", data.Task.ChannelCode, data.Task.BrandingRevision)
+	unsignedPath := filepath.Join(workDir, "unsigned.apk")
+	if err := injectChannelAsset(intermediatePath, unsignedPath, payload); err != nil {
+		closeLog()
+		return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+	}
+	w.writeLog(logFile, "channel and branding assets injected: channel=%s branding_revision=%d cache_hit=%t", data.Task.ChannelCode, data.Task.BrandingRevision, cacheHit)
 	if err := w.report(ctx, task.Id, task.BuilderAttempt, builder.BuildTaskStatus_BUILD_TASK_STATUS_SIGNING, "signing APK", 55); err != nil {
 		closeLog()
 		return w.fail(ctx, task, logPath, data.Task.TenantId, err)
@@ -325,15 +618,26 @@ func (w *Worker) execute(parent context.Context, task *builder.BuildTask) error 
 		closeLog()
 		return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("zipalign APK: %w", err))
 	}
-	keystorePassword, err := w.secrets.Open(data.KeystorePasswordCiphertext)
-	if err != nil {
-		closeLog()
-		return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("decrypt keystore password failed"))
-	}
-	keyPassword, err := w.secrets.Open(data.KeyPasswordCiphertext)
-	if err != nil {
-		closeLog()
-		return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("decrypt key password failed"))
+	var keystorePassword, keyPassword string
+	if strings.TrimSpace(data.SecretRef) != "" {
+		resolved, resolveErr := w.provider.ResolveSigningSecret(ctx, data.SecretRef)
+		if resolveErr != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("resolve external signing secret failed"))
+		}
+		keystorePassword, keyPassword = resolved.KeystorePassword, resolved.KeyPassword
+		defer resolved.Erase()
+	} else {
+		keystorePassword, err = w.secrets.Open(data.KeystorePasswordCiphertext)
+		if err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("decrypt keystore password failed"))
+		}
+		keyPassword, err = w.secrets.Open(data.KeyPasswordCiphertext)
+		if err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("decrypt key password failed"))
+		}
 	}
 	secretEnv := []string{
 		"APPFORGE_KEYSTORE_PASSWORD=" + keystorePassword,
@@ -413,6 +717,11 @@ func (w *Worker) execute(parent context.Context, task *builder.BuildTask) error 
 		LogUrl: logKey, LogObjectKey: logKey, LogSha256: logSHA, LogSize: logSize, BuilderAttempt: task.BuilderAttempt,
 	})
 	if err != nil {
+		if isDefinitiveOwnershipError(err) {
+			cleanupCtx := context.WithoutCancel(ctx)
+			_ = w.store.DeleteObject(cleanupCtx, apkKey)
+			_ = w.store.DeleteObject(cleanupCtx, logKey)
+		}
 		return fmt.Errorf("complete build task: %w", err)
 	}
 	return nil
@@ -518,9 +827,21 @@ func (w *Worker) fail(ctx context.Context, task *builder.BuildTask, logPath stri
 		LogUrl: logKey, LogObjectKey: logKey, LogSha256: logSHA, LogSize: logSize, BuilderAttempt: task.BuilderAttempt,
 	})
 	if reportErr != nil {
+		if logKey != "" && isDefinitiveOwnershipError(reportErr) {
+			_ = w.store.DeleteObject(context.WithoutCancel(ctx), logKey)
+		}
 		return fmt.Errorf("%v; report failure: %w", cause, reportErr)
 	}
 	return cause
+}
+
+func isDefinitiveOwnershipError(err error) bool {
+	switch status.Code(err) {
+	case codes.NotFound, codes.FailedPrecondition, codes.PermissionDenied:
+		return true
+	default:
+		return false
+	}
 }
 
 func (w *Worker) writeLog(file io.Writer, format string, args ...any) {

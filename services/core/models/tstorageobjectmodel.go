@@ -12,6 +12,7 @@ type (
 	// and implement the added methods in customTStorageObjectModel.
 	TStorageObjectModel interface {
 		tStorageObjectModel
+		WithSession(session sqlx.Session) TStorageObjectModel
 	}
 
 	customTStorageObjectModel struct {
@@ -24,4 +25,8 @@ func NewTStorageObjectModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.
 	return &customTStorageObjectModel{
 		defaultTStorageObjectModel: newTStorageObjectModel(conn, c, opts...),
 	}
+}
+
+func (m *customTStorageObjectModel) WithSession(session sqlx.Session) TStorageObjectModel {
+	return &customTStorageObjectModel{defaultTStorageObjectModel: &defaultTStorageObjectModel{CachedConn: m.CachedConn.WithSession(session), table: m.table}}
 }

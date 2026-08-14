@@ -195,6 +195,69 @@ services:
     networks:
       - appforge
 
+  webhook-worker:
+    build:
+      context: ..
+      dockerfile: deploy/docker/go.Dockerfile
+      args:
+        MODULE_DIR: services/core
+    container_name: appforge-webhook-worker
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379", "-role", "webhook-worker"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mysql-migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      etcd-init:
+        condition: service_completed_successfully
+    networks:
+      - appforge
+
+  billing-worker:
+    build:
+      context: ..
+      dockerfile: deploy/docker/go.Dockerfile
+      args:
+        MODULE_DIR: services/core
+    container_name: appforge-billing-worker
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379", "-role", "billing-worker"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mysql-migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      etcd-init:
+        condition: service_completed_successfully
+    networks:
+      - appforge
+
+  enterprise-worker:
+    build:
+      context: ..
+      dockerfile: deploy/docker/go.Dockerfile
+      args:
+        MODULE_DIR: services/core
+    container_name: appforge-enterprise-worker
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379", "-role", "enterprise-worker"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mysql-migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      etcd-init:
+        condition: service_completed_successfully
+    networks:
+      - appforge
+
   builder-rpc:
     build:
       context: ..
@@ -219,13 +282,60 @@ services:
     networks:
       - appforge
 
-  builder-worker:
+  builder-worker-1:
     build:
       context: ..
       dockerfile: deploy/docker/builder-worker.Dockerfile
-    container_name: appforge-builder-worker
+    container_name: appforge-builder-worker-1
     restart: unless-stopped
     command: ["-etcd", "etcd:2379"]
+    environment:
+      APPFORGE_BUILDER_ID: builder-dev-01
+      APPFORGE_BUILDER_ENDPOINT: builder-worker-1
+    depends_on:
+      builder-rpc:
+        condition: service_healthy
+      core-rpc:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      etcd-init:
+        condition: service_completed_successfully
+    networks:
+      - appforge
+
+  builder-worker-2:
+    build:
+      context: ..
+      dockerfile: deploy/docker/builder-worker.Dockerfile
+    container_name: appforge-builder-worker-2
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379"]
+    environment:
+      APPFORGE_BUILDER_ID: builder-dev-02
+      APPFORGE_BUILDER_ENDPOINT: builder-worker-2
+    depends_on:
+      builder-rpc:
+        condition: service_healthy
+      core-rpc:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      etcd-init:
+        condition: service_completed_successfully
+    networks:
+      - appforge
+
+  builder-worker-3:
+    build:
+      context: ..
+      dockerfile: deploy/docker/builder-worker.Dockerfile
+    container_name: appforge-builder-worker-3
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379"]
+    environment:
+      APPFORGE_BUILDER_ID: builder-dev-03
+      APPFORGE_BUILDER_ENDPOINT: builder-worker-3
     depends_on:
       builder-rpc:
         condition: service_healthy
@@ -264,6 +374,25 @@ services:
     networks:
       - appforge
 
+  source-trigger-worker:
+    build:
+      context: ..
+      dockerfile: deploy/docker/go.Dockerfile
+      args:
+        MODULE_DIR: appforge-api
+    container_name: appforge-source-trigger-worker
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379", "-role", "source-trigger-worker"]
+    depends_on:
+      core-rpc:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      etcd-init:
+        condition: service_completed_successfully
+    networks:
+      - appforge
+
   admin-ui:
     build:
       context: ..
@@ -298,7 +427,7 @@ services:
     ports:
       - "${APPFORGE_AGENT_UI_PORT:-5174}:80"
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/agent/core"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/"]
       interval: 10s
       timeout: 5s
       retries: 10

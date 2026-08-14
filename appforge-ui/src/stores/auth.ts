@@ -64,7 +64,7 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     async login(payload: { username: string; password: string; googleCode?: string }) {
-		const res = await post<LoginResp>(`${AUTH_API_BASE}/auth/login`, payload)
+      const res = await post<LoginResp>(`${AUTH_API_BASE}/auth/login`, payload)
       if (res.code !== 200) {
         throw new Error(res.msg || 'login failed')
       }
@@ -75,7 +75,7 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('exp', String(res.data!.exp))
     },
     async fetchProfile() {
-		const res = await get<ProfileResp>(`${AUTH_API_BASE}/auth/profile`)
+      const res = await get<ProfileResp>(`${AUTH_API_BASE}/auth/profile`)
       if (res.code !== 200) throw new Error(res.msg || 'profile failed')
       this.user = res.data!.user
       this.tenantId = Number(res.data!.user?.tenantId || 0)
@@ -104,5 +104,5 @@ export function apiUpdateProfile(data: {
   avatar?: string
   password?: string
 }): Promise<RespBase> {
-	return post<RespBase>(`${AUTH_API_BASE}/auth/profile`, data)
+  return post<RespBase>(`${AUTH_API_BASE}/auth/profile`, data)
 }

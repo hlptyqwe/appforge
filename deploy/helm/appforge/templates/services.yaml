@@ -1,0 +1,32 @@
+{{- range $component, $port := dict "api" 8888 "system" 8080 "core" 8081 "builder" 8082 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appforge-{{ $component }}
+spec:
+  selector: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: {{ $component }}}
+  ports:
+    - {name: service, port: {{ $port }}, targetPort: service}
+{{- end }}
+{{- range $component := list "admin-ui" "agent-ui" }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appforge-{{ $component }}
+spec:
+  selector: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: {{ $component }}}
+  ports: [{name: http, port: 8080, targetPort: http}]
+{{- end }}
+{{- if .Values.localAgentGateway.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appforge-local-agent-gateway
+spec:
+  type: {{ .Values.localAgentGateway.serviceType }}
+  selector: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: api}
+  ports: [{name: mtls, port: {{ .Values.localAgentGateway.port }}, targetPort: agent-mtls}]
+{{- end }}

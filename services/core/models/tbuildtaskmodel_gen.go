@@ -24,13 +24,15 @@ var (
 	tBuildTaskRowsExpectAutoSet   = strings.Join(stringx.Remove(tBuildTaskFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
 	tBuildTaskRowsWithPlaceHolder = strings.Join(stringx.Remove(tBuildTaskFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
-	cacheTBuildTaskIdPrefix = "cache:tBuildTask:id:"
+	cacheTBuildTaskIdPrefix                            = "cache:tBuildTask:id:"
+	cacheTBuildTaskSourceWebhookEventIdChannelIdPrefix = "cache:tBuildTask:sourceWebhookEventId:channelId:"
 )
 
 type (
 	tBuildTaskModel interface {
 		Insert(ctx context.Context, data *TBuildTask) (sql.Result, error)
 		FindOne(ctx context.Context, id int64) (*TBuildTask, error)
+		FindOneBySourceWebhookEventIdChannelId(ctx context.Context, sourceWebhookEventId sql.NullInt64, channelId int64) (*TBuildTask, error)
 		Update(ctx context.Context, data *TBuildTask) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -41,42 +43,51 @@ type (
 	}
 
 	TBuildTask struct {
-		Id                  int64          `db:"id"`                     // 构建任务ID
-		TenantId            int64          `db:"tenant_id"`              // 所属租户ID
-		AppId               int64          `db:"app_id"`                 // 应用ID
-		VersionId           int64          `db:"version_id"`             // 应用版本ID
-		ChannelId           int64          `db:"channel_id"`             // 渠道ID
-		SigningConfigId     int64          `db:"signing_config_id"`      // 签名配置ID
-		ChannelCode         string         `db:"channel_code"`           // 构建时使用的渠道编码快照
-		VersionCode         int64          `db:"version_code"`           // 构建时使用的versionCode快照
-		VersionName         string         `db:"version_name"`           // 构建时使用的versionName快照
-		SourceApkObjectId   int64          `db:"source_apk_object_id"`   // 构建时使用的原始APK对象ID快照
-		SourceApkUrl        sql.NullString `db:"source_apk_url"`         // 构建时使用的原始APK地址快照
-		BuildConfig         sql.NullString `db:"build_config"`           // 构建时使用的构建配置快照
-		BrandingProfileId   int64          `db:"branding_profile_id"`    // 构建时使用的品牌配置ID，0表示不启用白标
-		BrandingRevision    int64          `db:"branding_revision"`      // 构建时使用的品牌配置修订号
-		BrandingSnapshot    sql.NullString `db:"branding_snapshot"`      // 构建时固化的品牌配置快照JSON
-		WhiteLabelProductId int64          `db:"white_label_product_id"` // V3白标产品ID，0表示非高级白标构建
-		TemplateRevision    int64          `db:"template_revision"`      // V3构建使用的模板修订号
-		TemplateSnapshot    sql.NullString `db:"template_snapshot"`      // V3模板和产品不可变构建快照JSON
-		Status              string         `db:"status"`                 // 构建状态
-		BuilderId           sql.NullString `db:"builder_id"`             // Builder工作节点ID
-		BuilderAttempt      int64          `db:"builder_attempt"`        // Builder尝试次数
-		Priority            int64          `db:"priority"`               // 任务优先级，值越大越优先
-		ApkObjectId         int64          `db:"apk_object_id"`          // 构建产物APK存储对象ID
-		ApkUrl              sql.NullString `db:"apk_url"`                // 构建产物下载地址
-		ApkSha256           sql.NullString `db:"apk_sha256"`             // 构建产物SHA-256
-		ApkSize             int64          `db:"apk_size"`               // 构建产物大小（字节）
-		LogObjectId         int64          `db:"log_object_id"`          // 构建日志存储对象ID
-		LogUrl              sql.NullString `db:"log_url"`                // 构建日志地址
-		ErrorMessage        sql.NullString `db:"error_message"`          // 失败原因
-		QueuedAt            time.Time      `db:"queued_at"`              // 进入队列时间
-		StartTime           sql.NullTime   `db:"start_time"`             // 开始构建时间
-		FinishTime          sql.NullTime   `db:"finish_time"`            // 完成时间
-		LeaseUntil          sql.NullTime   `db:"lease_until"`            // Builder租约到期时间
-		CreateBy            int64          `db:"create_by"`              // 创建人ID
-		CreateTime          time.Time      `db:"create_time"`            // 创建时间
-		UpdateTime          time.Time      `db:"update_time"`            // 更新时间
+		Id                   int64          `db:"id"`                      // 构建任务ID
+		TenantId             int64          `db:"tenant_id"`               // 所属租户ID
+		AppId                int64          `db:"app_id"`                  // 应用ID
+		VersionId            int64          `db:"version_id"`              // 应用版本ID
+		ChannelId            int64          `db:"channel_id"`              // 渠道ID
+		SigningConfigId      int64          `db:"signing_config_id"`       // 签名配置ID
+		ChannelCode          string         `db:"channel_code"`            // 构建时使用的渠道编码快照
+		VersionCode          int64          `db:"version_code"`            // 构建时使用的versionCode快照
+		VersionName          string         `db:"version_name"`            // 构建时使用的versionName快照
+		SourceApkObjectId    int64          `db:"source_apk_object_id"`    // 构建时使用的原始APK对象ID快照
+		SourceApkUrl         sql.NullString `db:"source_apk_url"`          // 构建时使用的原始APK地址快照
+		BuildConfig          sql.NullString `db:"build_config"`            // 构建时使用的构建配置快照
+		BrandingProfileId    int64          `db:"branding_profile_id"`     // 构建时使用的品牌配置ID，0表示不启用白标
+		BrandingRevision     int64          `db:"branding_revision"`       // 构建时使用的品牌配置修订号
+		BrandingSnapshot     sql.NullString `db:"branding_snapshot"`       // 构建时固化的品牌配置快照JSON
+		WhiteLabelProductId  int64          `db:"white_label_product_id"`  // V3白标产品ID，0表示非高级白标构建
+		TemplateRevision     int64          `db:"template_revision"`       // V3构建使用的模板修订号
+		TemplateSnapshot     sql.NullString `db:"template_snapshot"`       // V3模板和产品不可变构建快照JSON
+		PoolCode             string         `db:"pool_code"`               // V4任务目标构建池编码
+		CacheKey             sql.NullString `db:"cache_key"`               // V4不可变输入构建缓存键
+		SourceWebhookEventId sql.NullInt64  `db:"source_webhook_event_id"` // V5源码Webhook事件ID，普通构建为空
+		CacheEntryId         int64          `db:"cache_entry_id"`          // V4命中的构建缓存条目ID
+		CacheHit             int64          `db:"cache_hit"`               // V4缓存命中标记：0未命中 1命中
+		Status               string         `db:"status"`                  // 构建状态
+		BuilderId            sql.NullString `db:"builder_id"`              // Builder工作节点ID
+		BuilderAttempt       int64          `db:"builder_attempt"`         // Builder尝试次数
+		Priority             int64          `db:"priority"`                // 任务优先级，值越大越优先
+		ApkObjectId          int64          `db:"apk_object_id"`           // 构建产物APK存储对象ID
+		ApkUrl               sql.NullString `db:"apk_url"`                 // 构建产物下载地址
+		ApkSha256            sql.NullString `db:"apk_sha256"`              // 构建产物SHA-256
+		ApkSize              int64          `db:"apk_size"`                // 构建产物大小（字节）
+		LogObjectId          int64          `db:"log_object_id"`           // 构建日志存储对象ID
+		LogUrl               sql.NullString `db:"log_url"`                 // 构建日志地址
+		ErrorMessage         sql.NullString `db:"error_message"`           // 失败原因
+		QueuedAt             time.Time      `db:"queued_at"`               // 进入队列时间
+		StartTime            sql.NullTime   `db:"start_time"`              // 开始构建时间
+		FinishTime           sql.NullTime   `db:"finish_time"`             // 完成时间
+		LeaseUntil           sql.NullTime   `db:"lease_until"`             // Builder租约到期时间
+		CancelRequestedAt    sql.NullTime   `db:"cancel_requested_at"`     // 取消请求时间
+		CancelledAt          sql.NullTime   `db:"cancelled_at"`            // 任务取消完成时间
+		CancelReason         sql.NullString `db:"cancel_reason"`           // 任务取消原因
+		RetryOfTaskId        int64          `db:"retry_of_task_id"`        // 重试来源任务ID，0表示非重试任务
+		CreateBy             int64          `db:"create_by"`               // 创建人ID
+		CreateTime           time.Time      `db:"create_time"`             // 创建时间
+		UpdateTime           time.Time      `db:"update_time"`             // 更新时间
 	}
 )
 
@@ -88,11 +99,17 @@ func newTBuildTaskModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Opti
 }
 
 func (m *defaultTBuildTaskModel) Delete(ctx context.Context, id int64) error {
+	data, err := m.FindOne(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	tBuildTaskIdKey := fmt.Sprintf("%s%v", cacheTBuildTaskIdPrefix, id)
-	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+	tBuildTaskSourceWebhookEventIdChannelIdKey := fmt.Sprintf("%s%v:%v", cacheTBuildTaskSourceWebhookEventIdChannelIdPrefix, data.SourceWebhookEventId, data.ChannelId)
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 		return conn.ExecCtx(ctx, query, id)
-	}, tBuildTaskIdKey)
+	}, tBuildTaskIdKey, tBuildTaskSourceWebhookEventIdChannelIdKey)
 	return err
 }
 
@@ -113,21 +130,48 @@ func (m *defaultTBuildTaskModel) FindOne(ctx context.Context, id int64) (*TBuild
 	}
 }
 
+func (m *defaultTBuildTaskModel) FindOneBySourceWebhookEventIdChannelId(ctx context.Context, sourceWebhookEventId sql.NullInt64, channelId int64) (*TBuildTask, error) {
+	tBuildTaskSourceWebhookEventIdChannelIdKey := fmt.Sprintf("%s%v:%v", cacheTBuildTaskSourceWebhookEventIdChannelIdPrefix, sourceWebhookEventId, channelId)
+	var resp TBuildTask
+	err := m.QueryRowIndexCtx(ctx, &resp, tBuildTaskSourceWebhookEventIdChannelIdKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v any) (i any, e error) {
+		query := fmt.Sprintf("select %s from %s where `source_webhook_event_id` = ? and `channel_id` = ? limit 1", tBuildTaskRows, m.table)
+		if err := conn.QueryRowCtx(ctx, &resp, query, sourceWebhookEventId, channelId); err != nil {
+			return nil, err
+		}
+		return resp.Id, nil
+	}, m.queryPrimary)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
 func (m *defaultTBuildTaskModel) Insert(ctx context.Context, data *TBuildTask) (sql.Result, error) {
 	tBuildTaskIdKey := fmt.Sprintf("%s%v", cacheTBuildTaskIdPrefix, data.Id)
+	tBuildTaskSourceWebhookEventIdChannelIdKey := fmt.Sprintf("%s%v:%v", cacheTBuildTaskSourceWebhookEventIdChannelIdPrefix, data.SourceWebhookEventId, data.ChannelId)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, tBuildTaskRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.TenantId, data.AppId, data.VersionId, data.ChannelId, data.SigningConfigId, data.ChannelCode, data.VersionCode, data.VersionName, data.SourceApkObjectId, data.SourceApkUrl, data.BuildConfig, data.BrandingProfileId, data.BrandingRevision, data.BrandingSnapshot, data.WhiteLabelProductId, data.TemplateRevision, data.TemplateSnapshot, data.Status, data.BuilderId, data.BuilderAttempt, data.Priority, data.ApkObjectId, data.ApkUrl, data.ApkSha256, data.ApkSize, data.LogObjectId, data.LogUrl, data.ErrorMessage, data.QueuedAt, data.StartTime, data.FinishTime, data.LeaseUntil, data.CreateBy)
-	}, tBuildTaskIdKey)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, tBuildTaskRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.TenantId, data.AppId, data.VersionId, data.ChannelId, data.SigningConfigId, data.ChannelCode, data.VersionCode, data.VersionName, data.SourceApkObjectId, data.SourceApkUrl, data.BuildConfig, data.BrandingProfileId, data.BrandingRevision, data.BrandingSnapshot, data.WhiteLabelProductId, data.TemplateRevision, data.TemplateSnapshot, data.PoolCode, data.CacheKey, data.SourceWebhookEventId, data.CacheEntryId, data.CacheHit, data.Status, data.BuilderId, data.BuilderAttempt, data.Priority, data.ApkObjectId, data.ApkUrl, data.ApkSha256, data.ApkSize, data.LogObjectId, data.LogUrl, data.ErrorMessage, data.QueuedAt, data.StartTime, data.FinishTime, data.LeaseUntil, data.CancelRequestedAt, data.CancelledAt, data.CancelReason, data.RetryOfTaskId, data.CreateBy)
+	}, tBuildTaskIdKey, tBuildTaskSourceWebhookEventIdChannelIdKey)
 	return ret, err
 }
 
-func (m *defaultTBuildTaskModel) Update(ctx context.Context, data *TBuildTask) error {
+func (m *defaultTBuildTaskModel) Update(ctx context.Context, newData *TBuildTask) error {
+	data, err := m.FindOne(ctx, newData.Id)
+	if err != nil {
+		return err
+	}
+
 	tBuildTaskIdKey := fmt.Sprintf("%s%v", cacheTBuildTaskIdPrefix, data.Id)
-	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+	tBuildTaskSourceWebhookEventIdChannelIdKey := fmt.Sprintf("%s%v:%v", cacheTBuildTaskSourceWebhookEventIdChannelIdPrefix, data.SourceWebhookEventId, data.ChannelId)
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, tBuildTaskRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.TenantId, data.AppId, data.VersionId, data.ChannelId, data.SigningConfigId, data.ChannelCode, data.VersionCode, data.VersionName, data.SourceApkObjectId, data.SourceApkUrl, data.BuildConfig, data.BrandingProfileId, data.BrandingRevision, data.BrandingSnapshot, data.WhiteLabelProductId, data.TemplateRevision, data.TemplateSnapshot, data.Status, data.BuilderId, data.BuilderAttempt, data.Priority, data.ApkObjectId, data.ApkUrl, data.ApkSha256, data.ApkSize, data.LogObjectId, data.LogUrl, data.ErrorMessage, data.QueuedAt, data.StartTime, data.FinishTime, data.LeaseUntil, data.CreateBy, data.Id)
-	}, tBuildTaskIdKey)
+		return conn.ExecCtx(ctx, query, newData.TenantId, newData.AppId, newData.VersionId, newData.ChannelId, newData.SigningConfigId, newData.ChannelCode, newData.VersionCode, newData.VersionName, newData.SourceApkObjectId, newData.SourceApkUrl, newData.BuildConfig, newData.BrandingProfileId, newData.BrandingRevision, newData.BrandingSnapshot, newData.WhiteLabelProductId, newData.TemplateRevision, newData.TemplateSnapshot, newData.PoolCode, newData.CacheKey, newData.SourceWebhookEventId, newData.CacheEntryId, newData.CacheHit, newData.Status, newData.BuilderId, newData.BuilderAttempt, newData.Priority, newData.ApkObjectId, newData.ApkUrl, newData.ApkSha256, newData.ApkSize, newData.LogObjectId, newData.LogUrl, newData.ErrorMessage, newData.QueuedAt, newData.StartTime, newData.FinishTime, newData.LeaseUntil, newData.CancelRequestedAt, newData.CancelledAt, newData.CancelReason, newData.RetryOfTaskId, newData.CreateBy, newData.Id)
+	}, tBuildTaskIdKey, tBuildTaskSourceWebhookEventIdChannelIdKey)
 	return err
 }
 

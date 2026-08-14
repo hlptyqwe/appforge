@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -60,5 +61,11 @@ func (m *PublicRateLimitMiddleware) allow(key string) bool {
 }
 
 func isPublicTraffic(path string) bool {
-	return path == "/api/install/report" || path == "/api/channel/event" || path == "/d" || len(path) > 3 && path[:3] == "/d/"
+	// 支付回调使用供应商签名、事件幂等和重放保护，不使用共享IP桶，
+	// 避免供应商批量回调被错误限流后延迟订阅状态。
+	if path == "/public/v1/billing/stripe" {
+		return false
+	}
+	return path == "/api/install/report" || path == "/api/channel/event" || path == "/d" ||
+		strings.HasPrefix(path, "/d/") || strings.HasPrefix(path, "/public/v1/")
 }

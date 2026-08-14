@@ -186,6 +186,7 @@ const (
 	BuildTaskStatus_BUILD_TASK_STATUS_UPLOADING BuildTaskStatus = 4 // 上传中
 	BuildTaskStatus_BUILD_TASK_STATUS_SUCCESS   BuildTaskStatus = 5 // 成功
 	BuildTaskStatus_BUILD_TASK_STATUS_FAILED    BuildTaskStatus = 6 // 失败
+	BuildTaskStatus_BUILD_TASK_STATUS_CANCELLED BuildTaskStatus = 7 // 已取消
 )
 
 // Enum value maps for BuildTaskStatus.
@@ -198,6 +199,7 @@ var (
 		4: "BUILD_TASK_STATUS_UPLOADING",
 		5: "BUILD_TASK_STATUS_SUCCESS",
 		6: "BUILD_TASK_STATUS_FAILED",
+		7: "BUILD_TASK_STATUS_CANCELLED",
 	}
 	BuildTaskStatus_value = map[string]int32{
 		"BUILD_TASK_STATUS_UNKNOWN":   0,
@@ -207,6 +209,7 @@ var (
 		"BUILD_TASK_STATUS_UPLOADING": 4,
 		"BUILD_TASK_STATUS_SUCCESS":   5,
 		"BUILD_TASK_STATUS_FAILED":    6,
+		"BUILD_TASK_STATUS_CANCELLED": 7,
 	}
 )
 
@@ -249,6 +252,7 @@ const (
 	StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO    StorageObjectType = 5 // 品牌Logo图片
 	StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH  StorageObjectType = 6 // 品牌启动图图片
 	StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE StorageObjectType = 7 // V3模板声明式补丁引用的受控文件
+	StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_CACHE   StorageObjectType = 8 // V4独立构建缓存产物
 )
 
 // Enum value maps for StorageObjectType.
@@ -262,6 +266,7 @@ var (
 		5: "STORAGE_OBJECT_TYPE_BRAND_LOGO",
 		6: "STORAGE_OBJECT_TYPE_BRAND_SPLASH",
 		7: "STORAGE_OBJECT_TYPE_TEMPLATE_FILE",
+		8: "STORAGE_OBJECT_TYPE_BUILD_CACHE",
 	}
 	StorageObjectType_value = map[string]int32{
 		"STORAGE_OBJECT_TYPE_UNKNOWN":       0,
@@ -272,6 +277,7 @@ var (
 		"STORAGE_OBJECT_TYPE_BRAND_LOGO":    5,
 		"STORAGE_OBJECT_TYPE_BRAND_SPLASH":  6,
 		"STORAGE_OBJECT_TYPE_TEMPLATE_FILE": 7,
+		"STORAGE_OBJECT_TYPE_BUILD_CACHE":   8,
 	}
 )
 
@@ -300,6 +306,2001 @@ func (x StorageObjectType) Number() protoreflect.EnumNumber {
 // Deprecated: Use StorageObjectType.Descriptor instead.
 func (StorageObjectType) EnumDescriptor() ([]byte, []int) {
 	return file_proto_core_core_proto_rawDescGZIP(), []int{4}
+}
+
+// V4 Builder节点状态。
+type BuilderNodeStatus int32
+
+const (
+	BuilderNodeStatus_BUILDER_NODE_STATUS_UNKNOWN  BuilderNodeStatus = 0 // 未知状态
+	BuilderNodeStatus_BUILDER_NODE_STATUS_ONLINE   BuilderNodeStatus = 1 // 在线且健康
+	BuilderNodeStatus_BUILDER_NODE_STATUS_OFFLINE  BuilderNodeStatus = 2 // 心跳超时离线
+	BuilderNodeStatus_BUILDER_NODE_STATUS_ISOLATED BuilderNodeStatus = 3 // 因容量、工具链或连续失败被隔离
+)
+
+// Enum value maps for BuilderNodeStatus.
+var (
+	BuilderNodeStatus_name = map[int32]string{
+		0: "BUILDER_NODE_STATUS_UNKNOWN",
+		1: "BUILDER_NODE_STATUS_ONLINE",
+		2: "BUILDER_NODE_STATUS_OFFLINE",
+		3: "BUILDER_NODE_STATUS_ISOLATED",
+	}
+	BuilderNodeStatus_value = map[string]int32{
+		"BUILDER_NODE_STATUS_UNKNOWN":  0,
+		"BUILDER_NODE_STATUS_ONLINE":   1,
+		"BUILDER_NODE_STATUS_OFFLINE":  2,
+		"BUILDER_NODE_STATUS_ISOLATED": 3,
+	}
+)
+
+func (x BuilderNodeStatus) Enum() *BuilderNodeStatus {
+	p := new(BuilderNodeStatus)
+	*p = x
+	return p
+}
+
+func (x BuilderNodeStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BuilderNodeStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[5].Descriptor()
+}
+
+func (BuilderNodeStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[5]
+}
+
+func (x BuilderNodeStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BuilderNodeStatus.Descriptor instead.
+func (BuilderNodeStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{5}
+}
+
+// V4 Builder节点排空状态。
+type BuilderDrainStatus int32
+
+const (
+	BuilderDrainStatus_BUILDER_DRAIN_STATUS_UNKNOWN   BuilderDrainStatus = 0 // 未知状态
+	BuilderDrainStatus_BUILDER_DRAIN_STATUS_ACCEPTING BuilderDrainStatus = 1 // 接收新任务
+	BuilderDrainStatus_BUILDER_DRAIN_STATUS_DRAINING  BuilderDrainStatus = 2 // 排空中，不领取新任务
+)
+
+// Enum value maps for BuilderDrainStatus.
+var (
+	BuilderDrainStatus_name = map[int32]string{
+		0: "BUILDER_DRAIN_STATUS_UNKNOWN",
+		1: "BUILDER_DRAIN_STATUS_ACCEPTING",
+		2: "BUILDER_DRAIN_STATUS_DRAINING",
+	}
+	BuilderDrainStatus_value = map[string]int32{
+		"BUILDER_DRAIN_STATUS_UNKNOWN":   0,
+		"BUILDER_DRAIN_STATUS_ACCEPTING": 1,
+		"BUILDER_DRAIN_STATUS_DRAINING":  2,
+	}
+)
+
+func (x BuilderDrainStatus) Enum() *BuilderDrainStatus {
+	p := new(BuilderDrainStatus)
+	*p = x
+	return p
+}
+
+func (x BuilderDrainStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BuilderDrainStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[6].Descriptor()
+}
+
+func (BuilderDrainStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[6]
+}
+
+func (x BuilderDrainStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BuilderDrainStatus.Descriptor instead.
+func (BuilderDrainStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{6}
+}
+
+// V4 构建并发策略状态。
+type BuildPolicyStatus int32
+
+const (
+	BuildPolicyStatus_BUILD_POLICY_STATUS_UNKNOWN  BuildPolicyStatus = 0 // 未知状态
+	BuildPolicyStatus_BUILD_POLICY_STATUS_ENABLED  BuildPolicyStatus = 1 // 启用
+	BuildPolicyStatus_BUILD_POLICY_STATUS_DISABLED BuildPolicyStatus = 2 // 停用
+)
+
+// Enum value maps for BuildPolicyStatus.
+var (
+	BuildPolicyStatus_name = map[int32]string{
+		0: "BUILD_POLICY_STATUS_UNKNOWN",
+		1: "BUILD_POLICY_STATUS_ENABLED",
+		2: "BUILD_POLICY_STATUS_DISABLED",
+	}
+	BuildPolicyStatus_value = map[string]int32{
+		"BUILD_POLICY_STATUS_UNKNOWN":  0,
+		"BUILD_POLICY_STATUS_ENABLED":  1,
+		"BUILD_POLICY_STATUS_DISABLED": 2,
+	}
+)
+
+func (x BuildPolicyStatus) Enum() *BuildPolicyStatus {
+	p := new(BuildPolicyStatus)
+	*p = x
+	return p
+}
+
+func (x BuildPolicyStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BuildPolicyStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[7].Descriptor()
+}
+
+func (BuildPolicyStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[7]
+}
+
+func (x BuildPolicyStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BuildPolicyStatus.Descriptor instead.
+func (BuildPolicyStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{7}
+}
+
+// V4 构建槽位租约状态。
+type BuildSlotLeaseStatus int32
+
+const (
+	BuildSlotLeaseStatus_BUILD_SLOT_LEASE_STATUS_UNKNOWN   BuildSlotLeaseStatus = 0 // 未知状态
+	BuildSlotLeaseStatus_BUILD_SLOT_LEASE_STATUS_ACTIVE    BuildSlotLeaseStatus = 1 // 生效中
+	BuildSlotLeaseStatus_BUILD_SLOT_LEASE_STATUS_RELEASED  BuildSlotLeaseStatus = 2 // 正常释放
+	BuildSlotLeaseStatus_BUILD_SLOT_LEASE_STATUS_EXPIRED   BuildSlotLeaseStatus = 3 // 租约过期
+	BuildSlotLeaseStatus_BUILD_SLOT_LEASE_STATUS_CANCELLED BuildSlotLeaseStatus = 4 // 因任务取消释放
+)
+
+// Enum value maps for BuildSlotLeaseStatus.
+var (
+	BuildSlotLeaseStatus_name = map[int32]string{
+		0: "BUILD_SLOT_LEASE_STATUS_UNKNOWN",
+		1: "BUILD_SLOT_LEASE_STATUS_ACTIVE",
+		2: "BUILD_SLOT_LEASE_STATUS_RELEASED",
+		3: "BUILD_SLOT_LEASE_STATUS_EXPIRED",
+		4: "BUILD_SLOT_LEASE_STATUS_CANCELLED",
+	}
+	BuildSlotLeaseStatus_value = map[string]int32{
+		"BUILD_SLOT_LEASE_STATUS_UNKNOWN":   0,
+		"BUILD_SLOT_LEASE_STATUS_ACTIVE":    1,
+		"BUILD_SLOT_LEASE_STATUS_RELEASED":  2,
+		"BUILD_SLOT_LEASE_STATUS_EXPIRED":   3,
+		"BUILD_SLOT_LEASE_STATUS_CANCELLED": 4,
+	}
+)
+
+func (x BuildSlotLeaseStatus) Enum() *BuildSlotLeaseStatus {
+	p := new(BuildSlotLeaseStatus)
+	*p = x
+	return p
+}
+
+func (x BuildSlotLeaseStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BuildSlotLeaseStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[8].Descriptor()
+}
+
+func (BuildSlotLeaseStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[8]
+}
+
+func (x BuildSlotLeaseStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BuildSlotLeaseStatus.Descriptor instead.
+func (BuildSlotLeaseStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{8}
+}
+
+// V4 构建缓存作用域。
+type BuildCacheScope int32
+
+const (
+	BuildCacheScope_BUILD_CACHE_SCOPE_UNKNOWN               BuildCacheScope = 0 // 未知作用域
+	BuildCacheScope_BUILD_CACHE_SCOPE_TENANT_INTERMEDIATE   BuildCacheScope = 1 // 租户隔离的白标中间APK，尚未注入任务渠道元数据和签名
+	BuildCacheScope_BUILD_CACHE_SCOPE_PLATFORM_INTERMEDIATE BuildCacheScope = 2 // 不含租户敏感信息的平台中间产物
+)
+
+// Enum value maps for BuildCacheScope.
+var (
+	BuildCacheScope_name = map[int32]string{
+		0: "BUILD_CACHE_SCOPE_UNKNOWN",
+		1: "BUILD_CACHE_SCOPE_TENANT_INTERMEDIATE",
+		2: "BUILD_CACHE_SCOPE_PLATFORM_INTERMEDIATE",
+	}
+	BuildCacheScope_value = map[string]int32{
+		"BUILD_CACHE_SCOPE_UNKNOWN":               0,
+		"BUILD_CACHE_SCOPE_TENANT_INTERMEDIATE":   1,
+		"BUILD_CACHE_SCOPE_PLATFORM_INTERMEDIATE": 2,
+	}
+)
+
+func (x BuildCacheScope) Enum() *BuildCacheScope {
+	p := new(BuildCacheScope)
+	*p = x
+	return p
+}
+
+func (x BuildCacheScope) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BuildCacheScope) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[9].Descriptor()
+}
+
+func (BuildCacheScope) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[9]
+}
+
+func (x BuildCacheScope) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BuildCacheScope.Descriptor instead.
+func (BuildCacheScope) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{9}
+}
+
+// V4 构建缓存状态。
+type BuildCacheStatus int32
+
+const (
+	BuildCacheStatus_BUILD_CACHE_STATUS_UNKNOWN     BuildCacheStatus = 0 // 未知状态
+	BuildCacheStatus_BUILD_CACHE_STATUS_ACTIVE      BuildCacheStatus = 1 // 有效
+	BuildCacheStatus_BUILD_CACHE_STATUS_INVALIDATED BuildCacheStatus = 2 // 已失效
+	BuildCacheStatus_BUILD_CACHE_STATUS_EXPIRED     BuildCacheStatus = 3 // 已过期
+)
+
+// Enum value maps for BuildCacheStatus.
+var (
+	BuildCacheStatus_name = map[int32]string{
+		0: "BUILD_CACHE_STATUS_UNKNOWN",
+		1: "BUILD_CACHE_STATUS_ACTIVE",
+		2: "BUILD_CACHE_STATUS_INVALIDATED",
+		3: "BUILD_CACHE_STATUS_EXPIRED",
+	}
+	BuildCacheStatus_value = map[string]int32{
+		"BUILD_CACHE_STATUS_UNKNOWN":     0,
+		"BUILD_CACHE_STATUS_ACTIVE":      1,
+		"BUILD_CACHE_STATUS_INVALIDATED": 2,
+		"BUILD_CACHE_STATUS_EXPIRED":     3,
+	}
+)
+
+func (x BuildCacheStatus) Enum() *BuildCacheStatus {
+	p := new(BuildCacheStatus)
+	*p = x
+	return p
+}
+
+func (x BuildCacheStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BuildCacheStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[10].Descriptor()
+}
+
+func (BuildCacheStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[10]
+}
+
+func (x BuildCacheStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BuildCacheStatus.Descriptor instead.
+func (BuildCacheStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{10}
+}
+
+// V4 调度事件类型。
+type BuildSchedulerEventType int32
+
+const (
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_UNKNOWN           BuildSchedulerEventType = 0  // 未知事件
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_QUEUED            BuildSchedulerEventType = 1  // 任务进入队列
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_CLAIMED           BuildSchedulerEventType = 2  // 节点领取任务
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_THROTTLED         BuildSchedulerEventType = 3  // 并发或能力限制
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_RECOVERED         BuildSchedulerEventType = 4  // 租约恢复
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_DRAINED           BuildSchedulerEventType = 5  // 节点排空状态变化
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_CANCELLED         BuildSchedulerEventType = 6  // 任务取消
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_RETRIED           BuildSchedulerEventType = 7  // 任务重试
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_CACHE_HIT         BuildSchedulerEventType = 8  // 构建缓存命中
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_CACHE_INVALIDATED BuildSchedulerEventType = 9  // 构建缓存失效
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_COMPLETED         BuildSchedulerEventType = 10 // 任务完成
+	BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_FAILED            BuildSchedulerEventType = 11 // 任务失败
+)
+
+// Enum value maps for BuildSchedulerEventType.
+var (
+	BuildSchedulerEventType_name = map[int32]string{
+		0:  "BUILD_SCHEDULER_EVENT_TYPE_UNKNOWN",
+		1:  "BUILD_SCHEDULER_EVENT_TYPE_QUEUED",
+		2:  "BUILD_SCHEDULER_EVENT_TYPE_CLAIMED",
+		3:  "BUILD_SCHEDULER_EVENT_TYPE_THROTTLED",
+		4:  "BUILD_SCHEDULER_EVENT_TYPE_RECOVERED",
+		5:  "BUILD_SCHEDULER_EVENT_TYPE_DRAINED",
+		6:  "BUILD_SCHEDULER_EVENT_TYPE_CANCELLED",
+		7:  "BUILD_SCHEDULER_EVENT_TYPE_RETRIED",
+		8:  "BUILD_SCHEDULER_EVENT_TYPE_CACHE_HIT",
+		9:  "BUILD_SCHEDULER_EVENT_TYPE_CACHE_INVALIDATED",
+		10: "BUILD_SCHEDULER_EVENT_TYPE_COMPLETED",
+		11: "BUILD_SCHEDULER_EVENT_TYPE_FAILED",
+	}
+	BuildSchedulerEventType_value = map[string]int32{
+		"BUILD_SCHEDULER_EVENT_TYPE_UNKNOWN":           0,
+		"BUILD_SCHEDULER_EVENT_TYPE_QUEUED":            1,
+		"BUILD_SCHEDULER_EVENT_TYPE_CLAIMED":           2,
+		"BUILD_SCHEDULER_EVENT_TYPE_THROTTLED":         3,
+		"BUILD_SCHEDULER_EVENT_TYPE_RECOVERED":         4,
+		"BUILD_SCHEDULER_EVENT_TYPE_DRAINED":           5,
+		"BUILD_SCHEDULER_EVENT_TYPE_CANCELLED":         6,
+		"BUILD_SCHEDULER_EVENT_TYPE_RETRIED":           7,
+		"BUILD_SCHEDULER_EVENT_TYPE_CACHE_HIT":         8,
+		"BUILD_SCHEDULER_EVENT_TYPE_CACHE_INVALIDATED": 9,
+		"BUILD_SCHEDULER_EVENT_TYPE_COMPLETED":         10,
+		"BUILD_SCHEDULER_EVENT_TYPE_FAILED":            11,
+	}
+)
+
+func (x BuildSchedulerEventType) Enum() *BuildSchedulerEventType {
+	p := new(BuildSchedulerEventType)
+	*p = x
+	return p
+}
+
+func (x BuildSchedulerEventType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BuildSchedulerEventType) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[11].Descriptor()
+}
+
+func (BuildSchedulerEventType) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[11]
+}
+
+func (x BuildSchedulerEventType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BuildSchedulerEventType.Descriptor instead.
+func (BuildSchedulerEventType) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{11}
+}
+
+// V5 Open API凭证状态。
+type OpenApiCredentialStatus int32
+
+const (
+	OpenApiCredentialStatus_OPEN_API_CREDENTIAL_STATUS_UNKNOWN        OpenApiCredentialStatus = 0 // 未知状态
+	OpenApiCredentialStatus_OPEN_API_CREDENTIAL_STATUS_ACTIVE         OpenApiCredentialStatus = 1 // 启用
+	OpenApiCredentialStatus_OPEN_API_CREDENTIAL_STATUS_ROTATION_GRACE OpenApiCredentialStatus = 2 // 轮换过渡期
+	OpenApiCredentialStatus_OPEN_API_CREDENTIAL_STATUS_REVOKED        OpenApiCredentialStatus = 3 // 已吊销
+	OpenApiCredentialStatus_OPEN_API_CREDENTIAL_STATUS_EXPIRED        OpenApiCredentialStatus = 4 // 已过期
+)
+
+// Enum value maps for OpenApiCredentialStatus.
+var (
+	OpenApiCredentialStatus_name = map[int32]string{
+		0: "OPEN_API_CREDENTIAL_STATUS_UNKNOWN",
+		1: "OPEN_API_CREDENTIAL_STATUS_ACTIVE",
+		2: "OPEN_API_CREDENTIAL_STATUS_ROTATION_GRACE",
+		3: "OPEN_API_CREDENTIAL_STATUS_REVOKED",
+		4: "OPEN_API_CREDENTIAL_STATUS_EXPIRED",
+	}
+	OpenApiCredentialStatus_value = map[string]int32{
+		"OPEN_API_CREDENTIAL_STATUS_UNKNOWN":        0,
+		"OPEN_API_CREDENTIAL_STATUS_ACTIVE":         1,
+		"OPEN_API_CREDENTIAL_STATUS_ROTATION_GRACE": 2,
+		"OPEN_API_CREDENTIAL_STATUS_REVOKED":        3,
+		"OPEN_API_CREDENTIAL_STATUS_EXPIRED":        4,
+	}
+)
+
+func (x OpenApiCredentialStatus) Enum() *OpenApiCredentialStatus {
+	p := new(OpenApiCredentialStatus)
+	*p = x
+	return p
+}
+
+func (x OpenApiCredentialStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OpenApiCredentialStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[12].Descriptor()
+}
+
+func (OpenApiCredentialStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[12]
+}
+
+func (x OpenApiCredentialStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OpenApiCredentialStatus.Descriptor instead.
+func (OpenApiCredentialStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{12}
+}
+
+// V5 Open API权限范围。
+type OpenApiScope int32
+
+const (
+	OpenApiScope_OPEN_API_SCOPE_UNKNOWN        OpenApiScope = 0  // 未知Scope
+	OpenApiScope_OPEN_API_SCOPE_APPS_READ      OpenApiScope = 1  // 读取应用
+	OpenApiScope_OPEN_API_SCOPE_APPS_WRITE     OpenApiScope = 2  // 管理应用
+	OpenApiScope_OPEN_API_SCOPE_VERSIONS_READ  OpenApiScope = 3  // 读取版本
+	OpenApiScope_OPEN_API_SCOPE_VERSIONS_WRITE OpenApiScope = 4  // 管理版本
+	OpenApiScope_OPEN_API_SCOPE_CHANNELS_READ  OpenApiScope = 5  // 读取渠道
+	OpenApiScope_OPEN_API_SCOPE_CHANNELS_WRITE OpenApiScope = 6  // 管理渠道
+	OpenApiScope_OPEN_API_SCOPE_BRANDING_READ  OpenApiScope = 7  // 读取品牌和白标产品
+	OpenApiScope_OPEN_API_SCOPE_BRANDING_WRITE OpenApiScope = 8  // 管理品牌和白标产品
+	OpenApiScope_OPEN_API_SCOPE_BUILDS_READ    OpenApiScope = 9  // 读取构建
+	OpenApiScope_OPEN_API_SCOPE_BUILDS_WRITE   OpenApiScope = 10 // 创建、取消和重试构建
+	OpenApiScope_OPEN_API_SCOPE_ARTIFACTS_READ OpenApiScope = 11 // 下载构建产物
+	OpenApiScope_OPEN_API_SCOPE_STATS_READ     OpenApiScope = 12 // 读取归因统计
+)
+
+// Enum value maps for OpenApiScope.
+var (
+	OpenApiScope_name = map[int32]string{
+		0:  "OPEN_API_SCOPE_UNKNOWN",
+		1:  "OPEN_API_SCOPE_APPS_READ",
+		2:  "OPEN_API_SCOPE_APPS_WRITE",
+		3:  "OPEN_API_SCOPE_VERSIONS_READ",
+		4:  "OPEN_API_SCOPE_VERSIONS_WRITE",
+		5:  "OPEN_API_SCOPE_CHANNELS_READ",
+		6:  "OPEN_API_SCOPE_CHANNELS_WRITE",
+		7:  "OPEN_API_SCOPE_BRANDING_READ",
+		8:  "OPEN_API_SCOPE_BRANDING_WRITE",
+		9:  "OPEN_API_SCOPE_BUILDS_READ",
+		10: "OPEN_API_SCOPE_BUILDS_WRITE",
+		11: "OPEN_API_SCOPE_ARTIFACTS_READ",
+		12: "OPEN_API_SCOPE_STATS_READ",
+	}
+	OpenApiScope_value = map[string]int32{
+		"OPEN_API_SCOPE_UNKNOWN":        0,
+		"OPEN_API_SCOPE_APPS_READ":      1,
+		"OPEN_API_SCOPE_APPS_WRITE":     2,
+		"OPEN_API_SCOPE_VERSIONS_READ":  3,
+		"OPEN_API_SCOPE_VERSIONS_WRITE": 4,
+		"OPEN_API_SCOPE_CHANNELS_READ":  5,
+		"OPEN_API_SCOPE_CHANNELS_WRITE": 6,
+		"OPEN_API_SCOPE_BRANDING_READ":  7,
+		"OPEN_API_SCOPE_BRANDING_WRITE": 8,
+		"OPEN_API_SCOPE_BUILDS_READ":    9,
+		"OPEN_API_SCOPE_BUILDS_WRITE":   10,
+		"OPEN_API_SCOPE_ARTIFACTS_READ": 11,
+		"OPEN_API_SCOPE_STATS_READ":     12,
+	}
+)
+
+func (x OpenApiScope) Enum() *OpenApiScope {
+	p := new(OpenApiScope)
+	*p = x
+	return p
+}
+
+func (x OpenApiScope) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OpenApiScope) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[13].Descriptor()
+}
+
+func (OpenApiScope) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[13]
+}
+
+func (x OpenApiScope) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OpenApiScope.Descriptor instead.
+func (OpenApiScope) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{13}
+}
+
+// V5 Open API幂等键处理结果。
+type OpenApiIdempotencyDecision int32
+
+const (
+	OpenApiIdempotencyDecision_OPEN_API_IDEMPOTENCY_DECISION_UNKNOWN     OpenApiIdempotencyDecision = 0 // 未知结果
+	OpenApiIdempotencyDecision_OPEN_API_IDEMPOTENCY_DECISION_ACQUIRED    OpenApiIdempotencyDecision = 1 // 当前请求取得执行权
+	OpenApiIdempotencyDecision_OPEN_API_IDEMPOTENCY_DECISION_REPLAY      OpenApiIdempotencyDecision = 2 // 返回已完成请求的响应
+	OpenApiIdempotencyDecision_OPEN_API_IDEMPOTENCY_DECISION_IN_PROGRESS OpenApiIdempotencyDecision = 3 // 相同请求正在处理中
+	OpenApiIdempotencyDecision_OPEN_API_IDEMPOTENCY_DECISION_CONFLICT    OpenApiIdempotencyDecision = 4 // 相同幂等键对应不同请求
+)
+
+// Enum value maps for OpenApiIdempotencyDecision.
+var (
+	OpenApiIdempotencyDecision_name = map[int32]string{
+		0: "OPEN_API_IDEMPOTENCY_DECISION_UNKNOWN",
+		1: "OPEN_API_IDEMPOTENCY_DECISION_ACQUIRED",
+		2: "OPEN_API_IDEMPOTENCY_DECISION_REPLAY",
+		3: "OPEN_API_IDEMPOTENCY_DECISION_IN_PROGRESS",
+		4: "OPEN_API_IDEMPOTENCY_DECISION_CONFLICT",
+	}
+	OpenApiIdempotencyDecision_value = map[string]int32{
+		"OPEN_API_IDEMPOTENCY_DECISION_UNKNOWN":     0,
+		"OPEN_API_IDEMPOTENCY_DECISION_ACQUIRED":    1,
+		"OPEN_API_IDEMPOTENCY_DECISION_REPLAY":      2,
+		"OPEN_API_IDEMPOTENCY_DECISION_IN_PROGRESS": 3,
+		"OPEN_API_IDEMPOTENCY_DECISION_CONFLICT":    4,
+	}
+)
+
+func (x OpenApiIdempotencyDecision) Enum() *OpenApiIdempotencyDecision {
+	p := new(OpenApiIdempotencyDecision)
+	*p = x
+	return p
+}
+
+func (x OpenApiIdempotencyDecision) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OpenApiIdempotencyDecision) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[14].Descriptor()
+}
+
+func (OpenApiIdempotencyDecision) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[14]
+}
+
+func (x OpenApiIdempotencyDecision) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OpenApiIdempotencyDecision.Descriptor instead.
+func (OpenApiIdempotencyDecision) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{14}
+}
+
+// V5 Webhook端点状态。
+type WebhookEndpointStatus int32
+
+const (
+	WebhookEndpointStatus_WEBHOOK_ENDPOINT_STATUS_UNKNOWN WebhookEndpointStatus = 0 // 未知状态
+	WebhookEndpointStatus_WEBHOOK_ENDPOINT_STATUS_ACTIVE  WebhookEndpointStatus = 1 // 启用
+	WebhookEndpointStatus_WEBHOOK_ENDPOINT_STATUS_PAUSED  WebhookEndpointStatus = 2 // 暂停
+	WebhookEndpointStatus_WEBHOOK_ENDPOINT_STATUS_REVOKED WebhookEndpointStatus = 3 // 已吊销
+)
+
+// Enum value maps for WebhookEndpointStatus.
+var (
+	WebhookEndpointStatus_name = map[int32]string{
+		0: "WEBHOOK_ENDPOINT_STATUS_UNKNOWN",
+		1: "WEBHOOK_ENDPOINT_STATUS_ACTIVE",
+		2: "WEBHOOK_ENDPOINT_STATUS_PAUSED",
+		3: "WEBHOOK_ENDPOINT_STATUS_REVOKED",
+	}
+	WebhookEndpointStatus_value = map[string]int32{
+		"WEBHOOK_ENDPOINT_STATUS_UNKNOWN": 0,
+		"WEBHOOK_ENDPOINT_STATUS_ACTIVE":  1,
+		"WEBHOOK_ENDPOINT_STATUS_PAUSED":  2,
+		"WEBHOOK_ENDPOINT_STATUS_REVOKED": 3,
+	}
+)
+
+func (x WebhookEndpointStatus) Enum() *WebhookEndpointStatus {
+	p := new(WebhookEndpointStatus)
+	*p = x
+	return p
+}
+
+func (x WebhookEndpointStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (WebhookEndpointStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[15].Descriptor()
+}
+
+func (WebhookEndpointStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[15]
+}
+
+func (x WebhookEndpointStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use WebhookEndpointStatus.Descriptor instead.
+func (WebhookEndpointStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{15}
+}
+
+// V5 Webhook投递状态。
+type WebhookDeliveryStatus int32
+
+const (
+	WebhookDeliveryStatus_WEBHOOK_DELIVERY_STATUS_UNKNOWN     WebhookDeliveryStatus = 0 // 未知状态
+	WebhookDeliveryStatus_WEBHOOK_DELIVERY_STATUS_PENDING     WebhookDeliveryStatus = 1 // 待投递
+	WebhookDeliveryStatus_WEBHOOK_DELIVERY_STATUS_DELIVERING  WebhookDeliveryStatus = 2 // 投递中
+	WebhookDeliveryStatus_WEBHOOK_DELIVERY_STATUS_SUCCEEDED   WebhookDeliveryStatus = 3 // 投递成功
+	WebhookDeliveryStatus_WEBHOOK_DELIVERY_STATUS_RETRYING    WebhookDeliveryStatus = 4 // 等待重试
+	WebhookDeliveryStatus_WEBHOOK_DELIVERY_STATUS_DEAD_LETTER WebhookDeliveryStatus = 5 // 已进入死信
+)
+
+// Enum value maps for WebhookDeliveryStatus.
+var (
+	WebhookDeliveryStatus_name = map[int32]string{
+		0: "WEBHOOK_DELIVERY_STATUS_UNKNOWN",
+		1: "WEBHOOK_DELIVERY_STATUS_PENDING",
+		2: "WEBHOOK_DELIVERY_STATUS_DELIVERING",
+		3: "WEBHOOK_DELIVERY_STATUS_SUCCEEDED",
+		4: "WEBHOOK_DELIVERY_STATUS_RETRYING",
+		5: "WEBHOOK_DELIVERY_STATUS_DEAD_LETTER",
+	}
+	WebhookDeliveryStatus_value = map[string]int32{
+		"WEBHOOK_DELIVERY_STATUS_UNKNOWN":     0,
+		"WEBHOOK_DELIVERY_STATUS_PENDING":     1,
+		"WEBHOOK_DELIVERY_STATUS_DELIVERING":  2,
+		"WEBHOOK_DELIVERY_STATUS_SUCCEEDED":   3,
+		"WEBHOOK_DELIVERY_STATUS_RETRYING":    4,
+		"WEBHOOK_DELIVERY_STATUS_DEAD_LETTER": 5,
+	}
+)
+
+func (x WebhookDeliveryStatus) Enum() *WebhookDeliveryStatus {
+	p := new(WebhookDeliveryStatus)
+	*p = x
+	return p
+}
+
+func (x WebhookDeliveryStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (WebhookDeliveryStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[16].Descriptor()
+}
+
+func (WebhookDeliveryStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[16]
+}
+
+func (x WebhookDeliveryStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use WebhookDeliveryStatus.Descriptor instead.
+func (WebhookDeliveryStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{16}
+}
+
+// V5 代码托管平台类型。
+type SourcePlatform int32
+
+const (
+	SourcePlatform_SOURCE_PLATFORM_UNKNOWN SourcePlatform = 0 // 未知平台
+	SourcePlatform_SOURCE_PLATFORM_GITHUB  SourcePlatform = 1 // GitHub App或OAuth
+	SourcePlatform_SOURCE_PLATFORM_GITLAB  SourcePlatform = 2 // GitLab OAuth
+)
+
+// Enum value maps for SourcePlatform.
+var (
+	SourcePlatform_name = map[int32]string{
+		0: "SOURCE_PLATFORM_UNKNOWN",
+		1: "SOURCE_PLATFORM_GITHUB",
+		2: "SOURCE_PLATFORM_GITLAB",
+	}
+	SourcePlatform_value = map[string]int32{
+		"SOURCE_PLATFORM_UNKNOWN": 0,
+		"SOURCE_PLATFORM_GITHUB":  1,
+		"SOURCE_PLATFORM_GITLAB":  2,
+	}
+)
+
+func (x SourcePlatform) Enum() *SourcePlatform {
+	p := new(SourcePlatform)
+	*p = x
+	return p
+}
+
+func (x SourcePlatform) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SourcePlatform) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[17].Descriptor()
+}
+
+func (SourcePlatform) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[17]
+}
+
+func (x SourcePlatform) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SourcePlatform.Descriptor instead.
+func (SourcePlatform) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{17}
+}
+
+// V5 代码平台集成状态。
+type SourceIntegrationStatus int32
+
+const (
+	SourceIntegrationStatus_SOURCE_INTEGRATION_STATUS_UNKNOWN      SourceIntegrationStatus = 0 // 未知状态
+	SourceIntegrationStatus_SOURCE_INTEGRATION_STATUS_ACTIVE       SourceIntegrationStatus = 1 // 已连接且可用
+	SourceIntegrationStatus_SOURCE_INTEGRATION_STATUS_DISCONNECTED SourceIntegrationStatus = 2 // 已主动断开
+	SourceIntegrationStatus_SOURCE_INTEGRATION_STATUS_ERROR        SourceIntegrationStatus = 3 // 安装或令牌同步异常
+)
+
+// Enum value maps for SourceIntegrationStatus.
+var (
+	SourceIntegrationStatus_name = map[int32]string{
+		0: "SOURCE_INTEGRATION_STATUS_UNKNOWN",
+		1: "SOURCE_INTEGRATION_STATUS_ACTIVE",
+		2: "SOURCE_INTEGRATION_STATUS_DISCONNECTED",
+		3: "SOURCE_INTEGRATION_STATUS_ERROR",
+	}
+	SourceIntegrationStatus_value = map[string]int32{
+		"SOURCE_INTEGRATION_STATUS_UNKNOWN":      0,
+		"SOURCE_INTEGRATION_STATUS_ACTIVE":       1,
+		"SOURCE_INTEGRATION_STATUS_DISCONNECTED": 2,
+		"SOURCE_INTEGRATION_STATUS_ERROR":        3,
+	}
+)
+
+func (x SourceIntegrationStatus) Enum() *SourceIntegrationStatus {
+	p := new(SourceIntegrationStatus)
+	*p = x
+	return p
+}
+
+func (x SourceIntegrationStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SourceIntegrationStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[18].Descriptor()
+}
+
+func (SourceIntegrationStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[18]
+}
+
+func (x SourceIntegrationStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SourceIntegrationStatus.Descriptor instead.
+func (SourceIntegrationStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{18}
+}
+
+// V5 授权仓库状态。
+type SourceRepositoryStatus int32
+
+const (
+	SourceRepositoryStatus_SOURCE_REPOSITORY_STATUS_UNKNOWN    SourceRepositoryStatus = 0 // 未知状态
+	SourceRepositoryStatus_SOURCE_REPOSITORY_STATUS_AUTHORIZED SourceRepositoryStatus = 1 // 已授权只读访问
+	SourceRepositoryStatus_SOURCE_REPOSITORY_STATUS_REVOKED    SourceRepositoryStatus = 2 // 已撤销授权
+)
+
+// Enum value maps for SourceRepositoryStatus.
+var (
+	SourceRepositoryStatus_name = map[int32]string{
+		0: "SOURCE_REPOSITORY_STATUS_UNKNOWN",
+		1: "SOURCE_REPOSITORY_STATUS_AUTHORIZED",
+		2: "SOURCE_REPOSITORY_STATUS_REVOKED",
+	}
+	SourceRepositoryStatus_value = map[string]int32{
+		"SOURCE_REPOSITORY_STATUS_UNKNOWN":    0,
+		"SOURCE_REPOSITORY_STATUS_AUTHORIZED": 1,
+		"SOURCE_REPOSITORY_STATUS_REVOKED":    2,
+	}
+)
+
+func (x SourceRepositoryStatus) Enum() *SourceRepositoryStatus {
+	p := new(SourceRepositoryStatus)
+	*p = x
+	return p
+}
+
+func (x SourceRepositoryStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SourceRepositoryStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[19].Descriptor()
+}
+
+func (SourceRepositoryStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[19]
+}
+
+func (x SourceRepositoryStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SourceRepositoryStatus.Descriptor instead.
+func (SourceRepositoryStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{19}
+}
+
+// V5 APK Artifact来源类型。
+type SourceArtifactType int32
+
+const (
+	SourceArtifactType_SOURCE_ARTIFACT_TYPE_UNKNOWN SourceArtifactType = 0 // 未知来源
+	SourceArtifactType_SOURCE_ARTIFACT_TYPE_RELEASE SourceArtifactType = 1 // Release附件
+	SourceArtifactType_SOURCE_ARTIFACT_TYPE_CI_JOB  SourceArtifactType = 2 // CI任务Artifact
+)
+
+// Enum value maps for SourceArtifactType.
+var (
+	SourceArtifactType_name = map[int32]string{
+		0: "SOURCE_ARTIFACT_TYPE_UNKNOWN",
+		1: "SOURCE_ARTIFACT_TYPE_RELEASE",
+		2: "SOURCE_ARTIFACT_TYPE_CI_JOB",
+	}
+	SourceArtifactType_value = map[string]int32{
+		"SOURCE_ARTIFACT_TYPE_UNKNOWN": 0,
+		"SOURCE_ARTIFACT_TYPE_RELEASE": 1,
+		"SOURCE_ARTIFACT_TYPE_CI_JOB":  2,
+	}
+)
+
+func (x SourceArtifactType) Enum() *SourceArtifactType {
+	p := new(SourceArtifactType)
+	*p = x
+	return p
+}
+
+func (x SourceArtifactType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SourceArtifactType) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[20].Descriptor()
+}
+
+func (SourceArtifactType) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[20]
+}
+
+func (x SourceArtifactType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SourceArtifactType.Descriptor instead.
+func (SourceArtifactType) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{20}
+}
+
+// V5 源码平台预定义构建触发事件类型。
+type SourceBuildTriggerEventType int32
+
+const (
+	SourceBuildTriggerEventType_SOURCE_BUILD_TRIGGER_EVENT_TYPE_UNKNOWN           SourceBuildTriggerEventType = 0 // 未知事件
+	SourceBuildTriggerEventType_SOURCE_BUILD_TRIGGER_EVENT_TYPE_RELEASE_PUBLISHED SourceBuildTriggerEventType = 1 // Release发布事件
+	SourceBuildTriggerEventType_SOURCE_BUILD_TRIGGER_EVENT_TYPE_CI_SUCCEEDED      SourceBuildTriggerEventType = 2 // CI流水线成功事件
+)
+
+// Enum value maps for SourceBuildTriggerEventType.
+var (
+	SourceBuildTriggerEventType_name = map[int32]string{
+		0: "SOURCE_BUILD_TRIGGER_EVENT_TYPE_UNKNOWN",
+		1: "SOURCE_BUILD_TRIGGER_EVENT_TYPE_RELEASE_PUBLISHED",
+		2: "SOURCE_BUILD_TRIGGER_EVENT_TYPE_CI_SUCCEEDED",
+	}
+	SourceBuildTriggerEventType_value = map[string]int32{
+		"SOURCE_BUILD_TRIGGER_EVENT_TYPE_UNKNOWN":           0,
+		"SOURCE_BUILD_TRIGGER_EVENT_TYPE_RELEASE_PUBLISHED": 1,
+		"SOURCE_BUILD_TRIGGER_EVENT_TYPE_CI_SUCCEEDED":      2,
+	}
+)
+
+func (x SourceBuildTriggerEventType) Enum() *SourceBuildTriggerEventType {
+	p := new(SourceBuildTriggerEventType)
+	*p = x
+	return p
+}
+
+func (x SourceBuildTriggerEventType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SourceBuildTriggerEventType) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[21].Descriptor()
+}
+
+func (SourceBuildTriggerEventType) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[21]
+}
+
+func (x SourceBuildTriggerEventType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SourceBuildTriggerEventType.Descriptor instead.
+func (SourceBuildTriggerEventType) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{21}
+}
+
+// V5 源码平台预定义构建触发策略状态。
+type SourceBuildTriggerStatus int32
+
+const (
+	SourceBuildTriggerStatus_SOURCE_BUILD_TRIGGER_STATUS_UNKNOWN  SourceBuildTriggerStatus = 0 // 未知状态
+	SourceBuildTriggerStatus_SOURCE_BUILD_TRIGGER_STATUS_ACTIVE   SourceBuildTriggerStatus = 1 // 启用并接受签名Webhook
+	SourceBuildTriggerStatus_SOURCE_BUILD_TRIGGER_STATUS_DISABLED SourceBuildTriggerStatus = 2 // 停用且拒绝Webhook
+)
+
+// Enum value maps for SourceBuildTriggerStatus.
+var (
+	SourceBuildTriggerStatus_name = map[int32]string{
+		0: "SOURCE_BUILD_TRIGGER_STATUS_UNKNOWN",
+		1: "SOURCE_BUILD_TRIGGER_STATUS_ACTIVE",
+		2: "SOURCE_BUILD_TRIGGER_STATUS_DISABLED",
+	}
+	SourceBuildTriggerStatus_value = map[string]int32{
+		"SOURCE_BUILD_TRIGGER_STATUS_UNKNOWN":  0,
+		"SOURCE_BUILD_TRIGGER_STATUS_ACTIVE":   1,
+		"SOURCE_BUILD_TRIGGER_STATUS_DISABLED": 2,
+	}
+)
+
+func (x SourceBuildTriggerStatus) Enum() *SourceBuildTriggerStatus {
+	p := new(SourceBuildTriggerStatus)
+	*p = x
+	return p
+}
+
+func (x SourceBuildTriggerStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SourceBuildTriggerStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[22].Descriptor()
+}
+
+func (SourceBuildTriggerStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[22]
+}
+
+func (x SourceBuildTriggerStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SourceBuildTriggerStatus.Descriptor instead.
+func (SourceBuildTriggerStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{22}
+}
+
+// V5 源码平台入站Webhook处理状态。
+type SourceWebhookEventStatus int32
+
+const (
+	SourceWebhookEventStatus_SOURCE_WEBHOOK_EVENT_STATUS_UNKNOWN    SourceWebhookEventStatus = 0 // 未知状态
+	SourceWebhookEventStatus_SOURCE_WEBHOOK_EVENT_STATUS_PENDING    SourceWebhookEventStatus = 1 // 已可靠入队等待处理
+	SourceWebhookEventStatus_SOURCE_WEBHOOK_EVENT_STATUS_PROCESSING SourceWebhookEventStatus = 2 // Worker处理中
+	SourceWebhookEventStatus_SOURCE_WEBHOOK_EVENT_STATUS_SUCCEEDED  SourceWebhookEventStatus = 3 // Artifact导入和构建任务创建成功
+	SourceWebhookEventStatus_SOURCE_WEBHOOK_EVENT_STATUS_IGNORED    SourceWebhookEventStatus = 4 // 未满足预定义策略并已忽略
+	SourceWebhookEventStatus_SOURCE_WEBHOOK_EVENT_STATUS_FAILED     SourceWebhookEventStatus = 5 // 达到重试上限后失败
+)
+
+// Enum value maps for SourceWebhookEventStatus.
+var (
+	SourceWebhookEventStatus_name = map[int32]string{
+		0: "SOURCE_WEBHOOK_EVENT_STATUS_UNKNOWN",
+		1: "SOURCE_WEBHOOK_EVENT_STATUS_PENDING",
+		2: "SOURCE_WEBHOOK_EVENT_STATUS_PROCESSING",
+		3: "SOURCE_WEBHOOK_EVENT_STATUS_SUCCEEDED",
+		4: "SOURCE_WEBHOOK_EVENT_STATUS_IGNORED",
+		5: "SOURCE_WEBHOOK_EVENT_STATUS_FAILED",
+	}
+	SourceWebhookEventStatus_value = map[string]int32{
+		"SOURCE_WEBHOOK_EVENT_STATUS_UNKNOWN":    0,
+		"SOURCE_WEBHOOK_EVENT_STATUS_PENDING":    1,
+		"SOURCE_WEBHOOK_EVENT_STATUS_PROCESSING": 2,
+		"SOURCE_WEBHOOK_EVENT_STATUS_SUCCEEDED":  3,
+		"SOURCE_WEBHOOK_EVENT_STATUS_IGNORED":    4,
+		"SOURCE_WEBHOOK_EVENT_STATUS_FAILED":     5,
+	}
+)
+
+func (x SourceWebhookEventStatus) Enum() *SourceWebhookEventStatus {
+	p := new(SourceWebhookEventStatus)
+	*p = x
+	return p
+}
+
+func (x SourceWebhookEventStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SourceWebhookEventStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[23].Descriptor()
+}
+
+func (SourceWebhookEventStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[23]
+}
+
+func (x SourceWebhookEventStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SourceWebhookEventStatus.Descriptor instead.
+func (SourceWebhookEventStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{23}
+}
+
+// V6 套餐计费周期。
+type BillingCycle int32
+
+const (
+	BillingCycle_BILLING_CYCLE_UNKNOWN BillingCycle = 0 // 未知周期
+	BillingCycle_BILLING_CYCLE_MONTHLY BillingCycle = 1 // 按月计费
+	BillingCycle_BILLING_CYCLE_YEARLY  BillingCycle = 2 // 按年计费
+)
+
+// Enum value maps for BillingCycle.
+var (
+	BillingCycle_name = map[int32]string{
+		0: "BILLING_CYCLE_UNKNOWN",
+		1: "BILLING_CYCLE_MONTHLY",
+		2: "BILLING_CYCLE_YEARLY",
+	}
+	BillingCycle_value = map[string]int32{
+		"BILLING_CYCLE_UNKNOWN": 0,
+		"BILLING_CYCLE_MONTHLY": 1,
+		"BILLING_CYCLE_YEARLY":  2,
+	}
+)
+
+func (x BillingCycle) Enum() *BillingCycle {
+	p := new(BillingCycle)
+	*p = x
+	return p
+}
+
+func (x BillingCycle) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BillingCycle) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[24].Descriptor()
+}
+
+func (BillingCycle) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[24]
+}
+
+func (x BillingCycle) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BillingCycle.Descriptor instead.
+func (BillingCycle) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{24}
+}
+
+// V6 套餐版本状态。
+type BillingPlanStatus int32
+
+const (
+	BillingPlanStatus_BILLING_PLAN_STATUS_UNKNOWN BillingPlanStatus = 0 // 未知状态
+	BillingPlanStatus_BILLING_PLAN_STATUS_ACTIVE  BillingPlanStatus = 1 // 可售且可订阅
+	BillingPlanStatus_BILLING_PLAN_STATUS_RETIRED BillingPlanStatus = 2 // 已退役，不影响历史订阅
+)
+
+// Enum value maps for BillingPlanStatus.
+var (
+	BillingPlanStatus_name = map[int32]string{
+		0: "BILLING_PLAN_STATUS_UNKNOWN",
+		1: "BILLING_PLAN_STATUS_ACTIVE",
+		2: "BILLING_PLAN_STATUS_RETIRED",
+	}
+	BillingPlanStatus_value = map[string]int32{
+		"BILLING_PLAN_STATUS_UNKNOWN": 0,
+		"BILLING_PLAN_STATUS_ACTIVE":  1,
+		"BILLING_PLAN_STATUS_RETIRED": 2,
+	}
+)
+
+func (x BillingPlanStatus) Enum() *BillingPlanStatus {
+	p := new(BillingPlanStatus)
+	*p = x
+	return p
+}
+
+func (x BillingPlanStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BillingPlanStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[25].Descriptor()
+}
+
+func (BillingPlanStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[25]
+}
+
+func (x BillingPlanStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BillingPlanStatus.Descriptor instead.
+func (BillingPlanStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{25}
+}
+
+// V6 租户订阅状态。
+type TenantSubscriptionStatus int32
+
+const (
+	TenantSubscriptionStatus_TENANT_SUBSCRIPTION_STATUS_UNKNOWN  TenantSubscriptionStatus = 0 // 未知状态
+	TenantSubscriptionStatus_TENANT_SUBSCRIPTION_STATUS_ACTIVE   TenantSubscriptionStatus = 1 // 正常生效
+	TenantSubscriptionStatus_TENANT_SUBSCRIPTION_STATUS_PAST_DUE TenantSubscriptionStatus = 2 // 支付逾期
+	TenantSubscriptionStatus_TENANT_SUBSCRIPTION_STATUS_GRACE    TenantSubscriptionStatus = 3 // 宽限期内
+	TenantSubscriptionStatus_TENANT_SUBSCRIPTION_STATUS_PAUSED   TenantSubscriptionStatus = 4 // 已暂停，不允许新增消耗
+	TenantSubscriptionStatus_TENANT_SUBSCRIPTION_STATUS_CANCELED TenantSubscriptionStatus = 5 // 已取消
+	TenantSubscriptionStatus_TENANT_SUBSCRIPTION_STATUS_PENDING  TenantSubscriptionStatus = 6 // 待支付或待人工确认
+)
+
+// Enum value maps for TenantSubscriptionStatus.
+var (
+	TenantSubscriptionStatus_name = map[int32]string{
+		0: "TENANT_SUBSCRIPTION_STATUS_UNKNOWN",
+		1: "TENANT_SUBSCRIPTION_STATUS_ACTIVE",
+		2: "TENANT_SUBSCRIPTION_STATUS_PAST_DUE",
+		3: "TENANT_SUBSCRIPTION_STATUS_GRACE",
+		4: "TENANT_SUBSCRIPTION_STATUS_PAUSED",
+		5: "TENANT_SUBSCRIPTION_STATUS_CANCELED",
+		6: "TENANT_SUBSCRIPTION_STATUS_PENDING",
+	}
+	TenantSubscriptionStatus_value = map[string]int32{
+		"TENANT_SUBSCRIPTION_STATUS_UNKNOWN":  0,
+		"TENANT_SUBSCRIPTION_STATUS_ACTIVE":   1,
+		"TENANT_SUBSCRIPTION_STATUS_PAST_DUE": 2,
+		"TENANT_SUBSCRIPTION_STATUS_GRACE":    3,
+		"TENANT_SUBSCRIPTION_STATUS_PAUSED":   4,
+		"TENANT_SUBSCRIPTION_STATUS_CANCELED": 5,
+		"TENANT_SUBSCRIPTION_STATUS_PENDING":  6,
+	}
+)
+
+func (x TenantSubscriptionStatus) Enum() *TenantSubscriptionStatus {
+	p := new(TenantSubscriptionStatus)
+	*p = x
+	return p
+}
+
+func (x TenantSubscriptionStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TenantSubscriptionStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[26].Descriptor()
+}
+
+func (TenantSubscriptionStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[26]
+}
+
+func (x TenantSubscriptionStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TenantSubscriptionStatus.Descriptor instead.
+func (TenantSubscriptionStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{26}
+}
+
+// V6 订阅来源。
+type TenantSubscriptionSource int32
+
+const (
+	TenantSubscriptionSource_TENANT_SUBSCRIPTION_SOURCE_UNKNOWN TenantSubscriptionSource = 0 // 未知来源
+	TenantSubscriptionSource_TENANT_SUBSCRIPTION_SOURCE_STRIPE  TenantSubscriptionSource = 1 // Stripe在线订阅
+	TenantSubscriptionSource_TENANT_SUBSCRIPTION_SOURCE_MANUAL  TenantSubscriptionSource = 2 // 人工合同订阅
+	TenantSubscriptionSource_TENANT_SUBSCRIPTION_SOURCE_GRANT   TenantSubscriptionSource = 3 // 平台赠送订阅
+)
+
+// Enum value maps for TenantSubscriptionSource.
+var (
+	TenantSubscriptionSource_name = map[int32]string{
+		0: "TENANT_SUBSCRIPTION_SOURCE_UNKNOWN",
+		1: "TENANT_SUBSCRIPTION_SOURCE_STRIPE",
+		2: "TENANT_SUBSCRIPTION_SOURCE_MANUAL",
+		3: "TENANT_SUBSCRIPTION_SOURCE_GRANT",
+	}
+	TenantSubscriptionSource_value = map[string]int32{
+		"TENANT_SUBSCRIPTION_SOURCE_UNKNOWN": 0,
+		"TENANT_SUBSCRIPTION_SOURCE_STRIPE":  1,
+		"TENANT_SUBSCRIPTION_SOURCE_MANUAL":  2,
+		"TENANT_SUBSCRIPTION_SOURCE_GRANT":   3,
+	}
+)
+
+func (x TenantSubscriptionSource) Enum() *TenantSubscriptionSource {
+	p := new(TenantSubscriptionSource)
+	*p = x
+	return p
+}
+
+func (x TenantSubscriptionSource) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TenantSubscriptionSource) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[27].Descriptor()
+}
+
+func (TenantSubscriptionSource) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[27]
+}
+
+func (x TenantSubscriptionSource) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TenantSubscriptionSource.Descriptor instead.
+func (TenantSubscriptionSource) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{27}
+}
+
+// V6 权益状态。
+type TenantEntitlementStatus int32
+
+const (
+	TenantEntitlementStatus_TENANT_ENTITLEMENT_STATUS_UNKNOWN TenantEntitlementStatus = 0 // 未知状态
+	TenantEntitlementStatus_TENANT_ENTITLEMENT_STATUS_ACTIVE  TenantEntitlementStatus = 1 // 当前生效
+	TenantEntitlementStatus_TENANT_ENTITLEMENT_STATUS_PAUSED  TenantEntitlementStatus = 2 // 已暂停
+)
+
+// Enum value maps for TenantEntitlementStatus.
+var (
+	TenantEntitlementStatus_name = map[int32]string{
+		0: "TENANT_ENTITLEMENT_STATUS_UNKNOWN",
+		1: "TENANT_ENTITLEMENT_STATUS_ACTIVE",
+		2: "TENANT_ENTITLEMENT_STATUS_PAUSED",
+	}
+	TenantEntitlementStatus_value = map[string]int32{
+		"TENANT_ENTITLEMENT_STATUS_UNKNOWN": 0,
+		"TENANT_ENTITLEMENT_STATUS_ACTIVE":  1,
+		"TENANT_ENTITLEMENT_STATUS_PAUSED":  2,
+	}
+)
+
+func (x TenantEntitlementStatus) Enum() *TenantEntitlementStatus {
+	p := new(TenantEntitlementStatus)
+	*p = x
+	return p
+}
+
+func (x TenantEntitlementStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TenantEntitlementStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[28].Descriptor()
+}
+
+func (TenantEntitlementStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[28]
+}
+
+func (x TenantEntitlementStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TenantEntitlementStatus.Descriptor instead.
+func (TenantEntitlementStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{28}
+}
+
+// V6 用量指标。
+type BillingUsageMetric int32
+
+const (
+	BillingUsageMetric_BILLING_USAGE_METRIC_UNKNOWN                BillingUsageMetric = 0 // 未知指标
+	BillingUsageMetric_BILLING_USAGE_METRIC_BUILD_STARTED          BillingUsageMetric = 1 // 启动构建次数
+	BillingUsageMetric_BILLING_USAGE_METRIC_BUILD_SUCCEEDED        BillingUsageMetric = 2 // 成功构建次数
+	BillingUsageMetric_BILLING_USAGE_METRIC_BUILD_COMPUTE_SECONDS  BillingUsageMetric = 3 // 构建计算秒数
+	BillingUsageMetric_BILLING_USAGE_METRIC_STORAGE_SOURCE_BYTES   BillingUsageMetric = 4 // 原始与配置源文件存储字节
+	BillingUsageMetric_BILLING_USAGE_METRIC_STORAGE_ARTIFACT_BYTES BillingUsageMetric = 5 // 构建产物存储字节
+	BillingUsageMetric_BILLING_USAGE_METRIC_STORAGE_LOG_BYTES      BillingUsageMetric = 6 // 构建日志存储字节
+	BillingUsageMetric_BILLING_USAGE_METRIC_API_REQUESTS           BillingUsageMetric = 7 // Open API调用次数
+	BillingUsageMetric_BILLING_USAGE_METRIC_TEAM_ACTIVE_SEATS      BillingUsageMetric = 8 // 团队活跃席位数快照
+)
+
+// Enum value maps for BillingUsageMetric.
+var (
+	BillingUsageMetric_name = map[int32]string{
+		0: "BILLING_USAGE_METRIC_UNKNOWN",
+		1: "BILLING_USAGE_METRIC_BUILD_STARTED",
+		2: "BILLING_USAGE_METRIC_BUILD_SUCCEEDED",
+		3: "BILLING_USAGE_METRIC_BUILD_COMPUTE_SECONDS",
+		4: "BILLING_USAGE_METRIC_STORAGE_SOURCE_BYTES",
+		5: "BILLING_USAGE_METRIC_STORAGE_ARTIFACT_BYTES",
+		6: "BILLING_USAGE_METRIC_STORAGE_LOG_BYTES",
+		7: "BILLING_USAGE_METRIC_API_REQUESTS",
+		8: "BILLING_USAGE_METRIC_TEAM_ACTIVE_SEATS",
+	}
+	BillingUsageMetric_value = map[string]int32{
+		"BILLING_USAGE_METRIC_UNKNOWN":                0,
+		"BILLING_USAGE_METRIC_BUILD_STARTED":          1,
+		"BILLING_USAGE_METRIC_BUILD_SUCCEEDED":        2,
+		"BILLING_USAGE_METRIC_BUILD_COMPUTE_SECONDS":  3,
+		"BILLING_USAGE_METRIC_STORAGE_SOURCE_BYTES":   4,
+		"BILLING_USAGE_METRIC_STORAGE_ARTIFACT_BYTES": 5,
+		"BILLING_USAGE_METRIC_STORAGE_LOG_BYTES":      6,
+		"BILLING_USAGE_METRIC_API_REQUESTS":           7,
+		"BILLING_USAGE_METRIC_TEAM_ACTIVE_SEATS":      8,
+	}
+)
+
+func (x BillingUsageMetric) Enum() *BillingUsageMetric {
+	p := new(BillingUsageMetric)
+	*p = x
+	return p
+}
+
+func (x BillingUsageMetric) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (BillingUsageMetric) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[29].Descriptor()
+}
+
+func (BillingUsageMetric) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[29]
+}
+
+func (x BillingUsageMetric) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use BillingUsageMetric.Descriptor instead.
+func (BillingUsageMetric) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{29}
+}
+
+// V6 可预占额度指标。
+type QuotaMetric int32
+
+const (
+	QuotaMetric_QUOTA_METRIC_UNKNOWN       QuotaMetric = 0 // 未知额度
+	QuotaMetric_QUOTA_METRIC_BUILD_COUNT   QuotaMetric = 1 // 周期构建次数
+	QuotaMetric_QUOTA_METRIC_STORAGE_BYTES QuotaMetric = 2 // 当前存储字节
+	QuotaMetric_QUOTA_METRIC_TEAM_SEATS    QuotaMetric = 3 // 当前活跃席位
+)
+
+// Enum value maps for QuotaMetric.
+var (
+	QuotaMetric_name = map[int32]string{
+		0: "QUOTA_METRIC_UNKNOWN",
+		1: "QUOTA_METRIC_BUILD_COUNT",
+		2: "QUOTA_METRIC_STORAGE_BYTES",
+		3: "QUOTA_METRIC_TEAM_SEATS",
+	}
+	QuotaMetric_value = map[string]int32{
+		"QUOTA_METRIC_UNKNOWN":       0,
+		"QUOTA_METRIC_BUILD_COUNT":   1,
+		"QUOTA_METRIC_STORAGE_BYTES": 2,
+		"QUOTA_METRIC_TEAM_SEATS":    3,
+	}
+)
+
+func (x QuotaMetric) Enum() *QuotaMetric {
+	p := new(QuotaMetric)
+	*p = x
+	return p
+}
+
+func (x QuotaMetric) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (QuotaMetric) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[30].Descriptor()
+}
+
+func (QuotaMetric) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[30]
+}
+
+func (x QuotaMetric) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use QuotaMetric.Descriptor instead.
+func (QuotaMetric) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{30}
+}
+
+// V6 额度预占状态。
+type QuotaReservationStatus int32
+
+const (
+	QuotaReservationStatus_QUOTA_RESERVATION_STATUS_UNKNOWN   QuotaReservationStatus = 0 // 未知状态
+	QuotaReservationStatus_QUOTA_RESERVATION_STATUS_RESERVED  QuotaReservationStatus = 1 // 已预占待确认
+	QuotaReservationStatus_QUOTA_RESERVATION_STATUS_CONFIRMED QuotaReservationStatus = 2 // 已确认并计量
+	QuotaReservationStatus_QUOTA_RESERVATION_STATUS_RELEASED  QuotaReservationStatus = 3 // 已释放
+	QuotaReservationStatus_QUOTA_RESERVATION_STATUS_EXPIRED   QuotaReservationStatus = 4 // 已过期释放
+)
+
+// Enum value maps for QuotaReservationStatus.
+var (
+	QuotaReservationStatus_name = map[int32]string{
+		0: "QUOTA_RESERVATION_STATUS_UNKNOWN",
+		1: "QUOTA_RESERVATION_STATUS_RESERVED",
+		2: "QUOTA_RESERVATION_STATUS_CONFIRMED",
+		3: "QUOTA_RESERVATION_STATUS_RELEASED",
+		4: "QUOTA_RESERVATION_STATUS_EXPIRED",
+	}
+	QuotaReservationStatus_value = map[string]int32{
+		"QUOTA_RESERVATION_STATUS_UNKNOWN":   0,
+		"QUOTA_RESERVATION_STATUS_RESERVED":  1,
+		"QUOTA_RESERVATION_STATUS_CONFIRMED": 2,
+		"QUOTA_RESERVATION_STATUS_RELEASED":  3,
+		"QUOTA_RESERVATION_STATUS_EXPIRED":   4,
+	}
+)
+
+func (x QuotaReservationStatus) Enum() *QuotaReservationStatus {
+	p := new(QuotaReservationStatus)
+	*p = x
+	return p
+}
+
+func (x QuotaReservationStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (QuotaReservationStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[31].Descriptor()
+}
+
+func (QuotaReservationStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[31]
+}
+
+func (x QuotaReservationStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use QuotaReservationStatus.Descriptor instead.
+func (QuotaReservationStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{31}
+}
+
+// V6 订阅套餐变更生效方式。
+type SubscriptionChangeMode int32
+
+const (
+	SubscriptionChangeMode_SUBSCRIPTION_CHANGE_MODE_UNKNOWN    SubscriptionChangeMode = 0 // 未知方式
+	SubscriptionChangeMode_SUBSCRIPTION_CHANGE_MODE_IMMEDIATE  SubscriptionChangeMode = 1 // 立即生效，通常用于升级或人工恢复
+	SubscriptionChangeMode_SUBSCRIPTION_CHANGE_MODE_PERIOD_END SubscriptionChangeMode = 2 // 当前周期结束后生效，通常用于降级
+)
+
+// Enum value maps for SubscriptionChangeMode.
+var (
+	SubscriptionChangeMode_name = map[int32]string{
+		0: "SUBSCRIPTION_CHANGE_MODE_UNKNOWN",
+		1: "SUBSCRIPTION_CHANGE_MODE_IMMEDIATE",
+		2: "SUBSCRIPTION_CHANGE_MODE_PERIOD_END",
+	}
+	SubscriptionChangeMode_value = map[string]int32{
+		"SUBSCRIPTION_CHANGE_MODE_UNKNOWN":    0,
+		"SUBSCRIPTION_CHANGE_MODE_IMMEDIATE":  1,
+		"SUBSCRIPTION_CHANGE_MODE_PERIOD_END": 2,
+	}
+)
+
+func (x SubscriptionChangeMode) Enum() *SubscriptionChangeMode {
+	p := new(SubscriptionChangeMode)
+	*p = x
+	return p
+}
+
+func (x SubscriptionChangeMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SubscriptionChangeMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[32].Descriptor()
+}
+
+func (SubscriptionChangeMode) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[32]
+}
+
+func (x SubscriptionChangeMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SubscriptionChangeMode.Descriptor instead.
+func (SubscriptionChangeMode) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{32}
+}
+
+// V6 账单状态。
+type InvoiceStatus int32
+
+const (
+	InvoiceStatus_INVOICE_STATUS_UNKNOWN        InvoiceStatus = 0 // 未知状态
+	InvoiceStatus_INVOICE_STATUS_DRAFT          InvoiceStatus = 1 // 草稿
+	InvoiceStatus_INVOICE_STATUS_OPEN           InvoiceStatus = 2 // 待支付
+	InvoiceStatus_INVOICE_STATUS_PAID           InvoiceStatus = 3 // 已支付
+	InvoiceStatus_INVOICE_STATUS_PAYMENT_FAILED InvoiceStatus = 4 // 支付失败
+	InvoiceStatus_INVOICE_STATUS_VOID           InvoiceStatus = 5 // 已作废
+	InvoiceStatus_INVOICE_STATUS_REFUNDED       InvoiceStatus = 6 // 已退款
+)
+
+// Enum value maps for InvoiceStatus.
+var (
+	InvoiceStatus_name = map[int32]string{
+		0: "INVOICE_STATUS_UNKNOWN",
+		1: "INVOICE_STATUS_DRAFT",
+		2: "INVOICE_STATUS_OPEN",
+		3: "INVOICE_STATUS_PAID",
+		4: "INVOICE_STATUS_PAYMENT_FAILED",
+		5: "INVOICE_STATUS_VOID",
+		6: "INVOICE_STATUS_REFUNDED",
+	}
+	InvoiceStatus_value = map[string]int32{
+		"INVOICE_STATUS_UNKNOWN":        0,
+		"INVOICE_STATUS_DRAFT":          1,
+		"INVOICE_STATUS_OPEN":           2,
+		"INVOICE_STATUS_PAID":           3,
+		"INVOICE_STATUS_PAYMENT_FAILED": 4,
+		"INVOICE_STATUS_VOID":           5,
+		"INVOICE_STATUS_REFUNDED":       6,
+	}
+)
+
+func (x InvoiceStatus) Enum() *InvoiceStatus {
+	p := new(InvoiceStatus)
+	*p = x
+	return p
+}
+
+func (x InvoiceStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (InvoiceStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[33].Descriptor()
+}
+
+func (InvoiceStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[33]
+}
+
+func (x InvoiceStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use InvoiceStatus.Descriptor instead.
+func (InvoiceStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{33}
+}
+
+// V6 支付交易类型。
+type PaymentTransactionType int32
+
+const (
+	PaymentTransactionType_PAYMENT_TRANSACTION_TYPE_UNKNOWN PaymentTransactionType = 0 // 未知类型
+	PaymentTransactionType_PAYMENT_TRANSACTION_TYPE_CHARGE  PaymentTransactionType = 1 // 扣款
+	PaymentTransactionType_PAYMENT_TRANSACTION_TYPE_REFUND  PaymentTransactionType = 2 // 退款
+	PaymentTransactionType_PAYMENT_TRANSACTION_TYPE_DISPUTE PaymentTransactionType = 3 // 争议
+)
+
+// Enum value maps for PaymentTransactionType.
+var (
+	PaymentTransactionType_name = map[int32]string{
+		0: "PAYMENT_TRANSACTION_TYPE_UNKNOWN",
+		1: "PAYMENT_TRANSACTION_TYPE_CHARGE",
+		2: "PAYMENT_TRANSACTION_TYPE_REFUND",
+		3: "PAYMENT_TRANSACTION_TYPE_DISPUTE",
+	}
+	PaymentTransactionType_value = map[string]int32{
+		"PAYMENT_TRANSACTION_TYPE_UNKNOWN": 0,
+		"PAYMENT_TRANSACTION_TYPE_CHARGE":  1,
+		"PAYMENT_TRANSACTION_TYPE_REFUND":  2,
+		"PAYMENT_TRANSACTION_TYPE_DISPUTE": 3,
+	}
+)
+
+func (x PaymentTransactionType) Enum() *PaymentTransactionType {
+	p := new(PaymentTransactionType)
+	*p = x
+	return p
+}
+
+func (x PaymentTransactionType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PaymentTransactionType) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[34].Descriptor()
+}
+
+func (PaymentTransactionType) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[34]
+}
+
+func (x PaymentTransactionType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PaymentTransactionType.Descriptor instead.
+func (PaymentTransactionType) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{34}
+}
+
+// V6 支付交易状态。
+type PaymentTransactionStatus int32
+
+const (
+	PaymentTransactionStatus_PAYMENT_TRANSACTION_STATUS_UNKNOWN   PaymentTransactionStatus = 0 // 未知状态
+	PaymentTransactionStatus_PAYMENT_TRANSACTION_STATUS_PENDING   PaymentTransactionStatus = 1 // 处理中
+	PaymentTransactionStatus_PAYMENT_TRANSACTION_STATUS_SUCCEEDED PaymentTransactionStatus = 2 // 成功
+	PaymentTransactionStatus_PAYMENT_TRANSACTION_STATUS_FAILED    PaymentTransactionStatus = 3 // 失败
+	PaymentTransactionStatus_PAYMENT_TRANSACTION_STATUS_REVERSED  PaymentTransactionStatus = 4 // 已撤销
+)
+
+// Enum value maps for PaymentTransactionStatus.
+var (
+	PaymentTransactionStatus_name = map[int32]string{
+		0: "PAYMENT_TRANSACTION_STATUS_UNKNOWN",
+		1: "PAYMENT_TRANSACTION_STATUS_PENDING",
+		2: "PAYMENT_TRANSACTION_STATUS_SUCCEEDED",
+		3: "PAYMENT_TRANSACTION_STATUS_FAILED",
+		4: "PAYMENT_TRANSACTION_STATUS_REVERSED",
+	}
+	PaymentTransactionStatus_value = map[string]int32{
+		"PAYMENT_TRANSACTION_STATUS_UNKNOWN":   0,
+		"PAYMENT_TRANSACTION_STATUS_PENDING":   1,
+		"PAYMENT_TRANSACTION_STATUS_SUCCEEDED": 2,
+		"PAYMENT_TRANSACTION_STATUS_FAILED":    3,
+		"PAYMENT_TRANSACTION_STATUS_REVERSED":  4,
+	}
+)
+
+func (x PaymentTransactionStatus) Enum() *PaymentTransactionStatus {
+	p := new(PaymentTransactionStatus)
+	*p = x
+	return p
+}
+
+func (x PaymentTransactionStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PaymentTransactionStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[35].Descriptor()
+}
+
+func (PaymentTransactionStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[35]
+}
+
+func (x PaymentTransactionStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PaymentTransactionStatus.Descriptor instead.
+func (PaymentTransactionStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{35}
+}
+
+// V7 Local Agent运行状态。
+type LocalAgentStatus int32
+
+const (
+	LocalAgentStatus_LOCAL_AGENT_STATUS_UNKNOWN          LocalAgentStatus = 0 // 未知状态
+	LocalAgentStatus_LOCAL_AGENT_STATUS_PENDING          LocalAgentStatus = 1 // 已创建，等待一次性注册
+	LocalAgentStatus_LOCAL_AGENT_STATUS_ONLINE           LocalAgentStatus = 2 // 证书有效且心跳在线
+	LocalAgentStatus_LOCAL_AGENT_STATUS_OFFLINE          LocalAgentStatus = 3 // 心跳超时
+	LocalAgentStatus_LOCAL_AGENT_STATUS_REVOKED          LocalAgentStatus = 4 // 已吊销，证书和注册码均不可用
+	LocalAgentStatus_LOCAL_AGENT_STATUS_UPGRADE_REQUIRED LocalAgentStatus = 5 // 协议超出兼容窗口，只允许升级和轮换
+)
+
+// Enum value maps for LocalAgentStatus.
+var (
+	LocalAgentStatus_name = map[int32]string{
+		0: "LOCAL_AGENT_STATUS_UNKNOWN",
+		1: "LOCAL_AGENT_STATUS_PENDING",
+		2: "LOCAL_AGENT_STATUS_ONLINE",
+		3: "LOCAL_AGENT_STATUS_OFFLINE",
+		4: "LOCAL_AGENT_STATUS_REVOKED",
+		5: "LOCAL_AGENT_STATUS_UPGRADE_REQUIRED",
+	}
+	LocalAgentStatus_value = map[string]int32{
+		"LOCAL_AGENT_STATUS_UNKNOWN":          0,
+		"LOCAL_AGENT_STATUS_PENDING":          1,
+		"LOCAL_AGENT_STATUS_ONLINE":           2,
+		"LOCAL_AGENT_STATUS_OFFLINE":          3,
+		"LOCAL_AGENT_STATUS_REVOKED":          4,
+		"LOCAL_AGENT_STATUS_UPGRADE_REQUIRED": 5,
+	}
+)
+
+func (x LocalAgentStatus) Enum() *LocalAgentStatus {
+	p := new(LocalAgentStatus)
+	*p = x
+	return p
+}
+
+func (x LocalAgentStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (LocalAgentStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[36].Descriptor()
+}
+
+func (LocalAgentStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[36]
+}
+
+func (x LocalAgentStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use LocalAgentStatus.Descriptor instead.
+func (LocalAgentStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{36}
+}
+
+// V7 Local Agent排空状态。
+type LocalAgentDrainStatus int32
+
+const (
+	LocalAgentDrainStatus_LOCAL_AGENT_DRAIN_STATUS_UNKNOWN   LocalAgentDrainStatus = 0 // 未知状态
+	LocalAgentDrainStatus_LOCAL_AGENT_DRAIN_STATUS_ACCEPTING LocalAgentDrainStatus = 1 // 接受新任务
+	LocalAgentDrainStatus_LOCAL_AGENT_DRAIN_STATUS_DRAINING  LocalAgentDrainStatus = 2 // 排空中，不领取新任务
+	LocalAgentDrainStatus_LOCAL_AGENT_DRAIN_STATUS_DRAINED   LocalAgentDrainStatus = 3 // 已排空
+)
+
+// Enum value maps for LocalAgentDrainStatus.
+var (
+	LocalAgentDrainStatus_name = map[int32]string{
+		0: "LOCAL_AGENT_DRAIN_STATUS_UNKNOWN",
+		1: "LOCAL_AGENT_DRAIN_STATUS_ACCEPTING",
+		2: "LOCAL_AGENT_DRAIN_STATUS_DRAINING",
+		3: "LOCAL_AGENT_DRAIN_STATUS_DRAINED",
+	}
+	LocalAgentDrainStatus_value = map[string]int32{
+		"LOCAL_AGENT_DRAIN_STATUS_UNKNOWN":   0,
+		"LOCAL_AGENT_DRAIN_STATUS_ACCEPTING": 1,
+		"LOCAL_AGENT_DRAIN_STATUS_DRAINING":  2,
+		"LOCAL_AGENT_DRAIN_STATUS_DRAINED":   3,
+	}
+)
+
+func (x LocalAgentDrainStatus) Enum() *LocalAgentDrainStatus {
+	p := new(LocalAgentDrainStatus)
+	*p = x
+	return p
+}
+
+func (x LocalAgentDrainStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (LocalAgentDrainStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[37].Descriptor()
+}
+
+func (LocalAgentDrainStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[37]
+}
+
+func (x LocalAgentDrainStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use LocalAgentDrainStatus.Descriptor instead.
+func (LocalAgentDrainStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{37}
+}
+
+// V7 Hybrid Artifact存储模式。
+type HybridArtifactMode int32
+
+const (
+	HybridArtifactMode_HYBRID_ARTIFACT_MODE_UNKNOWN               HybridArtifactMode = 0 // 未知模式
+	HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE HybridArtifactMode = 1 // 控制面私有对象存储
+	HybridArtifactMode_HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE      HybridArtifactMode = 2 // 客户S3、MinIO或OSS
+	HybridArtifactMode_HYBRID_ARTIFACT_MODE_AIR_GAPPED            HybridArtifactMode = 3 // 受签名离线任务包
+)
+
+// Enum value maps for HybridArtifactMode.
+var (
+	HybridArtifactMode_name = map[int32]string{
+		0: "HYBRID_ARTIFACT_MODE_UNKNOWN",
+		1: "HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE",
+		2: "HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE",
+		3: "HYBRID_ARTIFACT_MODE_AIR_GAPPED",
+	}
+	HybridArtifactMode_value = map[string]int32{
+		"HYBRID_ARTIFACT_MODE_UNKNOWN":               0,
+		"HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE": 1,
+		"HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE":      2,
+		"HYBRID_ARTIFACT_MODE_AIR_GAPPED":            3,
+	}
+)
+
+func (x HybridArtifactMode) Enum() *HybridArtifactMode {
+	p := new(HybridArtifactMode)
+	*p = x
+	return p
+}
+
+func (x HybridArtifactMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (HybridArtifactMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[38].Descriptor()
+}
+
+func (HybridArtifactMode) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[38]
+}
+
+func (x HybridArtifactMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use HybridArtifactMode.Descriptor instead.
+func (HybridArtifactMode) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{38}
+}
+
+// V7 Local Agent客户端证书状态。
+type LocalAgentCertificateStatus int32
+
+const (
+	LocalAgentCertificateStatus_LOCAL_AGENT_CERTIFICATE_STATUS_UNKNOWN LocalAgentCertificateStatus = 0 // 未知状态
+	LocalAgentCertificateStatus_LOCAL_AGENT_CERTIFICATE_STATUS_ACTIVE  LocalAgentCertificateStatus = 1 // 当前有效
+	LocalAgentCertificateStatus_LOCAL_AGENT_CERTIFICATE_STATUS_ROTATED LocalAgentCertificateStatus = 2 // 已完成轮换
+	LocalAgentCertificateStatus_LOCAL_AGENT_CERTIFICATE_STATUS_REVOKED LocalAgentCertificateStatus = 3 // 已吊销
+	LocalAgentCertificateStatus_LOCAL_AGENT_CERTIFICATE_STATUS_EXPIRED LocalAgentCertificateStatus = 4 // 已过期
+)
+
+// Enum value maps for LocalAgentCertificateStatus.
+var (
+	LocalAgentCertificateStatus_name = map[int32]string{
+		0: "LOCAL_AGENT_CERTIFICATE_STATUS_UNKNOWN",
+		1: "LOCAL_AGENT_CERTIFICATE_STATUS_ACTIVE",
+		2: "LOCAL_AGENT_CERTIFICATE_STATUS_ROTATED",
+		3: "LOCAL_AGENT_CERTIFICATE_STATUS_REVOKED",
+		4: "LOCAL_AGENT_CERTIFICATE_STATUS_EXPIRED",
+	}
+	LocalAgentCertificateStatus_value = map[string]int32{
+		"LOCAL_AGENT_CERTIFICATE_STATUS_UNKNOWN": 0,
+		"LOCAL_AGENT_CERTIFICATE_STATUS_ACTIVE":  1,
+		"LOCAL_AGENT_CERTIFICATE_STATUS_ROTATED": 2,
+		"LOCAL_AGENT_CERTIFICATE_STATUS_REVOKED": 3,
+		"LOCAL_AGENT_CERTIFICATE_STATUS_EXPIRED": 4,
+	}
+)
+
+func (x LocalAgentCertificateStatus) Enum() *LocalAgentCertificateStatus {
+	p := new(LocalAgentCertificateStatus)
+	*p = x
+	return p
+}
+
+func (x LocalAgentCertificateStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (LocalAgentCertificateStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[39].Descriptor()
+}
+
+func (LocalAgentCertificateStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[39]
+}
+
+func (x LocalAgentCertificateStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use LocalAgentCertificateStatus.Descriptor instead.
+func (LocalAgentCertificateStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{39}
+}
+
+// V7 Hybrid Artifact类型。
+type HybridArtifactType int32
+
+const (
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_UNKNOWN              HybridArtifactType = 0 // 未知类型
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_SOURCE_APK           HybridArtifactType = 1 // 源APK
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK            HybridArtifactType = 2 // 构建APK
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG            HybridArtifactType = 3 // 构建日志
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE HybridArtifactType = 4 // 受签名离线任务包
+)
+
+// Enum value maps for HybridArtifactType.
+var (
+	HybridArtifactType_name = map[int32]string{
+		0: "HYBRID_ARTIFACT_TYPE_UNKNOWN",
+		1: "HYBRID_ARTIFACT_TYPE_SOURCE_APK",
+		2: "HYBRID_ARTIFACT_TYPE_BUILT_APK",
+		3: "HYBRID_ARTIFACT_TYPE_BUILD_LOG",
+		4: "HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE",
+	}
+	HybridArtifactType_value = map[string]int32{
+		"HYBRID_ARTIFACT_TYPE_UNKNOWN":              0,
+		"HYBRID_ARTIFACT_TYPE_SOURCE_APK":           1,
+		"HYBRID_ARTIFACT_TYPE_BUILT_APK":            2,
+		"HYBRID_ARTIFACT_TYPE_BUILD_LOG":            3,
+		"HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE": 4,
+	}
+)
+
+func (x HybridArtifactType) Enum() *HybridArtifactType {
+	p := new(HybridArtifactType)
+	*p = x
+	return p
+}
+
+func (x HybridArtifactType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (HybridArtifactType) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[40].Descriptor()
+}
+
+func (HybridArtifactType) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[40]
+}
+
+func (x HybridArtifactType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use HybridArtifactType.Descriptor instead.
+func (HybridArtifactType) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{40}
 }
 
 // 存储对象生命周期状态。
@@ -345,11 +2346,11 @@ func (x StorageObjectStatus) String() string {
 }
 
 func (StorageObjectStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[5].Descriptor()
+	return file_proto_core_core_proto_enumTypes[41].Descriptor()
 }
 
 func (StorageObjectStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[5]
+	return &file_proto_core_core_proto_enumTypes[41]
 }
 
 func (x StorageObjectStatus) Number() protoreflect.EnumNumber {
@@ -358,7 +2359,7 @@ func (x StorageObjectStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use StorageObjectStatus.Descriptor instead.
 func (StorageObjectStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{5}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{41}
 }
 
 // 品牌资源改写模式。
@@ -395,11 +2396,11 @@ func (x BrandingRewriteMode) String() string {
 }
 
 func (BrandingRewriteMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[6].Descriptor()
+	return file_proto_core_core_proto_enumTypes[42].Descriptor()
 }
 
 func (BrandingRewriteMode) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[6]
+	return &file_proto_core_core_proto_enumTypes[42]
 }
 
 func (x BrandingRewriteMode) Number() protoreflect.EnumNumber {
@@ -408,7 +2409,7 @@ func (x BrandingRewriteMode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use BrandingRewriteMode.Descriptor instead.
 func (BrandingRewriteMode) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{6}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{42}
 }
 
 // 品牌配置状态。
@@ -448,11 +2449,11 @@ func (x BrandingProfileStatus) String() string {
 }
 
 func (BrandingProfileStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[7].Descriptor()
+	return file_proto_core_core_proto_enumTypes[43].Descriptor()
 }
 
 func (BrandingProfileStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[7]
+	return &file_proto_core_core_proto_enumTypes[43]
 }
 
 func (x BrandingProfileStatus) Number() protoreflect.EnumNumber {
@@ -461,7 +2462,7 @@ func (x BrandingProfileStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use BrandingProfileStatus.Descriptor instead.
 func (BrandingProfileStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{7}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{43}
 }
 
 // 品牌兼容性预检状态。
@@ -504,11 +2505,11 @@ func (x BrandingPreflightStatus) String() string {
 }
 
 func (BrandingPreflightStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[8].Descriptor()
+	return file_proto_core_core_proto_enumTypes[44].Descriptor()
 }
 
 func (BrandingPreflightStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[8]
+	return &file_proto_core_core_proto_enumTypes[44]
 }
 
 func (x BrandingPreflightStatus) Number() protoreflect.EnumNumber {
@@ -517,7 +2518,7 @@ func (x BrandingPreflightStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use BrandingPreflightStatus.Descriptor instead.
 func (BrandingPreflightStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{8}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{44}
 }
 
 // V3白标模板状态。
@@ -557,11 +2558,11 @@ func (x WhiteLabelTemplateStatus) String() string {
 }
 
 func (WhiteLabelTemplateStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[9].Descriptor()
+	return file_proto_core_core_proto_enumTypes[45].Descriptor()
 }
 
 func (WhiteLabelTemplateStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[9]
+	return &file_proto_core_core_proto_enumTypes[45]
 }
 
 func (x WhiteLabelTemplateStatus) Number() protoreflect.EnumNumber {
@@ -570,7 +2571,7 @@ func (x WhiteLabelTemplateStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WhiteLabelTemplateStatus.Descriptor instead.
 func (WhiteLabelTemplateStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{9}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{45}
 }
 
 // V3白标模板修订状态。
@@ -610,11 +2611,11 @@ func (x WhiteLabelRevisionStatus) String() string {
 }
 
 func (WhiteLabelRevisionStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[10].Descriptor()
+	return file_proto_core_core_proto_enumTypes[46].Descriptor()
 }
 
 func (WhiteLabelRevisionStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[10]
+	return &file_proto_core_core_proto_enumTypes[46]
 }
 
 func (x WhiteLabelRevisionStatus) Number() protoreflect.EnumNumber {
@@ -623,7 +2624,7 @@ func (x WhiteLabelRevisionStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WhiteLabelRevisionStatus.Descriptor instead.
 func (WhiteLabelRevisionStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{10}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{46}
 }
 
 // V3白标产品状态。
@@ -663,11 +2664,11 @@ func (x WhiteLabelProductStatus) String() string {
 }
 
 func (WhiteLabelProductStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[11].Descriptor()
+	return file_proto_core_core_proto_enumTypes[47].Descriptor()
 }
 
 func (WhiteLabelProductStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[11]
+	return &file_proto_core_core_proto_enumTypes[47]
 }
 
 func (x WhiteLabelProductStatus) Number() protoreflect.EnumNumber {
@@ -676,7 +2677,7 @@ func (x WhiteLabelProductStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WhiteLabelProductStatus.Descriptor instead.
 func (WhiteLabelProductStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{11}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{47}
 }
 
 type RespBase struct {
@@ -1322,6 +3323,14 @@ type BuildTask struct {
 	WhiteLabelProductId  int64                  `protobuf:"varint,33,opt,name=white_label_product_id,json=whiteLabelProductId,proto3" json:"white_label_product_id,omitempty"` // V3白标产品ID
 	TemplateRevision     int32                  `protobuf:"varint,34,opt,name=template_revision,json=templateRevision,proto3" json:"template_revision,omitempty"`              // V3模板修订号
 	TemplateSnapshotJson string                 `protobuf:"bytes,35,opt,name=template_snapshot_json,json=templateSnapshotJson,proto3" json:"template_snapshot_json,omitempty"` // V3模板和产品不可变快照JSON
+	PoolCode             string                 `protobuf:"bytes,36,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                       // V4目标构建池编码
+	CacheKey             string                 `protobuf:"bytes,37,opt,name=cache_key,json=cacheKey,proto3" json:"cache_key,omitempty"`                                       // V4不可变输入缓存键
+	CacheEntryId         int64                  `protobuf:"varint,38,opt,name=cache_entry_id,json=cacheEntryId,proto3" json:"cache_entry_id,omitempty"`                        // V4命中的缓存条目ID
+	CacheHit             bool                   `protobuf:"varint,39,opt,name=cache_hit,json=cacheHit,proto3" json:"cache_hit,omitempty"`                                      // V4是否命中缓存
+	CancelRequestedAt    int64                  `protobuf:"varint,40,opt,name=cancel_requested_at,json=cancelRequestedAt,proto3" json:"cancel_requested_at,omitempty"`         // V4取消请求时间，Unix毫秒
+	CancelledAt          int64                  `protobuf:"varint,41,opt,name=cancelled_at,json=cancelledAt,proto3" json:"cancelled_at,omitempty"`                             // V4取消完成时间，Unix毫秒
+	CancelReason         string                 `protobuf:"bytes,42,opt,name=cancel_reason,json=cancelReason,proto3" json:"cancel_reason,omitempty"`                           // V4取消原因
+	RetryOfTaskId        int64                  `protobuf:"varint,43,opt,name=retry_of_task_id,json=retryOfTaskId,proto3" json:"retry_of_task_id,omitempty"`                   // V4重试来源任务ID
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -1599,6 +3608,62 @@ func (x *BuildTask) GetTemplateSnapshotJson() string {
 		return x.TemplateSnapshotJson
 	}
 	return ""
+}
+
+func (x *BuildTask) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuildTask) GetCacheKey() string {
+	if x != nil {
+		return x.CacheKey
+	}
+	return ""
+}
+
+func (x *BuildTask) GetCacheEntryId() int64 {
+	if x != nil {
+		return x.CacheEntryId
+	}
+	return 0
+}
+
+func (x *BuildTask) GetCacheHit() bool {
+	if x != nil {
+		return x.CacheHit
+	}
+	return false
+}
+
+func (x *BuildTask) GetCancelRequestedAt() int64 {
+	if x != nil {
+		return x.CancelRequestedAt
+	}
+	return 0
+}
+
+func (x *BuildTask) GetCancelledAt() int64 {
+	if x != nil {
+		return x.CancelledAt
+	}
+	return 0
+}
+
+func (x *BuildTask) GetCancelReason() string {
+	if x != nil {
+		return x.CancelReason
+	}
+	return ""
+}
+
+func (x *BuildTask) GetRetryOfTaskId() int64 {
+	if x != nil {
+		return x.RetryOfTaskId
+	}
+	return 0
 }
 
 // 私有对象存储元数据。
@@ -2535,6 +4600,1158 @@ func (x *WhiteLabelProduct) GetUpdateTime() int64 {
 	return 0
 }
 
+// V4 Builder集群节点。
+type BuilderNode struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Id                   int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                    // 节点ID
+	NodeCode             string                 `protobuf:"bytes,2,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                         // 节点唯一编码
+	PoolCode             string                 `protobuf:"bytes,3,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                         // 所属构建池编码
+	Endpoint             string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`                                                         // 节点管理端点或实例标识
+	Status               BuilderNodeStatus      `protobuf:"varint,5,opt,name=status,proto3,enum=core.BuilderNodeStatus" json:"status,omitempty"`                                // 节点健康状态
+	DrainStatus          BuilderDrainStatus     `protobuf:"varint,6,opt,name=drain_status,json=drainStatus,proto3,enum=core.BuilderDrainStatus" json:"drain_status,omitempty"`  // 节点排空状态
+	MaxConcurrency       int32                  `protobuf:"varint,7,opt,name=max_concurrency,json=maxConcurrency,proto3" json:"max_concurrency,omitempty"`                      // 最大并发执行数
+	RunningCount         int32                  `protobuf:"varint,8,opt,name=running_count,json=runningCount,proto3" json:"running_count,omitempty"`                            // 当前执行数
+	CpuCapacity          int32                  `protobuf:"varint,9,opt,name=cpu_capacity,json=cpuCapacity,proto3" json:"cpu_capacity,omitempty"`                               // CPU容量，单位毫核
+	MemoryCapacity       int64                  `protobuf:"varint,10,opt,name=memory_capacity,json=memoryCapacity,proto3" json:"memory_capacity,omitempty"`                     // 内存容量，单位字节
+	DiskCapacity         int64                  `protobuf:"varint,11,opt,name=disk_capacity,json=diskCapacity,proto3" json:"disk_capacity,omitempty"`                           // 构建磁盘总容量，单位字节
+	DiskFree             int64                  `protobuf:"varint,12,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                                       // 构建磁盘剩余容量，单位字节
+	ToolchainVersion     string                 `protobuf:"bytes,13,opt,name=toolchain_version,json=toolchainVersion,proto3" json:"toolchain_version,omitempty"`                // APK构建工具链版本
+	BuildProtocolVersion int32                  `protobuf:"varint,14,opt,name=build_protocol_version,json=buildProtocolVersion,proto3" json:"build_protocol_version,omitempty"` // 构建协议版本
+	CapabilityJson       string                 `protobuf:"bytes,15,opt,name=capability_json,json=capabilityJson,proto3" json:"capability_json,omitempty"`                      // 节点能力白名单JSON
+	ConsecutiveFailures  int32                  `protobuf:"varint,16,opt,name=consecutive_failures,json=consecutiveFailures,proto3" json:"consecutive_failures,omitempty"`      // 连续失败次数
+	LastErrorMessage     string                 `protobuf:"bytes,17,opt,name=last_error_message,json=lastErrorMessage,proto3" json:"last_error_message,omitempty"`              // 最近错误摘要
+	LastHeartbeatAt      int64                  `protobuf:"varint,18,opt,name=last_heartbeat_at,json=lastHeartbeatAt,proto3" json:"last_heartbeat_at,omitempty"`                // 最近心跳时间，Unix毫秒
+	CreateTime           int64                  `protobuf:"varint,19,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                                 // 创建时间，Unix毫秒
+	UpdateTime           int64                  `protobuf:"varint,20,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                                 // 更新时间，Unix毫秒
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *BuilderNode) Reset() {
+	*x = BuilderNode{}
+	mi := &file_proto_core_core_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuilderNode) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuilderNode) ProtoMessage() {}
+
+func (x *BuilderNode) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuilderNode.ProtoReflect.Descriptor instead.
+func (*BuilderNode) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *BuilderNode) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetStatus() BuilderNodeStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BuilderNodeStatus_BUILDER_NODE_STATUS_UNKNOWN
+}
+
+func (x *BuilderNode) GetDrainStatus() BuilderDrainStatus {
+	if x != nil {
+		return x.DrainStatus
+	}
+	return BuilderDrainStatus_BUILDER_DRAIN_STATUS_UNKNOWN
+}
+
+func (x *BuilderNode) GetMaxConcurrency() int32 {
+	if x != nil {
+		return x.MaxConcurrency
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetRunningCount() int32 {
+	if x != nil {
+		return x.RunningCount
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetCpuCapacity() int32 {
+	if x != nil {
+		return x.CpuCapacity
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetMemoryCapacity() int64 {
+	if x != nil {
+		return x.MemoryCapacity
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetDiskCapacity() int64 {
+	if x != nil {
+		return x.DiskCapacity
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetDiskFree() int64 {
+	if x != nil {
+		return x.DiskFree
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetToolchainVersion() string {
+	if x != nil {
+		return x.ToolchainVersion
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetBuildProtocolVersion() int32 {
+	if x != nil {
+		return x.BuildProtocolVersion
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetCapabilityJson() string {
+	if x != nil {
+		return x.CapabilityJson
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetConsecutiveFailures() int32 {
+	if x != nil {
+		return x.ConsecutiveFailures
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetLastErrorMessage() string {
+	if x != nil {
+		return x.LastErrorMessage
+	}
+	return ""
+}
+
+func (x *BuilderNode) GetLastHeartbeatAt() int64 {
+	if x != nil {
+		return x.LastHeartbeatAt
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *BuilderNode) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V4 构建并发与公平调度策略。
+type BuildConcurrencyPolicy struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                               // 策略ID
+	TenantId       int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                   // 租户ID，0表示全局作用域
+	AppId          int64                  `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                            // 应用ID，0表示非应用作用域
+	PoolCode       string                 `protobuf:"bytes,4,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                    // 构建池编码
+	MaxConcurrency int32                  `protobuf:"varint,5,opt,name=max_concurrency,json=maxConcurrency,proto3" json:"max_concurrency,omitempty"` // 作用域最大并发数
+	FairWeight     int32                  `protobuf:"varint,6,opt,name=fair_weight,json=fairWeight,proto3" json:"fair_weight,omitempty"`             // 租户公平调度权重
+	MaxPriority    int32                  `protobuf:"varint,7,opt,name=max_priority,json=maxPriority,proto3" json:"max_priority,omitempty"`          // 允许提交的最高普通优先级
+	Status         BuildPolicyStatus      `protobuf:"varint,8,opt,name=status,proto3,enum=core.BuildPolicyStatus" json:"status,omitempty"`           // 策略状态
+	CreateBy       int64                  `protobuf:"varint,9,opt,name=create_by,json=createBy,proto3" json:"create_by,omitempty"`                   // 创建人ID
+	CreateTime     int64                  `protobuf:"varint,10,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`            // 创建时间，Unix毫秒
+	UpdateTime     int64                  `protobuf:"varint,11,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`            // 更新时间，Unix毫秒
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *BuildConcurrencyPolicy) Reset() {
+	*x = BuildConcurrencyPolicy{}
+	mi := &file_proto_core_core_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildConcurrencyPolicy) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildConcurrencyPolicy) ProtoMessage() {}
+
+func (x *BuildConcurrencyPolicy) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildConcurrencyPolicy.ProtoReflect.Descriptor instead.
+func (*BuildConcurrencyPolicy) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *BuildConcurrencyPolicy) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BuildConcurrencyPolicy) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *BuildConcurrencyPolicy) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *BuildConcurrencyPolicy) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuildConcurrencyPolicy) GetMaxConcurrency() int32 {
+	if x != nil {
+		return x.MaxConcurrency
+	}
+	return 0
+}
+
+func (x *BuildConcurrencyPolicy) GetFairWeight() int32 {
+	if x != nil {
+		return x.FairWeight
+	}
+	return 0
+}
+
+func (x *BuildConcurrencyPolicy) GetMaxPriority() int32 {
+	if x != nil {
+		return x.MaxPriority
+	}
+	return 0
+}
+
+func (x *BuildConcurrencyPolicy) GetStatus() BuildPolicyStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BuildPolicyStatus_BUILD_POLICY_STATUS_UNKNOWN
+}
+
+func (x *BuildConcurrencyPolicy) GetCreateBy() int64 {
+	if x != nil {
+		return x.CreateBy
+	}
+	return 0
+}
+
+func (x *BuildConcurrencyPolicy) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *BuildConcurrencyPolicy) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V4 构建缓存条目。
+type BuildCacheEntry struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Id                   int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                   // 缓存条目ID
+	TenantId             int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                       // 所属租户ID
+	CacheScope           BuildCacheScope        `protobuf:"varint,3,opt,name=cache_scope,json=cacheScope,proto3,enum=core.BuildCacheScope" json:"cache_scope,omitempty"`       // 缓存作用域
+	CacheKey             string                 `protobuf:"bytes,4,opt,name=cache_key,json=cacheKey,proto3" json:"cache_key,omitempty"`                                        // 不可变输入缓存键
+	ToolchainVersion     string                 `protobuf:"bytes,5,opt,name=toolchain_version,json=toolchainVersion,proto3" json:"toolchain_version,omitempty"`                // 生成缓存的工具链版本
+	BuildProtocolVersion int32                  `protobuf:"varint,6,opt,name=build_protocol_version,json=buildProtocolVersion,proto3" json:"build_protocol_version,omitempty"` // 生成缓存的构建协议版本
+	InputDigest          string                 `protobuf:"bytes,7,opt,name=input_digest,json=inputDigest,proto3" json:"input_digest,omitempty"`                               // 规范化输入摘要
+	ArtifactObjectId     int64                  `protobuf:"varint,8,opt,name=artifact_object_id,json=artifactObjectId,proto3" json:"artifact_object_id,omitempty"`             // 缓存产物对象ID
+	ArtifactSha256       string                 `protobuf:"bytes,9,opt,name=artifact_sha256,json=artifactSha256,proto3" json:"artifact_sha256,omitempty"`                      // 缓存产物SHA-256
+	SizeBytes            int64                  `protobuf:"varint,10,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`                                   // 缓存产物大小，单位字节
+	HitCount             int64                  `protobuf:"varint,11,opt,name=hit_count,json=hitCount,proto3" json:"hit_count,omitempty"`                                      // 累计命中次数
+	Status               BuildCacheStatus       `protobuf:"varint,12,opt,name=status,proto3,enum=core.BuildCacheStatus" json:"status,omitempty"`                               // 缓存状态
+	ExpiresAt            int64                  `protobuf:"varint,13,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`                                   // 过期时间，Unix毫秒
+	LastHitAt            int64                  `protobuf:"varint,14,opt,name=last_hit_at,json=lastHitAt,proto3" json:"last_hit_at,omitempty"`                                 // 最近命中时间，Unix毫秒
+	CreateTime           int64                  `protobuf:"varint,15,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                                // 创建时间，Unix毫秒
+	UpdateTime           int64                  `protobuf:"varint,16,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                                // 更新时间，Unix毫秒
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *BuildCacheEntry) Reset() {
+	*x = BuildCacheEntry{}
+	mi := &file_proto_core_core_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheEntry) ProtoMessage() {}
+
+func (x *BuildCacheEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheEntry.ProtoReflect.Descriptor instead.
+func (*BuildCacheEntry) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *BuildCacheEntry) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetCacheScope() BuildCacheScope {
+	if x != nil {
+		return x.CacheScope
+	}
+	return BuildCacheScope_BUILD_CACHE_SCOPE_UNKNOWN
+}
+
+func (x *BuildCacheEntry) GetCacheKey() string {
+	if x != nil {
+		return x.CacheKey
+	}
+	return ""
+}
+
+func (x *BuildCacheEntry) GetToolchainVersion() string {
+	if x != nil {
+		return x.ToolchainVersion
+	}
+	return ""
+}
+
+func (x *BuildCacheEntry) GetBuildProtocolVersion() int32 {
+	if x != nil {
+		return x.BuildProtocolVersion
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetInputDigest() string {
+	if x != nil {
+		return x.InputDigest
+	}
+	return ""
+}
+
+func (x *BuildCacheEntry) GetArtifactObjectId() int64 {
+	if x != nil {
+		return x.ArtifactObjectId
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetArtifactSha256() string {
+	if x != nil {
+		return x.ArtifactSha256
+	}
+	return ""
+}
+
+func (x *BuildCacheEntry) GetSizeBytes() int64 {
+	if x != nil {
+		return x.SizeBytes
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetHitCount() int64 {
+	if x != nil {
+		return x.HitCount
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetStatus() BuildCacheStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BuildCacheStatus_BUILD_CACHE_STATUS_UNKNOWN
+}
+
+func (x *BuildCacheEntry) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetLastHitAt() int64 {
+	if x != nil {
+		return x.LastHitAt
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *BuildCacheEntry) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V4 构建调度结构化事件。
+type BuildSchedulerEvent struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Id            int64                   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                  // 调度事件ID
+	TenantId      int64                   `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                      // 关联租户ID
+	AppId         int64                   `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                               // 关联应用ID
+	TaskId        int64                   `protobuf:"varint,4,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                                            // 关联构建任务ID
+	NodeCode      string                  `protobuf:"bytes,5,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                       // 关联Builder节点编码
+	PoolCode      string                  `protobuf:"bytes,6,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                       // 构建池编码
+	EventType     BuildSchedulerEventType `protobuf:"varint,7,opt,name=event_type,json=eventType,proto3,enum=core.BuildSchedulerEventType" json:"event_type,omitempty"` // 调度事件类型
+	ReasonCode    string                  `protobuf:"bytes,8,opt,name=reason_code,json=reasonCode,proto3" json:"reason_code,omitempty"`                                 // 结构化调度原因编码
+	DecisionJson  string                  `protobuf:"bytes,9,opt,name=decision_json,json=decisionJson,proto3" json:"decision_json,omitempty"`                           // 调度输入、限制和结果JSON
+	CreateTime    int64                   `protobuf:"varint,10,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                               // 事件时间，Unix毫秒
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildSchedulerEvent) Reset() {
+	*x = BuildSchedulerEvent{}
+	mi := &file_proto_core_core_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildSchedulerEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildSchedulerEvent) ProtoMessage() {}
+
+func (x *BuildSchedulerEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildSchedulerEvent.ProtoReflect.Descriptor instead.
+func (*BuildSchedulerEvent) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *BuildSchedulerEvent) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BuildSchedulerEvent) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *BuildSchedulerEvent) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *BuildSchedulerEvent) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *BuildSchedulerEvent) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *BuildSchedulerEvent) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuildSchedulerEvent) GetEventType() BuildSchedulerEventType {
+	if x != nil {
+		return x.EventType
+	}
+	return BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_UNKNOWN
+}
+
+func (x *BuildSchedulerEvent) GetReasonCode() string {
+	if x != nil {
+		return x.ReasonCode
+	}
+	return ""
+}
+
+func (x *BuildSchedulerEvent) GetDecisionJson() string {
+	if x != nil {
+		return x.DecisionJson
+	}
+	return ""
+}
+
+func (x *BuildSchedulerEvent) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+// V4 构建集群运行指标与告警摘要。
+type BuildClusterMetrics struct {
+	state                       protoimpl.MessageState `protogen:"open.v1"`
+	PoolCode                    string                 `protobuf:"bytes,1,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                                                // 构建池编码
+	PeriodMinutes               int32                  `protobuf:"varint,2,opt,name=period_minutes,json=periodMinutes,proto3" json:"period_minutes,omitempty"`                                                // 统计窗口分钟数
+	OnlineNodes                 int64                  `protobuf:"varint,3,opt,name=online_nodes,json=onlineNodes,proto3" json:"online_nodes,omitempty"`                                                      // 在线节点数
+	OfflineNodes                int64                  `protobuf:"varint,4,opt,name=offline_nodes,json=offlineNodes,proto3" json:"offline_nodes,omitempty"`                                                   // 离线或隔离节点数
+	DrainingNodes               int64                  `protobuf:"varint,5,opt,name=draining_nodes,json=drainingNodes,proto3" json:"draining_nodes,omitempty"`                                                // 排空中节点数
+	TotalSlots                  int64                  `protobuf:"varint,6,opt,name=total_slots,json=totalSlots,proto3" json:"total_slots,omitempty"`                                                         // 节点总并发槽位数
+	RunningSlots                int64                  `protobuf:"varint,7,opt,name=running_slots,json=runningSlots,proto3" json:"running_slots,omitempty"`                                                   // 当前运行槽位数
+	DiskCapacity                int64                  `protobuf:"varint,8,opt,name=disk_capacity,json=diskCapacity,proto3" json:"disk_capacity,omitempty"`                                                   // 节点磁盘总容量，单位字节
+	DiskFree                    int64                  `protobuf:"varint,9,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                                                               // 节点磁盘剩余容量，单位字节
+	QueuedTasks                 int64                  `protobuf:"varint,10,opt,name=queued_tasks,json=queuedTasks,proto3" json:"queued_tasks,omitempty"`                                                     // 当前排队任务数
+	RunningTasks                int64                  `protobuf:"varint,11,opt,name=running_tasks,json=runningTasks,proto3" json:"running_tasks,omitempty"`                                                  // 当前执行任务数
+	CompletedTasks              int64                  `protobuf:"varint,12,opt,name=completed_tasks,json=completedTasks,proto3" json:"completed_tasks,omitempty"`                                            // 窗口内完成任务数
+	SuccessTasks                int64                  `protobuf:"varint,13,opt,name=success_tasks,json=successTasks,proto3" json:"success_tasks,omitempty"`                                                  // 窗口内成功任务数
+	FailedTasks                 int64                  `protobuf:"varint,14,opt,name=failed_tasks,json=failedTasks,proto3" json:"failed_tasks,omitempty"`                                                     // 窗口内失败任务数
+	CancelledTasks              int64                  `protobuf:"varint,15,opt,name=cancelled_tasks,json=cancelledTasks,proto3" json:"cancelled_tasks,omitempty"`                                            // 窗口内取消任务数
+	AverageQueueMs              int64                  `protobuf:"varint,16,opt,name=average_queue_ms,json=averageQueueMs,proto3" json:"average_queue_ms,omitempty"`                                          // 窗口内平均排队时长，单位毫秒
+	AverageBuildMs              int64                  `protobuf:"varint,17,opt,name=average_build_ms,json=averageBuildMs,proto3" json:"average_build_ms,omitempty"`                                          // 窗口内平均构建时长，单位毫秒
+	SuccessRate                 float64                `protobuf:"fixed64,18,opt,name=success_rate,json=successRate,proto3" json:"success_rate,omitempty"`                                                    // 窗口内成功率，取值0到1
+	CacheHitTasks               int64                  `protobuf:"varint,19,opt,name=cache_hit_tasks,json=cacheHitTasks,proto3" json:"cache_hit_tasks,omitempty"`                                             // 窗口内缓存命中任务数
+	CacheHitRate                float64                `protobuf:"fixed64,20,opt,name=cache_hit_rate,json=cacheHitRate,proto3" json:"cache_hit_rate,omitempty"`                                               // 窗口内缓存命中率，取值0到1
+	ActiveCacheEntries          int64                  `protobuf:"varint,21,opt,name=active_cache_entries,json=activeCacheEntries,proto3" json:"active_cache_entries,omitempty"`                              // 当前有效缓存条目数
+	ActiveCacheBytes            int64                  `protobuf:"varint,22,opt,name=active_cache_bytes,json=activeCacheBytes,proto3" json:"active_cache_bytes,omitempty"`                                    // 当前有效缓存占用字节数
+	LeaseRecoveryCount          int64                  `protobuf:"varint,23,opt,name=lease_recovery_count,json=leaseRecoveryCount,proto3" json:"lease_recovery_count,omitempty"`                              // 窗口内租约恢复次数
+	CacheValidationFailureCount int64                  `protobuf:"varint,24,opt,name=cache_validation_failure_count,json=cacheValidationFailureCount,proto3" json:"cache_validation_failure_count,omitempty"` // 窗口内缓存校验失败次数
+	OldestQueuedMs              int64                  `protobuf:"varint,25,opt,name=oldest_queued_ms,json=oldestQueuedMs,proto3" json:"oldest_queued_ms,omitempty"`                                          // 最老排队任务等待时长，单位毫秒
+	Alerts                      []string               `protobuf:"bytes,26,rep,name=alerts,proto3" json:"alerts,omitempty"`                                                                                   // 当前告警代码列表
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
+}
+
+func (x *BuildClusterMetrics) Reset() {
+	*x = BuildClusterMetrics{}
+	mi := &file_proto_core_core_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildClusterMetrics) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildClusterMetrics) ProtoMessage() {}
+
+func (x *BuildClusterMetrics) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildClusterMetrics.ProtoReflect.Descriptor instead.
+func (*BuildClusterMetrics) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *BuildClusterMetrics) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuildClusterMetrics) GetPeriodMinutes() int32 {
+	if x != nil {
+		return x.PeriodMinutes
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetOnlineNodes() int64 {
+	if x != nil {
+		return x.OnlineNodes
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetOfflineNodes() int64 {
+	if x != nil {
+		return x.OfflineNodes
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetDrainingNodes() int64 {
+	if x != nil {
+		return x.DrainingNodes
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetTotalSlots() int64 {
+	if x != nil {
+		return x.TotalSlots
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetRunningSlots() int64 {
+	if x != nil {
+		return x.RunningSlots
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetDiskCapacity() int64 {
+	if x != nil {
+		return x.DiskCapacity
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetDiskFree() int64 {
+	if x != nil {
+		return x.DiskFree
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetQueuedTasks() int64 {
+	if x != nil {
+		return x.QueuedTasks
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetRunningTasks() int64 {
+	if x != nil {
+		return x.RunningTasks
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetCompletedTasks() int64 {
+	if x != nil {
+		return x.CompletedTasks
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetSuccessTasks() int64 {
+	if x != nil {
+		return x.SuccessTasks
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetFailedTasks() int64 {
+	if x != nil {
+		return x.FailedTasks
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetCancelledTasks() int64 {
+	if x != nil {
+		return x.CancelledTasks
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetAverageQueueMs() int64 {
+	if x != nil {
+		return x.AverageQueueMs
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetAverageBuildMs() int64 {
+	if x != nil {
+		return x.AverageBuildMs
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetSuccessRate() float64 {
+	if x != nil {
+		return x.SuccessRate
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetCacheHitTasks() int64 {
+	if x != nil {
+		return x.CacheHitTasks
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetCacheHitRate() float64 {
+	if x != nil {
+		return x.CacheHitRate
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetActiveCacheEntries() int64 {
+	if x != nil {
+		return x.ActiveCacheEntries
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetActiveCacheBytes() int64 {
+	if x != nil {
+		return x.ActiveCacheBytes
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetLeaseRecoveryCount() int64 {
+	if x != nil {
+		return x.LeaseRecoveryCount
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetCacheValidationFailureCount() int64 {
+	if x != nil {
+		return x.CacheValidationFailureCount
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetOldestQueuedMs() int64 {
+	if x != nil {
+		return x.OldestQueuedMs
+	}
+	return 0
+}
+
+func (x *BuildClusterMetrics) GetAlerts() []string {
+	if x != nil {
+		return x.Alerts
+	}
+	return nil
+}
+
+// V5 Open API凭证；不包含Secret或Secret摘要。
+type OpenApiCredential struct {
+	state              protoimpl.MessageState  `protogen:"open.v1"`
+	Id                 int64                   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                               // 凭证ID
+	TenantId           int64                   `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                   // 所属租户ID
+	CredentialName     string                  `protobuf:"bytes,3,opt,name=credential_name,json=credentialName,proto3" json:"credential_name,omitempty"`                  // 凭证名称
+	KeyId              string                  `protobuf:"bytes,4,opt,name=key_id,json=keyId,proto3" json:"key_id,omitempty"`                                             // 公开Key标识
+	Scopes             []OpenApiScope          `protobuf:"varint,5,rep,packed,name=scopes,proto3,enum=core.OpenApiScope" json:"scopes,omitempty"`                         // 授权Scope列表
+	AppIds             []int64                 `protobuf:"varint,6,rep,packed,name=app_ids,json=appIds,proto3" json:"app_ids,omitempty"`                                  // 允许访问的应用ID，空列表表示全部应用
+	IpAllowlist        []string                `protobuf:"bytes,7,rep,name=ip_allowlist,json=ipAllowlist,proto3" json:"ip_allowlist,omitempty"`                           // 允许访问的IP或CIDR，空列表表示不限制
+	RateLimitPerMinute int32                   `protobuf:"varint,8,opt,name=rate_limit_per_minute,json=rateLimitPerMinute,proto3" json:"rate_limit_per_minute,omitempty"` // 每分钟请求上限
+	Status             OpenApiCredentialStatus `protobuf:"varint,9,opt,name=status,proto3,enum=core.OpenApiCredentialStatus" json:"status,omitempty"`                     // 凭证状态
+	ExpiresAt          int64                   `protobuf:"varint,10,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`                               // 到期时间，Unix毫秒，0表示长期有效
+	GraceExpiresAt     int64                   `protobuf:"varint,11,opt,name=grace_expires_at,json=graceExpiresAt,proto3" json:"grace_expires_at,omitempty"`              // 轮换过渡截止时间，Unix毫秒
+	RotatedFromId      int64                   `protobuf:"varint,12,opt,name=rotated_from_id,json=rotatedFromId,proto3" json:"rotated_from_id,omitempty"`                 // 轮换来源凭证ID
+	LastUsedAt         int64                   `protobuf:"varint,13,opt,name=last_used_at,json=lastUsedAt,proto3" json:"last_used_at,omitempty"`                          // 最近成功使用时间，Unix毫秒
+	CreateBy           int64                   `protobuf:"varint,14,opt,name=create_by,json=createBy,proto3" json:"create_by,omitempty"`                                  // 创建人ID
+	CreateTime         int64                   `protobuf:"varint,15,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                            // 创建时间，Unix毫秒
+	UpdateTime         int64                   `protobuf:"varint,16,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                            // 更新时间，Unix毫秒
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *OpenApiCredential) Reset() {
+	*x = OpenApiCredential{}
+	mi := &file_proto_core_core_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiCredential) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiCredential) ProtoMessage() {}
+
+func (x *OpenApiCredential) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiCredential.ProtoReflect.Descriptor instead.
+func (*OpenApiCredential) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *OpenApiCredential) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *OpenApiCredential) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *OpenApiCredential) GetCredentialName() string {
+	if x != nil {
+		return x.CredentialName
+	}
+	return ""
+}
+
+func (x *OpenApiCredential) GetKeyId() string {
+	if x != nil {
+		return x.KeyId
+	}
+	return ""
+}
+
+func (x *OpenApiCredential) GetScopes() []OpenApiScope {
+	if x != nil {
+		return x.Scopes
+	}
+	return nil
+}
+
+func (x *OpenApiCredential) GetAppIds() []int64 {
+	if x != nil {
+		return x.AppIds
+	}
+	return nil
+}
+
+func (x *OpenApiCredential) GetIpAllowlist() []string {
+	if x != nil {
+		return x.IpAllowlist
+	}
+	return nil
+}
+
+func (x *OpenApiCredential) GetRateLimitPerMinute() int32 {
+	if x != nil {
+		return x.RateLimitPerMinute
+	}
+	return 0
+}
+
+func (x *OpenApiCredential) GetStatus() OpenApiCredentialStatus {
+	if x != nil {
+		return x.Status
+	}
+	return OpenApiCredentialStatus_OPEN_API_CREDENTIAL_STATUS_UNKNOWN
+}
+
+func (x *OpenApiCredential) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
+func (x *OpenApiCredential) GetGraceExpiresAt() int64 {
+	if x != nil {
+		return x.GraceExpiresAt
+	}
+	return 0
+}
+
+func (x *OpenApiCredential) GetRotatedFromId() int64 {
+	if x != nil {
+		return x.RotatedFromId
+	}
+	return 0
+}
+
+func (x *OpenApiCredential) GetLastUsedAt() int64 {
+	if x != nil {
+		return x.LastUsedAt
+	}
+	return 0
+}
+
+func (x *OpenApiCredential) GetCreateBy() int64 {
+	if x != nil {
+		return x.CreateBy
+	}
+	return 0
+}
+
+func (x *OpenApiCredential) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *OpenApiCredential) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V5 一次性返回的Open API凭证Secret。
+type OpenApiCredentialSecret struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Credential    *OpenApiCredential     `protobuf:"bytes,1,opt,name=credential,proto3" json:"credential,omitempty"`       // 凭证元数据
+	ApiKey        string                 `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"` // 完整API Key，仅本次响应返回
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OpenApiCredentialSecret) Reset() {
+	*x = OpenApiCredentialSecret{}
+	mi := &file_proto_core_core_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiCredentialSecret) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiCredentialSecret) ProtoMessage() {}
+
+func (x *OpenApiCredentialSecret) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiCredentialSecret.ProtoReflect.Descriptor instead.
+func (*OpenApiCredentialSecret) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *OpenApiCredentialSecret) GetCredential() *OpenApiCredential {
+	if x != nil {
+		return x.Credential
+	}
+	return nil
+}
+
+func (x *OpenApiCredentialSecret) GetApiKey() string {
+	if x != nil {
+		return x.ApiKey
+	}
+	return ""
+}
+
+// V5 Open API认证上下文。
+type OpenApiAuthContext struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	CredentialId       int64                  `protobuf:"varint,1,opt,name=credential_id,json=credentialId,proto3" json:"credential_id,omitempty"`                       // 凭证ID
+	TenantId           int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                   // 所属租户ID
+	KeyId              string                 `protobuf:"bytes,3,opt,name=key_id,json=keyId,proto3" json:"key_id,omitempty"`                                             // 公开Key标识
+	Scopes             []OpenApiScope         `protobuf:"varint,4,rep,packed,name=scopes,proto3,enum=core.OpenApiScope" json:"scopes,omitempty"`                         // 授权Scope
+	AppIds             []int64                `protobuf:"varint,5,rep,packed,name=app_ids,json=appIds,proto3" json:"app_ids,omitempty"`                                  // 应用范围
+	RateLimitPerMinute int32                  `protobuf:"varint,6,opt,name=rate_limit_per_minute,json=rateLimitPerMinute,proto3" json:"rate_limit_per_minute,omitempty"` // 每分钟请求上限
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *OpenApiAuthContext) Reset() {
+	*x = OpenApiAuthContext{}
+	mi := &file_proto_core_core_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiAuthContext) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiAuthContext) ProtoMessage() {}
+
+func (x *OpenApiAuthContext) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiAuthContext.ProtoReflect.Descriptor instead.
+func (*OpenApiAuthContext) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *OpenApiAuthContext) GetCredentialId() int64 {
+	if x != nil {
+		return x.CredentialId
+	}
+	return 0
+}
+
+func (x *OpenApiAuthContext) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *OpenApiAuthContext) GetKeyId() string {
+	if x != nil {
+		return x.KeyId
+	}
+	return ""
+}
+
+func (x *OpenApiAuthContext) GetScopes() []OpenApiScope {
+	if x != nil {
+		return x.Scopes
+	}
+	return nil
+}
+
+func (x *OpenApiAuthContext) GetAppIds() []int64 {
+	if x != nil {
+		return x.AppIds
+	}
+	return nil
+}
+
+func (x *OpenApiAuthContext) GetRateLimitPerMinute() int32 {
+	if x != nil {
+		return x.RateLimitPerMinute
+	}
+	return 0
+}
+
 type ApplicationIdReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -2544,7 +5761,7 @@ type ApplicationIdReq struct {
 
 func (x *ApplicationIdReq) Reset() {
 	*x = ApplicationIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[12]
+	mi := &file_proto_core_core_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2556,7 +5773,7 @@ func (x *ApplicationIdReq) String() string {
 func (*ApplicationIdReq) ProtoMessage() {}
 
 func (x *ApplicationIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[12]
+	mi := &file_proto_core_core_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2569,7 +5786,7 @@ func (x *ApplicationIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApplicationIdReq.ProtoReflect.Descriptor instead.
 func (*ApplicationIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{12}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ApplicationIdReq) GetId() int64 {
@@ -2588,7 +5805,7 @@ type VersionIdReq struct {
 
 func (x *VersionIdReq) Reset() {
 	*x = VersionIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[13]
+	mi := &file_proto_core_core_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2600,7 +5817,7 @@ func (x *VersionIdReq) String() string {
 func (*VersionIdReq) ProtoMessage() {}
 
 func (x *VersionIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[13]
+	mi := &file_proto_core_core_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2613,7 +5830,7 @@ func (x *VersionIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionIdReq.ProtoReflect.Descriptor instead.
 func (*VersionIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{13}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *VersionIdReq) GetId() int64 {
@@ -2632,7 +5849,7 @@ type ChannelIdReq struct {
 
 func (x *ChannelIdReq) Reset() {
 	*x = ChannelIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[14]
+	mi := &file_proto_core_core_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2644,7 +5861,7 @@ func (x *ChannelIdReq) String() string {
 func (*ChannelIdReq) ProtoMessage() {}
 
 func (x *ChannelIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[14]
+	mi := &file_proto_core_core_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2657,7 +5874,7 @@ func (x *ChannelIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelIdReq.ProtoReflect.Descriptor instead.
 func (*ChannelIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{14}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ChannelIdReq) GetId() int64 {
@@ -2676,7 +5893,7 @@ type BuildTaskIdReq struct {
 
 func (x *BuildTaskIdReq) Reset() {
 	*x = BuildTaskIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[15]
+	mi := &file_proto_core_core_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2688,7 +5905,7 @@ func (x *BuildTaskIdReq) String() string {
 func (*BuildTaskIdReq) ProtoMessage() {}
 
 func (x *BuildTaskIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[15]
+	mi := &file_proto_core_core_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2701,7 +5918,7 @@ func (x *BuildTaskIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildTaskIdReq.ProtoReflect.Descriptor instead.
 func (*BuildTaskIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{15}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *BuildTaskIdReq) GetId() int64 {
@@ -2721,7 +5938,7 @@ type BrandingProfileIdReq struct {
 
 func (x *BrandingProfileIdReq) Reset() {
 	*x = BrandingProfileIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[16]
+	mi := &file_proto_core_core_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2733,7 +5950,7 @@ func (x *BrandingProfileIdReq) String() string {
 func (*BrandingProfileIdReq) ProtoMessage() {}
 
 func (x *BrandingProfileIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[16]
+	mi := &file_proto_core_core_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2746,7 +5963,7 @@ func (x *BrandingProfileIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BrandingProfileIdReq.ProtoReflect.Descriptor instead.
 func (*BrandingProfileIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{16}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *BrandingProfileIdReq) GetId() int64 {
@@ -2766,7 +5983,7 @@ type BrandingPreflightIdReq struct {
 
 func (x *BrandingPreflightIdReq) Reset() {
 	*x = BrandingPreflightIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[17]
+	mi := &file_proto_core_core_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2778,7 +5995,7 @@ func (x *BrandingPreflightIdReq) String() string {
 func (*BrandingPreflightIdReq) ProtoMessage() {}
 
 func (x *BrandingPreflightIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[17]
+	mi := &file_proto_core_core_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2791,7 +6008,7 @@ func (x *BrandingPreflightIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BrandingPreflightIdReq.ProtoReflect.Descriptor instead.
 func (*BrandingPreflightIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{17}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *BrandingPreflightIdReq) GetId() int64 {
@@ -2811,7 +6028,7 @@ type WhiteLabelTemplateIdReq struct {
 
 func (x *WhiteLabelTemplateIdReq) Reset() {
 	*x = WhiteLabelTemplateIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[18]
+	mi := &file_proto_core_core_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2823,7 +6040,7 @@ func (x *WhiteLabelTemplateIdReq) String() string {
 func (*WhiteLabelTemplateIdReq) ProtoMessage() {}
 
 func (x *WhiteLabelTemplateIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[18]
+	mi := &file_proto_core_core_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2836,7 +6053,7 @@ func (x *WhiteLabelTemplateIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelTemplateIdReq.ProtoReflect.Descriptor instead.
 func (*WhiteLabelTemplateIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{18}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *WhiteLabelTemplateIdReq) GetId() int64 {
@@ -2857,7 +6074,7 @@ type WhiteLabelTemplateRevisionIdReq struct {
 
 func (x *WhiteLabelTemplateRevisionIdReq) Reset() {
 	*x = WhiteLabelTemplateRevisionIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[19]
+	mi := &file_proto_core_core_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2869,7 +6086,7 @@ func (x *WhiteLabelTemplateRevisionIdReq) String() string {
 func (*WhiteLabelTemplateRevisionIdReq) ProtoMessage() {}
 
 func (x *WhiteLabelTemplateRevisionIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[19]
+	mi := &file_proto_core_core_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2882,7 +6099,7 @@ func (x *WhiteLabelTemplateRevisionIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelTemplateRevisionIdReq.ProtoReflect.Descriptor instead.
 func (*WhiteLabelTemplateRevisionIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{19}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *WhiteLabelTemplateRevisionIdReq) GetTemplateId() int64 {
@@ -2909,7 +6126,7 @@ type WhiteLabelProductIdReq struct {
 
 func (x *WhiteLabelProductIdReq) Reset() {
 	*x = WhiteLabelProductIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[20]
+	mi := &file_proto_core_core_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2921,7 +6138,7 @@ func (x *WhiteLabelProductIdReq) String() string {
 func (*WhiteLabelProductIdReq) ProtoMessage() {}
 
 func (x *WhiteLabelProductIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[20]
+	mi := &file_proto_core_core_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2934,7 +6151,7 @@ func (x *WhiteLabelProductIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelProductIdReq.ProtoReflect.Descriptor instead.
 func (*WhiteLabelProductIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{20}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *WhiteLabelProductIdReq) GetId() int64 {
@@ -2954,7 +6171,7 @@ type ApplicationResp struct {
 
 func (x *ApplicationResp) Reset() {
 	*x = ApplicationResp{}
-	mi := &file_proto_core_core_proto_msgTypes[21]
+	mi := &file_proto_core_core_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2966,7 +6183,7 @@ func (x *ApplicationResp) String() string {
 func (*ApplicationResp) ProtoMessage() {}
 
 func (x *ApplicationResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[21]
+	mi := &file_proto_core_core_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2979,7 +6196,7 @@ func (x *ApplicationResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApplicationResp.ProtoReflect.Descriptor instead.
 func (*ApplicationResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{21}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ApplicationResp) GetBase() *common.RespBase {
@@ -3006,7 +6223,7 @@ type VersionResp struct {
 
 func (x *VersionResp) Reset() {
 	*x = VersionResp{}
-	mi := &file_proto_core_core_proto_msgTypes[22]
+	mi := &file_proto_core_core_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3018,7 +6235,7 @@ func (x *VersionResp) String() string {
 func (*VersionResp) ProtoMessage() {}
 
 func (x *VersionResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[22]
+	mi := &file_proto_core_core_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3031,7 +6248,7 @@ func (x *VersionResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionResp.ProtoReflect.Descriptor instead.
 func (*VersionResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{22}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *VersionResp) GetBase() *common.RespBase {
@@ -3058,7 +6275,7 @@ type ChannelResp struct {
 
 func (x *ChannelResp) Reset() {
 	*x = ChannelResp{}
-	mi := &file_proto_core_core_proto_msgTypes[23]
+	mi := &file_proto_core_core_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3070,7 +6287,7 @@ func (x *ChannelResp) String() string {
 func (*ChannelResp) ProtoMessage() {}
 
 func (x *ChannelResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[23]
+	mi := &file_proto_core_core_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3083,7 +6300,7 @@ func (x *ChannelResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelResp.ProtoReflect.Descriptor instead.
 func (*ChannelResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{23}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ChannelResp) GetBase() *common.RespBase {
@@ -3110,7 +6327,7 @@ type SigningConfigResp struct {
 
 func (x *SigningConfigResp) Reset() {
 	*x = SigningConfigResp{}
-	mi := &file_proto_core_core_proto_msgTypes[24]
+	mi := &file_proto_core_core_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3122,7 +6339,7 @@ func (x *SigningConfigResp) String() string {
 func (*SigningConfigResp) ProtoMessage() {}
 
 func (x *SigningConfigResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[24]
+	mi := &file_proto_core_core_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3135,7 +6352,7 @@ func (x *SigningConfigResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SigningConfigResp.ProtoReflect.Descriptor instead.
 func (*SigningConfigResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{24}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *SigningConfigResp) GetBase() *common.RespBase {
@@ -3163,7 +6380,7 @@ type SigningConfigListReq struct {
 
 func (x *SigningConfigListReq) Reset() {
 	*x = SigningConfigListReq{}
-	mi := &file_proto_core_core_proto_msgTypes[25]
+	mi := &file_proto_core_core_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3175,7 +6392,7 @@ func (x *SigningConfigListReq) String() string {
 func (*SigningConfigListReq) ProtoMessage() {}
 
 func (x *SigningConfigListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[25]
+	mi := &file_proto_core_core_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3188,7 +6405,7 @@ func (x *SigningConfigListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SigningConfigListReq.ProtoReflect.Descriptor instead.
 func (*SigningConfigListReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{25}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *SigningConfigListReq) GetPage() *common.PageReq {
@@ -3222,7 +6439,7 @@ type SigningConfigListResp struct {
 
 func (x *SigningConfigListResp) Reset() {
 	*x = SigningConfigListResp{}
-	mi := &file_proto_core_core_proto_msgTypes[26]
+	mi := &file_proto_core_core_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3234,7 +6451,7 @@ func (x *SigningConfigListResp) String() string {
 func (*SigningConfigListResp) ProtoMessage() {}
 
 func (x *SigningConfigListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[26]
+	mi := &file_proto_core_core_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3247,7 +6464,7 @@ func (x *SigningConfigListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SigningConfigListResp.ProtoReflect.Descriptor instead.
 func (*SigningConfigListResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{26}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *SigningConfigListResp) GetBase() *common.RespBase {
@@ -3274,7 +6491,7 @@ type BuildTaskResp struct {
 
 func (x *BuildTaskResp) Reset() {
 	*x = BuildTaskResp{}
-	mi := &file_proto_core_core_proto_msgTypes[27]
+	mi := &file_proto_core_core_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3286,7 +6503,7 @@ func (x *BuildTaskResp) String() string {
 func (*BuildTaskResp) ProtoMessage() {}
 
 func (x *BuildTaskResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[27]
+	mi := &file_proto_core_core_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3299,7 +6516,7 @@ func (x *BuildTaskResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildTaskResp.ProtoReflect.Descriptor instead.
 func (*BuildTaskResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{27}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *BuildTaskResp) GetBase() *common.RespBase {
@@ -3310,6 +6527,6143 @@ func (x *BuildTaskResp) GetBase() *common.RespBase {
 }
 
 func (x *BuildTaskResp) GetData() *BuildTask {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 Builder节点响应。
+type BuilderNodeResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *BuilderNode           `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // Builder节点
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuilderNodeResp) Reset() {
+	*x = BuilderNodeResp{}
+	mi := &file_proto_core_core_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuilderNodeResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuilderNodeResp) ProtoMessage() {}
+
+func (x *BuilderNodeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuilderNodeResp.ProtoReflect.Descriptor instead.
+func (*BuilderNodeResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *BuilderNodeResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuilderNodeResp) GetData() *BuilderNode {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 Builder节点列表请求。
+type BuilderNodeListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *common.PageReq        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                                                // 分页参数
+	PoolCode      string                 `protobuf:"bytes,2,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                        // 构建池编码
+	Status        BuilderNodeStatus      `protobuf:"varint,3,opt,name=status,proto3,enum=core.BuilderNodeStatus" json:"status,omitempty"`                               // 节点健康状态
+	DrainStatus   BuilderDrainStatus     `protobuf:"varint,4,opt,name=drain_status,json=drainStatus,proto3,enum=core.BuilderDrainStatus" json:"drain_status,omitempty"` // 节点排空状态
+	Keyword       string                 `protobuf:"bytes,5,opt,name=keyword,proto3" json:"keyword,omitempty"`                                                          // 节点编码或端点关键字
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuilderNodeListReq) Reset() {
+	*x = BuilderNodeListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuilderNodeListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuilderNodeListReq) ProtoMessage() {}
+
+func (x *BuilderNodeListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuilderNodeListReq.ProtoReflect.Descriptor instead.
+func (*BuilderNodeListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *BuilderNodeListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *BuilderNodeListReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuilderNodeListReq) GetStatus() BuilderNodeStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BuilderNodeStatus_BUILDER_NODE_STATUS_UNKNOWN
+}
+
+func (x *BuilderNodeListReq) GetDrainStatus() BuilderDrainStatus {
+	if x != nil {
+		return x.DrainStatus
+	}
+	return BuilderDrainStatus_BUILDER_DRAIN_STATUS_UNKNOWN
+}
+
+func (x *BuilderNodeListReq) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
+// V4 Builder节点列表响应。
+type BuilderNodeListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*BuilderNode         `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // Builder节点列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuilderNodeListResp) Reset() {
+	*x = BuilderNodeListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuilderNodeListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuilderNodeListResp) ProtoMessage() {}
+
+func (x *BuilderNodeListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuilderNodeListResp.ProtoReflect.Descriptor instead.
+func (*BuilderNodeListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *BuilderNodeListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuilderNodeListResp) GetData() []*BuilderNode {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 构建并发策略响应。
+type BuildConcurrencyPolicyResp struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Base          *common.RespBase        `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *BuildConcurrencyPolicy `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 构建并发策略
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildConcurrencyPolicyResp) Reset() {
+	*x = BuildConcurrencyPolicyResp{}
+	mi := &file_proto_core_core_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildConcurrencyPolicyResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildConcurrencyPolicyResp) ProtoMessage() {}
+
+func (x *BuildConcurrencyPolicyResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildConcurrencyPolicyResp.ProtoReflect.Descriptor instead.
+func (*BuildConcurrencyPolicyResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *BuildConcurrencyPolicyResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuildConcurrencyPolicyResp) GetData() *BuildConcurrencyPolicy {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 构建并发策略列表请求。
+type BuildConcurrencyPolicyListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *common.PageReq        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                  // 分页参数
+	TenantId      int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`         // 租户ID，平台查询允许0
+	AppId         int64                  `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                  // 应用ID
+	PoolCode      string                 `protobuf:"bytes,4,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`          // 构建池编码
+	Status        BuildPolicyStatus      `protobuf:"varint,5,opt,name=status,proto3,enum=core.BuildPolicyStatus" json:"status,omitempty"` // 策略状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildConcurrencyPolicyListReq) Reset() {
+	*x = BuildConcurrencyPolicyListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildConcurrencyPolicyListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildConcurrencyPolicyListReq) ProtoMessage() {}
+
+func (x *BuildConcurrencyPolicyListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildConcurrencyPolicyListReq.ProtoReflect.Descriptor instead.
+func (*BuildConcurrencyPolicyListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *BuildConcurrencyPolicyListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *BuildConcurrencyPolicyListReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *BuildConcurrencyPolicyListReq) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *BuildConcurrencyPolicyListReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuildConcurrencyPolicyListReq) GetStatus() BuildPolicyStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BuildPolicyStatus_BUILD_POLICY_STATUS_UNKNOWN
+}
+
+// V4 构建并发策略列表响应。
+type BuildConcurrencyPolicyListResp struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Base          *common.RespBase          `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*BuildConcurrencyPolicy `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // 构建并发策略列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildConcurrencyPolicyListResp) Reset() {
+	*x = BuildConcurrencyPolicyListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildConcurrencyPolicyListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildConcurrencyPolicyListResp) ProtoMessage() {}
+
+func (x *BuildConcurrencyPolicyListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildConcurrencyPolicyListResp.ProtoReflect.Descriptor instead.
+func (*BuildConcurrencyPolicyListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *BuildConcurrencyPolicyListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuildConcurrencyPolicyListResp) GetData() []*BuildConcurrencyPolicy {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 构建缓存条目响应。
+type BuildCacheEntryResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *BuildCacheEntry       `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 构建缓存条目
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildCacheEntryResp) Reset() {
+	*x = BuildCacheEntryResp{}
+	mi := &file_proto_core_core_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheEntryResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheEntryResp) ProtoMessage() {}
+
+func (x *BuildCacheEntryResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheEntryResp.ProtoReflect.Descriptor instead.
+func (*BuildCacheEntryResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *BuildCacheEntryResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuildCacheEntryResp) GetData() *BuildCacheEntry {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 构建缓存列表请求。
+type BuildCacheEntryListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *common.PageReq        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                                          // 分页参数
+	TenantId      int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                 // 租户ID，普通租户由上下文强制覆盖
+	CacheScope    BuildCacheScope        `protobuf:"varint,3,opt,name=cache_scope,json=cacheScope,proto3,enum=core.BuildCacheScope" json:"cache_scope,omitempty"` // 缓存作用域
+	Status        BuildCacheStatus       `protobuf:"varint,4,opt,name=status,proto3,enum=core.BuildCacheStatus" json:"status,omitempty"`                          // 缓存状态
+	Keyword       string                 `protobuf:"bytes,5,opt,name=keyword,proto3" json:"keyword,omitempty"`                                                    // 缓存键、输入摘要或工具链关键字
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildCacheEntryListReq) Reset() {
+	*x = BuildCacheEntryListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheEntryListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheEntryListReq) ProtoMessage() {}
+
+func (x *BuildCacheEntryListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheEntryListReq.ProtoReflect.Descriptor instead.
+func (*BuildCacheEntryListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *BuildCacheEntryListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *BuildCacheEntryListReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *BuildCacheEntryListReq) GetCacheScope() BuildCacheScope {
+	if x != nil {
+		return x.CacheScope
+	}
+	return BuildCacheScope_BUILD_CACHE_SCOPE_UNKNOWN
+}
+
+func (x *BuildCacheEntryListReq) GetStatus() BuildCacheStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BuildCacheStatus_BUILD_CACHE_STATUS_UNKNOWN
+}
+
+func (x *BuildCacheEntryListReq) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
+// V4 构建缓存列表响应。
+type BuildCacheEntryListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*BuildCacheEntry     `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // 构建缓存条目列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildCacheEntryListResp) Reset() {
+	*x = BuildCacheEntryListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheEntryListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheEntryListResp) ProtoMessage() {}
+
+func (x *BuildCacheEntryListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheEntryListResp.ProtoReflect.Descriptor instead.
+func (*BuildCacheEntryListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *BuildCacheEntryListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuildCacheEntryListResp) GetData() []*BuildCacheEntry {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 调度事件列表请求。
+type BuildSchedulerEventListReq struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Page          *common.PageReq         `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                                               // 分页参数
+	TenantId      int64                   `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                      // 租户ID，普通租户由上下文强制覆盖
+	AppId         int64                   `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                               // 应用ID
+	TaskId        int64                   `protobuf:"varint,4,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                                            // 构建任务ID
+	NodeCode      string                  `protobuf:"bytes,5,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                       // Builder节点编码
+	PoolCode      string                  `protobuf:"bytes,6,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                       // 构建池编码
+	EventType     BuildSchedulerEventType `protobuf:"varint,7,opt,name=event_type,json=eventType,proto3,enum=core.BuildSchedulerEventType" json:"event_type,omitempty"` // 调度事件类型
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildSchedulerEventListReq) Reset() {
+	*x = BuildSchedulerEventListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildSchedulerEventListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildSchedulerEventListReq) ProtoMessage() {}
+
+func (x *BuildSchedulerEventListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildSchedulerEventListReq.ProtoReflect.Descriptor instead.
+func (*BuildSchedulerEventListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *BuildSchedulerEventListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *BuildSchedulerEventListReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *BuildSchedulerEventListReq) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *BuildSchedulerEventListReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *BuildSchedulerEventListReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *BuildSchedulerEventListReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuildSchedulerEventListReq) GetEventType() BuildSchedulerEventType {
+	if x != nil {
+		return x.EventType
+	}
+	return BuildSchedulerEventType_BUILD_SCHEDULER_EVENT_TYPE_UNKNOWN
+}
+
+// V4 调度事件列表响应。
+type BuildSchedulerEventListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*BuildSchedulerEvent `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // 调度事件列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildSchedulerEventListResp) Reset() {
+	*x = BuildSchedulerEventListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildSchedulerEventListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildSchedulerEventListResp) ProtoMessage() {}
+
+func (x *BuildSchedulerEventListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildSchedulerEventListResp.ProtoReflect.Descriptor instead.
+func (*BuildSchedulerEventListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *BuildSchedulerEventListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuildSchedulerEventListResp) GetData() []*BuildSchedulerEvent {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 构建集群指标查询请求。
+type BuildClusterMetricsReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PoolCode      string                 `protobuf:"bytes,1,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                 // 构建池编码，空值使用default
+	PeriodMinutes int32                  `protobuf:"varint,2,opt,name=period_minutes,json=periodMinutes,proto3" json:"period_minutes,omitempty"` // 统计窗口分钟数，默认60，最大10080
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildClusterMetricsReq) Reset() {
+	*x = BuildClusterMetricsReq{}
+	mi := &file_proto_core_core_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildClusterMetricsReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildClusterMetricsReq) ProtoMessage() {}
+
+func (x *BuildClusterMetricsReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildClusterMetricsReq.ProtoReflect.Descriptor instead.
+func (*BuildClusterMetricsReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *BuildClusterMetricsReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *BuildClusterMetricsReq) GetPeriodMinutes() int32 {
+	if x != nil {
+		return x.PeriodMinutes
+	}
+	return 0
+}
+
+// V4 构建集群指标响应。
+type BuildClusterMetricsResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *BuildClusterMetrics   `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 集群运行指标与告警摘要
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildClusterMetricsResp) Reset() {
+	*x = BuildClusterMetricsResp{}
+	mi := &file_proto_core_core_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildClusterMetricsResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildClusterMetricsResp) ProtoMessage() {}
+
+func (x *BuildClusterMetricsResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildClusterMetricsResp.ProtoReflect.Descriptor instead.
+func (*BuildClusterMetricsResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *BuildClusterMetricsResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuildClusterMetricsResp) GetData() *BuildClusterMetrics {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 Open API凭证列表请求。
+type OpenApiCredentialListReq struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Page          *common.PageReq         `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                        // 分页参数
+	Status        OpenApiCredentialStatus `protobuf:"varint,2,opt,name=status,proto3,enum=core.OpenApiCredentialStatus" json:"status,omitempty"` // 凭证状态
+	Keyword       string                  `protobuf:"bytes,3,opt,name=keyword,proto3" json:"keyword,omitempty"`                                  // 名称或Key标识关键字
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OpenApiCredentialListReq) Reset() {
+	*x = OpenApiCredentialListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[49]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiCredentialListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiCredentialListReq) ProtoMessage() {}
+
+func (x *OpenApiCredentialListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[49]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiCredentialListReq.ProtoReflect.Descriptor instead.
+func (*OpenApiCredentialListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{49}
+}
+
+func (x *OpenApiCredentialListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *OpenApiCredentialListReq) GetStatus() OpenApiCredentialStatus {
+	if x != nil {
+		return x.Status
+	}
+	return OpenApiCredentialStatus_OPEN_API_CREDENTIAL_STATUS_UNKNOWN
+}
+
+func (x *OpenApiCredentialListReq) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
+// V5 Open API凭证列表响应。
+type OpenApiCredentialListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*OpenApiCredential   `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // 凭证列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OpenApiCredentialListResp) Reset() {
+	*x = OpenApiCredentialListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[50]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiCredentialListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiCredentialListResp) ProtoMessage() {}
+
+func (x *OpenApiCredentialListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[50]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiCredentialListResp.ProtoReflect.Descriptor instead.
+func (*OpenApiCredentialListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{50}
+}
+
+func (x *OpenApiCredentialListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *OpenApiCredentialListResp) GetData() []*OpenApiCredential {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 Open API凭证响应。
+type OpenApiCredentialResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *OpenApiCredential     `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 凭证
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OpenApiCredentialResp) Reset() {
+	*x = OpenApiCredentialResp{}
+	mi := &file_proto_core_core_proto_msgTypes[51]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiCredentialResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiCredentialResp) ProtoMessage() {}
+
+func (x *OpenApiCredentialResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[51]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiCredentialResp.ProtoReflect.Descriptor instead.
+func (*OpenApiCredentialResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{51}
+}
+
+func (x *OpenApiCredentialResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *OpenApiCredentialResp) GetData() *OpenApiCredential {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 Open API凭证一次性Secret响应。
+type OpenApiCredentialSecretResp struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Base          *common.RespBase         `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *OpenApiCredentialSecret `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 凭证与一次性Secret
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OpenApiCredentialSecretResp) Reset() {
+	*x = OpenApiCredentialSecretResp{}
+	mi := &file_proto_core_core_proto_msgTypes[52]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiCredentialSecretResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiCredentialSecretResp) ProtoMessage() {}
+
+func (x *OpenApiCredentialSecretResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[52]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiCredentialSecretResp.ProtoReflect.Descriptor instead.
+func (*OpenApiCredentialSecretResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{52}
+}
+
+func (x *OpenApiCredentialSecretResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *OpenApiCredentialSecretResp) GetData() *OpenApiCredentialSecret {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 创建Open API凭证请求。
+type CreateOpenApiCredentialReq struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	CredentialName     string                 `protobuf:"bytes,1,opt,name=credential_name,json=credentialName,proto3" json:"credential_name,omitempty"`                  // 凭证名称
+	Scopes             []OpenApiScope         `protobuf:"varint,2,rep,packed,name=scopes,proto3,enum=core.OpenApiScope" json:"scopes,omitempty"`                         // 授权Scope
+	AppIds             []int64                `protobuf:"varint,3,rep,packed,name=app_ids,json=appIds,proto3" json:"app_ids,omitempty"`                                  // 应用范围
+	IpAllowlist        []string               `protobuf:"bytes,4,rep,name=ip_allowlist,json=ipAllowlist,proto3" json:"ip_allowlist,omitempty"`                           // IP或CIDR白名单
+	RateLimitPerMinute int32                  `protobuf:"varint,5,opt,name=rate_limit_per_minute,json=rateLimitPerMinute,proto3" json:"rate_limit_per_minute,omitempty"` // 每分钟请求上限
+	ExpiresAt          int64                  `protobuf:"varint,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`                                // 到期时间，Unix毫秒，0表示长期有效
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *CreateOpenApiCredentialReq) Reset() {
+	*x = CreateOpenApiCredentialReq{}
+	mi := &file_proto_core_core_proto_msgTypes[53]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateOpenApiCredentialReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateOpenApiCredentialReq) ProtoMessage() {}
+
+func (x *CreateOpenApiCredentialReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[53]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateOpenApiCredentialReq.ProtoReflect.Descriptor instead.
+func (*CreateOpenApiCredentialReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{53}
+}
+
+func (x *CreateOpenApiCredentialReq) GetCredentialName() string {
+	if x != nil {
+		return x.CredentialName
+	}
+	return ""
+}
+
+func (x *CreateOpenApiCredentialReq) GetScopes() []OpenApiScope {
+	if x != nil {
+		return x.Scopes
+	}
+	return nil
+}
+
+func (x *CreateOpenApiCredentialReq) GetAppIds() []int64 {
+	if x != nil {
+		return x.AppIds
+	}
+	return nil
+}
+
+func (x *CreateOpenApiCredentialReq) GetIpAllowlist() []string {
+	if x != nil {
+		return x.IpAllowlist
+	}
+	return nil
+}
+
+func (x *CreateOpenApiCredentialReq) GetRateLimitPerMinute() int32 {
+	if x != nil {
+		return x.RateLimitPerMinute
+	}
+	return 0
+}
+
+func (x *CreateOpenApiCredentialReq) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
+// V5 Open API凭证主键请求。
+type OpenApiCredentialIdReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 凭证ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OpenApiCredentialIdReq) Reset() {
+	*x = OpenApiCredentialIdReq{}
+	mi := &file_proto_core_core_proto_msgTypes[54]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiCredentialIdReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiCredentialIdReq) ProtoMessage() {}
+
+func (x *OpenApiCredentialIdReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[54]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiCredentialIdReq.ProtoReflect.Descriptor instead.
+func (*OpenApiCredentialIdReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{54}
+}
+
+func (x *OpenApiCredentialIdReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// V5 轮换Open API凭证请求。
+type RotateOpenApiCredentialReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                         // 原凭证ID
+	GraceSeconds  int64                  `protobuf:"varint,2,opt,name=grace_seconds,json=graceSeconds,proto3" json:"grace_seconds,omitempty"` // 旧Key过渡秒数，0表示立即吊销
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RotateOpenApiCredentialReq) Reset() {
+	*x = RotateOpenApiCredentialReq{}
+	mi := &file_proto_core_core_proto_msgTypes[55]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RotateOpenApiCredentialReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RotateOpenApiCredentialReq) ProtoMessage() {}
+
+func (x *RotateOpenApiCredentialReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[55]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RotateOpenApiCredentialReq.ProtoReflect.Descriptor instead.
+func (*RotateOpenApiCredentialReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{55}
+}
+
+func (x *RotateOpenApiCredentialReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *RotateOpenApiCredentialReq) GetGraceSeconds() int64 {
+	if x != nil {
+		return x.GraceSeconds
+	}
+	return 0
+}
+
+// V5 认证Open API凭证请求；不传输明文Secret。
+type AuthenticateOpenApiCredentialReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	KeyId         string                 `protobuf:"bytes,1,opt,name=key_id,json=keyId,proto3" json:"key_id,omitempty"`                // 公开Key标识
+	SecretHash    string                 `protobuf:"bytes,2,opt,name=secret_hash,json=secretHash,proto3" json:"secret_hash,omitempty"` // API层计算的Secret SHA-256
+	ClientIp      string                 `protobuf:"bytes,3,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`       // 调用方IP
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AuthenticateOpenApiCredentialReq) Reset() {
+	*x = AuthenticateOpenApiCredentialReq{}
+	mi := &file_proto_core_core_proto_msgTypes[56]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AuthenticateOpenApiCredentialReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuthenticateOpenApiCredentialReq) ProtoMessage() {}
+
+func (x *AuthenticateOpenApiCredentialReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[56]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuthenticateOpenApiCredentialReq.ProtoReflect.Descriptor instead.
+func (*AuthenticateOpenApiCredentialReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{56}
+}
+
+func (x *AuthenticateOpenApiCredentialReq) GetKeyId() string {
+	if x != nil {
+		return x.KeyId
+	}
+	return ""
+}
+
+func (x *AuthenticateOpenApiCredentialReq) GetSecretHash() string {
+	if x != nil {
+		return x.SecretHash
+	}
+	return ""
+}
+
+func (x *AuthenticateOpenApiCredentialReq) GetClientIp() string {
+	if x != nil {
+		return x.ClientIp
+	}
+	return ""
+}
+
+// V5 认证Open API凭证响应。
+type OpenApiAuthContextResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *OpenApiAuthContext    `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 认证上下文
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OpenApiAuthContextResp) Reset() {
+	*x = OpenApiAuthContextResp{}
+	mi := &file_proto_core_core_proto_msgTypes[57]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiAuthContextResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiAuthContextResp) ProtoMessage() {}
+
+func (x *OpenApiAuthContextResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[57]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiAuthContextResp.ProtoReflect.Descriptor instead.
+func (*OpenApiAuthContextResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{57}
+}
+
+func (x *OpenApiAuthContextResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *OpenApiAuthContextResp) GetData() *OpenApiAuthContext {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 开始Open API幂等请求。
+type BeginOpenApiIdempotencyReq struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	CredentialId     int64                  `protobuf:"varint,1,opt,name=credential_id,json=credentialId,proto3" json:"credential_id,omitempty"`               // 调用凭证ID
+	IdempotencyKey   string                 `protobuf:"bytes,2,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"`          // 客户端幂等键
+	RequestMethod    string                 `protobuf:"bytes,3,opt,name=request_method,json=requestMethod,proto3" json:"request_method,omitempty"`             // HTTP请求方法
+	RequestPath      string                 `protobuf:"bytes,4,opt,name=request_path,json=requestPath,proto3" json:"request_path,omitempty"`                   // 规范化请求路径
+	RequestHash      string                 `protobuf:"bytes,5,opt,name=request_hash,json=requestHash,proto3" json:"request_hash,omitempty"`                   // 请求体SHA-256摘要
+	ExpiresInSeconds int64                  `protobuf:"varint,6,opt,name=expires_in_seconds,json=expiresInSeconds,proto3" json:"expires_in_seconds,omitempty"` // 幂等记录有效秒数
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *BeginOpenApiIdempotencyReq) Reset() {
+	*x = BeginOpenApiIdempotencyReq{}
+	mi := &file_proto_core_core_proto_msgTypes[58]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BeginOpenApiIdempotencyReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BeginOpenApiIdempotencyReq) ProtoMessage() {}
+
+func (x *BeginOpenApiIdempotencyReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[58]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BeginOpenApiIdempotencyReq.ProtoReflect.Descriptor instead.
+func (*BeginOpenApiIdempotencyReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{58}
+}
+
+func (x *BeginOpenApiIdempotencyReq) GetCredentialId() int64 {
+	if x != nil {
+		return x.CredentialId
+	}
+	return 0
+}
+
+func (x *BeginOpenApiIdempotencyReq) GetIdempotencyKey() string {
+	if x != nil {
+		return x.IdempotencyKey
+	}
+	return ""
+}
+
+func (x *BeginOpenApiIdempotencyReq) GetRequestMethod() string {
+	if x != nil {
+		return x.RequestMethod
+	}
+	return ""
+}
+
+func (x *BeginOpenApiIdempotencyReq) GetRequestPath() string {
+	if x != nil {
+		return x.RequestPath
+	}
+	return ""
+}
+
+func (x *BeginOpenApiIdempotencyReq) GetRequestHash() string {
+	if x != nil {
+		return x.RequestHash
+	}
+	return ""
+}
+
+func (x *BeginOpenApiIdempotencyReq) GetExpiresInSeconds() int64 {
+	if x != nil {
+		return x.ExpiresInSeconds
+	}
+	return 0
+}
+
+// V5 Open API幂等处理结果。
+type OpenApiIdempotencyResult struct {
+	state          protoimpl.MessageState     `protogen:"open.v1"`
+	Id             int64                      `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                  // 幂等记录ID
+	Decision       OpenApiIdempotencyDecision `protobuf:"varint,2,opt,name=decision,proto3,enum=core.OpenApiIdempotencyDecision" json:"decision,omitempty"` // 本次处理决定
+	ResponseStatus int32                      `protobuf:"varint,3,opt,name=response_status,json=responseStatus,proto3" json:"response_status,omitempty"`    // 可重放HTTP状态码
+	ResponseBody   string                     `protobuf:"bytes,4,opt,name=response_body,json=responseBody,proto3" json:"response_body,omitempty"`           // 可重放JSON响应体
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *OpenApiIdempotencyResult) Reset() {
+	*x = OpenApiIdempotencyResult{}
+	mi := &file_proto_core_core_proto_msgTypes[59]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiIdempotencyResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiIdempotencyResult) ProtoMessage() {}
+
+func (x *OpenApiIdempotencyResult) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[59]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiIdempotencyResult.ProtoReflect.Descriptor instead.
+func (*OpenApiIdempotencyResult) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{59}
+}
+
+func (x *OpenApiIdempotencyResult) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *OpenApiIdempotencyResult) GetDecision() OpenApiIdempotencyDecision {
+	if x != nil {
+		return x.Decision
+	}
+	return OpenApiIdempotencyDecision_OPEN_API_IDEMPOTENCY_DECISION_UNKNOWN
+}
+
+func (x *OpenApiIdempotencyResult) GetResponseStatus() int32 {
+	if x != nil {
+		return x.ResponseStatus
+	}
+	return 0
+}
+
+func (x *OpenApiIdempotencyResult) GetResponseBody() string {
+	if x != nil {
+		return x.ResponseBody
+	}
+	return ""
+}
+
+// V5 Open API幂等处理响应。
+type OpenApiIdempotencyResp struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Base          *common.RespBase          `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *OpenApiIdempotencyResult `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 幂等处理结果
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OpenApiIdempotencyResp) Reset() {
+	*x = OpenApiIdempotencyResp{}
+	mi := &file_proto_core_core_proto_msgTypes[60]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OpenApiIdempotencyResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OpenApiIdempotencyResp) ProtoMessage() {}
+
+func (x *OpenApiIdempotencyResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[60]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OpenApiIdempotencyResp.ProtoReflect.Descriptor instead.
+func (*OpenApiIdempotencyResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{60}
+}
+
+func (x *OpenApiIdempotencyResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *OpenApiIdempotencyResp) GetData() *OpenApiIdempotencyResult {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 完成Open API幂等请求。
+type CompleteOpenApiIdempotencyReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                               // 幂等记录ID
+	CredentialId   int64                  `protobuf:"varint,2,opt,name=credential_id,json=credentialId,proto3" json:"credential_id,omitempty"`       // 调用凭证ID
+	ResponseStatus int32                  `protobuf:"varint,3,opt,name=response_status,json=responseStatus,proto3" json:"response_status,omitempty"` // HTTP响应状态码
+	ResponseBody   string                 `protobuf:"bytes,4,opt,name=response_body,json=responseBody,proto3" json:"response_body,omitempty"`        // JSON响应体
+	ResourceType   string                 `protobuf:"bytes,5,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`        // 创建的资源类型
+	ResourceId     int64                  `protobuf:"varint,6,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`             // 创建的资源ID
+	Succeeded      bool                   `protobuf:"varint,7,opt,name=succeeded,proto3" json:"succeeded,omitempty"`                                 // 请求是否成功完成
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *CompleteOpenApiIdempotencyReq) Reset() {
+	*x = CompleteOpenApiIdempotencyReq{}
+	mi := &file_proto_core_core_proto_msgTypes[61]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompleteOpenApiIdempotencyReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompleteOpenApiIdempotencyReq) ProtoMessage() {}
+
+func (x *CompleteOpenApiIdempotencyReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[61]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompleteOpenApiIdempotencyReq.ProtoReflect.Descriptor instead.
+func (*CompleteOpenApiIdempotencyReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{61}
+}
+
+func (x *CompleteOpenApiIdempotencyReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *CompleteOpenApiIdempotencyReq) GetCredentialId() int64 {
+	if x != nil {
+		return x.CredentialId
+	}
+	return 0
+}
+
+func (x *CompleteOpenApiIdempotencyReq) GetResponseStatus() int32 {
+	if x != nil {
+		return x.ResponseStatus
+	}
+	return 0
+}
+
+func (x *CompleteOpenApiIdempotencyReq) GetResponseBody() string {
+	if x != nil {
+		return x.ResponseBody
+	}
+	return ""
+}
+
+func (x *CompleteOpenApiIdempotencyReq) GetResourceType() string {
+	if x != nil {
+		return x.ResourceType
+	}
+	return ""
+}
+
+func (x *CompleteOpenApiIdempotencyReq) GetResourceId() int64 {
+	if x != nil {
+		return x.ResourceId
+	}
+	return 0
+}
+
+func (x *CompleteOpenApiIdempotencyReq) GetSucceeded() bool {
+	if x != nil {
+		return x.Succeeded
+	}
+	return false
+}
+
+// V5 写入Open API调用审计。
+type RecordOpenApiAuditReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	CredentialId   int64                  `protobuf:"varint,1,opt,name=credential_id,json=credentialId,proto3" json:"credential_id,omitempty"`        // 调用凭证ID
+	KeyId          string                 `protobuf:"bytes,2,opt,name=key_id,json=keyId,proto3" json:"key_id,omitempty"`                              // Key标识快照
+	RequestId      string                 `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`                  // 请求唯一标识
+	RequestMethod  string                 `protobuf:"bytes,4,opt,name=request_method,json=requestMethod,proto3" json:"request_method,omitempty"`      // HTTP请求方法
+	RequestPath    string                 `protobuf:"bytes,5,opt,name=request_path,json=requestPath,proto3" json:"request_path,omitempty"`            // 规范化请求路径
+	ScopeUsed      string                 `protobuf:"bytes,6,opt,name=scope_used,json=scopeUsed,proto3" json:"scope_used,omitempty"`                  // 本次使用的Scope
+	ResourceType   string                 `protobuf:"bytes,7,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`         // 资源类型
+	ResourceId     int64                  `protobuf:"varint,8,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`              // 资源ID
+	ClientIp       string                 `protobuf:"bytes,9,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`                     // 调用方IP
+	ResponseStatus int32                  `protobuf:"varint,10,opt,name=response_status,json=responseStatus,proto3" json:"response_status,omitempty"` // HTTP响应状态码
+	DurationMs     int64                  `protobuf:"varint,11,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`             // 请求耗时毫秒
+	ErrorCode      string                 `protobuf:"bytes,12,opt,name=error_code,json=errorCode,proto3" json:"error_code,omitempty"`                 // 结构化错误码
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RecordOpenApiAuditReq) Reset() {
+	*x = RecordOpenApiAuditReq{}
+	mi := &file_proto_core_core_proto_msgTypes[62]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecordOpenApiAuditReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecordOpenApiAuditReq) ProtoMessage() {}
+
+func (x *RecordOpenApiAuditReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[62]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecordOpenApiAuditReq.ProtoReflect.Descriptor instead.
+func (*RecordOpenApiAuditReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{62}
+}
+
+func (x *RecordOpenApiAuditReq) GetCredentialId() int64 {
+	if x != nil {
+		return x.CredentialId
+	}
+	return 0
+}
+
+func (x *RecordOpenApiAuditReq) GetKeyId() string {
+	if x != nil {
+		return x.KeyId
+	}
+	return ""
+}
+
+func (x *RecordOpenApiAuditReq) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *RecordOpenApiAuditReq) GetRequestMethod() string {
+	if x != nil {
+		return x.RequestMethod
+	}
+	return ""
+}
+
+func (x *RecordOpenApiAuditReq) GetRequestPath() string {
+	if x != nil {
+		return x.RequestPath
+	}
+	return ""
+}
+
+func (x *RecordOpenApiAuditReq) GetScopeUsed() string {
+	if x != nil {
+		return x.ScopeUsed
+	}
+	return ""
+}
+
+func (x *RecordOpenApiAuditReq) GetResourceType() string {
+	if x != nil {
+		return x.ResourceType
+	}
+	return ""
+}
+
+func (x *RecordOpenApiAuditReq) GetResourceId() int64 {
+	if x != nil {
+		return x.ResourceId
+	}
+	return 0
+}
+
+func (x *RecordOpenApiAuditReq) GetClientIp() string {
+	if x != nil {
+		return x.ClientIp
+	}
+	return ""
+}
+
+func (x *RecordOpenApiAuditReq) GetResponseStatus() int32 {
+	if x != nil {
+		return x.ResponseStatus
+	}
+	return 0
+}
+
+func (x *RecordOpenApiAuditReq) GetDurationMs() int64 {
+	if x != nil {
+		return x.DurationMs
+	}
+	return 0
+}
+
+func (x *RecordOpenApiAuditReq) GetErrorCode() string {
+	if x != nil {
+		return x.ErrorCode
+	}
+	return ""
+}
+
+// V5 Webhook端点；不包含签名Secret密文。
+type WebhookEndpoint struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                               // 端点ID
+	TenantId      int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                   // 所属租户ID
+	EndpointName  string                 `protobuf:"bytes,3,opt,name=endpoint_name,json=endpointName,proto3" json:"endpoint_name,omitempty"`        // 端点名称
+	EndpointUrl   string                 `protobuf:"bytes,4,opt,name=endpoint_url,json=endpointUrl,proto3" json:"endpoint_url,omitempty"`           // HTTPS投递地址
+	EventTypes    []string               `protobuf:"bytes,5,rep,name=event_types,json=eventTypes,proto3" json:"event_types,omitempty"`              // 订阅事件类型
+	SecretHint    string                 `protobuf:"bytes,6,opt,name=secret_hint,json=secretHint,proto3" json:"secret_hint,omitempty"`              // Secret末尾提示
+	MaxAttempts   int32                  `protobuf:"varint,7,opt,name=max_attempts,json=maxAttempts,proto3" json:"max_attempts,omitempty"`          // 最大投递次数
+	Status        WebhookEndpointStatus  `protobuf:"varint,8,opt,name=status,proto3,enum=core.WebhookEndpointStatus" json:"status,omitempty"`       // 端点状态
+	LastSuccessAt int64                  `protobuf:"varint,9,opt,name=last_success_at,json=lastSuccessAt,proto3" json:"last_success_at,omitempty"`  // 最近成功时间，Unix毫秒
+	LastFailureAt int64                  `protobuf:"varint,10,opt,name=last_failure_at,json=lastFailureAt,proto3" json:"last_failure_at,omitempty"` // 最近失败时间，Unix毫秒
+	CreateBy      int64                  `protobuf:"varint,11,opt,name=create_by,json=createBy,proto3" json:"create_by,omitempty"`                  // 创建人ID
+	CreateTime    int64                  `protobuf:"varint,12,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`            // 创建时间，Unix毫秒
+	UpdateTime    int64                  `protobuf:"varint,13,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`            // 更新时间，Unix毫秒
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookEndpoint) Reset() {
+	*x = WebhookEndpoint{}
+	mi := &file_proto_core_core_proto_msgTypes[63]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookEndpoint) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookEndpoint) ProtoMessage() {}
+
+func (x *WebhookEndpoint) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[63]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookEndpoint.ProtoReflect.Descriptor instead.
+func (*WebhookEndpoint) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{63}
+}
+
+func (x *WebhookEndpoint) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *WebhookEndpoint) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *WebhookEndpoint) GetEndpointName() string {
+	if x != nil {
+		return x.EndpointName
+	}
+	return ""
+}
+
+func (x *WebhookEndpoint) GetEndpointUrl() string {
+	if x != nil {
+		return x.EndpointUrl
+	}
+	return ""
+}
+
+func (x *WebhookEndpoint) GetEventTypes() []string {
+	if x != nil {
+		return x.EventTypes
+	}
+	return nil
+}
+
+func (x *WebhookEndpoint) GetSecretHint() string {
+	if x != nil {
+		return x.SecretHint
+	}
+	return ""
+}
+
+func (x *WebhookEndpoint) GetMaxAttempts() int32 {
+	if x != nil {
+		return x.MaxAttempts
+	}
+	return 0
+}
+
+func (x *WebhookEndpoint) GetStatus() WebhookEndpointStatus {
+	if x != nil {
+		return x.Status
+	}
+	return WebhookEndpointStatus_WEBHOOK_ENDPOINT_STATUS_UNKNOWN
+}
+
+func (x *WebhookEndpoint) GetLastSuccessAt() int64 {
+	if x != nil {
+		return x.LastSuccessAt
+	}
+	return 0
+}
+
+func (x *WebhookEndpoint) GetLastFailureAt() int64 {
+	if x != nil {
+		return x.LastFailureAt
+	}
+	return 0
+}
+
+func (x *WebhookEndpoint) GetCreateBy() int64 {
+	if x != nil {
+		return x.CreateBy
+	}
+	return 0
+}
+
+func (x *WebhookEndpoint) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *WebhookEndpoint) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V5 Webhook端点与仅显示一次的签名Secret。
+type WebhookEndpointSecret struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Endpoint      *WebhookEndpoint       `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`                                // 端点元数据
+	SigningSecret string                 `protobuf:"bytes,2,opt,name=signing_secret,json=signingSecret,proto3" json:"signing_secret,omitempty"` // 签名Secret，仅本次返回
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookEndpointSecret) Reset() {
+	*x = WebhookEndpointSecret{}
+	mi := &file_proto_core_core_proto_msgTypes[64]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookEndpointSecret) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookEndpointSecret) ProtoMessage() {}
+
+func (x *WebhookEndpointSecret) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[64]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookEndpointSecret.ProtoReflect.Descriptor instead.
+func (*WebhookEndpointSecret) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{64}
+}
+
+func (x *WebhookEndpointSecret) GetEndpoint() *WebhookEndpoint {
+	if x != nil {
+		return x.Endpoint
+	}
+	return nil
+}
+
+func (x *WebhookEndpointSecret) GetSigningSecret() string {
+	if x != nil {
+		return x.SigningSecret
+	}
+	return ""
+}
+
+// V5 Webhook投递记录。
+type WebhookDelivery struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                               // 投递ID
+	TenantId            int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                   // 所属租户ID
+	EndpointId          int64                  `protobuf:"varint,3,opt,name=endpoint_id,json=endpointId,proto3" json:"endpoint_id,omitempty"`                             // 端点ID
+	EventId             string                 `protobuf:"bytes,4,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`                                       // 对外事件ID
+	EventType           string                 `protobuf:"bytes,5,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`                                 // 事件类型
+	Attempt             int32                  `protobuf:"varint,6,opt,name=attempt,proto3" json:"attempt,omitempty"`                                                     // 已尝试次数
+	Status              WebhookDeliveryStatus  `protobuf:"varint,7,opt,name=status,proto3,enum=core.WebhookDeliveryStatus" json:"status,omitempty"`                       // 投递状态
+	ResponseStatus      int32                  `protobuf:"varint,8,opt,name=response_status,json=responseStatus,proto3" json:"response_status,omitempty"`                 // 最近HTTP状态码
+	ResponseBodyExcerpt string                 `protobuf:"bytes,9,opt,name=response_body_excerpt,json=responseBodyExcerpt,proto3" json:"response_body_excerpt,omitempty"` // 响应摘要
+	ErrorMessage        string                 `protobuf:"bytes,10,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`                       // 错误摘要
+	NextRetryAt         int64                  `protobuf:"varint,11,opt,name=next_retry_at,json=nextRetryAt,proto3" json:"next_retry_at,omitempty"`                       // 下次重试时间，Unix毫秒
+	DeliveredAt         int64                  `protobuf:"varint,12,opt,name=delivered_at,json=deliveredAt,proto3" json:"delivered_at,omitempty"`                         // 成功投递时间，Unix毫秒
+	CreateTime          int64                  `protobuf:"varint,13,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                            // 创建时间，Unix毫秒
+	UpdateTime          int64                  `protobuf:"varint,14,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                            // 更新时间，Unix毫秒
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *WebhookDelivery) Reset() {
+	*x = WebhookDelivery{}
+	mi := &file_proto_core_core_proto_msgTypes[65]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookDelivery) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookDelivery) ProtoMessage() {}
+
+func (x *WebhookDelivery) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[65]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookDelivery.ProtoReflect.Descriptor instead.
+func (*WebhookDelivery) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{65}
+}
+
+func (x *WebhookDelivery) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *WebhookDelivery) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *WebhookDelivery) GetEndpointId() int64 {
+	if x != nil {
+		return x.EndpointId
+	}
+	return 0
+}
+
+func (x *WebhookDelivery) GetEventId() string {
+	if x != nil {
+		return x.EventId
+	}
+	return ""
+}
+
+func (x *WebhookDelivery) GetEventType() string {
+	if x != nil {
+		return x.EventType
+	}
+	return ""
+}
+
+func (x *WebhookDelivery) GetAttempt() int32 {
+	if x != nil {
+		return x.Attempt
+	}
+	return 0
+}
+
+func (x *WebhookDelivery) GetStatus() WebhookDeliveryStatus {
+	if x != nil {
+		return x.Status
+	}
+	return WebhookDeliveryStatus_WEBHOOK_DELIVERY_STATUS_UNKNOWN
+}
+
+func (x *WebhookDelivery) GetResponseStatus() int32 {
+	if x != nil {
+		return x.ResponseStatus
+	}
+	return 0
+}
+
+func (x *WebhookDelivery) GetResponseBodyExcerpt() string {
+	if x != nil {
+		return x.ResponseBodyExcerpt
+	}
+	return ""
+}
+
+func (x *WebhookDelivery) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+func (x *WebhookDelivery) GetNextRetryAt() int64 {
+	if x != nil {
+		return x.NextRetryAt
+	}
+	return 0
+}
+
+func (x *WebhookDelivery) GetDeliveredAt() int64 {
+	if x != nil {
+		return x.DeliveredAt
+	}
+	return 0
+}
+
+func (x *WebhookDelivery) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *WebhookDelivery) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V5 创建Webhook端点请求。
+type CreateWebhookEndpointReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EndpointName  string                 `protobuf:"bytes,1,opt,name=endpoint_name,json=endpointName,proto3" json:"endpoint_name,omitempty"` // 端点名称
+	EndpointUrl   string                 `protobuf:"bytes,2,opt,name=endpoint_url,json=endpointUrl,proto3" json:"endpoint_url,omitempty"`    // HTTPS投递地址
+	EventTypes    []string               `protobuf:"bytes,3,rep,name=event_types,json=eventTypes,proto3" json:"event_types,omitempty"`       // 订阅事件类型
+	MaxAttempts   int32                  `protobuf:"varint,4,opt,name=max_attempts,json=maxAttempts,proto3" json:"max_attempts,omitempty"`   // 最大投递次数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateWebhookEndpointReq) Reset() {
+	*x = CreateWebhookEndpointReq{}
+	mi := &file_proto_core_core_proto_msgTypes[66]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateWebhookEndpointReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateWebhookEndpointReq) ProtoMessage() {}
+
+func (x *CreateWebhookEndpointReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[66]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateWebhookEndpointReq.ProtoReflect.Descriptor instead.
+func (*CreateWebhookEndpointReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{66}
+}
+
+func (x *CreateWebhookEndpointReq) GetEndpointName() string {
+	if x != nil {
+		return x.EndpointName
+	}
+	return ""
+}
+
+func (x *CreateWebhookEndpointReq) GetEndpointUrl() string {
+	if x != nil {
+		return x.EndpointUrl
+	}
+	return ""
+}
+
+func (x *CreateWebhookEndpointReq) GetEventTypes() []string {
+	if x != nil {
+		return x.EventTypes
+	}
+	return nil
+}
+
+func (x *CreateWebhookEndpointReq) GetMaxAttempts() int32 {
+	if x != nil {
+		return x.MaxAttempts
+	}
+	return 0
+}
+
+// V5 更新Webhook端点请求。
+type UpdateWebhookEndpointReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                         // 端点ID
+	EndpointName  string                 `protobuf:"bytes,2,opt,name=endpoint_name,json=endpointName,proto3" json:"endpoint_name,omitempty"`  // 端点名称
+	EndpointUrl   string                 `protobuf:"bytes,3,opt,name=endpoint_url,json=endpointUrl,proto3" json:"endpoint_url,omitempty"`     // HTTPS投递地址
+	EventTypes    []string               `protobuf:"bytes,4,rep,name=event_types,json=eventTypes,proto3" json:"event_types,omitempty"`        // 订阅事件类型
+	MaxAttempts   int32                  `protobuf:"varint,5,opt,name=max_attempts,json=maxAttempts,proto3" json:"max_attempts,omitempty"`    // 最大投递次数
+	Status        WebhookEndpointStatus  `protobuf:"varint,6,opt,name=status,proto3,enum=core.WebhookEndpointStatus" json:"status,omitempty"` // 端点状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateWebhookEndpointReq) Reset() {
+	*x = UpdateWebhookEndpointReq{}
+	mi := &file_proto_core_core_proto_msgTypes[67]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateWebhookEndpointReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateWebhookEndpointReq) ProtoMessage() {}
+
+func (x *UpdateWebhookEndpointReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[67]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateWebhookEndpointReq.ProtoReflect.Descriptor instead.
+func (*UpdateWebhookEndpointReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{67}
+}
+
+func (x *UpdateWebhookEndpointReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdateWebhookEndpointReq) GetEndpointName() string {
+	if x != nil {
+		return x.EndpointName
+	}
+	return ""
+}
+
+func (x *UpdateWebhookEndpointReq) GetEndpointUrl() string {
+	if x != nil {
+		return x.EndpointUrl
+	}
+	return ""
+}
+
+func (x *UpdateWebhookEndpointReq) GetEventTypes() []string {
+	if x != nil {
+		return x.EventTypes
+	}
+	return nil
+}
+
+func (x *UpdateWebhookEndpointReq) GetMaxAttempts() int32 {
+	if x != nil {
+		return x.MaxAttempts
+	}
+	return 0
+}
+
+func (x *UpdateWebhookEndpointReq) GetStatus() WebhookEndpointStatus {
+	if x != nil {
+		return x.Status
+	}
+	return WebhookEndpointStatus_WEBHOOK_ENDPOINT_STATUS_UNKNOWN
+}
+
+// V5 Webhook端点主键请求。
+type WebhookEndpointIdReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 端点ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookEndpointIdReq) Reset() {
+	*x = WebhookEndpointIdReq{}
+	mi := &file_proto_core_core_proto_msgTypes[68]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookEndpointIdReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookEndpointIdReq) ProtoMessage() {}
+
+func (x *WebhookEndpointIdReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[68]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookEndpointIdReq.ProtoReflect.Descriptor instead.
+func (*WebhookEndpointIdReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{68}
+}
+
+func (x *WebhookEndpointIdReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// V5 Webhook端点列表请求。
+type WebhookEndpointListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *common.PageReq        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                      // 分页参数
+	Status        WebhookEndpointStatus  `protobuf:"varint,2,opt,name=status,proto3,enum=core.WebhookEndpointStatus" json:"status,omitempty"` // 端点状态
+	Keyword       string                 `protobuf:"bytes,3,opt,name=keyword,proto3" json:"keyword,omitempty"`                                // 名称或URL关键字
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookEndpointListReq) Reset() {
+	*x = WebhookEndpointListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[69]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookEndpointListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookEndpointListReq) ProtoMessage() {}
+
+func (x *WebhookEndpointListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[69]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookEndpointListReq.ProtoReflect.Descriptor instead.
+func (*WebhookEndpointListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{69}
+}
+
+func (x *WebhookEndpointListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *WebhookEndpointListReq) GetStatus() WebhookEndpointStatus {
+	if x != nil {
+		return x.Status
+	}
+	return WebhookEndpointStatus_WEBHOOK_ENDPOINT_STATUS_UNKNOWN
+}
+
+func (x *WebhookEndpointListReq) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
+// V5 Webhook端点响应。
+type WebhookEndpointResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *WebhookEndpoint       `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // Webhook端点
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookEndpointResp) Reset() {
+	*x = WebhookEndpointResp{}
+	mi := &file_proto_core_core_proto_msgTypes[70]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookEndpointResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookEndpointResp) ProtoMessage() {}
+
+func (x *WebhookEndpointResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[70]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookEndpointResp.ProtoReflect.Descriptor instead.
+func (*WebhookEndpointResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{70}
+}
+
+func (x *WebhookEndpointResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *WebhookEndpointResp) GetData() *WebhookEndpoint {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 Webhook端点列表响应。
+type WebhookEndpointListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*WebhookEndpoint     `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // Webhook端点列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookEndpointListResp) Reset() {
+	*x = WebhookEndpointListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[71]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookEndpointListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookEndpointListResp) ProtoMessage() {}
+
+func (x *WebhookEndpointListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[71]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookEndpointListResp.ProtoReflect.Descriptor instead.
+func (*WebhookEndpointListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{71}
+}
+
+func (x *WebhookEndpointListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *WebhookEndpointListResp) GetData() []*WebhookEndpoint {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 Webhook端点Secret响应。
+type WebhookEndpointSecretResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *WebhookEndpointSecret `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 端点与一次性Secret
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookEndpointSecretResp) Reset() {
+	*x = WebhookEndpointSecretResp{}
+	mi := &file_proto_core_core_proto_msgTypes[72]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookEndpointSecretResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookEndpointSecretResp) ProtoMessage() {}
+
+func (x *WebhookEndpointSecretResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[72]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookEndpointSecretResp.ProtoReflect.Descriptor instead.
+func (*WebhookEndpointSecretResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{72}
+}
+
+func (x *WebhookEndpointSecretResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *WebhookEndpointSecretResp) GetData() *WebhookEndpointSecret {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 Webhook投递列表请求。
+type WebhookDeliveryListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *common.PageReq        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                      // 分页参数
+	EndpointId    int64                  `protobuf:"varint,2,opt,name=endpoint_id,json=endpointId,proto3" json:"endpoint_id,omitempty"`       // Webhook端点ID
+	Status        WebhookDeliveryStatus  `protobuf:"varint,3,opt,name=status,proto3,enum=core.WebhookDeliveryStatus" json:"status,omitempty"` // 投递状态
+	EventType     string                 `protobuf:"bytes,4,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`           // 事件类型
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookDeliveryListReq) Reset() {
+	*x = WebhookDeliveryListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[73]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookDeliveryListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookDeliveryListReq) ProtoMessage() {}
+
+func (x *WebhookDeliveryListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[73]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookDeliveryListReq.ProtoReflect.Descriptor instead.
+func (*WebhookDeliveryListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{73}
+}
+
+func (x *WebhookDeliveryListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *WebhookDeliveryListReq) GetEndpointId() int64 {
+	if x != nil {
+		return x.EndpointId
+	}
+	return 0
+}
+
+func (x *WebhookDeliveryListReq) GetStatus() WebhookDeliveryStatus {
+	if x != nil {
+		return x.Status
+	}
+	return WebhookDeliveryStatus_WEBHOOK_DELIVERY_STATUS_UNKNOWN
+}
+
+func (x *WebhookDeliveryListReq) GetEventType() string {
+	if x != nil {
+		return x.EventType
+	}
+	return ""
+}
+
+// V5 Webhook投递列表响应。
+type WebhookDeliveryListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*WebhookDelivery     `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // 投递记录列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookDeliveryListResp) Reset() {
+	*x = WebhookDeliveryListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[74]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookDeliveryListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookDeliveryListResp) ProtoMessage() {}
+
+func (x *WebhookDeliveryListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[74]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookDeliveryListResp.ProtoReflect.Descriptor instead.
+func (*WebhookDeliveryListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{74}
+}
+
+func (x *WebhookDeliveryListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *WebhookDeliveryListResp) GetData() []*WebhookDelivery {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 Webhook投递响应。
+type WebhookDeliveryResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *WebhookDelivery       `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // Webhook投递记录
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookDeliveryResp) Reset() {
+	*x = WebhookDeliveryResp{}
+	mi := &file_proto_core_core_proto_msgTypes[75]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookDeliveryResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookDeliveryResp) ProtoMessage() {}
+
+func (x *WebhookDeliveryResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[75]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookDeliveryResp.ProtoReflect.Descriptor instead.
+func (*WebhookDeliveryResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{75}
+}
+
+func (x *WebhookDeliveryResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *WebhookDeliveryResp) GetData() *WebhookDelivery {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 Webhook投递主键请求。
+type WebhookDeliveryIdReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 投递ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WebhookDeliveryIdReq) Reset() {
+	*x = WebhookDeliveryIdReq{}
+	mi := &file_proto_core_core_proto_msgTypes[76]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebhookDeliveryIdReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebhookDeliveryIdReq) ProtoMessage() {}
+
+func (x *WebhookDeliveryIdReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[76]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebhookDeliveryIdReq.ProtoReflect.Descriptor instead.
+func (*WebhookDeliveryIdReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{76}
+}
+
+func (x *WebhookDeliveryIdReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// V5 创建测试Webhook事件请求。
+type CreateTestWebhookEventReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EndpointId    int64                  `protobuf:"varint,1,opt,name=endpoint_id,json=endpointId,proto3" json:"endpoint_id,omitempty"` // 目标端点ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateTestWebhookEventReq) Reset() {
+	*x = CreateTestWebhookEventReq{}
+	mi := &file_proto_core_core_proto_msgTypes[77]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateTestWebhookEventReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTestWebhookEventReq) ProtoMessage() {}
+
+func (x *CreateTestWebhookEventReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[77]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTestWebhookEventReq.ProtoReflect.Descriptor instead.
+func (*CreateTestWebhookEventReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{77}
+}
+
+func (x *CreateTestWebhookEventReq) GetEndpointId() int64 {
+	if x != nil {
+		return x.EndpointId
+	}
+	return 0
+}
+
+// V5 代码平台集成；永不返回访问令牌或刷新令牌。
+type SourceIntegration struct {
+	state           protoimpl.MessageState  `protogen:"open.v1"`
+	Id              int64                   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                 // 集成ID
+	TenantId        int64                   `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                     // 所属租户ID
+	Platform        SourcePlatform          `protobuf:"varint,3,opt,name=platform,proto3,enum=core.SourcePlatform" json:"platform,omitempty"`            // 代码平台
+	IntegrationName string                  `protobuf:"bytes,4,opt,name=integration_name,json=integrationName,proto3" json:"integration_name,omitempty"` // 集成显示名称
+	InstallationRef string                  `protobuf:"bytes,5,opt,name=installation_ref,json=installationRef,proto3" json:"installation_ref,omitempty"` // OAuth或App安装标识
+	TokenExpiresAt  int64                   `protobuf:"varint,6,opt,name=token_expires_at,json=tokenExpiresAt,proto3" json:"token_expires_at,omitempty"` // 访问令牌到期时间，Unix毫秒
+	Status          SourceIntegrationStatus `protobuf:"varint,7,opt,name=status,proto3,enum=core.SourceIntegrationStatus" json:"status,omitempty"`       // 集成状态
+	LastSyncAt      int64                   `protobuf:"varint,8,opt,name=last_sync_at,json=lastSyncAt,proto3" json:"last_sync_at,omitempty"`             // 最近状态同步时间，Unix毫秒
+	CreateBy        int64                   `protobuf:"varint,9,opt,name=create_by,json=createBy,proto3" json:"create_by,omitempty"`                     // 创建人ID
+	CreateTime      int64                   `protobuf:"varint,10,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`              // 创建时间，Unix毫秒
+	UpdateTime      int64                   `protobuf:"varint,11,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`              // 更新时间，Unix毫秒
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *SourceIntegration) Reset() {
+	*x = SourceIntegration{}
+	mi := &file_proto_core_core_proto_msgTypes[78]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceIntegration) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceIntegration) ProtoMessage() {}
+
+func (x *SourceIntegration) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[78]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceIntegration.ProtoReflect.Descriptor instead.
+func (*SourceIntegration) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{78}
+}
+
+func (x *SourceIntegration) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *SourceIntegration) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *SourceIntegration) GetPlatform() SourcePlatform {
+	if x != nil {
+		return x.Platform
+	}
+	return SourcePlatform_SOURCE_PLATFORM_UNKNOWN
+}
+
+func (x *SourceIntegration) GetIntegrationName() string {
+	if x != nil {
+		return x.IntegrationName
+	}
+	return ""
+}
+
+func (x *SourceIntegration) GetInstallationRef() string {
+	if x != nil {
+		return x.InstallationRef
+	}
+	return ""
+}
+
+func (x *SourceIntegration) GetTokenExpiresAt() int64 {
+	if x != nil {
+		return x.TokenExpiresAt
+	}
+	return 0
+}
+
+func (x *SourceIntegration) GetStatus() SourceIntegrationStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SourceIntegrationStatus_SOURCE_INTEGRATION_STATUS_UNKNOWN
+}
+
+func (x *SourceIntegration) GetLastSyncAt() int64 {
+	if x != nil {
+		return x.LastSyncAt
+	}
+	return 0
+}
+
+func (x *SourceIntegration) GetCreateBy() int64 {
+	if x != nil {
+		return x.CreateBy
+	}
+	return 0
+}
+
+func (x *SourceIntegration) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *SourceIntegration) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V5 完成受信任OAuth回调或App安装同步请求，仅接收供应商返回的受控令牌。
+type CompleteSourceIntegrationReq struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Platform        SourcePlatform         `protobuf:"varint,1,opt,name=platform,proto3,enum=core.SourcePlatform" json:"platform,omitempty"`            // 代码平台
+	IntegrationName string                 `protobuf:"bytes,2,opt,name=integration_name,json=integrationName,proto3" json:"integration_name,omitempty"` // 集成显示名称
+	InstallationRef string                 `protobuf:"bytes,3,opt,name=installation_ref,json=installationRef,proto3" json:"installation_ref,omitempty"` // OAuth或App安装标识
+	AccessToken     string                 `protobuf:"bytes,4,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`             // 最小权限访问令牌，仅用于加密保存
+	RefreshToken    string                 `protobuf:"bytes,5,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`          // 刷新令牌，仅用于加密保存
+	TokenExpiresAt  int64                  `protobuf:"varint,6,opt,name=token_expires_at,json=tokenExpiresAt,proto3" json:"token_expires_at,omitempty"` // 访问令牌到期时间，Unix毫秒
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *CompleteSourceIntegrationReq) Reset() {
+	*x = CompleteSourceIntegrationReq{}
+	mi := &file_proto_core_core_proto_msgTypes[79]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompleteSourceIntegrationReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompleteSourceIntegrationReq) ProtoMessage() {}
+
+func (x *CompleteSourceIntegrationReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[79]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompleteSourceIntegrationReq.ProtoReflect.Descriptor instead.
+func (*CompleteSourceIntegrationReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{79}
+}
+
+func (x *CompleteSourceIntegrationReq) GetPlatform() SourcePlatform {
+	if x != nil {
+		return x.Platform
+	}
+	return SourcePlatform_SOURCE_PLATFORM_UNKNOWN
+}
+
+func (x *CompleteSourceIntegrationReq) GetIntegrationName() string {
+	if x != nil {
+		return x.IntegrationName
+	}
+	return ""
+}
+
+func (x *CompleteSourceIntegrationReq) GetInstallationRef() string {
+	if x != nil {
+		return x.InstallationRef
+	}
+	return ""
+}
+
+func (x *CompleteSourceIntegrationReq) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
+func (x *CompleteSourceIntegrationReq) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+func (x *CompleteSourceIntegrationReq) GetTokenExpiresAt() int64 {
+	if x != nil {
+		return x.TokenExpiresAt
+	}
+	return 0
+}
+
+// V5 代码平台集成主键请求。
+type SourceIntegrationIdReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 集成ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceIntegrationIdReq) Reset() {
+	*x = SourceIntegrationIdReq{}
+	mi := &file_proto_core_core_proto_msgTypes[80]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceIntegrationIdReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceIntegrationIdReq) ProtoMessage() {}
+
+func (x *SourceIntegrationIdReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[80]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceIntegrationIdReq.ProtoReflect.Descriptor instead.
+func (*SourceIntegrationIdReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{80}
+}
+
+func (x *SourceIntegrationIdReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// V5 代码平台集成列表请求。
+type SourceIntegrationListReq struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Page          *common.PageReq         `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                        // 分页参数
+	Platform      SourcePlatform          `protobuf:"varint,2,opt,name=platform,proto3,enum=core.SourcePlatform" json:"platform,omitempty"`      // 代码平台筛选
+	Status        SourceIntegrationStatus `protobuf:"varint,3,opt,name=status,proto3,enum=core.SourceIntegrationStatus" json:"status,omitempty"` // 状态筛选
+	Keyword       string                  `protobuf:"bytes,4,opt,name=keyword,proto3" json:"keyword,omitempty"`                                  // 名称或安装标识关键字
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceIntegrationListReq) Reset() {
+	*x = SourceIntegrationListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[81]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceIntegrationListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceIntegrationListReq) ProtoMessage() {}
+
+func (x *SourceIntegrationListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[81]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceIntegrationListReq.ProtoReflect.Descriptor instead.
+func (*SourceIntegrationListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{81}
+}
+
+func (x *SourceIntegrationListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *SourceIntegrationListReq) GetPlatform() SourcePlatform {
+	if x != nil {
+		return x.Platform
+	}
+	return SourcePlatform_SOURCE_PLATFORM_UNKNOWN
+}
+
+func (x *SourceIntegrationListReq) GetStatus() SourceIntegrationStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SourceIntegrationStatus_SOURCE_INTEGRATION_STATUS_UNKNOWN
+}
+
+func (x *SourceIntegrationListReq) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
+// V5 代码平台集成响应。
+type SourceIntegrationResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *SourceIntegration     `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 集成信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceIntegrationResp) Reset() {
+	*x = SourceIntegrationResp{}
+	mi := &file_proto_core_core_proto_msgTypes[82]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceIntegrationResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceIntegrationResp) ProtoMessage() {}
+
+func (x *SourceIntegrationResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[82]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceIntegrationResp.ProtoReflect.Descriptor instead.
+func (*SourceIntegrationResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{82}
+}
+
+func (x *SourceIntegrationResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceIntegrationResp) GetData() *SourceIntegration {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 代码平台集成列表响应。
+type SourceIntegrationListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*SourceIntegration   `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // 集成列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceIntegrationListResp) Reset() {
+	*x = SourceIntegrationListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[83]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceIntegrationListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceIntegrationListResp) ProtoMessage() {}
+
+func (x *SourceIntegrationListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[83]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceIntegrationListResp.ProtoReflect.Descriptor instead.
+func (*SourceIntegrationListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{83}
+}
+
+func (x *SourceIntegrationListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceIntegrationListResp) GetData() []*SourceIntegration {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 代码平台集成内部凭证，只允许可信服务间RPC使用，禁止映射到HTTP响应。
+type SourceIntegrationCredential struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Integration   *SourceIntegration     `protobuf:"bytes,1,opt,name=integration,proto3" json:"integration,omitempty"`                       // 集成元数据
+	AccessToken   string                 `protobuf:"bytes,2,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`    // 解密后的短时访问令牌
+	RefreshToken  string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"` // 解密后的刷新令牌
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceIntegrationCredential) Reset() {
+	*x = SourceIntegrationCredential{}
+	mi := &file_proto_core_core_proto_msgTypes[84]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceIntegrationCredential) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceIntegrationCredential) ProtoMessage() {}
+
+func (x *SourceIntegrationCredential) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[84]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceIntegrationCredential.ProtoReflect.Descriptor instead.
+func (*SourceIntegrationCredential) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{84}
+}
+
+func (x *SourceIntegrationCredential) GetIntegration() *SourceIntegration {
+	if x != nil {
+		return x.Integration
+	}
+	return nil
+}
+
+func (x *SourceIntegrationCredential) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
+func (x *SourceIntegrationCredential) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+// V5 代码平台集成内部凭证响应。
+type SourceIntegrationCredentialResp struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Base          *common.RespBase             `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *SourceIntegrationCredential `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 内部凭证
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceIntegrationCredentialResp) Reset() {
+	*x = SourceIntegrationCredentialResp{}
+	mi := &file_proto_core_core_proto_msgTypes[85]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceIntegrationCredentialResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceIntegrationCredentialResp) ProtoMessage() {}
+
+func (x *SourceIntegrationCredentialResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[85]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceIntegrationCredentialResp.ProtoReflect.Descriptor instead.
+func (*SourceIntegrationCredentialResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{85}
+}
+
+func (x *SourceIntegrationCredentialResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceIntegrationCredentialResp) GetData() *SourceIntegrationCredential {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 授权仓库。
+type SourceRepository struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Id                   int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                  // 授权仓库ID
+	TenantId             int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                      // 所属租户ID
+	IntegrationId        int64                  `protobuf:"varint,3,opt,name=integration_id,json=integrationId,proto3" json:"integration_id,omitempty"`                       // 代码平台集成ID
+	ExternalRepositoryId string                 `protobuf:"bytes,4,opt,name=external_repository_id,json=externalRepositoryId,proto3" json:"external_repository_id,omitempty"` // 平台仓库ID
+	RepositoryFullName   string                 `protobuf:"bytes,5,opt,name=repository_full_name,json=repositoryFullName,proto3" json:"repository_full_name,omitempty"`       // 仓库完整名称
+	DefaultBranch        string                 `protobuf:"bytes,6,opt,name=default_branch,json=defaultBranch,proto3" json:"default_branch,omitempty"`                        // 默认分支
+	PermissionLevel      string                 `protobuf:"bytes,7,opt,name=permission_level,json=permissionLevel,proto3" json:"permission_level,omitempty"`                  // 固定为read
+	Status               SourceRepositoryStatus `protobuf:"varint,8,opt,name=status,proto3,enum=core.SourceRepositoryStatus" json:"status,omitempty"`                         // 授权状态
+	CreateTime           int64                  `protobuf:"varint,9,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                                // 创建时间，Unix毫秒
+	UpdateTime           int64                  `protobuf:"varint,10,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                               // 更新时间，Unix毫秒
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *SourceRepository) Reset() {
+	*x = SourceRepository{}
+	mi := &file_proto_core_core_proto_msgTypes[86]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceRepository) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceRepository) ProtoMessage() {}
+
+func (x *SourceRepository) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[86]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceRepository.ProtoReflect.Descriptor instead.
+func (*SourceRepository) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{86}
+}
+
+func (x *SourceRepository) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *SourceRepository) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *SourceRepository) GetIntegrationId() int64 {
+	if x != nil {
+		return x.IntegrationId
+	}
+	return 0
+}
+
+func (x *SourceRepository) GetExternalRepositoryId() string {
+	if x != nil {
+		return x.ExternalRepositoryId
+	}
+	return ""
+}
+
+func (x *SourceRepository) GetRepositoryFullName() string {
+	if x != nil {
+		return x.RepositoryFullName
+	}
+	return ""
+}
+
+func (x *SourceRepository) GetDefaultBranch() string {
+	if x != nil {
+		return x.DefaultBranch
+	}
+	return ""
+}
+
+func (x *SourceRepository) GetPermissionLevel() string {
+	if x != nil {
+		return x.PermissionLevel
+	}
+	return ""
+}
+
+func (x *SourceRepository) GetStatus() SourceRepositoryStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SourceRepositoryStatus_SOURCE_REPOSITORY_STATUS_UNKNOWN
+}
+
+func (x *SourceRepository) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *SourceRepository) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V5 同步OAuth/App明确授权的仓库请求。
+type AuthorizeSourceRepositoryReq struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	IntegrationId        int64                  `protobuf:"varint,1,opt,name=integration_id,json=integrationId,proto3" json:"integration_id,omitempty"`                       // 代码平台集成ID
+	ExternalRepositoryId string                 `protobuf:"bytes,2,opt,name=external_repository_id,json=externalRepositoryId,proto3" json:"external_repository_id,omitempty"` // 平台仓库ID
+	RepositoryFullName   string                 `protobuf:"bytes,3,opt,name=repository_full_name,json=repositoryFullName,proto3" json:"repository_full_name,omitempty"`       // 仓库完整名称
+	DefaultBranch        string                 `protobuf:"bytes,4,opt,name=default_branch,json=defaultBranch,proto3" json:"default_branch,omitempty"`                        // 默认分支
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *AuthorizeSourceRepositoryReq) Reset() {
+	*x = AuthorizeSourceRepositoryReq{}
+	mi := &file_proto_core_core_proto_msgTypes[87]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AuthorizeSourceRepositoryReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuthorizeSourceRepositoryReq) ProtoMessage() {}
+
+func (x *AuthorizeSourceRepositoryReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[87]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuthorizeSourceRepositoryReq.ProtoReflect.Descriptor instead.
+func (*AuthorizeSourceRepositoryReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{87}
+}
+
+func (x *AuthorizeSourceRepositoryReq) GetIntegrationId() int64 {
+	if x != nil {
+		return x.IntegrationId
+	}
+	return 0
+}
+
+func (x *AuthorizeSourceRepositoryReq) GetExternalRepositoryId() string {
+	if x != nil {
+		return x.ExternalRepositoryId
+	}
+	return ""
+}
+
+func (x *AuthorizeSourceRepositoryReq) GetRepositoryFullName() string {
+	if x != nil {
+		return x.RepositoryFullName
+	}
+	return ""
+}
+
+func (x *AuthorizeSourceRepositoryReq) GetDefaultBranch() string {
+	if x != nil {
+		return x.DefaultBranch
+	}
+	return ""
+}
+
+// V5 授权仓库主键请求。
+type SourceRepositoryIdReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 授权仓库ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceRepositoryIdReq) Reset() {
+	*x = SourceRepositoryIdReq{}
+	mi := &file_proto_core_core_proto_msgTypes[88]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceRepositoryIdReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceRepositoryIdReq) ProtoMessage() {}
+
+func (x *SourceRepositoryIdReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[88]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceRepositoryIdReq.ProtoReflect.Descriptor instead.
+func (*SourceRepositoryIdReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{88}
+}
+
+func (x *SourceRepositoryIdReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// V5 授权仓库列表请求。
+type SourceRepositoryListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          *common.PageReq        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                         // 分页参数
+	IntegrationId int64                  `protobuf:"varint,2,opt,name=integration_id,json=integrationId,proto3" json:"integration_id,omitempty"` // 集成ID筛选
+	Status        SourceRepositoryStatus `protobuf:"varint,3,opt,name=status,proto3,enum=core.SourceRepositoryStatus" json:"status,omitempty"`   // 授权状态筛选
+	Keyword       string                 `protobuf:"bytes,4,opt,name=keyword,proto3" json:"keyword,omitempty"`                                   // 仓库名称关键字
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceRepositoryListReq) Reset() {
+	*x = SourceRepositoryListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[89]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceRepositoryListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceRepositoryListReq) ProtoMessage() {}
+
+func (x *SourceRepositoryListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[89]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceRepositoryListReq.ProtoReflect.Descriptor instead.
+func (*SourceRepositoryListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{89}
+}
+
+func (x *SourceRepositoryListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *SourceRepositoryListReq) GetIntegrationId() int64 {
+	if x != nil {
+		return x.IntegrationId
+	}
+	return 0
+}
+
+func (x *SourceRepositoryListReq) GetStatus() SourceRepositoryStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SourceRepositoryStatus_SOURCE_REPOSITORY_STATUS_UNKNOWN
+}
+
+func (x *SourceRepositoryListReq) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
+// V5 授权仓库响应。
+type SourceRepositoryResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *SourceRepository      `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 授权仓库
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceRepositoryResp) Reset() {
+	*x = SourceRepositoryResp{}
+	mi := &file_proto_core_core_proto_msgTypes[90]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceRepositoryResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceRepositoryResp) ProtoMessage() {}
+
+func (x *SourceRepositoryResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[90]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceRepositoryResp.ProtoReflect.Descriptor instead.
+func (*SourceRepositoryResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{90}
+}
+
+func (x *SourceRepositoryResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceRepositoryResp) GetData() *SourceRepository {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 授权仓库列表响应。
+type SourceRepositoryListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*SourceRepository    `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // 授权仓库列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceRepositoryListResp) Reset() {
+	*x = SourceRepositoryListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[91]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceRepositoryListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceRepositoryListResp) ProtoMessage() {}
+
+func (x *SourceRepositoryListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[91]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceRepositoryListResp.ProtoReflect.Descriptor instead.
+func (*SourceRepositoryListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{91}
+}
+
+func (x *SourceRepositoryListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceRepositoryListResp) GetData() []*SourceRepository {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 已导入APK Artifact来源审计记录。
+type SourceArtifact struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Id                 int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                            // 来源记录ID
+	TenantId           int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                                // 所属租户ID
+	AppId              int64                  `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                                         // 关联应用ID
+	VersionId          int64                  `protobuf:"varint,4,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`                                             // 关联版本ID
+	IntegrationId      int64                  `protobuf:"varint,5,opt,name=integration_id,json=integrationId,proto3" json:"integration_id,omitempty"`                                 // 集成ID
+	RepositoryId       int64                  `protobuf:"varint,6,opt,name=repository_id,json=repositoryId,proto3" json:"repository_id,omitempty"`                                    // 授权仓库ID
+	ArtifactSource     SourceArtifactType     `protobuf:"varint,7,opt,name=artifact_source,json=artifactSource,proto3,enum=core.SourceArtifactType" json:"artifact_source,omitempty"` // Artifact来源
+	ExternalArtifactId string                 `protobuf:"bytes,8,opt,name=external_artifact_id,json=externalArtifactId,proto3" json:"external_artifact_id,omitempty"`                 // 平台Artifact ID
+	CommitSha          string                 `protobuf:"bytes,9,opt,name=commit_sha,json=commitSha,proto3" json:"commit_sha,omitempty"`                                              // 来源Commit SHA
+	PipelineRef        string                 `protobuf:"bytes,10,opt,name=pipeline_ref,json=pipelineRef,proto3" json:"pipeline_ref,omitempty"`                                       // Pipeline或Workflow标识
+	JobRef             string                 `protobuf:"bytes,11,opt,name=job_ref,json=jobRef,proto3" json:"job_ref,omitempty"`                                                      // Job标识
+	ArtifactSha256     string                 `protobuf:"bytes,12,opt,name=artifact_sha256,json=artifactSha256,proto3" json:"artifact_sha256,omitempty"`                              // APK SHA-256
+	StorageObjectId    int64                  `protobuf:"varint,13,opt,name=storage_object_id,json=storageObjectId,proto3" json:"storage_object_id,omitempty"`                        // 导入后的私有存储对象ID
+	CreateTime         int64                  `protobuf:"varint,14,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                                         // 创建时间，Unix毫秒
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *SourceArtifact) Reset() {
+	*x = SourceArtifact{}
+	mi := &file_proto_core_core_proto_msgTypes[92]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceArtifact) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceArtifact) ProtoMessage() {}
+
+func (x *SourceArtifact) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[92]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceArtifact.ProtoReflect.Descriptor instead.
+func (*SourceArtifact) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{92}
+}
+
+func (x *SourceArtifact) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *SourceArtifact) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *SourceArtifact) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *SourceArtifact) GetVersionId() int64 {
+	if x != nil {
+		return x.VersionId
+	}
+	return 0
+}
+
+func (x *SourceArtifact) GetIntegrationId() int64 {
+	if x != nil {
+		return x.IntegrationId
+	}
+	return 0
+}
+
+func (x *SourceArtifact) GetRepositoryId() int64 {
+	if x != nil {
+		return x.RepositoryId
+	}
+	return 0
+}
+
+func (x *SourceArtifact) GetArtifactSource() SourceArtifactType {
+	if x != nil {
+		return x.ArtifactSource
+	}
+	return SourceArtifactType_SOURCE_ARTIFACT_TYPE_UNKNOWN
+}
+
+func (x *SourceArtifact) GetExternalArtifactId() string {
+	if x != nil {
+		return x.ExternalArtifactId
+	}
+	return ""
+}
+
+func (x *SourceArtifact) GetCommitSha() string {
+	if x != nil {
+		return x.CommitSha
+	}
+	return ""
+}
+
+func (x *SourceArtifact) GetPipelineRef() string {
+	if x != nil {
+		return x.PipelineRef
+	}
+	return ""
+}
+
+func (x *SourceArtifact) GetJobRef() string {
+	if x != nil {
+		return x.JobRef
+	}
+	return ""
+}
+
+func (x *SourceArtifact) GetArtifactSha256() string {
+	if x != nil {
+		return x.ArtifactSha256
+	}
+	return ""
+}
+
+func (x *SourceArtifact) GetStorageObjectId() int64 {
+	if x != nil {
+		return x.StorageObjectId
+	}
+	return 0
+}
+
+func (x *SourceArtifact) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+// V5 记录由受控供应商客户端完成的APK Artifact导入。
+type RecordSourceArtifactReq struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	AppId              int64                  `protobuf:"varint,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                                         // 关联应用ID
+	VersionId          int64                  `protobuf:"varint,2,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`                                             // 关联版本ID
+	IntegrationId      int64                  `protobuf:"varint,3,opt,name=integration_id,json=integrationId,proto3" json:"integration_id,omitempty"`                                 // 集成ID
+	RepositoryId       int64                  `protobuf:"varint,4,opt,name=repository_id,json=repositoryId,proto3" json:"repository_id,omitempty"`                                    // 授权仓库ID
+	ArtifactSource     SourceArtifactType     `protobuf:"varint,5,opt,name=artifact_source,json=artifactSource,proto3,enum=core.SourceArtifactType" json:"artifact_source,omitempty"` // Artifact来源
+	ExternalArtifactId string                 `protobuf:"bytes,6,opt,name=external_artifact_id,json=externalArtifactId,proto3" json:"external_artifact_id,omitempty"`                 // 平台Artifact ID
+	CommitSha          string                 `protobuf:"bytes,7,opt,name=commit_sha,json=commitSha,proto3" json:"commit_sha,omitempty"`                                              // 来源Commit SHA
+	PipelineRef        string                 `protobuf:"bytes,8,opt,name=pipeline_ref,json=pipelineRef,proto3" json:"pipeline_ref,omitempty"`                                        // Pipeline或Workflow标识
+	JobRef             string                 `protobuf:"bytes,9,opt,name=job_ref,json=jobRef,proto3" json:"job_ref,omitempty"`                                                       // Job标识
+	ArtifactSha256     string                 `protobuf:"bytes,10,opt,name=artifact_sha256,json=artifactSha256,proto3" json:"artifact_sha256,omitempty"`                              // 下载后校验的APK SHA-256
+	StorageObjectId    int64                  `protobuf:"varint,11,opt,name=storage_object_id,json=storageObjectId,proto3" json:"storage_object_id,omitempty"`                        // 已校验私有存储对象ID
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *RecordSourceArtifactReq) Reset() {
+	*x = RecordSourceArtifactReq{}
+	mi := &file_proto_core_core_proto_msgTypes[93]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecordSourceArtifactReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecordSourceArtifactReq) ProtoMessage() {}
+
+func (x *RecordSourceArtifactReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[93]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecordSourceArtifactReq.ProtoReflect.Descriptor instead.
+func (*RecordSourceArtifactReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{93}
+}
+
+func (x *RecordSourceArtifactReq) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *RecordSourceArtifactReq) GetVersionId() int64 {
+	if x != nil {
+		return x.VersionId
+	}
+	return 0
+}
+
+func (x *RecordSourceArtifactReq) GetIntegrationId() int64 {
+	if x != nil {
+		return x.IntegrationId
+	}
+	return 0
+}
+
+func (x *RecordSourceArtifactReq) GetRepositoryId() int64 {
+	if x != nil {
+		return x.RepositoryId
+	}
+	return 0
+}
+
+func (x *RecordSourceArtifactReq) GetArtifactSource() SourceArtifactType {
+	if x != nil {
+		return x.ArtifactSource
+	}
+	return SourceArtifactType_SOURCE_ARTIFACT_TYPE_UNKNOWN
+}
+
+func (x *RecordSourceArtifactReq) GetExternalArtifactId() string {
+	if x != nil {
+		return x.ExternalArtifactId
+	}
+	return ""
+}
+
+func (x *RecordSourceArtifactReq) GetCommitSha() string {
+	if x != nil {
+		return x.CommitSha
+	}
+	return ""
+}
+
+func (x *RecordSourceArtifactReq) GetPipelineRef() string {
+	if x != nil {
+		return x.PipelineRef
+	}
+	return ""
+}
+
+func (x *RecordSourceArtifactReq) GetJobRef() string {
+	if x != nil {
+		return x.JobRef
+	}
+	return ""
+}
+
+func (x *RecordSourceArtifactReq) GetArtifactSha256() string {
+	if x != nil {
+		return x.ArtifactSha256
+	}
+	return ""
+}
+
+func (x *RecordSourceArtifactReq) GetStorageObjectId() int64 {
+	if x != nil {
+		return x.StorageObjectId
+	}
+	return 0
+}
+
+// V5 APK Artifact来源响应。
+type SourceArtifactResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *SourceArtifact        `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // Artifact来源
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceArtifactResp) Reset() {
+	*x = SourceArtifactResp{}
+	mi := &file_proto_core_core_proto_msgTypes[94]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceArtifactResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceArtifactResp) ProtoMessage() {}
+
+func (x *SourceArtifactResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[94]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceArtifactResp.ProtoReflect.Descriptor instead.
+func (*SourceArtifactResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{94}
+}
+
+func (x *SourceArtifactResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceArtifactResp) GetData() *SourceArtifact {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 原子创建应用版本并记录已校验的供应商Artifact来源。
+type ImportSourceArtifactReq struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	AppId              int64                  `protobuf:"varint,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                                         // 关联应用ID
+	VersionCode        int64                  `protobuf:"varint,2,opt,name=version_code,json=versionCode,proto3" json:"version_code,omitempty"`                                       // Android versionCode
+	VersionName        string                 `protobuf:"bytes,3,opt,name=version_name,json=versionName,proto3" json:"version_name,omitempty"`                                        // Android versionName
+	ReleaseNotes       string                 `protobuf:"bytes,4,opt,name=release_notes,json=releaseNotes,proto3" json:"release_notes,omitempty"`                                     // 发布说明
+	IntegrationId      int64                  `protobuf:"varint,5,opt,name=integration_id,json=integrationId,proto3" json:"integration_id,omitempty"`                                 // 集成ID
+	RepositoryId       int64                  `protobuf:"varint,6,opt,name=repository_id,json=repositoryId,proto3" json:"repository_id,omitempty"`                                    // 授权仓库ID
+	ArtifactSource     SourceArtifactType     `protobuf:"varint,7,opt,name=artifact_source,json=artifactSource,proto3,enum=core.SourceArtifactType" json:"artifact_source,omitempty"` // Artifact来源
+	ExternalArtifactId string                 `protobuf:"bytes,8,opt,name=external_artifact_id,json=externalArtifactId,proto3" json:"external_artifact_id,omitempty"`                 // 平台Artifact ID
+	CommitSha          string                 `protobuf:"bytes,9,opt,name=commit_sha,json=commitSha,proto3" json:"commit_sha,omitempty"`                                              // 来源Commit SHA
+	PipelineRef        string                 `protobuf:"bytes,10,opt,name=pipeline_ref,json=pipelineRef,proto3" json:"pipeline_ref,omitempty"`                                       // Pipeline或Workflow标识
+	JobRef             string                 `protobuf:"bytes,11,opt,name=job_ref,json=jobRef,proto3" json:"job_ref,omitempty"`                                                      // Job标识
+	ArtifactSha256     string                 `protobuf:"bytes,12,opt,name=artifact_sha256,json=artifactSha256,proto3" json:"artifact_sha256,omitempty"`                              // 下载后校验的APK SHA-256
+	StorageObjectId    int64                  `protobuf:"varint,13,opt,name=storage_object_id,json=storageObjectId,proto3" json:"storage_object_id,omitempty"`                        // 已校验私有存储对象ID
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *ImportSourceArtifactReq) Reset() {
+	*x = ImportSourceArtifactReq{}
+	mi := &file_proto_core_core_proto_msgTypes[95]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImportSourceArtifactReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImportSourceArtifactReq) ProtoMessage() {}
+
+func (x *ImportSourceArtifactReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[95]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImportSourceArtifactReq.ProtoReflect.Descriptor instead.
+func (*ImportSourceArtifactReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{95}
+}
+
+func (x *ImportSourceArtifactReq) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *ImportSourceArtifactReq) GetVersionCode() int64 {
+	if x != nil {
+		return x.VersionCode
+	}
+	return 0
+}
+
+func (x *ImportSourceArtifactReq) GetVersionName() string {
+	if x != nil {
+		return x.VersionName
+	}
+	return ""
+}
+
+func (x *ImportSourceArtifactReq) GetReleaseNotes() string {
+	if x != nil {
+		return x.ReleaseNotes
+	}
+	return ""
+}
+
+func (x *ImportSourceArtifactReq) GetIntegrationId() int64 {
+	if x != nil {
+		return x.IntegrationId
+	}
+	return 0
+}
+
+func (x *ImportSourceArtifactReq) GetRepositoryId() int64 {
+	if x != nil {
+		return x.RepositoryId
+	}
+	return 0
+}
+
+func (x *ImportSourceArtifactReq) GetArtifactSource() SourceArtifactType {
+	if x != nil {
+		return x.ArtifactSource
+	}
+	return SourceArtifactType_SOURCE_ARTIFACT_TYPE_UNKNOWN
+}
+
+func (x *ImportSourceArtifactReq) GetExternalArtifactId() string {
+	if x != nil {
+		return x.ExternalArtifactId
+	}
+	return ""
+}
+
+func (x *ImportSourceArtifactReq) GetCommitSha() string {
+	if x != nil {
+		return x.CommitSha
+	}
+	return ""
+}
+
+func (x *ImportSourceArtifactReq) GetPipelineRef() string {
+	if x != nil {
+		return x.PipelineRef
+	}
+	return ""
+}
+
+func (x *ImportSourceArtifactReq) GetJobRef() string {
+	if x != nil {
+		return x.JobRef
+	}
+	return ""
+}
+
+func (x *ImportSourceArtifactReq) GetArtifactSha256() string {
+	if x != nil {
+		return x.ArtifactSha256
+	}
+	return ""
+}
+
+func (x *ImportSourceArtifactReq) GetStorageObjectId() int64 {
+	if x != nil {
+		return x.StorageObjectId
+	}
+	return 0
+}
+
+// V5 原子Artifact导入结果。
+type SourceArtifactImportResult struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Version       *Version               `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`   // 创建的应用版本
+	Artifact      *SourceArtifact        `protobuf:"bytes,2,opt,name=artifact,proto3" json:"artifact,omitempty"` // 不可变来源审计记录
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceArtifactImportResult) Reset() {
+	*x = SourceArtifactImportResult{}
+	mi := &file_proto_core_core_proto_msgTypes[96]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceArtifactImportResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceArtifactImportResult) ProtoMessage() {}
+
+func (x *SourceArtifactImportResult) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[96]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceArtifactImportResult.ProtoReflect.Descriptor instead.
+func (*SourceArtifactImportResult) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{96}
+}
+
+func (x *SourceArtifactImportResult) GetVersion() *Version {
+	if x != nil {
+		return x.Version
+	}
+	return nil
+}
+
+func (x *SourceArtifactImportResult) GetArtifact() *SourceArtifact {
+	if x != nil {
+		return x.Artifact
+	}
+	return nil
+}
+
+// V5 原子Artifact导入响应。
+type SourceArtifactImportResp struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	Base          *common.RespBase            `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *SourceArtifactImportResult `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 导入结果
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceArtifactImportResp) Reset() {
+	*x = SourceArtifactImportResp{}
+	mi := &file_proto_core_core_proto_msgTypes[97]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceArtifactImportResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceArtifactImportResp) ProtoMessage() {}
+
+func (x *SourceArtifactImportResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[97]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceArtifactImportResp.ProtoReflect.Descriptor instead.
+func (*SourceArtifactImportResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{97}
+}
+
+func (x *SourceArtifactImportResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceArtifactImportResp) GetData() *SourceArtifactImportResult {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 源码平台预定义构建触发策略。
+type SourceBuildTrigger struct {
+	state               protoimpl.MessageState      `protogen:"open.v1"`
+	Id                  int64                       `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                      // 触发策略ID
+	TenantId            int64                       `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                          // 所属租户ID
+	RepositoryId        int64                       `protobuf:"varint,3,opt,name=repository_id,json=repositoryId,proto3" json:"repository_id,omitempty"`                              // 已授权仓库ID
+	AppId               int64                       `protobuf:"varint,4,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                                   // 目标应用ID
+	TriggerName         string                      `protobuf:"bytes,5,opt,name=trigger_name,json=triggerName,proto3" json:"trigger_name,omitempty"`                                  // 策略名称
+	EventType           SourceBuildTriggerEventType `protobuf:"varint,6,opt,name=event_type,json=eventType,proto3,enum=core.SourceBuildTriggerEventType" json:"event_type,omitempty"` // 接受的供应商事件类型
+	RefPattern          string                      `protobuf:"bytes,7,opt,name=ref_pattern,json=refPattern,proto3" json:"ref_pattern,omitempty"`                                     // Tag或分支glob模式
+	ArtifactSelector    string                      `protobuf:"bytes,8,opt,name=artifact_selector,json=artifactSelector,proto3" json:"artifact_selector,omitempty"`                   // Release附件名或CI Job名称精确选择器
+	ChannelIds          []int64                     `protobuf:"varint,9,rep,packed,name=channel_ids,json=channelIds,proto3" json:"channel_ids,omitempty"`                             // 构建目标渠道ID
+	SigningConfigId     int64                       `protobuf:"varint,10,opt,name=signing_config_id,json=signingConfigId,proto3" json:"signing_config_id,omitempty"`                  // 签名配置ID
+	BrandingProfileId   int64                       `protobuf:"varint,11,opt,name=branding_profile_id,json=brandingProfileId,proto3" json:"branding_profile_id,omitempty"`            // 品牌配置ID，0表示不使用
+	WhiteLabelProductId int64                       `protobuf:"varint,12,opt,name=white_label_product_id,json=whiteLabelProductId,proto3" json:"white_label_product_id,omitempty"`    // 白标产品ID，0表示不使用
+	Priority            int32                       `protobuf:"varint,13,opt,name=priority,proto3" json:"priority,omitempty"`                                                         // 构建优先级
+	PoolCode            string                      `protobuf:"bytes,14,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                          // 构建池编码
+	VersionNamePrefix   string                      `protobuf:"bytes,15,opt,name=version_name_prefix,json=versionNamePrefix,proto3" json:"version_name_prefix,omitempty"`             // 自动版本名称前缀
+	Status              SourceBuildTriggerStatus    `protobuf:"varint,16,opt,name=status,proto3,enum=core.SourceBuildTriggerStatus" json:"status,omitempty"`                          // 策略状态
+	Platform            SourcePlatform              `protobuf:"varint,17,opt,name=platform,proto3,enum=core.SourcePlatform" json:"platform,omitempty"`                                // 仓库所属代码平台
+	RepositoryFullName  string                      `protobuf:"bytes,18,opt,name=repository_full_name,json=repositoryFullName,proto3" json:"repository_full_name,omitempty"`          // 授权仓库完整名称
+	CreateTime          int64                       `protobuf:"varint,19,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                                   // 创建时间，Unix毫秒
+	UpdateTime          int64                       `protobuf:"varint,20,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                                   // 更新时间，Unix毫秒
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *SourceBuildTrigger) Reset() {
+	*x = SourceBuildTrigger{}
+	mi := &file_proto_core_core_proto_msgTypes[98]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceBuildTrigger) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceBuildTrigger) ProtoMessage() {}
+
+func (x *SourceBuildTrigger) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[98]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceBuildTrigger.ProtoReflect.Descriptor instead.
+func (*SourceBuildTrigger) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{98}
+}
+
+func (x *SourceBuildTrigger) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *SourceBuildTrigger) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *SourceBuildTrigger) GetRepositoryId() int64 {
+	if x != nil {
+		return x.RepositoryId
+	}
+	return 0
+}
+
+func (x *SourceBuildTrigger) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *SourceBuildTrigger) GetTriggerName() string {
+	if x != nil {
+		return x.TriggerName
+	}
+	return ""
+}
+
+func (x *SourceBuildTrigger) GetEventType() SourceBuildTriggerEventType {
+	if x != nil {
+		return x.EventType
+	}
+	return SourceBuildTriggerEventType_SOURCE_BUILD_TRIGGER_EVENT_TYPE_UNKNOWN
+}
+
+func (x *SourceBuildTrigger) GetRefPattern() string {
+	if x != nil {
+		return x.RefPattern
+	}
+	return ""
+}
+
+func (x *SourceBuildTrigger) GetArtifactSelector() string {
+	if x != nil {
+		return x.ArtifactSelector
+	}
+	return ""
+}
+
+func (x *SourceBuildTrigger) GetChannelIds() []int64 {
+	if x != nil {
+		return x.ChannelIds
+	}
+	return nil
+}
+
+func (x *SourceBuildTrigger) GetSigningConfigId() int64 {
+	if x != nil {
+		return x.SigningConfigId
+	}
+	return 0
+}
+
+func (x *SourceBuildTrigger) GetBrandingProfileId() int64 {
+	if x != nil {
+		return x.BrandingProfileId
+	}
+	return 0
+}
+
+func (x *SourceBuildTrigger) GetWhiteLabelProductId() int64 {
+	if x != nil {
+		return x.WhiteLabelProductId
+	}
+	return 0
+}
+
+func (x *SourceBuildTrigger) GetPriority() int32 {
+	if x != nil {
+		return x.Priority
+	}
+	return 0
+}
+
+func (x *SourceBuildTrigger) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *SourceBuildTrigger) GetVersionNamePrefix() string {
+	if x != nil {
+		return x.VersionNamePrefix
+	}
+	return ""
+}
+
+func (x *SourceBuildTrigger) GetStatus() SourceBuildTriggerStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SourceBuildTriggerStatus_SOURCE_BUILD_TRIGGER_STATUS_UNKNOWN
+}
+
+func (x *SourceBuildTrigger) GetPlatform() SourcePlatform {
+	if x != nil {
+		return x.Platform
+	}
+	return SourcePlatform_SOURCE_PLATFORM_UNKNOWN
+}
+
+func (x *SourceBuildTrigger) GetRepositoryFullName() string {
+	if x != nil {
+		return x.RepositoryFullName
+	}
+	return ""
+}
+
+func (x *SourceBuildTrigger) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *SourceBuildTrigger) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V5 创建源码平台预定义构建触发策略请求。
+type CreateSourceBuildTriggerReq struct {
+	state               protoimpl.MessageState      `protogen:"open.v1"`
+	RepositoryId        int64                       `protobuf:"varint,1,opt,name=repository_id,json=repositoryId,proto3" json:"repository_id,omitempty"`                              // 已授权仓库ID
+	AppId               int64                       `protobuf:"varint,2,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                                   // 目标应用ID
+	TriggerName         string                      `protobuf:"bytes,3,opt,name=trigger_name,json=triggerName,proto3" json:"trigger_name,omitempty"`                                  // 策略名称
+	EventType           SourceBuildTriggerEventType `protobuf:"varint,4,opt,name=event_type,json=eventType,proto3,enum=core.SourceBuildTriggerEventType" json:"event_type,omitempty"` // 接受的供应商事件类型
+	RefPattern          string                      `protobuf:"bytes,5,opt,name=ref_pattern,json=refPattern,proto3" json:"ref_pattern,omitempty"`                                     // Tag或分支glob模式
+	ArtifactSelector    string                      `protobuf:"bytes,6,opt,name=artifact_selector,json=artifactSelector,proto3" json:"artifact_selector,omitempty"`                   // Release附件名或CI Job名称精确选择器
+	ChannelIds          []int64                     `protobuf:"varint,7,rep,packed,name=channel_ids,json=channelIds,proto3" json:"channel_ids,omitempty"`                             // 构建目标渠道ID
+	SigningConfigId     int64                       `protobuf:"varint,8,opt,name=signing_config_id,json=signingConfigId,proto3" json:"signing_config_id,omitempty"`                   // 签名配置ID
+	BrandingProfileId   int64                       `protobuf:"varint,9,opt,name=branding_profile_id,json=brandingProfileId,proto3" json:"branding_profile_id,omitempty"`             // 品牌配置ID，0表示不使用
+	WhiteLabelProductId int64                       `protobuf:"varint,10,opt,name=white_label_product_id,json=whiteLabelProductId,proto3" json:"white_label_product_id,omitempty"`    // 白标产品ID，0表示不使用
+	Priority            int32                       `protobuf:"varint,11,opt,name=priority,proto3" json:"priority,omitempty"`                                                         // 构建优先级
+	PoolCode            string                      `protobuf:"bytes,12,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                          // 构建池编码
+	VersionNamePrefix   string                      `protobuf:"bytes,13,opt,name=version_name_prefix,json=versionNamePrefix,proto3" json:"version_name_prefix,omitempty"`             // 自动版本名称前缀
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *CreateSourceBuildTriggerReq) Reset() {
+	*x = CreateSourceBuildTriggerReq{}
+	mi := &file_proto_core_core_proto_msgTypes[99]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateSourceBuildTriggerReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSourceBuildTriggerReq) ProtoMessage() {}
+
+func (x *CreateSourceBuildTriggerReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[99]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateSourceBuildTriggerReq.ProtoReflect.Descriptor instead.
+func (*CreateSourceBuildTriggerReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{99}
+}
+
+func (x *CreateSourceBuildTriggerReq) GetRepositoryId() int64 {
+	if x != nil {
+		return x.RepositoryId
+	}
+	return 0
+}
+
+func (x *CreateSourceBuildTriggerReq) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *CreateSourceBuildTriggerReq) GetTriggerName() string {
+	if x != nil {
+		return x.TriggerName
+	}
+	return ""
+}
+
+func (x *CreateSourceBuildTriggerReq) GetEventType() SourceBuildTriggerEventType {
+	if x != nil {
+		return x.EventType
+	}
+	return SourceBuildTriggerEventType_SOURCE_BUILD_TRIGGER_EVENT_TYPE_UNKNOWN
+}
+
+func (x *CreateSourceBuildTriggerReq) GetRefPattern() string {
+	if x != nil {
+		return x.RefPattern
+	}
+	return ""
+}
+
+func (x *CreateSourceBuildTriggerReq) GetArtifactSelector() string {
+	if x != nil {
+		return x.ArtifactSelector
+	}
+	return ""
+}
+
+func (x *CreateSourceBuildTriggerReq) GetChannelIds() []int64 {
+	if x != nil {
+		return x.ChannelIds
+	}
+	return nil
+}
+
+func (x *CreateSourceBuildTriggerReq) GetSigningConfigId() int64 {
+	if x != nil {
+		return x.SigningConfigId
+	}
+	return 0
+}
+
+func (x *CreateSourceBuildTriggerReq) GetBrandingProfileId() int64 {
+	if x != nil {
+		return x.BrandingProfileId
+	}
+	return 0
+}
+
+func (x *CreateSourceBuildTriggerReq) GetWhiteLabelProductId() int64 {
+	if x != nil {
+		return x.WhiteLabelProductId
+	}
+	return 0
+}
+
+func (x *CreateSourceBuildTriggerReq) GetPriority() int32 {
+	if x != nil {
+		return x.Priority
+	}
+	return 0
+}
+
+func (x *CreateSourceBuildTriggerReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *CreateSourceBuildTriggerReq) GetVersionNamePrefix() string {
+	if x != nil {
+		return x.VersionNamePrefix
+	}
+	return ""
+}
+
+// V5 更新源码平台预定义构建触发策略请求。
+type UpdateSourceBuildTriggerReq struct {
+	state               protoimpl.MessageState      `protogen:"open.v1"`
+	Id                  int64                       `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                      // 触发策略ID
+	TriggerName         string                      `protobuf:"bytes,2,opt,name=trigger_name,json=triggerName,proto3" json:"trigger_name,omitempty"`                                  // 策略名称
+	EventType           SourceBuildTriggerEventType `protobuf:"varint,3,opt,name=event_type,json=eventType,proto3,enum=core.SourceBuildTriggerEventType" json:"event_type,omitempty"` // 接受的供应商事件类型
+	RefPattern          string                      `protobuf:"bytes,4,opt,name=ref_pattern,json=refPattern,proto3" json:"ref_pattern,omitempty"`                                     // Tag或分支glob模式
+	ArtifactSelector    string                      `protobuf:"bytes,5,opt,name=artifact_selector,json=artifactSelector,proto3" json:"artifact_selector,omitempty"`                   // Release附件名或CI Job名称精确选择器
+	ChannelIds          []int64                     `protobuf:"varint,6,rep,packed,name=channel_ids,json=channelIds,proto3" json:"channel_ids,omitempty"`                             // 构建目标渠道ID
+	SigningConfigId     int64                       `protobuf:"varint,7,opt,name=signing_config_id,json=signingConfigId,proto3" json:"signing_config_id,omitempty"`                   // 签名配置ID
+	BrandingProfileId   int64                       `protobuf:"varint,8,opt,name=branding_profile_id,json=brandingProfileId,proto3" json:"branding_profile_id,omitempty"`             // 品牌配置ID，0表示不使用
+	WhiteLabelProductId int64                       `protobuf:"varint,9,opt,name=white_label_product_id,json=whiteLabelProductId,proto3" json:"white_label_product_id,omitempty"`     // 白标产品ID，0表示不使用
+	Priority            int32                       `protobuf:"varint,10,opt,name=priority,proto3" json:"priority,omitempty"`                                                         // 构建优先级
+	PoolCode            string                      `protobuf:"bytes,11,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                          // 构建池编码
+	VersionNamePrefix   string                      `protobuf:"bytes,12,opt,name=version_name_prefix,json=versionNamePrefix,proto3" json:"version_name_prefix,omitempty"`             // 自动版本名称前缀
+	Status              SourceBuildTriggerStatus    `protobuf:"varint,13,opt,name=status,proto3,enum=core.SourceBuildTriggerStatus" json:"status,omitempty"`                          // 策略状态
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *UpdateSourceBuildTriggerReq) Reset() {
+	*x = UpdateSourceBuildTriggerReq{}
+	mi := &file_proto_core_core_proto_msgTypes[100]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateSourceBuildTriggerReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateSourceBuildTriggerReq) ProtoMessage() {}
+
+func (x *UpdateSourceBuildTriggerReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[100]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateSourceBuildTriggerReq.ProtoReflect.Descriptor instead.
+func (*UpdateSourceBuildTriggerReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{100}
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetTriggerName() string {
+	if x != nil {
+		return x.TriggerName
+	}
+	return ""
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetEventType() SourceBuildTriggerEventType {
+	if x != nil {
+		return x.EventType
+	}
+	return SourceBuildTriggerEventType_SOURCE_BUILD_TRIGGER_EVENT_TYPE_UNKNOWN
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetRefPattern() string {
+	if x != nil {
+		return x.RefPattern
+	}
+	return ""
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetArtifactSelector() string {
+	if x != nil {
+		return x.ArtifactSelector
+	}
+	return ""
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetChannelIds() []int64 {
+	if x != nil {
+		return x.ChannelIds
+	}
+	return nil
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetSigningConfigId() int64 {
+	if x != nil {
+		return x.SigningConfigId
+	}
+	return 0
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetBrandingProfileId() int64 {
+	if x != nil {
+		return x.BrandingProfileId
+	}
+	return 0
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetWhiteLabelProductId() int64 {
+	if x != nil {
+		return x.WhiteLabelProductId
+	}
+	return 0
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetPriority() int32 {
+	if x != nil {
+		return x.Priority
+	}
+	return 0
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetVersionNamePrefix() string {
+	if x != nil {
+		return x.VersionNamePrefix
+	}
+	return ""
+}
+
+func (x *UpdateSourceBuildTriggerReq) GetStatus() SourceBuildTriggerStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SourceBuildTriggerStatus_SOURCE_BUILD_TRIGGER_STATUS_UNKNOWN
+}
+
+// V5 源码平台构建触发策略主键请求。
+type SourceBuildTriggerIdReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 触发策略ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceBuildTriggerIdReq) Reset() {
+	*x = SourceBuildTriggerIdReq{}
+	mi := &file_proto_core_core_proto_msgTypes[101]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceBuildTriggerIdReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceBuildTriggerIdReq) ProtoMessage() {}
+
+func (x *SourceBuildTriggerIdReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[101]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceBuildTriggerIdReq.ProtoReflect.Descriptor instead.
+func (*SourceBuildTriggerIdReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{101}
+}
+
+func (x *SourceBuildTriggerIdReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// V5 源码平台构建触发策略列表请求。
+type SourceBuildTriggerListReq struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Page          *common.PageReq          `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                         // 分页参数
+	RepositoryId  int64                    `protobuf:"varint,2,opt,name=repository_id,json=repositoryId,proto3" json:"repository_id,omitempty"`    // 授权仓库ID筛选
+	AppId         int64                    `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                         // 应用ID筛选
+	Status        SourceBuildTriggerStatus `protobuf:"varint,4,opt,name=status,proto3,enum=core.SourceBuildTriggerStatus" json:"status,omitempty"` // 策略状态筛选
+	Keyword       string                   `protobuf:"bytes,5,opt,name=keyword,proto3" json:"keyword,omitempty"`                                   // 策略名称关键字
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceBuildTriggerListReq) Reset() {
+	*x = SourceBuildTriggerListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[102]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceBuildTriggerListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceBuildTriggerListReq) ProtoMessage() {}
+
+func (x *SourceBuildTriggerListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[102]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceBuildTriggerListReq.ProtoReflect.Descriptor instead.
+func (*SourceBuildTriggerListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{102}
+}
+
+func (x *SourceBuildTriggerListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *SourceBuildTriggerListReq) GetRepositoryId() int64 {
+	if x != nil {
+		return x.RepositoryId
+	}
+	return 0
+}
+
+func (x *SourceBuildTriggerListReq) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *SourceBuildTriggerListReq) GetStatus() SourceBuildTriggerStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SourceBuildTriggerStatus_SOURCE_BUILD_TRIGGER_STATUS_UNKNOWN
+}
+
+func (x *SourceBuildTriggerListReq) GetKeyword() string {
+	if x != nil {
+		return x.Keyword
+	}
+	return ""
+}
+
+// V5 源码平台构建触发策略响应。
+type SourceBuildTriggerResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *SourceBuildTrigger    `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 触发策略
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceBuildTriggerResp) Reset() {
+	*x = SourceBuildTriggerResp{}
+	mi := &file_proto_core_core_proto_msgTypes[103]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceBuildTriggerResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceBuildTriggerResp) ProtoMessage() {}
+
+func (x *SourceBuildTriggerResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[103]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceBuildTriggerResp.ProtoReflect.Descriptor instead.
+func (*SourceBuildTriggerResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{103}
+}
+
+func (x *SourceBuildTriggerResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceBuildTriggerResp) GetData() *SourceBuildTrigger {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 源码平台构建触发策略列表响应。
+type SourceBuildTriggerListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*SourceBuildTrigger  `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // 触发策略列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceBuildTriggerListResp) Reset() {
+	*x = SourceBuildTriggerListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[104]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceBuildTriggerListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceBuildTriggerListResp) ProtoMessage() {}
+
+func (x *SourceBuildTriggerListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[104]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceBuildTriggerListResp.ProtoReflect.Descriptor instead.
+func (*SourceBuildTriggerListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{104}
+}
+
+func (x *SourceBuildTriggerListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceBuildTriggerListResp) GetData() []*SourceBuildTrigger {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 源码平台构建触发策略一次性密钥。
+type SourceBuildTriggerSecret struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Trigger       *SourceBuildTrigger    `protobuf:"bytes,1,opt,name=trigger,proto3" json:"trigger,omitempty"`                                  // 已创建或已轮换的触发策略
+	WebhookToken  string                 `protobuf:"bytes,2,opt,name=webhook_token,json=webhookToken,proto3" json:"webhook_token,omitempty"`    // 仅本次返回的公开回调随机令牌
+	WebhookSecret string                 `protobuf:"bytes,3,opt,name=webhook_secret,json=webhookSecret,proto3" json:"webhook_secret,omitempty"` // 仅本次返回的供应商签名Secret
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceBuildTriggerSecret) Reset() {
+	*x = SourceBuildTriggerSecret{}
+	mi := &file_proto_core_core_proto_msgTypes[105]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceBuildTriggerSecret) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceBuildTriggerSecret) ProtoMessage() {}
+
+func (x *SourceBuildTriggerSecret) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[105]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceBuildTriggerSecret.ProtoReflect.Descriptor instead.
+func (*SourceBuildTriggerSecret) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{105}
+}
+
+func (x *SourceBuildTriggerSecret) GetTrigger() *SourceBuildTrigger {
+	if x != nil {
+		return x.Trigger
+	}
+	return nil
+}
+
+func (x *SourceBuildTriggerSecret) GetWebhookToken() string {
+	if x != nil {
+		return x.WebhookToken
+	}
+	return ""
+}
+
+func (x *SourceBuildTriggerSecret) GetWebhookSecret() string {
+	if x != nil {
+		return x.WebhookSecret
+	}
+	return ""
+}
+
+// V5 源码平台构建触发策略一次性密钥响应。
+type SourceBuildTriggerSecretResp struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Base          *common.RespBase          `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *SourceBuildTriggerSecret `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 一次性回调令牌和签名Secret
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceBuildTriggerSecretResp) Reset() {
+	*x = SourceBuildTriggerSecretResp{}
+	mi := &file_proto_core_core_proto_msgTypes[106]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceBuildTriggerSecretResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceBuildTriggerSecretResp) ProtoMessage() {}
+
+func (x *SourceBuildTriggerSecretResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[106]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceBuildTriggerSecretResp.ProtoReflect.Descriptor instead.
+func (*SourceBuildTriggerSecretResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{106}
+}
+
+func (x *SourceBuildTriggerSecretResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceBuildTriggerSecretResp) GetData() *SourceBuildTriggerSecret {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 解析公开回调随机令牌请求，仅允许可信API内部调用。
+type ResolveSourceBuildTriggerReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WebhookToken  string                 `protobuf:"bytes,1,opt,name=webhook_token,json=webhookToken,proto3" json:"webhook_token,omitempty"` // 公开回调路径中的高熵随机令牌
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResolveSourceBuildTriggerReq) Reset() {
+	*x = ResolveSourceBuildTriggerReq{}
+	mi := &file_proto_core_core_proto_msgTypes[107]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResolveSourceBuildTriggerReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResolveSourceBuildTriggerReq) ProtoMessage() {}
+
+func (x *ResolveSourceBuildTriggerReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[107]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResolveSourceBuildTriggerReq.ProtoReflect.Descriptor instead.
+func (*ResolveSourceBuildTriggerReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{107}
+}
+
+func (x *ResolveSourceBuildTriggerReq) GetWebhookToken() string {
+	if x != nil {
+		return x.WebhookToken
+	}
+	return ""
+}
+
+// V5 入站Webhook内部凭证，禁止映射到HTTP响应。
+type SourceBuildTriggerCredential struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Trigger              *SourceBuildTrigger    `protobuf:"bytes,1,opt,name=trigger,proto3" json:"trigger,omitempty"`                                                         // 启用的预定义触发策略
+	WebhookSecret        string                 `protobuf:"bytes,2,opt,name=webhook_secret,json=webhookSecret,proto3" json:"webhook_secret,omitempty"`                        // 解密后的供应商Webhook签名Secret
+	ExternalRepositoryId string                 `protobuf:"bytes,3,opt,name=external_repository_id,json=externalRepositoryId,proto3" json:"external_repository_id,omitempty"` // 必须匹配的供应商仓库ID
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *SourceBuildTriggerCredential) Reset() {
+	*x = SourceBuildTriggerCredential{}
+	mi := &file_proto_core_core_proto_msgTypes[108]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceBuildTriggerCredential) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceBuildTriggerCredential) ProtoMessage() {}
+
+func (x *SourceBuildTriggerCredential) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[108]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceBuildTriggerCredential.ProtoReflect.Descriptor instead.
+func (*SourceBuildTriggerCredential) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{108}
+}
+
+func (x *SourceBuildTriggerCredential) GetTrigger() *SourceBuildTrigger {
+	if x != nil {
+		return x.Trigger
+	}
+	return nil
+}
+
+func (x *SourceBuildTriggerCredential) GetWebhookSecret() string {
+	if x != nil {
+		return x.WebhookSecret
+	}
+	return ""
+}
+
+func (x *SourceBuildTriggerCredential) GetExternalRepositoryId() string {
+	if x != nil {
+		return x.ExternalRepositoryId
+	}
+	return ""
+}
+
+// V5 入站Webhook内部凭证响应。
+type SourceBuildTriggerCredentialResp struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	Base          *common.RespBase              `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *SourceBuildTriggerCredential `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 内部签名验证材料
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceBuildTriggerCredentialResp) Reset() {
+	*x = SourceBuildTriggerCredentialResp{}
+	mi := &file_proto_core_core_proto_msgTypes[109]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceBuildTriggerCredentialResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceBuildTriggerCredentialResp) ProtoMessage() {}
+
+func (x *SourceBuildTriggerCredentialResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[109]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceBuildTriggerCredentialResp.ProtoReflect.Descriptor instead.
+func (*SourceBuildTriggerCredentialResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{109}
+}
+
+func (x *SourceBuildTriggerCredentialResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceBuildTriggerCredentialResp) GetData() *SourceBuildTriggerCredential {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 已标准化的源码平台入站Webhook事件。
+type SourceWebhookEvent struct {
+	state              protoimpl.MessageState   `protogen:"open.v1"`
+	Id                 int64                    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                            // 入站事件ID
+	TenantId           int64                    `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                                // 所属租户ID
+	TriggerId          int64                    `protobuf:"varint,3,opt,name=trigger_id,json=triggerId,proto3" json:"trigger_id,omitempty"`                                             // 触发策略ID
+	ProviderEventId    string                   `protobuf:"bytes,4,opt,name=provider_event_id,json=providerEventId,proto3" json:"provider_event_id,omitempty"`                          // 供应商投递事件唯一ID
+	ProviderEventType  string                   `protobuf:"bytes,5,opt,name=provider_event_type,json=providerEventType,proto3" json:"provider_event_type,omitempty"`                    // 供应商原始事件类型
+	SourceRef          string                   `protobuf:"bytes,6,opt,name=source_ref,json=sourceRef,proto3" json:"source_ref,omitempty"`                                              // Tag或分支
+	CommitSha          string                   `protobuf:"bytes,7,opt,name=commit_sha,json=commitSha,proto3" json:"commit_sha,omitempty"`                                              // Commit SHA
+	ArtifactSource     SourceArtifactType       `protobuf:"varint,8,opt,name=artifact_source,json=artifactSource,proto3,enum=core.SourceArtifactType" json:"artifact_source,omitempty"` // Artifact来源
+	ExternalArtifactId string                   `protobuf:"bytes,9,opt,name=external_artifact_id,json=externalArtifactId,proto3" json:"external_artifact_id,omitempty"`                 // 供应商Artifact或Job ID
+	ReleaseRef         string                   `protobuf:"bytes,10,opt,name=release_ref,json=releaseRef,proto3" json:"release_ref,omitempty"`                                          // Release Tag
+	PipelineRef        string                   `protobuf:"bytes,11,opt,name=pipeline_ref,json=pipelineRef,proto3" json:"pipeline_ref,omitempty"`                                       // Pipeline或Workflow标识
+	JobRef             string                   `protobuf:"bytes,12,opt,name=job_ref,json=jobRef,proto3" json:"job_ref,omitempty"`                                                      // Job标识
+	PayloadSha256      string                   `protobuf:"bytes,13,opt,name=payload_sha256,json=payloadSha256,proto3" json:"payload_sha256,omitempty"`                                 // 原始请求体SHA-256
+	VersionCode        int64                    `protobuf:"varint,14,opt,name=version_code,json=versionCode,proto3" json:"version_code,omitempty"`                                      // 原子分配的Android versionCode
+	VersionName        string                   `protobuf:"bytes,15,opt,name=version_name,json=versionName,proto3" json:"version_name,omitempty"`                                       // 自动生成的Android versionName
+	Status             SourceWebhookEventStatus `protobuf:"varint,16,opt,name=status,proto3,enum=core.SourceWebhookEventStatus" json:"status,omitempty"`                                // 处理状态
+	Attempt            int32                    `protobuf:"varint,17,opt,name=attempt,proto3" json:"attempt,omitempty"`                                                                 // 已处理次数
+	VersionId          int64                    `protobuf:"varint,18,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`                                            // 导入成功后的版本ID
+	BuildTaskIds       []int64                  `protobuf:"varint,19,rep,packed,name=build_task_ids,json=buildTaskIds,proto3" json:"build_task_ids,omitempty"`                          // 创建成功的构建任务ID
+	ErrorMessage       string                   `protobuf:"bytes,20,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`                                    // 最近失败错误摘要
+	CreateTime         int64                    `protobuf:"varint,21,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                                         // 创建时间，Unix毫秒
+	UpdateTime         int64                    `protobuf:"varint,22,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                                         // 更新时间，Unix毫秒
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *SourceWebhookEvent) Reset() {
+	*x = SourceWebhookEvent{}
+	mi := &file_proto_core_core_proto_msgTypes[110]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceWebhookEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceWebhookEvent) ProtoMessage() {}
+
+func (x *SourceWebhookEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[110]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceWebhookEvent.ProtoReflect.Descriptor instead.
+func (*SourceWebhookEvent) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{110}
+}
+
+func (x *SourceWebhookEvent) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *SourceWebhookEvent) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *SourceWebhookEvent) GetTriggerId() int64 {
+	if x != nil {
+		return x.TriggerId
+	}
+	return 0
+}
+
+func (x *SourceWebhookEvent) GetProviderEventId() string {
+	if x != nil {
+		return x.ProviderEventId
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetProviderEventType() string {
+	if x != nil {
+		return x.ProviderEventType
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetSourceRef() string {
+	if x != nil {
+		return x.SourceRef
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetCommitSha() string {
+	if x != nil {
+		return x.CommitSha
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetArtifactSource() SourceArtifactType {
+	if x != nil {
+		return x.ArtifactSource
+	}
+	return SourceArtifactType_SOURCE_ARTIFACT_TYPE_UNKNOWN
+}
+
+func (x *SourceWebhookEvent) GetExternalArtifactId() string {
+	if x != nil {
+		return x.ExternalArtifactId
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetReleaseRef() string {
+	if x != nil {
+		return x.ReleaseRef
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetPipelineRef() string {
+	if x != nil {
+		return x.PipelineRef
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetJobRef() string {
+	if x != nil {
+		return x.JobRef
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetPayloadSha256() string {
+	if x != nil {
+		return x.PayloadSha256
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetVersionCode() int64 {
+	if x != nil {
+		return x.VersionCode
+	}
+	return 0
+}
+
+func (x *SourceWebhookEvent) GetVersionName() string {
+	if x != nil {
+		return x.VersionName
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetStatus() SourceWebhookEventStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SourceWebhookEventStatus_SOURCE_WEBHOOK_EVENT_STATUS_UNKNOWN
+}
+
+func (x *SourceWebhookEvent) GetAttempt() int32 {
+	if x != nil {
+		return x.Attempt
+	}
+	return 0
+}
+
+func (x *SourceWebhookEvent) GetVersionId() int64 {
+	if x != nil {
+		return x.VersionId
+	}
+	return 0
+}
+
+func (x *SourceWebhookEvent) GetBuildTaskIds() []int64 {
+	if x != nil {
+		return x.BuildTaskIds
+	}
+	return nil
+}
+
+func (x *SourceWebhookEvent) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+func (x *SourceWebhookEvent) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *SourceWebhookEvent) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V5 签名验证后可靠入队源码Webhook事件请求。
+type EnqueueSourceWebhookEventReq struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	TriggerId            int64                  `protobuf:"varint,1,opt,name=trigger_id,json=triggerId,proto3" json:"trigger_id,omitempty"`                                             // 已解析且签名验证通过的触发策略ID
+	ProviderEventId      string                 `protobuf:"bytes,2,opt,name=provider_event_id,json=providerEventId,proto3" json:"provider_event_id,omitempty"`                          // 供应商投递事件唯一ID
+	ProviderEventType    string                 `protobuf:"bytes,3,opt,name=provider_event_type,json=providerEventType,proto3" json:"provider_event_type,omitempty"`                    // 供应商原始事件类型
+	ExternalRepositoryId string                 `protobuf:"bytes,4,opt,name=external_repository_id,json=externalRepositoryId,proto3" json:"external_repository_id,omitempty"`           // 供应商仓库ID
+	SourceRef            string                 `protobuf:"bytes,5,opt,name=source_ref,json=sourceRef,proto3" json:"source_ref,omitempty"`                                              // Tag或分支
+	CommitSha            string                 `protobuf:"bytes,6,opt,name=commit_sha,json=commitSha,proto3" json:"commit_sha,omitempty"`                                              // Commit SHA
+	ArtifactSource       SourceArtifactType     `protobuf:"varint,7,opt,name=artifact_source,json=artifactSource,proto3,enum=core.SourceArtifactType" json:"artifact_source,omitempty"` // Artifact来源
+	ExternalArtifactId   string                 `protobuf:"bytes,8,opt,name=external_artifact_id,json=externalArtifactId,proto3" json:"external_artifact_id,omitempty"`                 // 供应商Artifact或Job ID
+	ReleaseRef           string                 `protobuf:"bytes,9,opt,name=release_ref,json=releaseRef,proto3" json:"release_ref,omitempty"`                                           // Release Tag
+	PipelineRef          string                 `protobuf:"bytes,10,opt,name=pipeline_ref,json=pipelineRef,proto3" json:"pipeline_ref,omitempty"`                                       // Pipeline或Workflow标识
+	JobRef               string                 `protobuf:"bytes,11,opt,name=job_ref,json=jobRef,proto3" json:"job_ref,omitempty"`                                                      // Job标识
+	PayloadSha256        string                 `protobuf:"bytes,12,opt,name=payload_sha256,json=payloadSha256,proto3" json:"payload_sha256,omitempty"`                                 // 原始请求体SHA-256
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *EnqueueSourceWebhookEventReq) Reset() {
+	*x = EnqueueSourceWebhookEventReq{}
+	mi := &file_proto_core_core_proto_msgTypes[111]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnqueueSourceWebhookEventReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnqueueSourceWebhookEventReq) ProtoMessage() {}
+
+func (x *EnqueueSourceWebhookEventReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[111]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnqueueSourceWebhookEventReq.ProtoReflect.Descriptor instead.
+func (*EnqueueSourceWebhookEventReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{111}
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetTriggerId() int64 {
+	if x != nil {
+		return x.TriggerId
+	}
+	return 0
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetProviderEventId() string {
+	if x != nil {
+		return x.ProviderEventId
+	}
+	return ""
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetProviderEventType() string {
+	if x != nil {
+		return x.ProviderEventType
+	}
+	return ""
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetExternalRepositoryId() string {
+	if x != nil {
+		return x.ExternalRepositoryId
+	}
+	return ""
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetSourceRef() string {
+	if x != nil {
+		return x.SourceRef
+	}
+	return ""
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetCommitSha() string {
+	if x != nil {
+		return x.CommitSha
+	}
+	return ""
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetArtifactSource() SourceArtifactType {
+	if x != nil {
+		return x.ArtifactSource
+	}
+	return SourceArtifactType_SOURCE_ARTIFACT_TYPE_UNKNOWN
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetExternalArtifactId() string {
+	if x != nil {
+		return x.ExternalArtifactId
+	}
+	return ""
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetReleaseRef() string {
+	if x != nil {
+		return x.ReleaseRef
+	}
+	return ""
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetPipelineRef() string {
+	if x != nil {
+		return x.PipelineRef
+	}
+	return ""
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetJobRef() string {
+	if x != nil {
+		return x.JobRef
+	}
+	return ""
+}
+
+func (x *EnqueueSourceWebhookEventReq) GetPayloadSha256() string {
+	if x != nil {
+		return x.PayloadSha256
+	}
+	return ""
+}
+
+// V5 源码Webhook入队结果。
+type EnqueueSourceWebhookEventResult struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Event         *SourceWebhookEvent    `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`        // 已存在或新建的可靠事件
+	Accepted      bool                   `protobuf:"varint,2,opt,name=accepted,proto3" json:"accepted,omitempty"` // true表示本次首次入队，false表示幂等重放
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnqueueSourceWebhookEventResult) Reset() {
+	*x = EnqueueSourceWebhookEventResult{}
+	mi := &file_proto_core_core_proto_msgTypes[112]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnqueueSourceWebhookEventResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnqueueSourceWebhookEventResult) ProtoMessage() {}
+
+func (x *EnqueueSourceWebhookEventResult) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[112]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnqueueSourceWebhookEventResult.ProtoReflect.Descriptor instead.
+func (*EnqueueSourceWebhookEventResult) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{112}
+}
+
+func (x *EnqueueSourceWebhookEventResult) GetEvent() *SourceWebhookEvent {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *EnqueueSourceWebhookEventResult) GetAccepted() bool {
+	if x != nil {
+		return x.Accepted
+	}
+	return false
+}
+
+// V5 源码Webhook入队响应。
+type EnqueueSourceWebhookEventResp struct {
+	state         protoimpl.MessageState           `protogen:"open.v1"`
+	Base          *common.RespBase                 `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *EnqueueSourceWebhookEventResult `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 入队结果
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnqueueSourceWebhookEventResp) Reset() {
+	*x = EnqueueSourceWebhookEventResp{}
+	mi := &file_proto_core_core_proto_msgTypes[113]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnqueueSourceWebhookEventResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnqueueSourceWebhookEventResp) ProtoMessage() {}
+
+func (x *EnqueueSourceWebhookEventResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[113]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnqueueSourceWebhookEventResp.ProtoReflect.Descriptor instead.
+func (*EnqueueSourceWebhookEventResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{113}
+}
+
+func (x *EnqueueSourceWebhookEventResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *EnqueueSourceWebhookEventResp) GetData() *EnqueueSourceWebhookEventResult {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 Worker领取源码Webhook事件请求。
+type ClaimSourceWebhookEventReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WorkerId      string                 `protobuf:"bytes,1,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`              // Worker唯一实例标识
+	LeaseSeconds  int32                  `protobuf:"varint,2,opt,name=lease_seconds,json=leaseSeconds,proto3" json:"lease_seconds,omitempty"` // 处理租约秒数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClaimSourceWebhookEventReq) Reset() {
+	*x = ClaimSourceWebhookEventReq{}
+	mi := &file_proto_core_core_proto_msgTypes[114]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClaimSourceWebhookEventReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClaimSourceWebhookEventReq) ProtoMessage() {}
+
+func (x *ClaimSourceWebhookEventReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[114]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClaimSourceWebhookEventReq.ProtoReflect.Descriptor instead.
+func (*ClaimSourceWebhookEventReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{114}
+}
+
+func (x *ClaimSourceWebhookEventReq) GetWorkerId() string {
+	if x != nil {
+		return x.WorkerId
+	}
+	return ""
+}
+
+func (x *ClaimSourceWebhookEventReq) GetLeaseSeconds() int32 {
+	if x != nil {
+		return x.LeaseSeconds
+	}
+	return 0
+}
+
+// V5 Worker领取源码Webhook事件结果。
+type ClaimedSourceWebhookEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Event         *SourceWebhookEvent    `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`     // 已领取事件
+	Trigger       *SourceBuildTrigger    `protobuf:"bytes,2,opt,name=trigger,proto3" json:"trigger,omitempty"` // 固化的预定义构建策略
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClaimedSourceWebhookEvent) Reset() {
+	*x = ClaimedSourceWebhookEvent{}
+	mi := &file_proto_core_core_proto_msgTypes[115]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClaimedSourceWebhookEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClaimedSourceWebhookEvent) ProtoMessage() {}
+
+func (x *ClaimedSourceWebhookEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[115]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClaimedSourceWebhookEvent.ProtoReflect.Descriptor instead.
+func (*ClaimedSourceWebhookEvent) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{115}
+}
+
+func (x *ClaimedSourceWebhookEvent) GetEvent() *SourceWebhookEvent {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *ClaimedSourceWebhookEvent) GetTrigger() *SourceBuildTrigger {
+	if x != nil {
+		return x.Trigger
+	}
+	return nil
+}
+
+// V5 Worker领取源码Webhook事件响应；无任务时data为空。
+type ClaimSourceWebhookEventResp struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Base          *common.RespBase           `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *ClaimedSourceWebhookEvent `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 已领取事件和策略
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClaimSourceWebhookEventResp) Reset() {
+	*x = ClaimSourceWebhookEventResp{}
+	mi := &file_proto_core_core_proto_msgTypes[116]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClaimSourceWebhookEventResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClaimSourceWebhookEventResp) ProtoMessage() {}
+
+func (x *ClaimSourceWebhookEventResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[116]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClaimSourceWebhookEventResp.ProtoReflect.Descriptor instead.
+func (*ClaimSourceWebhookEventResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{116}
+}
+
+func (x *ClaimSourceWebhookEventResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ClaimSourceWebhookEventResp) GetData() *ClaimedSourceWebhookEvent {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V5 Worker完成源码Webhook事件请求。
+type CompleteSourceWebhookEventReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                  // 入站事件ID
+	VersionId     int64                  `protobuf:"varint,2,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`                   // 导入成功的版本ID
+	BuildTaskIds  []int64                `protobuf:"varint,3,rep,packed,name=build_task_ids,json=buildTaskIds,proto3" json:"build_task_ids,omitempty"` // 创建成功的构建任务ID
+	CommitSha     string                 `protobuf:"bytes,4,opt,name=commit_sha,json=commitSha,proto3" json:"commit_sha,omitempty"`                    // Provider API最终确认的Commit SHA
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CompleteSourceWebhookEventReq) Reset() {
+	*x = CompleteSourceWebhookEventReq{}
+	mi := &file_proto_core_core_proto_msgTypes[117]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompleteSourceWebhookEventReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompleteSourceWebhookEventReq) ProtoMessage() {}
+
+func (x *CompleteSourceWebhookEventReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[117]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompleteSourceWebhookEventReq.ProtoReflect.Descriptor instead.
+func (*CompleteSourceWebhookEventReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{117}
+}
+
+func (x *CompleteSourceWebhookEventReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *CompleteSourceWebhookEventReq) GetVersionId() int64 {
+	if x != nil {
+		return x.VersionId
+	}
+	return 0
+}
+
+func (x *CompleteSourceWebhookEventReq) GetBuildTaskIds() []int64 {
+	if x != nil {
+		return x.BuildTaskIds
+	}
+	return nil
+}
+
+func (x *CompleteSourceWebhookEventReq) GetCommitSha() string {
+	if x != nil {
+		return x.CommitSha
+	}
+	return ""
+}
+
+// V5 Worker失败源码Webhook事件请求。
+type FailSourceWebhookEventReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                        // 入站事件ID
+	ErrorMessage  string                 `protobuf:"bytes,2,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"` // 已脱敏错误摘要
+	Retryable     bool                   `protobuf:"varint,3,opt,name=retryable,proto3" json:"retryable,omitempty"`                          // 是否允许指数退避重试
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FailSourceWebhookEventReq) Reset() {
+	*x = FailSourceWebhookEventReq{}
+	mi := &file_proto_core_core_proto_msgTypes[118]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FailSourceWebhookEventReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FailSourceWebhookEventReq) ProtoMessage() {}
+
+func (x *FailSourceWebhookEventReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[118]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FailSourceWebhookEventReq.ProtoReflect.Descriptor instead.
+func (*FailSourceWebhookEventReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{118}
+}
+
+func (x *FailSourceWebhookEventReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *FailSourceWebhookEventReq) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+func (x *FailSourceWebhookEventReq) GetRetryable() bool {
+	if x != nil {
+		return x.Retryable
+	}
+	return false
+}
+
+// V5 源码Webhook事件列表请求。
+type SourceWebhookEventListReq struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Page          *common.PageReq          `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                         // 分页参数
+	TriggerId     int64                    `protobuf:"varint,2,opt,name=trigger_id,json=triggerId,proto3" json:"trigger_id,omitempty"`             // 触发策略ID筛选
+	Status        SourceWebhookEventStatus `protobuf:"varint,3,opt,name=status,proto3,enum=core.SourceWebhookEventStatus" json:"status,omitempty"` // 处理状态筛选
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceWebhookEventListReq) Reset() {
+	*x = SourceWebhookEventListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[119]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceWebhookEventListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceWebhookEventListReq) ProtoMessage() {}
+
+func (x *SourceWebhookEventListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[119]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceWebhookEventListReq.ProtoReflect.Descriptor instead.
+func (*SourceWebhookEventListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{119}
+}
+
+func (x *SourceWebhookEventListReq) GetPage() *common.PageReq {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *SourceWebhookEventListReq) GetTriggerId() int64 {
+	if x != nil {
+		return x.TriggerId
+	}
+	return 0
+}
+
+func (x *SourceWebhookEventListReq) GetStatus() SourceWebhookEventStatus {
+	if x != nil {
+		return x.Status
+	}
+	return SourceWebhookEventStatus_SOURCE_WEBHOOK_EVENT_STATUS_UNKNOWN
+}
+
+// V5 源码Webhook事件列表响应。
+type SourceWebhookEventListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          []*SourceWebhookEvent  `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"` // 入站事件审计列表
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SourceWebhookEventListResp) Reset() {
+	*x = SourceWebhookEventListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[120]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SourceWebhookEventListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SourceWebhookEventListResp) ProtoMessage() {}
+
+func (x *SourceWebhookEventListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[120]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SourceWebhookEventListResp.ProtoReflect.Descriptor instead.
+func (*SourceWebhookEventListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{120}
+}
+
+func (x *SourceWebhookEventListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SourceWebhookEventListResp) GetData() []*SourceWebhookEvent {
 	if x != nil {
 		return x.Data
 	}
@@ -3327,7 +12681,7 @@ type BrandingProfileResp struct {
 
 func (x *BrandingProfileResp) Reset() {
 	*x = BrandingProfileResp{}
-	mi := &file_proto_core_core_proto_msgTypes[28]
+	mi := &file_proto_core_core_proto_msgTypes[121]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3339,7 +12693,7 @@ func (x *BrandingProfileResp) String() string {
 func (*BrandingProfileResp) ProtoMessage() {}
 
 func (x *BrandingProfileResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[28]
+	mi := &file_proto_core_core_proto_msgTypes[121]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3352,7 +12706,7 @@ func (x *BrandingProfileResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BrandingProfileResp.ProtoReflect.Descriptor instead.
 func (*BrandingProfileResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{28}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{121}
 }
 
 func (x *BrandingProfileResp) GetBase() *common.RespBase {
@@ -3382,7 +12736,7 @@ type BrandingProfileListReq struct {
 
 func (x *BrandingProfileListReq) Reset() {
 	*x = BrandingProfileListReq{}
-	mi := &file_proto_core_core_proto_msgTypes[29]
+	mi := &file_proto_core_core_proto_msgTypes[122]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3394,7 +12748,7 @@ func (x *BrandingProfileListReq) String() string {
 func (*BrandingProfileListReq) ProtoMessage() {}
 
 func (x *BrandingProfileListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[29]
+	mi := &file_proto_core_core_proto_msgTypes[122]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3407,7 +12761,7 @@ func (x *BrandingProfileListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BrandingProfileListReq.ProtoReflect.Descriptor instead.
 func (*BrandingProfileListReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{29}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{122}
 }
 
 func (x *BrandingProfileListReq) GetPage() *common.PageReq {
@@ -3449,7 +12803,7 @@ type BrandingProfileListResp struct {
 
 func (x *BrandingProfileListResp) Reset() {
 	*x = BrandingProfileListResp{}
-	mi := &file_proto_core_core_proto_msgTypes[30]
+	mi := &file_proto_core_core_proto_msgTypes[123]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3461,7 +12815,7 @@ func (x *BrandingProfileListResp) String() string {
 func (*BrandingProfileListResp) ProtoMessage() {}
 
 func (x *BrandingProfileListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[30]
+	mi := &file_proto_core_core_proto_msgTypes[123]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3474,7 +12828,7 @@ func (x *BrandingProfileListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BrandingProfileListResp.ProtoReflect.Descriptor instead.
 func (*BrandingProfileListResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{30}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{123}
 }
 
 func (x *BrandingProfileListResp) GetBase() *common.RespBase {
@@ -3502,7 +12856,7 @@ type BrandingPreflightResp struct {
 
 func (x *BrandingPreflightResp) Reset() {
 	*x = BrandingPreflightResp{}
-	mi := &file_proto_core_core_proto_msgTypes[31]
+	mi := &file_proto_core_core_proto_msgTypes[124]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3514,7 +12868,7 @@ func (x *BrandingPreflightResp) String() string {
 func (*BrandingPreflightResp) ProtoMessage() {}
 
 func (x *BrandingPreflightResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[31]
+	mi := &file_proto_core_core_proto_msgTypes[124]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3527,7 +12881,7 @@ func (x *BrandingPreflightResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BrandingPreflightResp.ProtoReflect.Descriptor instead.
 func (*BrandingPreflightResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{31}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{124}
 }
 
 func (x *BrandingPreflightResp) GetBase() *common.RespBase {
@@ -3558,7 +12912,7 @@ type BrandingPreflightListReq struct {
 
 func (x *BrandingPreflightListReq) Reset() {
 	*x = BrandingPreflightListReq{}
-	mi := &file_proto_core_core_proto_msgTypes[32]
+	mi := &file_proto_core_core_proto_msgTypes[125]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3570,7 +12924,7 @@ func (x *BrandingPreflightListReq) String() string {
 func (*BrandingPreflightListReq) ProtoMessage() {}
 
 func (x *BrandingPreflightListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[32]
+	mi := &file_proto_core_core_proto_msgTypes[125]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3583,7 +12937,7 @@ func (x *BrandingPreflightListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BrandingPreflightListReq.ProtoReflect.Descriptor instead.
 func (*BrandingPreflightListReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{32}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{125}
 }
 
 func (x *BrandingPreflightListReq) GetPage() *common.PageReq {
@@ -3632,7 +12986,7 @@ type BrandingPreflightListResp struct {
 
 func (x *BrandingPreflightListResp) Reset() {
 	*x = BrandingPreflightListResp{}
-	mi := &file_proto_core_core_proto_msgTypes[33]
+	mi := &file_proto_core_core_proto_msgTypes[126]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3644,7 +12998,7 @@ func (x *BrandingPreflightListResp) String() string {
 func (*BrandingPreflightListResp) ProtoMessage() {}
 
 func (x *BrandingPreflightListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[33]
+	mi := &file_proto_core_core_proto_msgTypes[126]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3657,7 +13011,7 @@ func (x *BrandingPreflightListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BrandingPreflightListResp.ProtoReflect.Descriptor instead.
 func (*BrandingPreflightListResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{33}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{126}
 }
 
 func (x *BrandingPreflightListResp) GetBase() *common.RespBase {
@@ -3685,7 +13039,7 @@ type WhiteLabelTemplateResp struct {
 
 func (x *WhiteLabelTemplateResp) Reset() {
 	*x = WhiteLabelTemplateResp{}
-	mi := &file_proto_core_core_proto_msgTypes[34]
+	mi := &file_proto_core_core_proto_msgTypes[127]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3697,7 +13051,7 @@ func (x *WhiteLabelTemplateResp) String() string {
 func (*WhiteLabelTemplateResp) ProtoMessage() {}
 
 func (x *WhiteLabelTemplateResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[34]
+	mi := &file_proto_core_core_proto_msgTypes[127]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3710,7 +13064,7 @@ func (x *WhiteLabelTemplateResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelTemplateResp.ProtoReflect.Descriptor instead.
 func (*WhiteLabelTemplateResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{34}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{127}
 }
 
 func (x *WhiteLabelTemplateResp) GetBase() *common.RespBase {
@@ -3740,7 +13094,7 @@ type WhiteLabelTemplateListReq struct {
 
 func (x *WhiteLabelTemplateListReq) Reset() {
 	*x = WhiteLabelTemplateListReq{}
-	mi := &file_proto_core_core_proto_msgTypes[35]
+	mi := &file_proto_core_core_proto_msgTypes[128]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3752,7 +13106,7 @@ func (x *WhiteLabelTemplateListReq) String() string {
 func (*WhiteLabelTemplateListReq) ProtoMessage() {}
 
 func (x *WhiteLabelTemplateListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[35]
+	mi := &file_proto_core_core_proto_msgTypes[128]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3765,7 +13119,7 @@ func (x *WhiteLabelTemplateListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelTemplateListReq.ProtoReflect.Descriptor instead.
 func (*WhiteLabelTemplateListReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{35}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{128}
 }
 
 func (x *WhiteLabelTemplateListReq) GetPage() *common.PageReq {
@@ -3807,7 +13161,7 @@ type WhiteLabelTemplateListResp struct {
 
 func (x *WhiteLabelTemplateListResp) Reset() {
 	*x = WhiteLabelTemplateListResp{}
-	mi := &file_proto_core_core_proto_msgTypes[36]
+	mi := &file_proto_core_core_proto_msgTypes[129]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3819,7 +13173,7 @@ func (x *WhiteLabelTemplateListResp) String() string {
 func (*WhiteLabelTemplateListResp) ProtoMessage() {}
 
 func (x *WhiteLabelTemplateListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[36]
+	mi := &file_proto_core_core_proto_msgTypes[129]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3832,7 +13186,7 @@ func (x *WhiteLabelTemplateListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelTemplateListResp.ProtoReflect.Descriptor instead.
 func (*WhiteLabelTemplateListResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{36}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{129}
 }
 
 func (x *WhiteLabelTemplateListResp) GetBase() *common.RespBase {
@@ -3860,7 +13214,7 @@ type WhiteLabelTemplateRevisionResp struct {
 
 func (x *WhiteLabelTemplateRevisionResp) Reset() {
 	*x = WhiteLabelTemplateRevisionResp{}
-	mi := &file_proto_core_core_proto_msgTypes[37]
+	mi := &file_proto_core_core_proto_msgTypes[130]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3872,7 +13226,7 @@ func (x *WhiteLabelTemplateRevisionResp) String() string {
 func (*WhiteLabelTemplateRevisionResp) ProtoMessage() {}
 
 func (x *WhiteLabelTemplateRevisionResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[37]
+	mi := &file_proto_core_core_proto_msgTypes[130]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3885,7 +13239,7 @@ func (x *WhiteLabelTemplateRevisionResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelTemplateRevisionResp.ProtoReflect.Descriptor instead.
 func (*WhiteLabelTemplateRevisionResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{37}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{130}
 }
 
 func (x *WhiteLabelTemplateRevisionResp) GetBase() *common.RespBase {
@@ -3914,7 +13268,7 @@ type WhiteLabelTemplateRevisionListReq struct {
 
 func (x *WhiteLabelTemplateRevisionListReq) Reset() {
 	*x = WhiteLabelTemplateRevisionListReq{}
-	mi := &file_proto_core_core_proto_msgTypes[38]
+	mi := &file_proto_core_core_proto_msgTypes[131]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3926,7 +13280,7 @@ func (x *WhiteLabelTemplateRevisionListReq) String() string {
 func (*WhiteLabelTemplateRevisionListReq) ProtoMessage() {}
 
 func (x *WhiteLabelTemplateRevisionListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[38]
+	mi := &file_proto_core_core_proto_msgTypes[131]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3939,7 +13293,7 @@ func (x *WhiteLabelTemplateRevisionListReq) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use WhiteLabelTemplateRevisionListReq.ProtoReflect.Descriptor instead.
 func (*WhiteLabelTemplateRevisionListReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{38}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{131}
 }
 
 func (x *WhiteLabelTemplateRevisionListReq) GetPage() *common.PageReq {
@@ -3974,7 +13328,7 @@ type WhiteLabelTemplateRevisionListResp struct {
 
 func (x *WhiteLabelTemplateRevisionListResp) Reset() {
 	*x = WhiteLabelTemplateRevisionListResp{}
-	mi := &file_proto_core_core_proto_msgTypes[39]
+	mi := &file_proto_core_core_proto_msgTypes[132]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3986,7 +13340,7 @@ func (x *WhiteLabelTemplateRevisionListResp) String() string {
 func (*WhiteLabelTemplateRevisionListResp) ProtoMessage() {}
 
 func (x *WhiteLabelTemplateRevisionListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[39]
+	mi := &file_proto_core_core_proto_msgTypes[132]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3999,7 +13353,7 @@ func (x *WhiteLabelTemplateRevisionListResp) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use WhiteLabelTemplateRevisionListResp.ProtoReflect.Descriptor instead.
 func (*WhiteLabelTemplateRevisionListResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{39}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{132}
 }
 
 func (x *WhiteLabelTemplateRevisionListResp) GetBase() *common.RespBase {
@@ -4027,7 +13381,7 @@ type WhiteLabelProductResp struct {
 
 func (x *WhiteLabelProductResp) Reset() {
 	*x = WhiteLabelProductResp{}
-	mi := &file_proto_core_core_proto_msgTypes[40]
+	mi := &file_proto_core_core_proto_msgTypes[133]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4039,7 +13393,7 @@ func (x *WhiteLabelProductResp) String() string {
 func (*WhiteLabelProductResp) ProtoMessage() {}
 
 func (x *WhiteLabelProductResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[40]
+	mi := &file_proto_core_core_proto_msgTypes[133]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4052,7 +13406,7 @@ func (x *WhiteLabelProductResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelProductResp.ProtoReflect.Descriptor instead.
 func (*WhiteLabelProductResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{40}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{133}
 }
 
 func (x *WhiteLabelProductResp) GetBase() *common.RespBase {
@@ -4082,7 +13436,7 @@ type WhiteLabelProductListReq struct {
 
 func (x *WhiteLabelProductListReq) Reset() {
 	*x = WhiteLabelProductListReq{}
-	mi := &file_proto_core_core_proto_msgTypes[41]
+	mi := &file_proto_core_core_proto_msgTypes[134]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4094,7 +13448,7 @@ func (x *WhiteLabelProductListReq) String() string {
 func (*WhiteLabelProductListReq) ProtoMessage() {}
 
 func (x *WhiteLabelProductListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[41]
+	mi := &file_proto_core_core_proto_msgTypes[134]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4107,7 +13461,7 @@ func (x *WhiteLabelProductListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelProductListReq.ProtoReflect.Descriptor instead.
 func (*WhiteLabelProductListReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{41}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{134}
 }
 
 func (x *WhiteLabelProductListReq) GetPage() *common.PageReq {
@@ -4149,7 +13503,7 @@ type WhiteLabelProductListResp struct {
 
 func (x *WhiteLabelProductListResp) Reset() {
 	*x = WhiteLabelProductListResp{}
-	mi := &file_proto_core_core_proto_msgTypes[42]
+	mi := &file_proto_core_core_proto_msgTypes[135]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4161,7 +13515,7 @@ func (x *WhiteLabelProductListResp) String() string {
 func (*WhiteLabelProductListResp) ProtoMessage() {}
 
 func (x *WhiteLabelProductListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[42]
+	mi := &file_proto_core_core_proto_msgTypes[135]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4174,7 +13528,7 @@ func (x *WhiteLabelProductListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelProductListResp.ProtoReflect.Descriptor instead.
 func (*WhiteLabelProductListResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{42}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{135}
 }
 
 func (x *WhiteLabelProductListResp) GetBase() *common.RespBase {
@@ -4203,7 +13557,7 @@ type WhiteLabelProductPreflightResp struct {
 
 func (x *WhiteLabelProductPreflightResp) Reset() {
 	*x = WhiteLabelProductPreflightResp{}
-	mi := &file_proto_core_core_proto_msgTypes[43]
+	mi := &file_proto_core_core_proto_msgTypes[136]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4215,7 +13569,7 @@ func (x *WhiteLabelProductPreflightResp) String() string {
 func (*WhiteLabelProductPreflightResp) ProtoMessage() {}
 
 func (x *WhiteLabelProductPreflightResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[43]
+	mi := &file_proto_core_core_proto_msgTypes[136]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4228,7 +13582,7 @@ func (x *WhiteLabelProductPreflightResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhiteLabelProductPreflightResp.ProtoReflect.Descriptor instead.
 func (*WhiteLabelProductPreflightResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{43}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{136}
 }
 
 func (x *WhiteLabelProductPreflightResp) GetBase() *common.RespBase {
@@ -4254,16 +13608,17 @@ func (x *WhiteLabelProductPreflightResp) GetReportJson() string {
 
 type ApplicationListReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          *common.PageReq        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
-	Keyword       string                 `protobuf:"bytes,2,opt,name=keyword,proto3" json:"keyword,omitempty"`
-	Status        ApplicationStatus      `protobuf:"varint,3,opt,name=status,proto3,enum=core.ApplicationStatus" json:"status,omitempty"`
+	Page          *common.PageReq        `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`                                  // 分页参数
+	Keyword       string                 `protobuf:"bytes,2,opt,name=keyword,proto3" json:"keyword,omitempty"`                            // 应用编码或应用名称关键字
+	Status        ApplicationStatus      `protobuf:"varint,3,opt,name=status,proto3,enum=core.ApplicationStatus" json:"status,omitempty"` // 应用状态
+	AppIds        []int64                `protobuf:"varint,4,rep,packed,name=app_ids,json=appIds,proto3" json:"app_ids,omitempty"`        // 可访问的应用ID白名单，为空表示不限制
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ApplicationListReq) Reset() {
 	*x = ApplicationListReq{}
-	mi := &file_proto_core_core_proto_msgTypes[44]
+	mi := &file_proto_core_core_proto_msgTypes[137]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4275,7 +13630,7 @@ func (x *ApplicationListReq) String() string {
 func (*ApplicationListReq) ProtoMessage() {}
 
 func (x *ApplicationListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[44]
+	mi := &file_proto_core_core_proto_msgTypes[137]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4288,7 +13643,7 @@ func (x *ApplicationListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApplicationListReq.ProtoReflect.Descriptor instead.
 func (*ApplicationListReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{44}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{137}
 }
 
 func (x *ApplicationListReq) GetPage() *common.PageReq {
@@ -4312,6 +13667,13 @@ func (x *ApplicationListReq) GetStatus() ApplicationStatus {
 	return ApplicationStatus_APPLICATION_STATUS_UNKNOWN
 }
 
+func (x *ApplicationListReq) GetAppIds() []int64 {
+	if x != nil {
+		return x.AppIds
+	}
+	return nil
+}
+
 type ApplicationListResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
@@ -4322,7 +13684,7 @@ type ApplicationListResp struct {
 
 func (x *ApplicationListResp) Reset() {
 	*x = ApplicationListResp{}
-	mi := &file_proto_core_core_proto_msgTypes[45]
+	mi := &file_proto_core_core_proto_msgTypes[138]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4334,7 +13696,7 @@ func (x *ApplicationListResp) String() string {
 func (*ApplicationListResp) ProtoMessage() {}
 
 func (x *ApplicationListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[45]
+	mi := &file_proto_core_core_proto_msgTypes[138]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4347,7 +13709,7 @@ func (x *ApplicationListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ApplicationListResp.ProtoReflect.Descriptor instead.
 func (*ApplicationListResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{45}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{138}
 }
 
 func (x *ApplicationListResp) GetBase() *common.RespBase {
@@ -4375,7 +13737,7 @@ type VersionListReq struct {
 
 func (x *VersionListReq) Reset() {
 	*x = VersionListReq{}
-	mi := &file_proto_core_core_proto_msgTypes[46]
+	mi := &file_proto_core_core_proto_msgTypes[139]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4387,7 +13749,7 @@ func (x *VersionListReq) String() string {
 func (*VersionListReq) ProtoMessage() {}
 
 func (x *VersionListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[46]
+	mi := &file_proto_core_core_proto_msgTypes[139]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4400,7 +13762,7 @@ func (x *VersionListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionListReq.ProtoReflect.Descriptor instead.
 func (*VersionListReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{46}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{139}
 }
 
 func (x *VersionListReq) GetPage() *common.PageReq {
@@ -4434,7 +13796,7 @@ type VersionListResp struct {
 
 func (x *VersionListResp) Reset() {
 	*x = VersionListResp{}
-	mi := &file_proto_core_core_proto_msgTypes[47]
+	mi := &file_proto_core_core_proto_msgTypes[140]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4446,7 +13808,7 @@ func (x *VersionListResp) String() string {
 func (*VersionListResp) ProtoMessage() {}
 
 func (x *VersionListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[47]
+	mi := &file_proto_core_core_proto_msgTypes[140]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4459,7 +13821,7 @@ func (x *VersionListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VersionListResp.ProtoReflect.Descriptor instead.
 func (*VersionListResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{47}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{140}
 }
 
 func (x *VersionListResp) GetBase() *common.RespBase {
@@ -4488,7 +13850,7 @@ type ChannelListReq struct {
 
 func (x *ChannelListReq) Reset() {
 	*x = ChannelListReq{}
-	mi := &file_proto_core_core_proto_msgTypes[48]
+	mi := &file_proto_core_core_proto_msgTypes[141]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4500,7 +13862,7 @@ func (x *ChannelListReq) String() string {
 func (*ChannelListReq) ProtoMessage() {}
 
 func (x *ChannelListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[48]
+	mi := &file_proto_core_core_proto_msgTypes[141]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4513,7 +13875,7 @@ func (x *ChannelListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelListReq.ProtoReflect.Descriptor instead.
 func (*ChannelListReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{48}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{141}
 }
 
 func (x *ChannelListReq) GetPage() *common.PageReq {
@@ -4554,7 +13916,7 @@ type ChannelListResp struct {
 
 func (x *ChannelListResp) Reset() {
 	*x = ChannelListResp{}
-	mi := &file_proto_core_core_proto_msgTypes[49]
+	mi := &file_proto_core_core_proto_msgTypes[142]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4566,7 +13928,7 @@ func (x *ChannelListResp) String() string {
 func (*ChannelListResp) ProtoMessage() {}
 
 func (x *ChannelListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[49]
+	mi := &file_proto_core_core_proto_msgTypes[142]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4579,7 +13941,7 @@ func (x *ChannelListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelListResp.ProtoReflect.Descriptor instead.
 func (*ChannelListResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{49}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{142}
 }
 
 func (x *ChannelListResp) GetBase() *common.RespBase {
@@ -4608,7 +13970,7 @@ type BuildTaskListReq struct {
 
 func (x *BuildTaskListReq) Reset() {
 	*x = BuildTaskListReq{}
-	mi := &file_proto_core_core_proto_msgTypes[50]
+	mi := &file_proto_core_core_proto_msgTypes[143]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4620,7 +13982,7 @@ func (x *BuildTaskListReq) String() string {
 func (*BuildTaskListReq) ProtoMessage() {}
 
 func (x *BuildTaskListReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[50]
+	mi := &file_proto_core_core_proto_msgTypes[143]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4633,7 +13995,7 @@ func (x *BuildTaskListReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildTaskListReq.ProtoReflect.Descriptor instead.
 func (*BuildTaskListReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{50}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{143}
 }
 
 func (x *BuildTaskListReq) GetPage() *common.PageReq {
@@ -4674,7 +14036,7 @@ type BuildTaskListResp struct {
 
 func (x *BuildTaskListResp) Reset() {
 	*x = BuildTaskListResp{}
-	mi := &file_proto_core_core_proto_msgTypes[51]
+	mi := &file_proto_core_core_proto_msgTypes[144]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4686,7 +14048,7 @@ func (x *BuildTaskListResp) String() string {
 func (*BuildTaskListResp) ProtoMessage() {}
 
 func (x *BuildTaskListResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[51]
+	mi := &file_proto_core_core_proto_msgTypes[144]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4699,7 +14061,7 @@ func (x *BuildTaskListResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildTaskListResp.ProtoReflect.Descriptor instead.
 func (*BuildTaskListResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{51}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{144}
 }
 
 func (x *BuildTaskListResp) GetBase() *common.RespBase {
@@ -4730,7 +14092,7 @@ type CreateApplicationReq struct {
 
 func (x *CreateApplicationReq) Reset() {
 	*x = CreateApplicationReq{}
-	mi := &file_proto_core_core_proto_msgTypes[52]
+	mi := &file_proto_core_core_proto_msgTypes[145]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4742,7 +14104,7 @@ func (x *CreateApplicationReq) String() string {
 func (*CreateApplicationReq) ProtoMessage() {}
 
 func (x *CreateApplicationReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[52]
+	mi := &file_proto_core_core_proto_msgTypes[145]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4755,7 +14117,7 @@ func (x *CreateApplicationReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateApplicationReq.ProtoReflect.Descriptor instead.
 func (*CreateApplicationReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{52}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{145}
 }
 
 func (x *CreateApplicationReq) GetAppCode() string {
@@ -4816,7 +14178,7 @@ type CreateVersionReq struct {
 
 func (x *CreateVersionReq) Reset() {
 	*x = CreateVersionReq{}
-	mi := &file_proto_core_core_proto_msgTypes[53]
+	mi := &file_proto_core_core_proto_msgTypes[146]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4828,7 +14190,7 @@ func (x *CreateVersionReq) String() string {
 func (*CreateVersionReq) ProtoMessage() {}
 
 func (x *CreateVersionReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[53]
+	mi := &file_proto_core_core_proto_msgTypes[146]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4841,7 +14203,7 @@ func (x *CreateVersionReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateVersionReq.ProtoReflect.Descriptor instead.
 func (*CreateVersionReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{53}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{146}
 }
 
 func (x *CreateVersionReq) GetAppId() int64 {
@@ -4913,7 +14275,7 @@ type CreateChannelReq struct {
 
 func (x *CreateChannelReq) Reset() {
 	*x = CreateChannelReq{}
-	mi := &file_proto_core_core_proto_msgTypes[54]
+	mi := &file_proto_core_core_proto_msgTypes[147]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4925,7 +14287,7 @@ func (x *CreateChannelReq) String() string {
 func (*CreateChannelReq) ProtoMessage() {}
 
 func (x *CreateChannelReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[54]
+	mi := &file_proto_core_core_proto_msgTypes[147]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4938,7 +14300,7 @@ func (x *CreateChannelReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateChannelReq.ProtoReflect.Descriptor instead.
 func (*CreateChannelReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{54}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{147}
 }
 
 func (x *CreateChannelReq) GetAppId() int64 {
@@ -4985,7 +14347,7 @@ type SigningConfigIdReq struct {
 
 func (x *SigningConfigIdReq) Reset() {
 	*x = SigningConfigIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[55]
+	mi := &file_proto_core_core_proto_msgTypes[148]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4997,7 +14359,7 @@ func (x *SigningConfigIdReq) String() string {
 func (*SigningConfigIdReq) ProtoMessage() {}
 
 func (x *SigningConfigIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[55]
+	mi := &file_proto_core_core_proto_msgTypes[148]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5010,7 +14372,7 @@ func (x *SigningConfigIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SigningConfigIdReq.ProtoReflect.Descriptor instead.
 func (*SigningConfigIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{55}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{148}
 }
 
 func (x *SigningConfigIdReq) GetId() int64 {
@@ -5037,7 +14399,7 @@ type CreateSigningConfigReq struct {
 
 func (x *CreateSigningConfigReq) Reset() {
 	*x = CreateSigningConfigReq{}
-	mi := &file_proto_core_core_proto_msgTypes[56]
+	mi := &file_proto_core_core_proto_msgTypes[149]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5049,7 +14411,7 @@ func (x *CreateSigningConfigReq) String() string {
 func (*CreateSigningConfigReq) ProtoMessage() {}
 
 func (x *CreateSigningConfigReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[56]
+	mi := &file_proto_core_core_proto_msgTypes[149]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5062,7 +14424,7 @@ func (x *CreateSigningConfigReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSigningConfigReq.ProtoReflect.Descriptor instead.
 func (*CreateSigningConfigReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{56}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{149}
 }
 
 func (x *CreateSigningConfigReq) GetAppId() int64 {
@@ -5143,7 +14505,7 @@ type CreateStorageObjectReq struct {
 
 func (x *CreateStorageObjectReq) Reset() {
 	*x = CreateStorageObjectReq{}
-	mi := &file_proto_core_core_proto_msgTypes[57]
+	mi := &file_proto_core_core_proto_msgTypes[150]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5155,7 +14517,7 @@ func (x *CreateStorageObjectReq) String() string {
 func (*CreateStorageObjectReq) ProtoMessage() {}
 
 func (x *CreateStorageObjectReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[57]
+	mi := &file_proto_core_core_proto_msgTypes[150]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5168,7 +14530,7 @@ func (x *CreateStorageObjectReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateStorageObjectReq.ProtoReflect.Descriptor instead.
 func (*CreateStorageObjectReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{57}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{150}
 }
 
 func (x *CreateStorageObjectReq) GetAppId() int64 {
@@ -5225,7 +14587,7 @@ type CompleteStorageObjectReq struct {
 
 func (x *CompleteStorageObjectReq) Reset() {
 	*x = CompleteStorageObjectReq{}
-	mi := &file_proto_core_core_proto_msgTypes[58]
+	mi := &file_proto_core_core_proto_msgTypes[151]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5237,7 +14599,7 @@ func (x *CompleteStorageObjectReq) String() string {
 func (*CompleteStorageObjectReq) ProtoMessage() {}
 
 func (x *CompleteStorageObjectReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[58]
+	mi := &file_proto_core_core_proto_msgTypes[151]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5250,7 +14612,7 @@ func (x *CompleteStorageObjectReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteStorageObjectReq.ProtoReflect.Descriptor instead.
 func (*CompleteStorageObjectReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{58}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{151}
 }
 
 func (x *CompleteStorageObjectReq) GetId() int64 {
@@ -5284,7 +14646,7 @@ type FailStorageObjectReq struct {
 
 func (x *FailStorageObjectReq) Reset() {
 	*x = FailStorageObjectReq{}
-	mi := &file_proto_core_core_proto_msgTypes[59]
+	mi := &file_proto_core_core_proto_msgTypes[152]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5296,7 +14658,7 @@ func (x *FailStorageObjectReq) String() string {
 func (*FailStorageObjectReq) ProtoMessage() {}
 
 func (x *FailStorageObjectReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[59]
+	mi := &file_proto_core_core_proto_msgTypes[152]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5309,7 +14671,7 @@ func (x *FailStorageObjectReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FailStorageObjectReq.ProtoReflect.Descriptor instead.
 func (*FailStorageObjectReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{59}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{152}
 }
 
 func (x *FailStorageObjectReq) GetId() int64 {
@@ -5330,7 +14692,7 @@ type ExpiredStorageObject struct {
 
 func (x *ExpiredStorageObject) Reset() {
 	*x = ExpiredStorageObject{}
-	mi := &file_proto_core_core_proto_msgTypes[60]
+	mi := &file_proto_core_core_proto_msgTypes[153]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5342,7 +14704,7 @@ func (x *ExpiredStorageObject) String() string {
 func (*ExpiredStorageObject) ProtoMessage() {}
 
 func (x *ExpiredStorageObject) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[60]
+	mi := &file_proto_core_core_proto_msgTypes[153]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5355,7 +14717,7 @@ func (x *ExpiredStorageObject) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExpiredStorageObject.ProtoReflect.Descriptor instead.
 func (*ExpiredStorageObject) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{60}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{153}
 }
 
 func (x *ExpiredStorageObject) GetId() int64 {
@@ -5383,7 +14745,7 @@ type ClaimExpiredStorageObjectsReq struct {
 
 func (x *ClaimExpiredStorageObjectsReq) Reset() {
 	*x = ClaimExpiredStorageObjectsReq{}
-	mi := &file_proto_core_core_proto_msgTypes[61]
+	mi := &file_proto_core_core_proto_msgTypes[154]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5395,7 +14757,7 @@ func (x *ClaimExpiredStorageObjectsReq) String() string {
 func (*ClaimExpiredStorageObjectsReq) ProtoMessage() {}
 
 func (x *ClaimExpiredStorageObjectsReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[61]
+	mi := &file_proto_core_core_proto_msgTypes[154]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5408,7 +14770,7 @@ func (x *ClaimExpiredStorageObjectsReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClaimExpiredStorageObjectsReq.ProtoReflect.Descriptor instead.
 func (*ClaimExpiredStorageObjectsReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{61}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{154}
 }
 
 func (x *ClaimExpiredStorageObjectsReq) GetStaleSeconds() int64 {
@@ -5436,7 +14798,7 @@ type ClaimExpiredStorageObjectsResp struct {
 
 func (x *ClaimExpiredStorageObjectsResp) Reset() {
 	*x = ClaimExpiredStorageObjectsResp{}
-	mi := &file_proto_core_core_proto_msgTypes[62]
+	mi := &file_proto_core_core_proto_msgTypes[155]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5448,7 +14810,7 @@ func (x *ClaimExpiredStorageObjectsResp) String() string {
 func (*ClaimExpiredStorageObjectsResp) ProtoMessage() {}
 
 func (x *ClaimExpiredStorageObjectsResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[62]
+	mi := &file_proto_core_core_proto_msgTypes[155]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5461,7 +14823,7 @@ func (x *ClaimExpiredStorageObjectsResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClaimExpiredStorageObjectsResp.ProtoReflect.Descriptor instead.
 func (*ClaimExpiredStorageObjectsResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{62}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{155}
 }
 
 func (x *ClaimExpiredStorageObjectsResp) GetBase() *common.RespBase {
@@ -5489,7 +14851,7 @@ type MarkStorageObjectDeletedReq struct {
 
 func (x *MarkStorageObjectDeletedReq) Reset() {
 	*x = MarkStorageObjectDeletedReq{}
-	mi := &file_proto_core_core_proto_msgTypes[63]
+	mi := &file_proto_core_core_proto_msgTypes[156]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5501,7 +14863,7 @@ func (x *MarkStorageObjectDeletedReq) String() string {
 func (*MarkStorageObjectDeletedReq) ProtoMessage() {}
 
 func (x *MarkStorageObjectDeletedReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[63]
+	mi := &file_proto_core_core_proto_msgTypes[156]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5514,7 +14876,7 @@ func (x *MarkStorageObjectDeletedReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MarkStorageObjectDeletedReq.ProtoReflect.Descriptor instead.
 func (*MarkStorageObjectDeletedReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{63}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{156}
 }
 
 func (x *MarkStorageObjectDeletedReq) GetId() int64 {
@@ -5541,7 +14903,7 @@ type StorageObjectIdReq struct {
 
 func (x *StorageObjectIdReq) Reset() {
 	*x = StorageObjectIdReq{}
-	mi := &file_proto_core_core_proto_msgTypes[64]
+	mi := &file_proto_core_core_proto_msgTypes[157]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5553,7 +14915,7 @@ func (x *StorageObjectIdReq) String() string {
 func (*StorageObjectIdReq) ProtoMessage() {}
 
 func (x *StorageObjectIdReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[64]
+	mi := &file_proto_core_core_proto_msgTypes[157]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5566,7 +14928,7 @@ func (x *StorageObjectIdReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StorageObjectIdReq.ProtoReflect.Descriptor instead.
 func (*StorageObjectIdReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{64}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{157}
 }
 
 func (x *StorageObjectIdReq) GetId() int64 {
@@ -5587,7 +14949,7 @@ type StorageObjectResp struct {
 
 func (x *StorageObjectResp) Reset() {
 	*x = StorageObjectResp{}
-	mi := &file_proto_core_core_proto_msgTypes[65]
+	mi := &file_proto_core_core_proto_msgTypes[158]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5599,7 +14961,7 @@ func (x *StorageObjectResp) String() string {
 func (*StorageObjectResp) ProtoMessage() {}
 
 func (x *StorageObjectResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[65]
+	mi := &file_proto_core_core_proto_msgTypes[158]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5612,7 +14974,7 @@ func (x *StorageObjectResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StorageObjectResp.ProtoReflect.Descriptor instead.
 func (*StorageObjectResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{65}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{158}
 }
 
 func (x *StorageObjectResp) GetBase() *common.RespBase {
@@ -5630,21 +14992,23 @@ func (x *StorageObjectResp) GetData() *StorageObject {
 }
 
 type CreateBuildTaskReq struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	AppId               int64                  `protobuf:"varint,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
-	VersionId           int64                  `protobuf:"varint,2,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
-	ChannelId           int64                  `protobuf:"varint,3,opt,name=channel_id,json=channelId,proto3" json:"channel_id,omitempty"`
-	SigningConfigId     int64                  `protobuf:"varint,4,opt,name=signing_config_id,json=signingConfigId,proto3" json:"signing_config_id,omitempty"`
-	Priority            int32                  `protobuf:"varint,5,opt,name=priority,proto3" json:"priority,omitempty"`
-	BrandingProfileId   int64                  `protobuf:"varint,6,opt,name=branding_profile_id,json=brandingProfileId,proto3" json:"branding_profile_id,omitempty"`         // 可选品牌配置ID，0表示沿用V1构建
-	WhiteLabelProductId int64                  `protobuf:"varint,7,opt,name=white_label_product_id,json=whiteLabelProductId,proto3" json:"white_label_product_id,omitempty"` // 可选V3白标产品ID，提供后由产品覆盖品牌和签名配置
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	AppId                int64                  `protobuf:"varint,1,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	VersionId            int64                  `protobuf:"varint,2,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
+	ChannelId            int64                  `protobuf:"varint,3,opt,name=channel_id,json=channelId,proto3" json:"channel_id,omitempty"`
+	SigningConfigId      int64                  `protobuf:"varint,4,opt,name=signing_config_id,json=signingConfigId,proto3" json:"signing_config_id,omitempty"`
+	Priority             int32                  `protobuf:"varint,5,opt,name=priority,proto3" json:"priority,omitempty"`
+	BrandingProfileId    int64                  `protobuf:"varint,6,opt,name=branding_profile_id,json=brandingProfileId,proto3" json:"branding_profile_id,omitempty"`            // 可选品牌配置ID，0表示沿用V1构建
+	WhiteLabelProductId  int64                  `protobuf:"varint,7,opt,name=white_label_product_id,json=whiteLabelProductId,proto3" json:"white_label_product_id,omitempty"`    // 可选V3白标产品ID，提供后由产品覆盖品牌和签名配置
+	PoolCode             string                 `protobuf:"bytes,8,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                          // V4目标构建池编码，空值使用default
+	SourceWebhookEventId int64                  `protobuf:"varint,9,opt,name=source_webhook_event_id,json=sourceWebhookEventId,proto3" json:"source_webhook_event_id,omitempty"` // V5内部源码Webhook事件ID，普通调用必须为0
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *CreateBuildTaskReq) Reset() {
 	*x = CreateBuildTaskReq{}
-	mi := &file_proto_core_core_proto_msgTypes[66]
+	mi := &file_proto_core_core_proto_msgTypes[159]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5656,7 +15020,7 @@ func (x *CreateBuildTaskReq) String() string {
 func (*CreateBuildTaskReq) ProtoMessage() {}
 
 func (x *CreateBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[66]
+	mi := &file_proto_core_core_proto_msgTypes[159]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5669,7 +15033,7 @@ func (x *CreateBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*CreateBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{66}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{159}
 }
 
 func (x *CreateBuildTaskReq) GetAppId() int64 {
@@ -5721,6 +15085,1238 @@ func (x *CreateBuildTaskReq) GetWhiteLabelProductId() int64 {
 	return 0
 }
 
+func (x *CreateBuildTaskReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *CreateBuildTaskReq) GetSourceWebhookEventId() int64 {
+	if x != nil {
+		return x.SourceWebhookEventId
+	}
+	return 0
+}
+
+// V4 Builder节点主键请求。
+type BuilderNodeIdReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // Builder节点ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuilderNodeIdReq) Reset() {
+	*x = BuilderNodeIdReq{}
+	mi := &file_proto_core_core_proto_msgTypes[160]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuilderNodeIdReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuilderNodeIdReq) ProtoMessage() {}
+
+func (x *BuilderNodeIdReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[160]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuilderNodeIdReq.ProtoReflect.Descriptor instead.
+func (*BuilderNodeIdReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{160}
+}
+
+func (x *BuilderNodeIdReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// V4 注册或刷新Builder节点请求。
+type RegisterBuilderNodeReq struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	NodeCode             string                 `protobuf:"bytes,1,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                         // 节点唯一编码
+	PoolCode             string                 `protobuf:"bytes,2,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                         // 所属构建池编码
+	Endpoint             string                 `protobuf:"bytes,3,opt,name=endpoint,proto3" json:"endpoint,omitempty"`                                                         // 节点管理端点或实例标识
+	MaxConcurrency       int32                  `protobuf:"varint,4,opt,name=max_concurrency,json=maxConcurrency,proto3" json:"max_concurrency,omitempty"`                      // 节点最大并发执行数
+	CpuCapacity          int32                  `protobuf:"varint,5,opt,name=cpu_capacity,json=cpuCapacity,proto3" json:"cpu_capacity,omitempty"`                               // CPU容量，单位毫核
+	MemoryCapacity       int64                  `protobuf:"varint,6,opt,name=memory_capacity,json=memoryCapacity,proto3" json:"memory_capacity,omitempty"`                      // 内存容量，单位字节
+	DiskCapacity         int64                  `protobuf:"varint,7,opt,name=disk_capacity,json=diskCapacity,proto3" json:"disk_capacity,omitempty"`                            // 构建磁盘总容量，单位字节
+	DiskFree             int64                  `protobuf:"varint,8,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                                        // 构建磁盘剩余容量，单位字节
+	ToolchainVersion     string                 `protobuf:"bytes,9,opt,name=toolchain_version,json=toolchainVersion,proto3" json:"toolchain_version,omitempty"`                 // APK构建工具链版本
+	BuildProtocolVersion int32                  `protobuf:"varint,10,opt,name=build_protocol_version,json=buildProtocolVersion,proto3" json:"build_protocol_version,omitempty"` // 构建协议版本
+	CapabilityJson       string                 `protobuf:"bytes,11,opt,name=capability_json,json=capabilityJson,proto3" json:"capability_json,omitempty"`                      // 节点能力白名单JSON
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *RegisterBuilderNodeReq) Reset() {
+	*x = RegisterBuilderNodeReq{}
+	mi := &file_proto_core_core_proto_msgTypes[161]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterBuilderNodeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterBuilderNodeReq) ProtoMessage() {}
+
+func (x *RegisterBuilderNodeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[161]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterBuilderNodeReq.ProtoReflect.Descriptor instead.
+func (*RegisterBuilderNodeReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{161}
+}
+
+func (x *RegisterBuilderNodeReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *RegisterBuilderNodeReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *RegisterBuilderNodeReq) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *RegisterBuilderNodeReq) GetMaxConcurrency() int32 {
+	if x != nil {
+		return x.MaxConcurrency
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetCpuCapacity() int32 {
+	if x != nil {
+		return x.CpuCapacity
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetMemoryCapacity() int64 {
+	if x != nil {
+		return x.MemoryCapacity
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetDiskCapacity() int64 {
+	if x != nil {
+		return x.DiskCapacity
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetDiskFree() int64 {
+	if x != nil {
+		return x.DiskFree
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetToolchainVersion() string {
+	if x != nil {
+		return x.ToolchainVersion
+	}
+	return ""
+}
+
+func (x *RegisterBuilderNodeReq) GetBuildProtocolVersion() int32 {
+	if x != nil {
+		return x.BuildProtocolVersion
+	}
+	return 0
+}
+
+func (x *RegisterBuilderNodeReq) GetCapabilityJson() string {
+	if x != nil {
+		return x.CapabilityJson
+	}
+	return ""
+}
+
+// V4 Builder节点心跳请求。
+type BuilderNodeHeartbeatReq struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	NodeCode         string                 `protobuf:"bytes,1,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                             // 节点唯一编码
+	RunningCount     int32                  `protobuf:"varint,2,opt,name=running_count,json=runningCount,proto3" json:"running_count,omitempty"`                // 当前执行任务数
+	DiskFree         int64                  `protobuf:"varint,3,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                            // 构建磁盘剩余容量，单位字节
+	RunningTaskIds   []int64                `protobuf:"varint,4,rep,packed,name=running_task_ids,json=runningTaskIds,proto3" json:"running_task_ids,omitempty"` // 当前执行任务ID列表
+	LastErrorMessage string                 `protobuf:"bytes,5,opt,name=last_error_message,json=lastErrorMessage,proto3" json:"last_error_message,omitempty"`   // 最近错误摘要，空值表示本次无错误
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *BuilderNodeHeartbeatReq) Reset() {
+	*x = BuilderNodeHeartbeatReq{}
+	mi := &file_proto_core_core_proto_msgTypes[162]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuilderNodeHeartbeatReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuilderNodeHeartbeatReq) ProtoMessage() {}
+
+func (x *BuilderNodeHeartbeatReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[162]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuilderNodeHeartbeatReq.ProtoReflect.Descriptor instead.
+func (*BuilderNodeHeartbeatReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{162}
+}
+
+func (x *BuilderNodeHeartbeatReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *BuilderNodeHeartbeatReq) GetRunningCount() int32 {
+	if x != nil {
+		return x.RunningCount
+	}
+	return 0
+}
+
+func (x *BuilderNodeHeartbeatReq) GetDiskFree() int64 {
+	if x != nil {
+		return x.DiskFree
+	}
+	return 0
+}
+
+func (x *BuilderNodeHeartbeatReq) GetRunningTaskIds() []int64 {
+	if x != nil {
+		return x.RunningTaskIds
+	}
+	return nil
+}
+
+func (x *BuilderNodeHeartbeatReq) GetLastErrorMessage() string {
+	if x != nil {
+		return x.LastErrorMessage
+	}
+	return ""
+}
+
+// V4 修改Builder节点排空状态请求。
+type DrainBuilderNodeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                   // Builder节点ID，管理端调用时使用
+	NodeCode      string                 `protobuf:"bytes,2,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                        // Builder节点编码，内部协议调用时使用
+	DrainStatus   BuilderDrainStatus     `protobuf:"varint,3,opt,name=drain_status,json=drainStatus,proto3,enum=core.BuilderDrainStatus" json:"drain_status,omitempty"` // 目标排空状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DrainBuilderNodeReq) Reset() {
+	*x = DrainBuilderNodeReq{}
+	mi := &file_proto_core_core_proto_msgTypes[163]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DrainBuilderNodeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DrainBuilderNodeReq) ProtoMessage() {}
+
+func (x *DrainBuilderNodeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[163]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DrainBuilderNodeReq.ProtoReflect.Descriptor instead.
+func (*DrainBuilderNodeReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{163}
+}
+
+func (x *DrainBuilderNodeReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *DrainBuilderNodeReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *DrainBuilderNodeReq) GetDrainStatus() BuilderDrainStatus {
+	if x != nil {
+		return x.DrainStatus
+	}
+	return BuilderDrainStatus_BUILDER_DRAIN_STATUS_UNKNOWN
+}
+
+// V4 人工确认恢复已隔离Builder节点请求。
+type RecoverBuilderNodeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`        // Builder节点ID
+	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"` // 人工恢复原因，写入结构化调度事件
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RecoverBuilderNodeReq) Reset() {
+	*x = RecoverBuilderNodeReq{}
+	mi := &file_proto_core_core_proto_msgTypes[164]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecoverBuilderNodeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecoverBuilderNodeReq) ProtoMessage() {}
+
+func (x *RecoverBuilderNodeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[164]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecoverBuilderNodeReq.ProtoReflect.Descriptor instead.
+func (*RecoverBuilderNodeReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{164}
+}
+
+func (x *RecoverBuilderNodeReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *RecoverBuilderNodeReq) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+// V4 原子领取调度任务请求。
+type ClaimScheduledBuildTaskReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NodeCode      string                 `protobuf:"bytes,1,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`              // 已注册Builder节点编码
+	LeaseSeconds  int32                  `protobuf:"varint,2,opt,name=lease_seconds,json=leaseSeconds,proto3" json:"lease_seconds,omitempty"` // 任务和槽位租约秒数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClaimScheduledBuildTaskReq) Reset() {
+	*x = ClaimScheduledBuildTaskReq{}
+	mi := &file_proto_core_core_proto_msgTypes[165]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClaimScheduledBuildTaskReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClaimScheduledBuildTaskReq) ProtoMessage() {}
+
+func (x *ClaimScheduledBuildTaskReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[165]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClaimScheduledBuildTaskReq.ProtoReflect.Descriptor instead.
+func (*ClaimScheduledBuildTaskReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{165}
+}
+
+func (x *ClaimScheduledBuildTaskReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *ClaimScheduledBuildTaskReq) GetLeaseSeconds() int32 {
+	if x != nil {
+		return x.LeaseSeconds
+	}
+	return 0
+}
+
+// V4 取消构建任务请求。
+type CancelBuildTaskReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`        // 构建任务ID
+	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"` // 取消原因
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CancelBuildTaskReq) Reset() {
+	*x = CancelBuildTaskReq{}
+	mi := &file_proto_core_core_proto_msgTypes[166]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancelBuildTaskReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancelBuildTaskReq) ProtoMessage() {}
+
+func (x *CancelBuildTaskReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[166]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancelBuildTaskReq.ProtoReflect.Descriptor instead.
+func (*CancelBuildTaskReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{166}
+}
+
+func (x *CancelBuildTaskReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *CancelBuildTaskReq) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+// V4 重试构建任务请求。
+type RetryBuildTaskReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`             // 来源构建任务ID
+	Priority      int32                  `protobuf:"varint,2,opt,name=priority,proto3" json:"priority,omitempty"` // 新任务优先级，0表示沿用
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RetryBuildTaskReq) Reset() {
+	*x = RetryBuildTaskReq{}
+	mi := &file_proto_core_core_proto_msgTypes[167]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RetryBuildTaskReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RetryBuildTaskReq) ProtoMessage() {}
+
+func (x *RetryBuildTaskReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[167]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RetryBuildTaskReq.ProtoReflect.Descriptor instead.
+func (*RetryBuildTaskReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{167}
+}
+
+func (x *RetryBuildTaskReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *RetryBuildTaskReq) GetPriority() int32 {
+	if x != nil {
+		return x.Priority
+	}
+	return 0
+}
+
+// V4 创建或更新构建并发策略请求。
+type UpsertBuildConcurrencyPolicyReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                               // 策略ID，0表示按作用域创建
+	TenantId       int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                   // 租户ID，0表示全局作用域
+	AppId          int64                  `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                            // 应用ID，0表示非应用作用域
+	PoolCode       string                 `protobuf:"bytes,4,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                    // 构建池编码
+	MaxConcurrency int32                  `protobuf:"varint,5,opt,name=max_concurrency,json=maxConcurrency,proto3" json:"max_concurrency,omitempty"` // 作用域最大并发数
+	FairWeight     int32                  `protobuf:"varint,6,opt,name=fair_weight,json=fairWeight,proto3" json:"fair_weight,omitempty"`             // 租户公平调度权重
+	MaxPriority    int32                  `protobuf:"varint,7,opt,name=max_priority,json=maxPriority,proto3" json:"max_priority,omitempty"`          // 允许提交的最高普通优先级
+	Status         BuildPolicyStatus      `protobuf:"varint,8,opt,name=status,proto3,enum=core.BuildPolicyStatus" json:"status,omitempty"`           // 策略状态
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *UpsertBuildConcurrencyPolicyReq) Reset() {
+	*x = UpsertBuildConcurrencyPolicyReq{}
+	mi := &file_proto_core_core_proto_msgTypes[168]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpsertBuildConcurrencyPolicyReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpsertBuildConcurrencyPolicyReq) ProtoMessage() {}
+
+func (x *UpsertBuildConcurrencyPolicyReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[168]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpsertBuildConcurrencyPolicyReq.ProtoReflect.Descriptor instead.
+func (*UpsertBuildConcurrencyPolicyReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{168}
+}
+
+func (x *UpsertBuildConcurrencyPolicyReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpsertBuildConcurrencyPolicyReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *UpsertBuildConcurrencyPolicyReq) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *UpsertBuildConcurrencyPolicyReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *UpsertBuildConcurrencyPolicyReq) GetMaxConcurrency() int32 {
+	if x != nil {
+		return x.MaxConcurrency
+	}
+	return 0
+}
+
+func (x *UpsertBuildConcurrencyPolicyReq) GetFairWeight() int32 {
+	if x != nil {
+		return x.FairWeight
+	}
+	return 0
+}
+
+func (x *UpsertBuildConcurrencyPolicyReq) GetMaxPriority() int32 {
+	if x != nil {
+		return x.MaxPriority
+	}
+	return 0
+}
+
+func (x *UpsertBuildConcurrencyPolicyReq) GetStatus() BuildPolicyStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BuildPolicyStatus_BUILD_POLICY_STATUS_UNKNOWN
+}
+
+// V4 构建缓存主键请求。
+type BuildCacheEntryIdReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 构建缓存条目ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildCacheEntryIdReq) Reset() {
+	*x = BuildCacheEntryIdReq{}
+	mi := &file_proto_core_core_proto_msgTypes[169]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheEntryIdReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheEntryIdReq) ProtoMessage() {}
+
+func (x *BuildCacheEntryIdReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[169]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheEntryIdReq.ProtoReflect.Descriptor instead.
+func (*BuildCacheEntryIdReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{169}
+}
+
+func (x *BuildCacheEntryIdReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// V4 解析构建缓存请求。
+type ResolveBuildCacheReq struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	TaskId               int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                                             // 当前构建任务ID
+	NodeCode             string                 `protobuf:"bytes,2,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                        // 当前Builder节点编码
+	BuilderAttempt       int32                  `protobuf:"varint,3,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"`                     // 当前任务领取代次
+	ToolchainVersion     string                 `protobuf:"bytes,4,opt,name=toolchain_version,json=toolchainVersion,proto3" json:"toolchain_version,omitempty"`                // 当前节点工具链版本
+	BuildProtocolVersion int32                  `protobuf:"varint,5,opt,name=build_protocol_version,json=buildProtocolVersion,proto3" json:"build_protocol_version,omitempty"` // 当前节点构建协议版本
+	ConfirmHit           bool                   `protobuf:"varint,6,opt,name=confirm_hit,json=confirmHit,proto3" json:"confirm_hit,omitempty"`                                 // Worker完成对象字节校验后确认命中；false仅解析候选缓存
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *ResolveBuildCacheReq) Reset() {
+	*x = ResolveBuildCacheReq{}
+	mi := &file_proto_core_core_proto_msgTypes[170]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResolveBuildCacheReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResolveBuildCacheReq) ProtoMessage() {}
+
+func (x *ResolveBuildCacheReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[170]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResolveBuildCacheReq.ProtoReflect.Descriptor instead.
+func (*ResolveBuildCacheReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{170}
+}
+
+func (x *ResolveBuildCacheReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *ResolveBuildCacheReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *ResolveBuildCacheReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+func (x *ResolveBuildCacheReq) GetToolchainVersion() string {
+	if x != nil {
+		return x.ToolchainVersion
+	}
+	return ""
+}
+
+func (x *ResolveBuildCacheReq) GetBuildProtocolVersion() int32 {
+	if x != nil {
+		return x.BuildProtocolVersion
+	}
+	return 0
+}
+
+func (x *ResolveBuildCacheReq) GetConfirmHit() bool {
+	if x != nil {
+		return x.ConfirmHit
+	}
+	return false
+}
+
+// V4 构建缓存解析结果。
+type BuildCacheResolution struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Hit           bool                   `protobuf:"varint,1,opt,name=hit,proto3" json:"hit,omitempty"`          // 是否命中有效缓存
+	Entry         *BuildCacheEntry       `protobuf:"bytes,2,opt,name=entry,proto3" json:"entry,omitempty"`       // 命中的缓存条目
+	Artifact      *StorageObject         `protobuf:"bytes,3,opt,name=artifact,proto3" json:"artifact,omitempty"` // 待校验缓存产物对象
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildCacheResolution) Reset() {
+	*x = BuildCacheResolution{}
+	mi := &file_proto_core_core_proto_msgTypes[171]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheResolution) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheResolution) ProtoMessage() {}
+
+func (x *BuildCacheResolution) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[171]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheResolution.ProtoReflect.Descriptor instead.
+func (*BuildCacheResolution) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{171}
+}
+
+func (x *BuildCacheResolution) GetHit() bool {
+	if x != nil {
+		return x.Hit
+	}
+	return false
+}
+
+func (x *BuildCacheResolution) GetEntry() *BuildCacheEntry {
+	if x != nil {
+		return x.Entry
+	}
+	return nil
+}
+
+func (x *BuildCacheResolution) GetArtifact() *StorageObject {
+	if x != nil {
+		return x.Artifact
+	}
+	return nil
+}
+
+// V4 构建缓存解析响应。
+type BuildCacheResolutionResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *BuildCacheResolution  `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 缓存解析结果
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BuildCacheResolutionResp) Reset() {
+	*x = BuildCacheResolutionResp{}
+	mi := &file_proto_core_core_proto_msgTypes[172]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BuildCacheResolutionResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildCacheResolutionResp) ProtoMessage() {}
+
+func (x *BuildCacheResolutionResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[172]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildCacheResolutionResp.ProtoReflect.Descriptor instead.
+func (*BuildCacheResolutionResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{172}
+}
+
+func (x *BuildCacheResolutionResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BuildCacheResolutionResp) GetData() *BuildCacheResolution {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V4 发布构建缓存请求。
+type PublishBuildCacheReq struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	TaskId               int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                                             // 已成功构建任务ID
+	NodeCode             string                 `protobuf:"bytes,2,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"`                                        // 发布缓存的Builder节点编码
+	BuilderAttempt       int32                  `protobuf:"varint,3,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"`                     // 构建任务领取代次
+	ToolchainVersion     string                 `protobuf:"bytes,4,opt,name=toolchain_version,json=toolchainVersion,proto3" json:"toolchain_version,omitempty"`                // 构建工具链版本
+	BuildProtocolVersion int32                  `protobuf:"varint,5,opt,name=build_protocol_version,json=buildProtocolVersion,proto3" json:"build_protocol_version,omitempty"` // 构建协议版本
+	ArtifactObjectId     int64                  `protobuf:"varint,6,opt,name=artifact_object_id,json=artifactObjectId,proto3" json:"artifact_object_id,omitempty"`             // 独立缓存产物对象ID
+	ArtifactSha256       string                 `protobuf:"bytes,7,opt,name=artifact_sha256,json=artifactSha256,proto3" json:"artifact_sha256,omitempty"`                      // 缓存产物SHA-256
+	SizeBytes            int64                  `protobuf:"varint,8,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`                                    // 缓存产物大小，单位字节
+	TtlSeconds           int64                  `protobuf:"varint,9,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`                                 // 缓存TTL秒数
+	ArtifactObjectKey    string                 `protobuf:"bytes,10,opt,name=artifact_object_key,json=artifactObjectKey,proto3" json:"artifact_object_key,omitempty"`          // 缓存中间APK私有对象Key，artifact_object_id为0时由Core登记
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *PublishBuildCacheReq) Reset() {
+	*x = PublishBuildCacheReq{}
+	mi := &file_proto_core_core_proto_msgTypes[173]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublishBuildCacheReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublishBuildCacheReq) ProtoMessage() {}
+
+func (x *PublishBuildCacheReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[173]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublishBuildCacheReq.ProtoReflect.Descriptor instead.
+func (*PublishBuildCacheReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{173}
+}
+
+func (x *PublishBuildCacheReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *PublishBuildCacheReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetToolchainVersion() string {
+	if x != nil {
+		return x.ToolchainVersion
+	}
+	return ""
+}
+
+func (x *PublishBuildCacheReq) GetBuildProtocolVersion() int32 {
+	if x != nil {
+		return x.BuildProtocolVersion
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetArtifactObjectId() int64 {
+	if x != nil {
+		return x.ArtifactObjectId
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetArtifactSha256() string {
+	if x != nil {
+		return x.ArtifactSha256
+	}
+	return ""
+}
+
+func (x *PublishBuildCacheReq) GetSizeBytes() int64 {
+	if x != nil {
+		return x.SizeBytes
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetTtlSeconds() int64 {
+	if x != nil {
+		return x.TtlSeconds
+	}
+	return 0
+}
+
+func (x *PublishBuildCacheReq) GetArtifactObjectKey() string {
+	if x != nil {
+		return x.ArtifactObjectKey
+	}
+	return ""
+}
+
+// V4 失效构建缓存请求。
+type InvalidateBuildCacheReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                            // 构建缓存条目ID
+	TaskId        int64                  `protobuf:"varint,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`      // 发现损坏的构建任务ID，管理端操作允许为0
+	NodeCode      string                 `protobuf:"bytes,3,opt,name=node_code,json=nodeCode,proto3" json:"node_code,omitempty"` // 发现损坏的Builder节点编码
+	Reason        string                 `protobuf:"bytes,4,opt,name=reason,proto3" json:"reason,omitempty"`                     // 失效原因
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvalidateBuildCacheReq) Reset() {
+	*x = InvalidateBuildCacheReq{}
+	mi := &file_proto_core_core_proto_msgTypes[174]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvalidateBuildCacheReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvalidateBuildCacheReq) ProtoMessage() {}
+
+func (x *InvalidateBuildCacheReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[174]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvalidateBuildCacheReq.ProtoReflect.Descriptor instead.
+func (*InvalidateBuildCacheReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{174}
+}
+
+func (x *InvalidateBuildCacheReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *InvalidateBuildCacheReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *InvalidateBuildCacheReq) GetNodeCode() string {
+	if x != nil {
+		return x.NodeCode
+	}
+	return ""
+}
+
+func (x *InvalidateBuildCacheReq) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+// V4 清理构建缓存请求。
+type CleanupBuildCacheReq struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Limit           int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`                                              // 单次最多清理条目数
+	TargetFreeBytes int64                  `protobuf:"varint,2,opt,name=target_free_bytes,json=targetFreeBytes,proto3" json:"target_free_bytes,omitempty"` // 目标释放字节数，0表示仅TTL清理
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *CleanupBuildCacheReq) Reset() {
+	*x = CleanupBuildCacheReq{}
+	mi := &file_proto_core_core_proto_msgTypes[175]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CleanupBuildCacheReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CleanupBuildCacheReq) ProtoMessage() {}
+
+func (x *CleanupBuildCacheReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[175]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CleanupBuildCacheReq.ProtoReflect.Descriptor instead.
+func (*CleanupBuildCacheReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{175}
+}
+
+func (x *CleanupBuildCacheReq) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *CleanupBuildCacheReq) GetTargetFreeBytes() int64 {
+	if x != nil {
+		return x.TargetFreeBytes
+	}
+	return 0
+}
+
+// V4 构建缓存清理结果。
+type CleanupBuildCacheResult struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	InvalidatedCount int32                  `protobuf:"varint,1,opt,name=invalidated_count,json=invalidatedCount,proto3" json:"invalidated_count,omitempty"` // 失效条目数
+	ReclaimableBytes int64                  `protobuf:"varint,2,opt,name=reclaimable_bytes,json=reclaimableBytes,proto3" json:"reclaimable_bytes,omitempty"` // 可回收对象字节数
+	ObjectIds        []int64                `protobuf:"varint,3,rep,packed,name=object_ids,json=objectIds,proto3" json:"object_ids,omitempty"`               // 可物理删除且未被任务引用的对象ID
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *CleanupBuildCacheResult) Reset() {
+	*x = CleanupBuildCacheResult{}
+	mi := &file_proto_core_core_proto_msgTypes[176]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CleanupBuildCacheResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CleanupBuildCacheResult) ProtoMessage() {}
+
+func (x *CleanupBuildCacheResult) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[176]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CleanupBuildCacheResult.ProtoReflect.Descriptor instead.
+func (*CleanupBuildCacheResult) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{176}
+}
+
+func (x *CleanupBuildCacheResult) GetInvalidatedCount() int32 {
+	if x != nil {
+		return x.InvalidatedCount
+	}
+	return 0
+}
+
+func (x *CleanupBuildCacheResult) GetReclaimableBytes() int64 {
+	if x != nil {
+		return x.ReclaimableBytes
+	}
+	return 0
+}
+
+func (x *CleanupBuildCacheResult) GetObjectIds() []int64 {
+	if x != nil {
+		return x.ObjectIds
+	}
+	return nil
+}
+
+// V4 构建缓存清理响应。
+type CleanupBuildCacheResp struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Base          *common.RespBase         `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *CleanupBuildCacheResult `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 清理结果
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CleanupBuildCacheResp) Reset() {
+	*x = CleanupBuildCacheResp{}
+	mi := &file_proto_core_core_proto_msgTypes[177]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CleanupBuildCacheResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CleanupBuildCacheResp) ProtoMessage() {}
+
+func (x *CleanupBuildCacheResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[177]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CleanupBuildCacheResp.ProtoReflect.Descriptor instead.
+func (*CleanupBuildCacheResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{177}
+}
+
+func (x *CleanupBuildCacheResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CleanupBuildCacheResp) GetData() *CleanupBuildCacheResult {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 // 创建V3白标模板请求。
 type CreateWhiteLabelTemplateReq struct {
 	state                  protoimpl.MessageState `protogen:"open.v1"`
@@ -5736,7 +16332,7 @@ type CreateWhiteLabelTemplateReq struct {
 
 func (x *CreateWhiteLabelTemplateReq) Reset() {
 	*x = CreateWhiteLabelTemplateReq{}
-	mi := &file_proto_core_core_proto_msgTypes[67]
+	mi := &file_proto_core_core_proto_msgTypes[178]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5748,7 +16344,7 @@ func (x *CreateWhiteLabelTemplateReq) String() string {
 func (*CreateWhiteLabelTemplateReq) ProtoMessage() {}
 
 func (x *CreateWhiteLabelTemplateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[67]
+	mi := &file_proto_core_core_proto_msgTypes[178]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5761,7 +16357,7 @@ func (x *CreateWhiteLabelTemplateReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateWhiteLabelTemplateReq.ProtoReflect.Descriptor instead.
 func (*CreateWhiteLabelTemplateReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{67}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{178}
 }
 
 func (x *CreateWhiteLabelTemplateReq) GetAppId() int64 {
@@ -5820,7 +16416,7 @@ type UpdateWhiteLabelTemplateReq struct {
 
 func (x *UpdateWhiteLabelTemplateReq) Reset() {
 	*x = UpdateWhiteLabelTemplateReq{}
-	mi := &file_proto_core_core_proto_msgTypes[68]
+	mi := &file_proto_core_core_proto_msgTypes[179]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5832,7 +16428,7 @@ func (x *UpdateWhiteLabelTemplateReq) String() string {
 func (*UpdateWhiteLabelTemplateReq) ProtoMessage() {}
 
 func (x *UpdateWhiteLabelTemplateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[68]
+	mi := &file_proto_core_core_proto_msgTypes[179]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5845,7 +16441,7 @@ func (x *UpdateWhiteLabelTemplateReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateWhiteLabelTemplateReq.ProtoReflect.Descriptor instead.
 func (*UpdateWhiteLabelTemplateReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{68}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{179}
 }
 
 func (x *UpdateWhiteLabelTemplateReq) GetId() int64 {
@@ -5896,7 +16492,7 @@ type CopyWhiteLabelTemplateReq struct {
 
 func (x *CopyWhiteLabelTemplateReq) Reset() {
 	*x = CopyWhiteLabelTemplateReq{}
-	mi := &file_proto_core_core_proto_msgTypes[69]
+	mi := &file_proto_core_core_proto_msgTypes[180]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5908,7 +16504,7 @@ func (x *CopyWhiteLabelTemplateReq) String() string {
 func (*CopyWhiteLabelTemplateReq) ProtoMessage() {}
 
 func (x *CopyWhiteLabelTemplateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[69]
+	mi := &file_proto_core_core_proto_msgTypes[180]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5921,7 +16517,7 @@ func (x *CopyWhiteLabelTemplateReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CopyWhiteLabelTemplateReq.ProtoReflect.Descriptor instead.
 func (*CopyWhiteLabelTemplateReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{69}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{180}
 }
 
 func (x *CopyWhiteLabelTemplateReq) GetId() int64 {
@@ -5967,7 +16563,7 @@ type CreateWhiteLabelTemplateRevisionReq struct {
 
 func (x *CreateWhiteLabelTemplateRevisionReq) Reset() {
 	*x = CreateWhiteLabelTemplateRevisionReq{}
-	mi := &file_proto_core_core_proto_msgTypes[70]
+	mi := &file_proto_core_core_proto_msgTypes[181]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5979,7 +16575,7 @@ func (x *CreateWhiteLabelTemplateRevisionReq) String() string {
 func (*CreateWhiteLabelTemplateRevisionReq) ProtoMessage() {}
 
 func (x *CreateWhiteLabelTemplateRevisionReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[70]
+	mi := &file_proto_core_core_proto_msgTypes[181]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5992,7 +16588,7 @@ func (x *CreateWhiteLabelTemplateRevisionReq) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use CreateWhiteLabelTemplateRevisionReq.ProtoReflect.Descriptor instead.
 func (*CreateWhiteLabelTemplateRevisionReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{70}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{181}
 }
 
 func (x *CreateWhiteLabelTemplateRevisionReq) GetTemplateId() int64 {
@@ -6053,7 +16649,7 @@ type UpdateWhiteLabelTemplateRevisionReq struct {
 
 func (x *UpdateWhiteLabelTemplateRevisionReq) Reset() {
 	*x = UpdateWhiteLabelTemplateRevisionReq{}
-	mi := &file_proto_core_core_proto_msgTypes[71]
+	mi := &file_proto_core_core_proto_msgTypes[182]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6065,7 +16661,7 @@ func (x *UpdateWhiteLabelTemplateRevisionReq) String() string {
 func (*UpdateWhiteLabelTemplateRevisionReq) ProtoMessage() {}
 
 func (x *UpdateWhiteLabelTemplateRevisionReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[71]
+	mi := &file_proto_core_core_proto_msgTypes[182]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6078,7 +16674,7 @@ func (x *UpdateWhiteLabelTemplateRevisionReq) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use UpdateWhiteLabelTemplateRevisionReq.ProtoReflect.Descriptor instead.
 func (*UpdateWhiteLabelTemplateRevisionReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{71}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{182}
 }
 
 func (x *UpdateWhiteLabelTemplateRevisionReq) GetTemplateId() int64 {
@@ -6141,7 +16737,7 @@ type PublishWhiteLabelTemplateReq struct {
 
 func (x *PublishWhiteLabelTemplateReq) Reset() {
 	*x = PublishWhiteLabelTemplateReq{}
-	mi := &file_proto_core_core_proto_msgTypes[72]
+	mi := &file_proto_core_core_proto_msgTypes[183]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6153,7 +16749,7 @@ func (x *PublishWhiteLabelTemplateReq) String() string {
 func (*PublishWhiteLabelTemplateReq) ProtoMessage() {}
 
 func (x *PublishWhiteLabelTemplateReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[72]
+	mi := &file_proto_core_core_proto_msgTypes[183]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6166,7 +16762,7 @@ func (x *PublishWhiteLabelTemplateReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PublishWhiteLabelTemplateReq.ProtoReflect.Descriptor instead.
 func (*PublishWhiteLabelTemplateReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{72}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{183}
 }
 
 func (x *PublishWhiteLabelTemplateReq) GetId() int64 {
@@ -6201,7 +16797,7 @@ type CreateWhiteLabelProductReq struct {
 
 func (x *CreateWhiteLabelProductReq) Reset() {
 	*x = CreateWhiteLabelProductReq{}
-	mi := &file_proto_core_core_proto_msgTypes[73]
+	mi := &file_proto_core_core_proto_msgTypes[184]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6213,7 +16809,7 @@ func (x *CreateWhiteLabelProductReq) String() string {
 func (*CreateWhiteLabelProductReq) ProtoMessage() {}
 
 func (x *CreateWhiteLabelProductReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[73]
+	mi := &file_proto_core_core_proto_msgTypes[184]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6226,7 +16822,7 @@ func (x *CreateWhiteLabelProductReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateWhiteLabelProductReq.ProtoReflect.Descriptor instead.
 func (*CreateWhiteLabelProductReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{73}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{184}
 }
 
 func (x *CreateWhiteLabelProductReq) GetAppId() int64 {
@@ -6309,7 +16905,7 @@ type UpdateWhiteLabelProductReq struct {
 
 func (x *UpdateWhiteLabelProductReq) Reset() {
 	*x = UpdateWhiteLabelProductReq{}
-	mi := &file_proto_core_core_proto_msgTypes[74]
+	mi := &file_proto_core_core_proto_msgTypes[185]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6321,7 +16917,7 @@ func (x *UpdateWhiteLabelProductReq) String() string {
 func (*UpdateWhiteLabelProductReq) ProtoMessage() {}
 
 func (x *UpdateWhiteLabelProductReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[74]
+	mi := &file_proto_core_core_proto_msgTypes[185]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6334,7 +16930,7 @@ func (x *UpdateWhiteLabelProductReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateWhiteLabelProductReq.ProtoReflect.Descriptor instead.
 func (*UpdateWhiteLabelProductReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{74}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{185}
 }
 
 func (x *UpdateWhiteLabelProductReq) GetId() int64 {
@@ -6404,7 +17000,7 @@ type ChangeWhiteLabelTemplateStatusReq struct {
 
 func (x *ChangeWhiteLabelTemplateStatusReq) Reset() {
 	*x = ChangeWhiteLabelTemplateStatusReq{}
-	mi := &file_proto_core_core_proto_msgTypes[75]
+	mi := &file_proto_core_core_proto_msgTypes[186]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6416,7 +17012,7 @@ func (x *ChangeWhiteLabelTemplateStatusReq) String() string {
 func (*ChangeWhiteLabelTemplateStatusReq) ProtoMessage() {}
 
 func (x *ChangeWhiteLabelTemplateStatusReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[75]
+	mi := &file_proto_core_core_proto_msgTypes[186]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6429,7 +17025,7 @@ func (x *ChangeWhiteLabelTemplateStatusReq) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use ChangeWhiteLabelTemplateStatusReq.ProtoReflect.Descriptor instead.
 func (*ChangeWhiteLabelTemplateStatusReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{75}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{186}
 }
 
 func (x *ChangeWhiteLabelTemplateStatusReq) GetId() int64 {
@@ -6457,7 +17053,7 @@ type ChangeWhiteLabelProductStatusReq struct {
 
 func (x *ChangeWhiteLabelProductStatusReq) Reset() {
 	*x = ChangeWhiteLabelProductStatusReq{}
-	mi := &file_proto_core_core_proto_msgTypes[76]
+	mi := &file_proto_core_core_proto_msgTypes[187]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6469,7 +17065,7 @@ func (x *ChangeWhiteLabelProductStatusReq) String() string {
 func (*ChangeWhiteLabelProductStatusReq) ProtoMessage() {}
 
 func (x *ChangeWhiteLabelProductStatusReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[76]
+	mi := &file_proto_core_core_proto_msgTypes[187]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6482,7 +17078,7 @@ func (x *ChangeWhiteLabelProductStatusReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeWhiteLabelProductStatusReq.ProtoReflect.Descriptor instead.
 func (*ChangeWhiteLabelProductStatusReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{76}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{187}
 }
 
 func (x *ChangeWhiteLabelProductStatusReq) GetId() int64 {
@@ -6518,7 +17114,7 @@ type CreateBrandingProfileReq struct {
 
 func (x *CreateBrandingProfileReq) Reset() {
 	*x = CreateBrandingProfileReq{}
-	mi := &file_proto_core_core_proto_msgTypes[77]
+	mi := &file_proto_core_core_proto_msgTypes[188]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6530,7 +17126,7 @@ func (x *CreateBrandingProfileReq) String() string {
 func (*CreateBrandingProfileReq) ProtoMessage() {}
 
 func (x *CreateBrandingProfileReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[77]
+	mi := &file_proto_core_core_proto_msgTypes[188]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6543,7 +17139,7 @@ func (x *CreateBrandingProfileReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateBrandingProfileReq.ProtoReflect.Descriptor instead.
 func (*CreateBrandingProfileReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{77}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{188}
 }
 
 func (x *CreateBrandingProfileReq) GetAppId() int64 {
@@ -6635,7 +17231,7 @@ type UpdateBrandingProfileReq struct {
 
 func (x *UpdateBrandingProfileReq) Reset() {
 	*x = UpdateBrandingProfileReq{}
-	mi := &file_proto_core_core_proto_msgTypes[78]
+	mi := &file_proto_core_core_proto_msgTypes[189]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6647,7 +17243,7 @@ func (x *UpdateBrandingProfileReq) String() string {
 func (*UpdateBrandingProfileReq) ProtoMessage() {}
 
 func (x *UpdateBrandingProfileReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[78]
+	mi := &file_proto_core_core_proto_msgTypes[189]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6660,7 +17256,7 @@ func (x *UpdateBrandingProfileReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateBrandingProfileReq.ProtoReflect.Descriptor instead.
 func (*UpdateBrandingProfileReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{78}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{189}
 }
 
 func (x *UpdateBrandingProfileReq) GetId() int64 {
@@ -6744,7 +17340,7 @@ type ChangeBrandingProfileStatusReq struct {
 
 func (x *ChangeBrandingProfileStatusReq) Reset() {
 	*x = ChangeBrandingProfileStatusReq{}
-	mi := &file_proto_core_core_proto_msgTypes[79]
+	mi := &file_proto_core_core_proto_msgTypes[190]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6756,7 +17352,7 @@ func (x *ChangeBrandingProfileStatusReq) String() string {
 func (*ChangeBrandingProfileStatusReq) ProtoMessage() {}
 
 func (x *ChangeBrandingProfileStatusReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[79]
+	mi := &file_proto_core_core_proto_msgTypes[190]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6769,7 +17365,7 @@ func (x *ChangeBrandingProfileStatusReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeBrandingProfileStatusReq.ProtoReflect.Descriptor instead.
 func (*ChangeBrandingProfileStatusReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{79}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{190}
 }
 
 func (x *ChangeBrandingProfileStatusReq) GetId() int64 {
@@ -6797,7 +17393,7 @@ type CreateBrandingPreflightReq struct {
 
 func (x *CreateBrandingPreflightReq) Reset() {
 	*x = CreateBrandingPreflightReq{}
-	mi := &file_proto_core_core_proto_msgTypes[80]
+	mi := &file_proto_core_core_proto_msgTypes[191]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6809,7 +17405,7 @@ func (x *CreateBrandingPreflightReq) String() string {
 func (*CreateBrandingPreflightReq) ProtoMessage() {}
 
 func (x *CreateBrandingPreflightReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[80]
+	mi := &file_proto_core_core_proto_msgTypes[191]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6822,7 +17418,7 @@ func (x *CreateBrandingPreflightReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateBrandingPreflightReq.ProtoReflect.Descriptor instead.
 func (*CreateBrandingPreflightReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{80}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{191}
 }
 
 func (x *CreateBrandingPreflightReq) GetBrandingProfileId() int64 {
@@ -6854,7 +17450,7 @@ type CompleteBrandingPreflightReq struct {
 
 func (x *CompleteBrandingPreflightReq) Reset() {
 	*x = CompleteBrandingPreflightReq{}
-	mi := &file_proto_core_core_proto_msgTypes[81]
+	mi := &file_proto_core_core_proto_msgTypes[192]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6866,7 +17462,7 @@ func (x *CompleteBrandingPreflightReq) String() string {
 func (*CompleteBrandingPreflightReq) ProtoMessage() {}
 
 func (x *CompleteBrandingPreflightReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[81]
+	mi := &file_proto_core_core_proto_msgTypes[192]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6879,7 +17475,7 @@ func (x *CompleteBrandingPreflightReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteBrandingPreflightReq.ProtoReflect.Descriptor instead.
 func (*CompleteBrandingPreflightReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{81}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{192}
 }
 
 func (x *CompleteBrandingPreflightReq) GetId() int64 {
@@ -6935,7 +17531,7 @@ type ClaimBrandingPreflightReq struct {
 
 func (x *ClaimBrandingPreflightReq) Reset() {
 	*x = ClaimBrandingPreflightReq{}
-	mi := &file_proto_core_core_proto_msgTypes[82]
+	mi := &file_proto_core_core_proto_msgTypes[193]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6947,7 +17543,7 @@ func (x *ClaimBrandingPreflightReq) String() string {
 func (*ClaimBrandingPreflightReq) ProtoMessage() {}
 
 func (x *ClaimBrandingPreflightReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[82]
+	mi := &file_proto_core_core_proto_msgTypes[193]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6960,7 +17556,7 @@ func (x *ClaimBrandingPreflightReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClaimBrandingPreflightReq.ProtoReflect.Descriptor instead.
 func (*ClaimBrandingPreflightReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{82}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{193}
 }
 
 func (x *ClaimBrandingPreflightReq) GetBuilderId() string {
@@ -6992,7 +17588,7 @@ type BrandingPreflightExecutionContext struct {
 
 func (x *BrandingPreflightExecutionContext) Reset() {
 	*x = BrandingPreflightExecutionContext{}
-	mi := &file_proto_core_core_proto_msgTypes[83]
+	mi := &file_proto_core_core_proto_msgTypes[194]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7004,7 +17600,7 @@ func (x *BrandingPreflightExecutionContext) String() string {
 func (*BrandingPreflightExecutionContext) ProtoMessage() {}
 
 func (x *BrandingPreflightExecutionContext) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[83]
+	mi := &file_proto_core_core_proto_msgTypes[194]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7017,7 +17613,7 @@ func (x *BrandingPreflightExecutionContext) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use BrandingPreflightExecutionContext.ProtoReflect.Descriptor instead.
 func (*BrandingPreflightExecutionContext) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{83}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{194}
 }
 
 func (x *BrandingPreflightExecutionContext) GetPreflight() *BrandingPreflight {
@@ -7073,7 +17669,7 @@ type BrandingPreflightExecutionContextResp struct {
 
 func (x *BrandingPreflightExecutionContextResp) Reset() {
 	*x = BrandingPreflightExecutionContextResp{}
-	mi := &file_proto_core_core_proto_msgTypes[84]
+	mi := &file_proto_core_core_proto_msgTypes[195]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7085,7 +17681,7 @@ func (x *BrandingPreflightExecutionContextResp) String() string {
 func (*BrandingPreflightExecutionContextResp) ProtoMessage() {}
 
 func (x *BrandingPreflightExecutionContextResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[84]
+	mi := &file_proto_core_core_proto_msgTypes[195]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7098,7 +17694,7 @@ func (x *BrandingPreflightExecutionContextResp) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use BrandingPreflightExecutionContextResp.ProtoReflect.Descriptor instead.
 func (*BrandingPreflightExecutionContextResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{84}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{195}
 }
 
 func (x *BrandingPreflightExecutionContextResp) GetBase() *common.RespBase {
@@ -7130,7 +17726,7 @@ type InstallReportReq struct {
 
 func (x *InstallReportReq) Reset() {
 	*x = InstallReportReq{}
-	mi := &file_proto_core_core_proto_msgTypes[85]
+	mi := &file_proto_core_core_proto_msgTypes[196]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7142,7 +17738,7 @@ func (x *InstallReportReq) String() string {
 func (*InstallReportReq) ProtoMessage() {}
 
 func (x *InstallReportReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[85]
+	mi := &file_proto_core_core_proto_msgTypes[196]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7155,7 +17751,7 @@ func (x *InstallReportReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InstallReportReq.ProtoReflect.Descriptor instead.
 func (*InstallReportReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{85}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{196}
 }
 
 func (x *InstallReportReq) GetAppId() int64 {
@@ -7219,7 +17815,7 @@ type ChannelStatsReq struct {
 
 func (x *ChannelStatsReq) Reset() {
 	*x = ChannelStatsReq{}
-	mi := &file_proto_core_core_proto_msgTypes[86]
+	mi := &file_proto_core_core_proto_msgTypes[197]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7231,7 +17827,7 @@ func (x *ChannelStatsReq) String() string {
 func (*ChannelStatsReq) ProtoMessage() {}
 
 func (x *ChannelStatsReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[86]
+	mi := &file_proto_core_core_proto_msgTypes[197]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7244,7 +17840,7 @@ func (x *ChannelStatsReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelStatsReq.ProtoReflect.Descriptor instead.
 func (*ChannelStatsReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{86}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{197}
 }
 
 func (x *ChannelStatsReq) GetAppId() int64 {
@@ -7291,7 +17887,7 @@ type ChannelStats struct {
 
 func (x *ChannelStats) Reset() {
 	*x = ChannelStats{}
-	mi := &file_proto_core_core_proto_msgTypes[87]
+	mi := &file_proto_core_core_proto_msgTypes[198]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7303,7 +17899,7 @@ func (x *ChannelStats) String() string {
 func (*ChannelStats) ProtoMessage() {}
 
 func (x *ChannelStats) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[87]
+	mi := &file_proto_core_core_proto_msgTypes[198]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7316,7 +17912,7 @@ func (x *ChannelStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelStats.ProtoReflect.Descriptor instead.
 func (*ChannelStats) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{87}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{198}
 }
 
 func (x *ChannelStats) GetChannelId() int64 {
@@ -7385,7 +17981,7 @@ type ChannelStatsResp struct {
 
 func (x *ChannelStatsResp) Reset() {
 	*x = ChannelStatsResp{}
-	mi := &file_proto_core_core_proto_msgTypes[88]
+	mi := &file_proto_core_core_proto_msgTypes[199]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7397,7 +17993,7 @@ func (x *ChannelStatsResp) String() string {
 func (*ChannelStatsResp) ProtoMessage() {}
 
 func (x *ChannelStatsResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[88]
+	mi := &file_proto_core_core_proto_msgTypes[199]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7410,7 +18006,7 @@ func (x *ChannelStatsResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelStatsResp.ProtoReflect.Descriptor instead.
 func (*ChannelStatsResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{88}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{199}
 }
 
 func (x *ChannelStatsResp) GetBase() *common.RespBase {
@@ -7447,7 +18043,7 @@ type ReportChannelEventReq struct {
 
 func (x *ReportChannelEventReq) Reset() {
 	*x = ReportChannelEventReq{}
-	mi := &file_proto_core_core_proto_msgTypes[89]
+	mi := &file_proto_core_core_proto_msgTypes[200]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7459,7 +18055,7 @@ func (x *ReportChannelEventReq) String() string {
 func (*ReportChannelEventReq) ProtoMessage() {}
 
 func (x *ReportChannelEventReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[89]
+	mi := &file_proto_core_core_proto_msgTypes[200]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7472,7 +18068,7 @@ func (x *ReportChannelEventReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportChannelEventReq.ProtoReflect.Descriptor instead.
 func (*ReportChannelEventReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{89}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{200}
 }
 
 func (x *ReportChannelEventReq) GetAppId() int64 {
@@ -7565,7 +18161,7 @@ type ResolveChannelDownloadReq struct {
 
 func (x *ResolveChannelDownloadReq) Reset() {
 	*x = ResolveChannelDownloadReq{}
-	mi := &file_proto_core_core_proto_msgTypes[90]
+	mi := &file_proto_core_core_proto_msgTypes[201]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7577,7 +18173,7 @@ func (x *ResolveChannelDownloadReq) String() string {
 func (*ResolveChannelDownloadReq) ProtoMessage() {}
 
 func (x *ResolveChannelDownloadReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[90]
+	mi := &file_proto_core_core_proto_msgTypes[201]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7590,7 +18186,7 @@ func (x *ResolveChannelDownloadReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResolveChannelDownloadReq.ProtoReflect.Descriptor instead.
 func (*ResolveChannelDownloadReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{90}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{201}
 }
 
 func (x *ResolveChannelDownloadReq) GetChannelCode() string {
@@ -7639,7 +18235,7 @@ type ChannelDownloadArtifact struct {
 
 func (x *ChannelDownloadArtifact) Reset() {
 	*x = ChannelDownloadArtifact{}
-	mi := &file_proto_core_core_proto_msgTypes[91]
+	mi := &file_proto_core_core_proto_msgTypes[202]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7651,7 +18247,7 @@ func (x *ChannelDownloadArtifact) String() string {
 func (*ChannelDownloadArtifact) ProtoMessage() {}
 
 func (x *ChannelDownloadArtifact) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[91]
+	mi := &file_proto_core_core_proto_msgTypes[202]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7664,7 +18260,7 @@ func (x *ChannelDownloadArtifact) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelDownloadArtifact.ProtoReflect.Descriptor instead.
 func (*ChannelDownloadArtifact) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{91}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{202}
 }
 
 func (x *ChannelDownloadArtifact) GetTenantId() int64 {
@@ -7741,7 +18337,7 @@ type ChannelDownloadArtifactResp struct {
 
 func (x *ChannelDownloadArtifactResp) Reset() {
 	*x = ChannelDownloadArtifactResp{}
-	mi := &file_proto_core_core_proto_msgTypes[92]
+	mi := &file_proto_core_core_proto_msgTypes[203]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7753,7 +18349,7 @@ func (x *ChannelDownloadArtifactResp) String() string {
 func (*ChannelDownloadArtifactResp) ProtoMessage() {}
 
 func (x *ChannelDownloadArtifactResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[92]
+	mi := &file_proto_core_core_proto_msgTypes[203]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7766,7 +18362,7 @@ func (x *ChannelDownloadArtifactResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelDownloadArtifactResp.ProtoReflect.Descriptor instead.
 func (*ChannelDownloadArtifactResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{92}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{203}
 }
 
 func (x *ChannelDownloadArtifactResp) GetBase() *common.RespBase {
@@ -7794,7 +18390,7 @@ type ClaimBuildTaskReq struct {
 
 func (x *ClaimBuildTaskReq) Reset() {
 	*x = ClaimBuildTaskReq{}
-	mi := &file_proto_core_core_proto_msgTypes[93]
+	mi := &file_proto_core_core_proto_msgTypes[204]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7806,7 +18402,7 @@ func (x *ClaimBuildTaskReq) String() string {
 func (*ClaimBuildTaskReq) ProtoMessage() {}
 
 func (x *ClaimBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[93]
+	mi := &file_proto_core_core_proto_msgTypes[204]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7819,7 +18415,7 @@ func (x *ClaimBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClaimBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*ClaimBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{93}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{204}
 }
 
 func (x *ClaimBuildTaskReq) GetBuilderId() string {
@@ -7849,7 +18445,7 @@ type HeartbeatBuildTaskReq struct {
 
 func (x *HeartbeatBuildTaskReq) Reset() {
 	*x = HeartbeatBuildTaskReq{}
-	mi := &file_proto_core_core_proto_msgTypes[94]
+	mi := &file_proto_core_core_proto_msgTypes[205]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7861,7 +18457,7 @@ func (x *HeartbeatBuildTaskReq) String() string {
 func (*HeartbeatBuildTaskReq) ProtoMessage() {}
 
 func (x *HeartbeatBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[94]
+	mi := &file_proto_core_core_proto_msgTypes[205]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7874,7 +18470,7 @@ func (x *HeartbeatBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HeartbeatBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*HeartbeatBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{94}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{205}
 }
 
 func (x *HeartbeatBuildTaskReq) GetTaskId() int64 {
@@ -7920,7 +18516,7 @@ type ReportBuildProgressReq struct {
 
 func (x *ReportBuildProgressReq) Reset() {
 	*x = ReportBuildProgressReq{}
-	mi := &file_proto_core_core_proto_msgTypes[95]
+	mi := &file_proto_core_core_proto_msgTypes[206]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7932,7 +18528,7 @@ func (x *ReportBuildProgressReq) String() string {
 func (*ReportBuildProgressReq) ProtoMessage() {}
 
 func (x *ReportBuildProgressReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[95]
+	mi := &file_proto_core_core_proto_msgTypes[206]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7945,7 +18541,7 @@ func (x *ReportBuildProgressReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportBuildProgressReq.ProtoReflect.Descriptor instead.
 func (*ReportBuildProgressReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{95}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{206}
 }
 
 func (x *ReportBuildProgressReq) GetTaskId() int64 {
@@ -8010,7 +18606,7 @@ type CompleteBuildTaskReq struct {
 
 func (x *CompleteBuildTaskReq) Reset() {
 	*x = CompleteBuildTaskReq{}
-	mi := &file_proto_core_core_proto_msgTypes[96]
+	mi := &file_proto_core_core_proto_msgTypes[207]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8022,7 +18618,7 @@ func (x *CompleteBuildTaskReq) String() string {
 func (*CompleteBuildTaskReq) ProtoMessage() {}
 
 func (x *CompleteBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[96]
+	mi := &file_proto_core_core_proto_msgTypes[207]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8035,7 +18631,7 @@ func (x *CompleteBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*CompleteBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{96}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{207}
 }
 
 func (x *CompleteBuildTaskReq) GetTaskId() int64 {
@@ -8132,7 +18728,7 @@ type FailBuildTaskReq struct {
 
 func (x *FailBuildTaskReq) Reset() {
 	*x = FailBuildTaskReq{}
-	mi := &file_proto_core_core_proto_msgTypes[97]
+	mi := &file_proto_core_core_proto_msgTypes[208]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8144,7 +18740,7 @@ func (x *FailBuildTaskReq) String() string {
 func (*FailBuildTaskReq) ProtoMessage() {}
 
 func (x *FailBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[97]
+	mi := &file_proto_core_core_proto_msgTypes[208]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8157,7 +18753,7 @@ func (x *FailBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FailBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*FailBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{97}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{208}
 }
 
 func (x *FailBuildTaskReq) GetTaskId() int64 {
@@ -8228,7 +18824,7 @@ type GetBuildExecutionContextReq struct {
 
 func (x *GetBuildExecutionContextReq) Reset() {
 	*x = GetBuildExecutionContextReq{}
-	mi := &file_proto_core_core_proto_msgTypes[98]
+	mi := &file_proto_core_core_proto_msgTypes[209]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8240,7 +18836,7 @@ func (x *GetBuildExecutionContextReq) String() string {
 func (*GetBuildExecutionContextReq) ProtoMessage() {}
 
 func (x *GetBuildExecutionContextReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[98]
+	mi := &file_proto_core_core_proto_msgTypes[209]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8253,7 +18849,7 @@ func (x *GetBuildExecutionContextReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBuildExecutionContextReq.ProtoReflect.Descriptor instead.
 func (*GetBuildExecutionContextReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{98}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{209}
 }
 
 func (x *GetBuildExecutionContextReq) GetTaskId() int64 {
@@ -8303,7 +18899,7 @@ type BuildExecutionContext struct {
 
 func (x *BuildExecutionContext) Reset() {
 	*x = BuildExecutionContext{}
-	mi := &file_proto_core_core_proto_msgTypes[99]
+	mi := &file_proto_core_core_proto_msgTypes[210]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8315,7 +18911,7 @@ func (x *BuildExecutionContext) String() string {
 func (*BuildExecutionContext) ProtoMessage() {}
 
 func (x *BuildExecutionContext) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[99]
+	mi := &file_proto_core_core_proto_msgTypes[210]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8328,7 +18924,7 @@ func (x *BuildExecutionContext) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildExecutionContext.ProtoReflect.Descriptor instead.
 func (*BuildExecutionContext) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{99}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{210}
 }
 
 func (x *BuildExecutionContext) GetTask() *BuildTask {
@@ -8461,7 +19057,7 @@ type BuildExecutionContextResp struct {
 
 func (x *BuildExecutionContextResp) Reset() {
 	*x = BuildExecutionContextResp{}
-	mi := &file_proto_core_core_proto_msgTypes[100]
+	mi := &file_proto_core_core_proto_msgTypes[211]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -8473,7 +19069,7 @@ func (x *BuildExecutionContextResp) String() string {
 func (*BuildExecutionContextResp) ProtoMessage() {}
 
 func (x *BuildExecutionContextResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[100]
+	mi := &file_proto_core_core_proto_msgTypes[211]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8486,7 +19082,7 @@ func (x *BuildExecutionContextResp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BuildExecutionContextResp.ProtoReflect.Descriptor instead.
 func (*BuildExecutionContextResp) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{100}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{211}
 }
 
 func (x *BuildExecutionContextResp) GetBase() *common.RespBase {
@@ -8501,6 +19097,4315 @@ func (x *BuildExecutionContextResp) GetData() *BuildExecutionContext {
 		return x.Data
 	}
 	return nil
+}
+
+// V6 不可变套餐版本。
+type BillingPlan struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                // 套餐版本ID
+	PlanCode            string                 `protobuf:"bytes,2,opt,name=plan_code,json=planCode,proto3" json:"plan_code,omitempty"`                                     // 套餐稳定编码
+	PlanName            string                 `protobuf:"bytes,3,opt,name=plan_name,json=planName,proto3" json:"plan_name,omitempty"`                                     // 套餐展示名称
+	BillingCycle        BillingCycle           `protobuf:"varint,4,opt,name=billing_cycle,json=billingCycle,proto3,enum=core.BillingCycle" json:"billing_cycle,omitempty"` // 计费周期
+	PriceAmount         int64                  `protobuf:"varint,5,opt,name=price_amount,json=priceAmount,proto3" json:"price_amount,omitempty"`                           // 价格，最小货币单位整数
+	Currency            string                 `protobuf:"bytes,6,opt,name=currency,proto3" json:"currency,omitempty"`                                                     // ISO 4217币种
+	FeatureJson         string                 `protobuf:"bytes,7,opt,name=feature_json,json=featureJson,proto3" json:"feature_json,omitempty"`                            // 功能开关JSON
+	BuildsPerCycle      int64                  `protobuf:"varint,8,opt,name=builds_per_cycle,json=buildsPerCycle,proto3" json:"builds_per_cycle,omitempty"`                // 周期构建次数，-1不限量
+	MaxBuildConcurrency int32                  `protobuf:"varint,9,opt,name=max_build_concurrency,json=maxBuildConcurrency,proto3" json:"max_build_concurrency,omitempty"` // 最大构建并发，-1不限量
+	StorageBytes        int64                  `protobuf:"varint,10,opt,name=storage_bytes,json=storageBytes,proto3" json:"storage_bytes,omitempty"`                       // 存储额度字节，-1不限量
+	MaxUploadBytes      int64                  `protobuf:"varint,11,opt,name=max_upload_bytes,json=maxUploadBytes,proto3" json:"max_upload_bytes,omitempty"`               // 单文件上传上限字节，-1不限量
+	TeamSeats           int32                  `protobuf:"varint,12,opt,name=team_seats,json=teamSeats,proto3" json:"team_seats,omitempty"`                                // 团队席位，-1不限量
+	ApiRateLimit        int32                  `protobuf:"varint,13,opt,name=api_rate_limit,json=apiRateLimit,proto3" json:"api_rate_limit,omitempty"`                     // Open API每分钟上限，-1不限量
+	ChargeFailedBuild   bool                   `protobuf:"varint,14,opt,name=charge_failed_build,json=chargeFailedBuild,proto3" json:"charge_failed_build,omitempty"`      // 失败构建是否计量
+	ChargeCacheHit      bool                   `protobuf:"varint,15,opt,name=charge_cache_hit,json=chargeCacheHit,proto3" json:"charge_cache_hit,omitempty"`               // 缓存命中是否计量
+	ChargeRetryBuild    bool                   `protobuf:"varint,16,opt,name=charge_retry_build,json=chargeRetryBuild,proto3" json:"charge_retry_build,omitempty"`         // 重试构建是否计量
+	Status              BillingPlanStatus      `protobuf:"varint,17,opt,name=status,proto3,enum=core.BillingPlanStatus" json:"status,omitempty"`                           // 套餐版本状态
+	Version             int32                  `protobuf:"varint,18,opt,name=version,proto3" json:"version,omitempty"`                                                     // 不可变版本号
+	CreateTime          int64                  `protobuf:"varint,19,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                             // 创建时间Unix毫秒
+	UpdateTime          int64                  `protobuf:"varint,20,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                             // 更新时间Unix毫秒
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *BillingPlan) Reset() {
+	*x = BillingPlan{}
+	mi := &file_proto_core_core_proto_msgTypes[212]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BillingPlan) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BillingPlan) ProtoMessage() {}
+
+func (x *BillingPlan) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[212]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BillingPlan.ProtoReflect.Descriptor instead.
+func (*BillingPlan) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{212}
+}
+
+func (x *BillingPlan) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BillingPlan) GetPlanCode() string {
+	if x != nil {
+		return x.PlanCode
+	}
+	return ""
+}
+
+func (x *BillingPlan) GetPlanName() string {
+	if x != nil {
+		return x.PlanName
+	}
+	return ""
+}
+
+func (x *BillingPlan) GetBillingCycle() BillingCycle {
+	if x != nil {
+		return x.BillingCycle
+	}
+	return BillingCycle_BILLING_CYCLE_UNKNOWN
+}
+
+func (x *BillingPlan) GetPriceAmount() int64 {
+	if x != nil {
+		return x.PriceAmount
+	}
+	return 0
+}
+
+func (x *BillingPlan) GetCurrency() string {
+	if x != nil {
+		return x.Currency
+	}
+	return ""
+}
+
+func (x *BillingPlan) GetFeatureJson() string {
+	if x != nil {
+		return x.FeatureJson
+	}
+	return ""
+}
+
+func (x *BillingPlan) GetBuildsPerCycle() int64 {
+	if x != nil {
+		return x.BuildsPerCycle
+	}
+	return 0
+}
+
+func (x *BillingPlan) GetMaxBuildConcurrency() int32 {
+	if x != nil {
+		return x.MaxBuildConcurrency
+	}
+	return 0
+}
+
+func (x *BillingPlan) GetStorageBytes() int64 {
+	if x != nil {
+		return x.StorageBytes
+	}
+	return 0
+}
+
+func (x *BillingPlan) GetMaxUploadBytes() int64 {
+	if x != nil {
+		return x.MaxUploadBytes
+	}
+	return 0
+}
+
+func (x *BillingPlan) GetTeamSeats() int32 {
+	if x != nil {
+		return x.TeamSeats
+	}
+	return 0
+}
+
+func (x *BillingPlan) GetApiRateLimit() int32 {
+	if x != nil {
+		return x.ApiRateLimit
+	}
+	return 0
+}
+
+func (x *BillingPlan) GetChargeFailedBuild() bool {
+	if x != nil {
+		return x.ChargeFailedBuild
+	}
+	return false
+}
+
+func (x *BillingPlan) GetChargeCacheHit() bool {
+	if x != nil {
+		return x.ChargeCacheHit
+	}
+	return false
+}
+
+func (x *BillingPlan) GetChargeRetryBuild() bool {
+	if x != nil {
+		return x.ChargeRetryBuild
+	}
+	return false
+}
+
+func (x *BillingPlan) GetStatus() BillingPlanStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BillingPlanStatus_BILLING_PLAN_STATUS_UNKNOWN
+}
+
+func (x *BillingPlan) GetVersion() int32 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
+func (x *BillingPlan) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *BillingPlan) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// 创建V6套餐不可变版本请求。
+type CreateBillingPlanReq struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	PlanCode            string                 `protobuf:"bytes,1,opt,name=plan_code,json=planCode,proto3" json:"plan_code,omitempty"`                                     // 套餐稳定编码
+	PlanName            string                 `protobuf:"bytes,2,opt,name=plan_name,json=planName,proto3" json:"plan_name,omitempty"`                                     // 套餐展示名称
+	BillingCycle        BillingCycle           `protobuf:"varint,3,opt,name=billing_cycle,json=billingCycle,proto3,enum=core.BillingCycle" json:"billing_cycle,omitempty"` // 计费周期
+	PriceAmount         int64                  `protobuf:"varint,4,opt,name=price_amount,json=priceAmount,proto3" json:"price_amount,omitempty"`                           // 服务端价格，最小货币单位整数
+	Currency            string                 `protobuf:"bytes,5,opt,name=currency,proto3" json:"currency,omitempty"`                                                     // ISO 4217币种
+	FeatureJson         string                 `protobuf:"bytes,6,opt,name=feature_json,json=featureJson,proto3" json:"feature_json,omitempty"`                            // 功能开关JSON
+	BuildsPerCycle      int64                  `protobuf:"varint,7,opt,name=builds_per_cycle,json=buildsPerCycle,proto3" json:"builds_per_cycle,omitempty"`                // 周期构建次数，-1不限量
+	MaxBuildConcurrency int32                  `protobuf:"varint,8,opt,name=max_build_concurrency,json=maxBuildConcurrency,proto3" json:"max_build_concurrency,omitempty"` // 最大构建并发，-1不限量
+	StorageBytes        int64                  `protobuf:"varint,9,opt,name=storage_bytes,json=storageBytes,proto3" json:"storage_bytes,omitempty"`                        // 存储额度字节，-1不限量
+	MaxUploadBytes      int64                  `protobuf:"varint,10,opt,name=max_upload_bytes,json=maxUploadBytes,proto3" json:"max_upload_bytes,omitempty"`               // 单文件上传上限字节，-1不限量
+	TeamSeats           int32                  `protobuf:"varint,11,opt,name=team_seats,json=teamSeats,proto3" json:"team_seats,omitempty"`                                // 团队席位，-1不限量
+	ApiRateLimit        int32                  `protobuf:"varint,12,opt,name=api_rate_limit,json=apiRateLimit,proto3" json:"api_rate_limit,omitempty"`                     // Open API每分钟上限，-1不限量
+	ChargeFailedBuild   bool                   `protobuf:"varint,13,opt,name=charge_failed_build,json=chargeFailedBuild,proto3" json:"charge_failed_build,omitempty"`      // 失败构建是否计量
+	ChargeCacheHit      bool                   `protobuf:"varint,14,opt,name=charge_cache_hit,json=chargeCacheHit,proto3" json:"charge_cache_hit,omitempty"`               // 缓存命中是否计量
+	ChargeRetryBuild    bool                   `protobuf:"varint,15,opt,name=charge_retry_build,json=chargeRetryBuild,proto3" json:"charge_retry_build,omitempty"`         // 重试构建是否计量
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *CreateBillingPlanReq) Reset() {
+	*x = CreateBillingPlanReq{}
+	mi := &file_proto_core_core_proto_msgTypes[213]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateBillingPlanReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateBillingPlanReq) ProtoMessage() {}
+
+func (x *CreateBillingPlanReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[213]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateBillingPlanReq.ProtoReflect.Descriptor instead.
+func (*CreateBillingPlanReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{213}
+}
+
+func (x *CreateBillingPlanReq) GetPlanCode() string {
+	if x != nil {
+		return x.PlanCode
+	}
+	return ""
+}
+
+func (x *CreateBillingPlanReq) GetPlanName() string {
+	if x != nil {
+		return x.PlanName
+	}
+	return ""
+}
+
+func (x *CreateBillingPlanReq) GetBillingCycle() BillingCycle {
+	if x != nil {
+		return x.BillingCycle
+	}
+	return BillingCycle_BILLING_CYCLE_UNKNOWN
+}
+
+func (x *CreateBillingPlanReq) GetPriceAmount() int64 {
+	if x != nil {
+		return x.PriceAmount
+	}
+	return 0
+}
+
+func (x *CreateBillingPlanReq) GetCurrency() string {
+	if x != nil {
+		return x.Currency
+	}
+	return ""
+}
+
+func (x *CreateBillingPlanReq) GetFeatureJson() string {
+	if x != nil {
+		return x.FeatureJson
+	}
+	return ""
+}
+
+func (x *CreateBillingPlanReq) GetBuildsPerCycle() int64 {
+	if x != nil {
+		return x.BuildsPerCycle
+	}
+	return 0
+}
+
+func (x *CreateBillingPlanReq) GetMaxBuildConcurrency() int32 {
+	if x != nil {
+		return x.MaxBuildConcurrency
+	}
+	return 0
+}
+
+func (x *CreateBillingPlanReq) GetStorageBytes() int64 {
+	if x != nil {
+		return x.StorageBytes
+	}
+	return 0
+}
+
+func (x *CreateBillingPlanReq) GetMaxUploadBytes() int64 {
+	if x != nil {
+		return x.MaxUploadBytes
+	}
+	return 0
+}
+
+func (x *CreateBillingPlanReq) GetTeamSeats() int32 {
+	if x != nil {
+		return x.TeamSeats
+	}
+	return 0
+}
+
+func (x *CreateBillingPlanReq) GetApiRateLimit() int32 {
+	if x != nil {
+		return x.ApiRateLimit
+	}
+	return 0
+}
+
+func (x *CreateBillingPlanReq) GetChargeFailedBuild() bool {
+	if x != nil {
+		return x.ChargeFailedBuild
+	}
+	return false
+}
+
+func (x *CreateBillingPlanReq) GetChargeCacheHit() bool {
+	if x != nil {
+		return x.ChargeCacheHit
+	}
+	return false
+}
+
+func (x *CreateBillingPlanReq) GetChargeRetryBuild() bool {
+	if x != nil {
+		return x.ChargeRetryBuild
+	}
+	return false
+}
+
+// V6套餐版本ID请求。
+type BillingPlanIdReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 套餐版本ID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BillingPlanIdReq) Reset() {
+	*x = BillingPlanIdReq{}
+	mi := &file_proto_core_core_proto_msgTypes[214]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BillingPlanIdReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BillingPlanIdReq) ProtoMessage() {}
+
+func (x *BillingPlanIdReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[214]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BillingPlanIdReq.ProtoReflect.Descriptor instead.
+func (*BillingPlanIdReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{214}
+}
+
+func (x *BillingPlanIdReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+// 查询V6套餐列表请求。
+type BillingPlanListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        BillingPlanStatus      `protobuf:"varint,1,opt,name=status,proto3,enum=core.BillingPlanStatus" json:"status,omitempty"` // 状态筛选，未知表示全部
+	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`                                 // 页码，从1开始
+	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`         // 每页数量
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BillingPlanListReq) Reset() {
+	*x = BillingPlanListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[215]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BillingPlanListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BillingPlanListReq) ProtoMessage() {}
+
+func (x *BillingPlanListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[215]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BillingPlanListReq.ProtoReflect.Descriptor instead.
+func (*BillingPlanListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{215}
+}
+
+func (x *BillingPlanListReq) GetStatus() BillingPlanStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BillingPlanStatus_BILLING_PLAN_STATUS_UNKNOWN
+}
+
+func (x *BillingPlanListReq) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *BillingPlanListReq) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+// V6套餐响应。
+type BillingPlanResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *BillingPlan           `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 套餐版本
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BillingPlanResp) Reset() {
+	*x = BillingPlanResp{}
+	mi := &file_proto_core_core_proto_msgTypes[216]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BillingPlanResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BillingPlanResp) ProtoMessage() {}
+
+func (x *BillingPlanResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[216]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BillingPlanResp.ProtoReflect.Descriptor instead.
+func (*BillingPlanResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{216}
+}
+
+func (x *BillingPlanResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BillingPlanResp) GetData() *BillingPlan {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V6套餐列表响应。
+type BillingPlanListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`    // 通用响应
+	Data          []*BillingPlan         `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"`    // 套餐版本列表
+	Total         int64                  `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"` // 总数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BillingPlanListResp) Reset() {
+	*x = BillingPlanListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[217]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BillingPlanListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BillingPlanListResp) ProtoMessage() {}
+
+func (x *BillingPlanListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[217]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BillingPlanListResp.ProtoReflect.Descriptor instead.
+func (*BillingPlanListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{217}
+}
+
+func (x *BillingPlanListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BillingPlanListResp) GetData() []*BillingPlan {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *BillingPlanListResp) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+// V6租户当前订阅。
+type TenantSubscription struct {
+	state                  protoimpl.MessageState   `protogen:"open.v1"`
+	Id                     int64                    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                        // 订阅ID
+	TenantId               int64                    `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                            // 租户ID
+	PlanId                 int64                    `protobuf:"varint,3,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`                                                  // 当前套餐版本ID
+	PlanVersion            int32                    `protobuf:"varint,4,opt,name=plan_version,json=planVersion,proto3" json:"plan_version,omitempty"`                                   // 固化套餐版本号
+	Status                 TenantSubscriptionStatus `protobuf:"varint,5,opt,name=status,proto3,enum=core.TenantSubscriptionStatus" json:"status,omitempty"`                             // 订阅状态
+	Source                 TenantSubscriptionSource `protobuf:"varint,6,opt,name=source,proto3,enum=core.TenantSubscriptionSource" json:"source,omitempty"`                             // 订阅来源
+	ExternalCustomerId     string                   `protobuf:"bytes,7,opt,name=external_customer_id,json=externalCustomerId,proto3" json:"external_customer_id,omitempty"`             // 支付客户ID
+	ExternalSubscriptionId string                   `protobuf:"bytes,8,opt,name=external_subscription_id,json=externalSubscriptionId,proto3" json:"external_subscription_id,omitempty"` // 支付订阅ID
+	CurrentPeriodStart     int64                    `protobuf:"varint,9,opt,name=current_period_start,json=currentPeriodStart,proto3" json:"current_period_start,omitempty"`            // 周期开始Unix毫秒
+	CurrentPeriodEnd       int64                    `protobuf:"varint,10,opt,name=current_period_end,json=currentPeriodEnd,proto3" json:"current_period_end,omitempty"`                 // 周期结束Unix毫秒
+	CancelAtPeriodEnd      bool                     `protobuf:"varint,11,opt,name=cancel_at_period_end,json=cancelAtPeriodEnd,proto3" json:"cancel_at_period_end,omitempty"`            // 是否周期末取消
+	GraceUntil             int64                    `protobuf:"varint,12,opt,name=grace_until,json=graceUntil,proto3" json:"grace_until,omitempty"`                                     // 宽限截止Unix毫秒
+	PendingPlanId          int64                    `protobuf:"varint,13,opt,name=pending_plan_id,json=pendingPlanId,proto3" json:"pending_plan_id,omitempty"`                          // 周期末待切换套餐ID
+	PendingPlanVersion     int32                    `protobuf:"varint,14,opt,name=pending_plan_version,json=pendingPlanVersion,proto3" json:"pending_plan_version,omitempty"`           // 周期末待切换套餐版本
+	CreateTime             int64                    `protobuf:"varint,15,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                                     // 创建时间Unix毫秒
+	UpdateTime             int64                    `protobuf:"varint,16,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                                     // 更新时间Unix毫秒
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *TenantSubscription) Reset() {
+	*x = TenantSubscription{}
+	mi := &file_proto_core_core_proto_msgTypes[218]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TenantSubscription) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TenantSubscription) ProtoMessage() {}
+
+func (x *TenantSubscription) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[218]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TenantSubscription.ProtoReflect.Descriptor instead.
+func (*TenantSubscription) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{218}
+}
+
+func (x *TenantSubscription) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *TenantSubscription) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *TenantSubscription) GetPlanId() int64 {
+	if x != nil {
+		return x.PlanId
+	}
+	return 0
+}
+
+func (x *TenantSubscription) GetPlanVersion() int32 {
+	if x != nil {
+		return x.PlanVersion
+	}
+	return 0
+}
+
+func (x *TenantSubscription) GetStatus() TenantSubscriptionStatus {
+	if x != nil {
+		return x.Status
+	}
+	return TenantSubscriptionStatus_TENANT_SUBSCRIPTION_STATUS_UNKNOWN
+}
+
+func (x *TenantSubscription) GetSource() TenantSubscriptionSource {
+	if x != nil {
+		return x.Source
+	}
+	return TenantSubscriptionSource_TENANT_SUBSCRIPTION_SOURCE_UNKNOWN
+}
+
+func (x *TenantSubscription) GetExternalCustomerId() string {
+	if x != nil {
+		return x.ExternalCustomerId
+	}
+	return ""
+}
+
+func (x *TenantSubscription) GetExternalSubscriptionId() string {
+	if x != nil {
+		return x.ExternalSubscriptionId
+	}
+	return ""
+}
+
+func (x *TenantSubscription) GetCurrentPeriodStart() int64 {
+	if x != nil {
+		return x.CurrentPeriodStart
+	}
+	return 0
+}
+
+func (x *TenantSubscription) GetCurrentPeriodEnd() int64 {
+	if x != nil {
+		return x.CurrentPeriodEnd
+	}
+	return 0
+}
+
+func (x *TenantSubscription) GetCancelAtPeriodEnd() bool {
+	if x != nil {
+		return x.CancelAtPeriodEnd
+	}
+	return false
+}
+
+func (x *TenantSubscription) GetGraceUntil() int64 {
+	if x != nil {
+		return x.GraceUntil
+	}
+	return 0
+}
+
+func (x *TenantSubscription) GetPendingPlanId() int64 {
+	if x != nil {
+		return x.PendingPlanId
+	}
+	return 0
+}
+
+func (x *TenantSubscription) GetPendingPlanVersion() int32 {
+	if x != nil {
+		return x.PendingPlanVersion
+	}
+	return 0
+}
+
+func (x *TenantSubscription) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *TenantSubscription) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V6租户当前权益。
+type TenantEntitlement struct {
+	state               protoimpl.MessageState  `protogen:"open.v1"`
+	Id                  int64                   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                // 权益ID
+	TenantId            int64                   `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                    // 租户ID
+	PlanId              int64                   `protobuf:"varint,3,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`                                          // 基础套餐版本ID
+	PlanVersion         int32                   `protobuf:"varint,4,opt,name=plan_version,json=planVersion,proto3" json:"plan_version,omitempty"`                           // 基础套餐版本号
+	BuildsPerCycle      int64                   `protobuf:"varint,5,opt,name=builds_per_cycle,json=buildsPerCycle,proto3" json:"builds_per_cycle,omitempty"`                // 周期构建次数
+	MaxBuildConcurrency int32                   `protobuf:"varint,6,opt,name=max_build_concurrency,json=maxBuildConcurrency,proto3" json:"max_build_concurrency,omitempty"` // 最大构建并发
+	StorageBytes        int64                   `protobuf:"varint,7,opt,name=storage_bytes,json=storageBytes,proto3" json:"storage_bytes,omitempty"`                        // 存储额度字节
+	MaxUploadBytes      int64                   `protobuf:"varint,8,opt,name=max_upload_bytes,json=maxUploadBytes,proto3" json:"max_upload_bytes,omitempty"`                // 单文件上传上限字节
+	TeamSeats           int32                   `protobuf:"varint,9,opt,name=team_seats,json=teamSeats,proto3" json:"team_seats,omitempty"`                                 // 团队席位
+	ApiRateLimit        int32                   `protobuf:"varint,10,opt,name=api_rate_limit,json=apiRateLimit,proto3" json:"api_rate_limit,omitempty"`                     // Open API每分钟上限
+	ChargeFailedBuild   bool                    `protobuf:"varint,11,opt,name=charge_failed_build,json=chargeFailedBuild,proto3" json:"charge_failed_build,omitempty"`      // 失败构建是否计量
+	ChargeCacheHit      bool                    `protobuf:"varint,12,opt,name=charge_cache_hit,json=chargeCacheHit,proto3" json:"charge_cache_hit,omitempty"`               // 缓存命中是否计量
+	ChargeRetryBuild    bool                    `protobuf:"varint,13,opt,name=charge_retry_build,json=chargeRetryBuild,proto3" json:"charge_retry_build,omitempty"`         // 重试构建是否计量
+	OverrideJson        string                  `protobuf:"bytes,14,opt,name=override_json,json=overrideJson,proto3" json:"override_json,omitempty"`                        // 人工覆盖JSON
+	ValidFrom           int64                   `protobuf:"varint,15,opt,name=valid_from,json=validFrom,proto3" json:"valid_from,omitempty"`                                // 生效时间Unix毫秒
+	ValidUntil          int64                   `protobuf:"varint,16,opt,name=valid_until,json=validUntil,proto3" json:"valid_until,omitempty"`                             // 失效时间Unix毫秒
+	Status              TenantEntitlementStatus `protobuf:"varint,17,opt,name=status,proto3,enum=core.TenantEntitlementStatus" json:"status,omitempty"`                     // 权益状态
+	Revision            int64                   `protobuf:"varint,18,opt,name=revision,proto3" json:"revision,omitempty"`                                                   // 权益修订号
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *TenantEntitlement) Reset() {
+	*x = TenantEntitlement{}
+	mi := &file_proto_core_core_proto_msgTypes[219]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TenantEntitlement) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TenantEntitlement) ProtoMessage() {}
+
+func (x *TenantEntitlement) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[219]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TenantEntitlement.ProtoReflect.Descriptor instead.
+func (*TenantEntitlement) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{219}
+}
+
+func (x *TenantEntitlement) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetPlanId() int64 {
+	if x != nil {
+		return x.PlanId
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetPlanVersion() int32 {
+	if x != nil {
+		return x.PlanVersion
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetBuildsPerCycle() int64 {
+	if x != nil {
+		return x.BuildsPerCycle
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetMaxBuildConcurrency() int32 {
+	if x != nil {
+		return x.MaxBuildConcurrency
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetStorageBytes() int64 {
+	if x != nil {
+		return x.StorageBytes
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetMaxUploadBytes() int64 {
+	if x != nil {
+		return x.MaxUploadBytes
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetTeamSeats() int32 {
+	if x != nil {
+		return x.TeamSeats
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetApiRateLimit() int32 {
+	if x != nil {
+		return x.ApiRateLimit
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetChargeFailedBuild() bool {
+	if x != nil {
+		return x.ChargeFailedBuild
+	}
+	return false
+}
+
+func (x *TenantEntitlement) GetChargeCacheHit() bool {
+	if x != nil {
+		return x.ChargeCacheHit
+	}
+	return false
+}
+
+func (x *TenantEntitlement) GetChargeRetryBuild() bool {
+	if x != nil {
+		return x.ChargeRetryBuild
+	}
+	return false
+}
+
+func (x *TenantEntitlement) GetOverrideJson() string {
+	if x != nil {
+		return x.OverrideJson
+	}
+	return ""
+}
+
+func (x *TenantEntitlement) GetValidFrom() int64 {
+	if x != nil {
+		return x.ValidFrom
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetValidUntil() int64 {
+	if x != nil {
+		return x.ValidUntil
+	}
+	return 0
+}
+
+func (x *TenantEntitlement) GetStatus() TenantEntitlementStatus {
+	if x != nil {
+		return x.Status
+	}
+	return TenantEntitlementStatus_TENANT_ENTITLEMENT_STATUS_UNKNOWN
+}
+
+func (x *TenantEntitlement) GetRevision() int64 {
+	if x != nil {
+		return x.Revision
+	}
+	return 0
+}
+
+// 查询V6租户账务请求；tenant_id为0时使用调用上下文租户。
+type TenantBillingReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"` // 目标租户ID，0表示当前租户
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TenantBillingReq) Reset() {
+	*x = TenantBillingReq{}
+	mi := &file_proto_core_core_proto_msgTypes[220]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TenantBillingReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TenantBillingReq) ProtoMessage() {}
+
+func (x *TenantBillingReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[220]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TenantBillingReq.ProtoReflect.Descriptor instead.
+func (*TenantBillingReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{220}
+}
+
+func (x *TenantBillingReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+// V6租户订阅和权益响应。
+type TenantBillingResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                 // 通用响应
+	Subscription  *TenantSubscription    `protobuf:"bytes,2,opt,name=subscription,proto3" json:"subscription,omitempty"` // 当前订阅
+	Entitlement   *TenantEntitlement     `protobuf:"bytes,3,opt,name=entitlement,proto3" json:"entitlement,omitempty"`   // 当前权益
+	Plan          *BillingPlan           `protobuf:"bytes,4,opt,name=plan,proto3" json:"plan,omitempty"`                 // 当前不可变套餐版本
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TenantBillingResp) Reset() {
+	*x = TenantBillingResp{}
+	mi := &file_proto_core_core_proto_msgTypes[221]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TenantBillingResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TenantBillingResp) ProtoMessage() {}
+
+func (x *TenantBillingResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[221]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TenantBillingResp.ProtoReflect.Descriptor instead.
+func (*TenantBillingResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{221}
+}
+
+func (x *TenantBillingResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *TenantBillingResp) GetSubscription() *TenantSubscription {
+	if x != nil {
+		return x.Subscription
+	}
+	return nil
+}
+
+func (x *TenantBillingResp) GetEntitlement() *TenantEntitlement {
+	if x != nil {
+		return x.Entitlement
+	}
+	return nil
+}
+
+func (x *TenantBillingResp) GetPlan() *BillingPlan {
+	if x != nil {
+		return x.Plan
+	}
+	return nil
+}
+
+// 管理端创建或更新V6人工合同订阅请求。
+type UpsertManualSubscriptionReq struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	TenantId          int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                           // 目标租户ID
+	PlanId            int64                  `protobuf:"varint,2,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`                                 // 套餐版本ID
+	PeriodStart       int64                  `protobuf:"varint,3,opt,name=period_start,json=periodStart,proto3" json:"period_start,omitempty"`                  // 周期开始Unix毫秒
+	PeriodEnd         int64                  `protobuf:"varint,4,opt,name=period_end,json=periodEnd,proto3" json:"period_end,omitempty"`                        // 周期结束Unix毫秒
+	GraceUntil        int64                  `protobuf:"varint,5,opt,name=grace_until,json=graceUntil,proto3" json:"grace_until,omitempty"`                     // 可选宽限截止Unix毫秒
+	OverrideJson      string                 `protobuf:"bytes,6,opt,name=override_json,json=overrideJson,proto3" json:"override_json,omitempty"`                // 可选权益覆盖JSON
+	ContractReference string                 `protobuf:"bytes,7,opt,name=contract_reference,json=contractReference,proto3" json:"contract_reference,omitempty"` // 人工合同编号
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *UpsertManualSubscriptionReq) Reset() {
+	*x = UpsertManualSubscriptionReq{}
+	mi := &file_proto_core_core_proto_msgTypes[222]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpsertManualSubscriptionReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpsertManualSubscriptionReq) ProtoMessage() {}
+
+func (x *UpsertManualSubscriptionReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[222]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpsertManualSubscriptionReq.ProtoReflect.Descriptor instead.
+func (*UpsertManualSubscriptionReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{222}
+}
+
+func (x *UpsertManualSubscriptionReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *UpsertManualSubscriptionReq) GetPlanId() int64 {
+	if x != nil {
+		return x.PlanId
+	}
+	return 0
+}
+
+func (x *UpsertManualSubscriptionReq) GetPeriodStart() int64 {
+	if x != nil {
+		return x.PeriodStart
+	}
+	return 0
+}
+
+func (x *UpsertManualSubscriptionReq) GetPeriodEnd() int64 {
+	if x != nil {
+		return x.PeriodEnd
+	}
+	return 0
+}
+
+func (x *UpsertManualSubscriptionReq) GetGraceUntil() int64 {
+	if x != nil {
+		return x.GraceUntil
+	}
+	return 0
+}
+
+func (x *UpsertManualSubscriptionReq) GetOverrideJson() string {
+	if x != nil {
+		return x.OverrideJson
+	}
+	return ""
+}
+
+func (x *UpsertManualSubscriptionReq) GetContractReference() string {
+	if x != nil {
+		return x.ContractReference
+	}
+	return ""
+}
+
+// V6订阅套餐变更请求。
+type ChangeTenantSubscriptionReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`          // 目标租户ID，0表示当前租户
+	PlanId        int64                  `protobuf:"varint,2,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`                // 新套餐版本ID
+	Mode          SubscriptionChangeMode `protobuf:"varint,3,opt,name=mode,proto3,enum=core.SubscriptionChangeMode" json:"mode,omitempty"` // 生效方式
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChangeTenantSubscriptionReq) Reset() {
+	*x = ChangeTenantSubscriptionReq{}
+	mi := &file_proto_core_core_proto_msgTypes[223]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChangeTenantSubscriptionReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChangeTenantSubscriptionReq) ProtoMessage() {}
+
+func (x *ChangeTenantSubscriptionReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[223]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChangeTenantSubscriptionReq.ProtoReflect.Descriptor instead.
+func (*ChangeTenantSubscriptionReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{223}
+}
+
+func (x *ChangeTenantSubscriptionReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *ChangeTenantSubscriptionReq) GetPlanId() int64 {
+	if x != nil {
+		return x.PlanId
+	}
+	return 0
+}
+
+func (x *ChangeTenantSubscriptionReq) GetMode() SubscriptionChangeMode {
+	if x != nil {
+		return x.Mode
+	}
+	return SubscriptionChangeMode_SUBSCRIPTION_CHANGE_MODE_UNKNOWN
+}
+
+// V6订阅取消请求。
+type CancelTenantSubscriptionReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"` // 目标租户ID，0表示当前租户
+	Immediately   bool                   `protobuf:"varint,2,opt,name=immediately,proto3" json:"immediately,omitempty"`           // 是否立即取消，否则周期末取消
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CancelTenantSubscriptionReq) Reset() {
+	*x = CancelTenantSubscriptionReq{}
+	mi := &file_proto_core_core_proto_msgTypes[224]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CancelTenantSubscriptionReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CancelTenantSubscriptionReq) ProtoMessage() {}
+
+func (x *CancelTenantSubscriptionReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[224]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CancelTenantSubscriptionReq.ProtoReflect.Descriptor instead.
+func (*CancelTenantSubscriptionReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{224}
+}
+
+func (x *CancelTenantSubscriptionReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *CancelTenantSubscriptionReq) GetImmediately() bool {
+	if x != nil {
+		return x.Immediately
+	}
+	return false
+}
+
+// V6额度预占请求。
+type ReserveQuotaReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	TenantId       int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                  // 目标租户ID，0表示当前租户
+	Metric         QuotaMetric            `protobuf:"varint,2,opt,name=metric,proto3,enum=core.QuotaMetric" json:"metric,omitempty"`                // 额度指标
+	Quantity       int64                  `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`                                  // 预占数量
+	ResourceType   string                 `protobuf:"bytes,4,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`       // 来源资源类型
+	ResourceId     int64                  `protobuf:"varint,5,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`            // 来源资源ID，创建前可为0
+	IdempotencyKey string                 `protobuf:"bytes,6,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"` // 预占幂等键
+	TtlSeconds     int64                  `protobuf:"varint,7,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`            // 预占有效秒数
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ReserveQuotaReq) Reset() {
+	*x = ReserveQuotaReq{}
+	mi := &file_proto_core_core_proto_msgTypes[225]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReserveQuotaReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReserveQuotaReq) ProtoMessage() {}
+
+func (x *ReserveQuotaReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[225]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReserveQuotaReq.ProtoReflect.Descriptor instead.
+func (*ReserveQuotaReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{225}
+}
+
+func (x *ReserveQuotaReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *ReserveQuotaReq) GetMetric() QuotaMetric {
+	if x != nil {
+		return x.Metric
+	}
+	return QuotaMetric_QUOTA_METRIC_UNKNOWN
+}
+
+func (x *ReserveQuotaReq) GetQuantity() int64 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+func (x *ReserveQuotaReq) GetResourceType() string {
+	if x != nil {
+		return x.ResourceType
+	}
+	return ""
+}
+
+func (x *ReserveQuotaReq) GetResourceId() int64 {
+	if x != nil {
+		return x.ResourceId
+	}
+	return 0
+}
+
+func (x *ReserveQuotaReq) GetIdempotencyKey() string {
+	if x != nil {
+		return x.IdempotencyKey
+	}
+	return ""
+}
+
+func (x *ReserveQuotaReq) GetTtlSeconds() int64 {
+	if x != nil {
+		return x.TtlSeconds
+	}
+	return 0
+}
+
+// V6额度预占结果。
+type QuotaReservation struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                      // 预占ID
+	TenantId         int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                          // 租户ID
+	Metric           QuotaMetric            `protobuf:"varint,3,opt,name=metric,proto3,enum=core.QuotaMetric" json:"metric,omitempty"`                        // 额度指标
+	Quantity         int64                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`                                          // 预占数量
+	ResourceType     string                 `protobuf:"bytes,5,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`               // 来源资源类型
+	ResourceId       int64                  `protobuf:"varint,6,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`                    // 来源资源ID
+	IdempotencyKey   string                 `protobuf:"bytes,7,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"`         // 幂等键
+	PeriodKey        string                 `protobuf:"bytes,8,opt,name=period_key,json=periodKey,proto3" json:"period_key,omitempty"`                        // 周期键YYYY-MM
+	Status           QuotaReservationStatus `protobuf:"varint,9,opt,name=status,proto3,enum=core.QuotaReservationStatus" json:"status,omitempty"`             // 预占状态
+	ExpiresAt        int64                  `protobuf:"varint,10,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`                      // 过期时间Unix毫秒
+	UsedQuantity     int64                  `protobuf:"varint,11,opt,name=used_quantity,json=usedQuantity,proto3" json:"used_quantity,omitempty"`             // 当前已使用数量
+	ReservedQuantity int64                  `protobuf:"varint,12,opt,name=reserved_quantity,json=reservedQuantity,proto3" json:"reserved_quantity,omitempty"` // 当前生效预占数量
+	LimitQuantity    int64                  `protobuf:"varint,13,opt,name=limit_quantity,json=limitQuantity,proto3" json:"limit_quantity,omitempty"`          // 当前限额，-1不限量
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *QuotaReservation) Reset() {
+	*x = QuotaReservation{}
+	mi := &file_proto_core_core_proto_msgTypes[226]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *QuotaReservation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QuotaReservation) ProtoMessage() {}
+
+func (x *QuotaReservation) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[226]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QuotaReservation.ProtoReflect.Descriptor instead.
+func (*QuotaReservation) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{226}
+}
+
+func (x *QuotaReservation) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *QuotaReservation) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *QuotaReservation) GetMetric() QuotaMetric {
+	if x != nil {
+		return x.Metric
+	}
+	return QuotaMetric_QUOTA_METRIC_UNKNOWN
+}
+
+func (x *QuotaReservation) GetQuantity() int64 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+func (x *QuotaReservation) GetResourceType() string {
+	if x != nil {
+		return x.ResourceType
+	}
+	return ""
+}
+
+func (x *QuotaReservation) GetResourceId() int64 {
+	if x != nil {
+		return x.ResourceId
+	}
+	return 0
+}
+
+func (x *QuotaReservation) GetIdempotencyKey() string {
+	if x != nil {
+		return x.IdempotencyKey
+	}
+	return ""
+}
+
+func (x *QuotaReservation) GetPeriodKey() string {
+	if x != nil {
+		return x.PeriodKey
+	}
+	return ""
+}
+
+func (x *QuotaReservation) GetStatus() QuotaReservationStatus {
+	if x != nil {
+		return x.Status
+	}
+	return QuotaReservationStatus_QUOTA_RESERVATION_STATUS_UNKNOWN
+}
+
+func (x *QuotaReservation) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
+func (x *QuotaReservation) GetUsedQuantity() int64 {
+	if x != nil {
+		return x.UsedQuantity
+	}
+	return 0
+}
+
+func (x *QuotaReservation) GetReservedQuantity() int64 {
+	if x != nil {
+		return x.ReservedQuantity
+	}
+	return 0
+}
+
+func (x *QuotaReservation) GetLimitQuantity() int64 {
+	if x != nil {
+		return x.LimitQuantity
+	}
+	return 0
+}
+
+// V6额度预占响应。
+type QuotaReservationResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *QuotaReservation      `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 预占结果
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *QuotaReservationResp) Reset() {
+	*x = QuotaReservationResp{}
+	mi := &file_proto_core_core_proto_msgTypes[227]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *QuotaReservationResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QuotaReservationResp) ProtoMessage() {}
+
+func (x *QuotaReservationResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[227]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QuotaReservationResp.ProtoReflect.Descriptor instead.
+func (*QuotaReservationResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{227}
+}
+
+func (x *QuotaReservationResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *QuotaReservationResp) GetData() *QuotaReservation {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V6额度确认或释放请求。
+type QuotaReservationActionReq struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	TenantId          int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                       // 目标租户ID，0表示当前租户
+	Metric            QuotaMetric            `protobuf:"varint,2,opt,name=metric,proto3,enum=core.QuotaMetric" json:"metric,omitempty"`                                     // 额度指标
+	IdempotencyKey    string                 `protobuf:"bytes,3,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"`                      // 预占幂等键
+	ResourceId        int64                  `protobuf:"varint,4,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`                                 // 最终资源ID
+	UsageMetric       BillingUsageMetric     `protobuf:"varint,5,opt,name=usage_metric,json=usageMetric,proto3,enum=core.BillingUsageMetric" json:"usage_metric,omitempty"` // 确认时写入的用量指标，释放时忽略
+	UsageMetadataJson string                 `protobuf:"bytes,6,opt,name=usage_metadata_json,json=usageMetadataJson,proto3" json:"usage_metadata_json,omitempty"`           // 确认时用量元数据JSON
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *QuotaReservationActionReq) Reset() {
+	*x = QuotaReservationActionReq{}
+	mi := &file_proto_core_core_proto_msgTypes[228]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *QuotaReservationActionReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QuotaReservationActionReq) ProtoMessage() {}
+
+func (x *QuotaReservationActionReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[228]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QuotaReservationActionReq.ProtoReflect.Descriptor instead.
+func (*QuotaReservationActionReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{228}
+}
+
+func (x *QuotaReservationActionReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *QuotaReservationActionReq) GetMetric() QuotaMetric {
+	if x != nil {
+		return x.Metric
+	}
+	return QuotaMetric_QUOTA_METRIC_UNKNOWN
+}
+
+func (x *QuotaReservationActionReq) GetIdempotencyKey() string {
+	if x != nil {
+		return x.IdempotencyKey
+	}
+	return ""
+}
+
+func (x *QuotaReservationActionReq) GetResourceId() int64 {
+	if x != nil {
+		return x.ResourceId
+	}
+	return 0
+}
+
+func (x *QuotaReservationActionReq) GetUsageMetric() BillingUsageMetric {
+	if x != nil {
+		return x.UsageMetric
+	}
+	return BillingUsageMetric_BILLING_USAGE_METRIC_UNKNOWN
+}
+
+func (x *QuotaReservationActionReq) GetUsageMetadataJson() string {
+	if x != nil {
+		return x.UsageMetadataJson
+	}
+	return ""
+}
+
+// V6幂等用量入账请求。
+type RecordUsageReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	TenantId       int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                  // 目标租户ID，0表示当前租户
+	Metric         BillingUsageMetric     `protobuf:"varint,2,opt,name=metric,proto3,enum=core.BillingUsageMetric" json:"metric,omitempty"`         // 用量指标
+	Quantity       int64                  `protobuf:"varint,3,opt,name=quantity,proto3" json:"quantity,omitempty"`                                  // 增量，调整账可为负数
+	ResourceType   string                 `protobuf:"bytes,4,opt,name=resource_type,json=resourceType,proto3" json:"resource_type,omitempty"`       // 来源资源类型
+	ResourceId     int64                  `protobuf:"varint,5,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`            // 来源资源ID
+	IdempotencyKey string                 `protobuf:"bytes,6,opt,name=idempotency_key,json=idempotencyKey,proto3" json:"idempotency_key,omitempty"` // 指标内幂等键
+	OccurredAt     int64                  `protobuf:"varint,7,opt,name=occurred_at,json=occurredAt,proto3" json:"occurred_at,omitempty"`            // 发生时间Unix毫秒，0表示当前时间
+	MetadataJson   string                 `protobuf:"bytes,8,opt,name=metadata_json,json=metadataJson,proto3" json:"metadata_json,omitempty"`       // 计量规则或调整原因JSON
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RecordUsageReq) Reset() {
+	*x = RecordUsageReq{}
+	mi := &file_proto_core_core_proto_msgTypes[229]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecordUsageReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecordUsageReq) ProtoMessage() {}
+
+func (x *RecordUsageReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[229]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecordUsageReq.ProtoReflect.Descriptor instead.
+func (*RecordUsageReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{229}
+}
+
+func (x *RecordUsageReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *RecordUsageReq) GetMetric() BillingUsageMetric {
+	if x != nil {
+		return x.Metric
+	}
+	return BillingUsageMetric_BILLING_USAGE_METRIC_UNKNOWN
+}
+
+func (x *RecordUsageReq) GetQuantity() int64 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+func (x *RecordUsageReq) GetResourceType() string {
+	if x != nil {
+		return x.ResourceType
+	}
+	return ""
+}
+
+func (x *RecordUsageReq) GetResourceId() int64 {
+	if x != nil {
+		return x.ResourceId
+	}
+	return 0
+}
+
+func (x *RecordUsageReq) GetIdempotencyKey() string {
+	if x != nil {
+		return x.IdempotencyKey
+	}
+	return ""
+}
+
+func (x *RecordUsageReq) GetOccurredAt() int64 {
+	if x != nil {
+		return x.OccurredAt
+	}
+	return 0
+}
+
+func (x *RecordUsageReq) GetMetadataJson() string {
+	if x != nil {
+		return x.MetadataJson
+	}
+	return ""
+}
+
+// V6单项用量汇总。
+type UsageMetricSummary struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Metric           BillingUsageMetric     `protobuf:"varint,1,opt,name=metric,proto3,enum=core.BillingUsageMetric" json:"metric,omitempty"`                // 用量指标
+	UsedQuantity     int64                  `protobuf:"varint,2,opt,name=used_quantity,json=usedQuantity,proto3" json:"used_quantity,omitempty"`             // 账本汇总用量
+	ReservedQuantity int64                  `protobuf:"varint,3,opt,name=reserved_quantity,json=reservedQuantity,proto3" json:"reserved_quantity,omitempty"` // 生效预占数量
+	LimitQuantity    int64                  `protobuf:"varint,4,opt,name=limit_quantity,json=limitQuantity,proto3" json:"limit_quantity,omitempty"`          // 当前权益限额，-1不限量
+	UsagePercent     int32                  `protobuf:"varint,5,opt,name=usage_percent,json=usagePercent,proto3" json:"usage_percent,omitempty"`             // 使用百分比，不限量为0
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *UsageMetricSummary) Reset() {
+	*x = UsageMetricSummary{}
+	mi := &file_proto_core_core_proto_msgTypes[230]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UsageMetricSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UsageMetricSummary) ProtoMessage() {}
+
+func (x *UsageMetricSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[230]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UsageMetricSummary.ProtoReflect.Descriptor instead.
+func (*UsageMetricSummary) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{230}
+}
+
+func (x *UsageMetricSummary) GetMetric() BillingUsageMetric {
+	if x != nil {
+		return x.Metric
+	}
+	return BillingUsageMetric_BILLING_USAGE_METRIC_UNKNOWN
+}
+
+func (x *UsageMetricSummary) GetUsedQuantity() int64 {
+	if x != nil {
+		return x.UsedQuantity
+	}
+	return 0
+}
+
+func (x *UsageMetricSummary) GetReservedQuantity() int64 {
+	if x != nil {
+		return x.ReservedQuantity
+	}
+	return 0
+}
+
+func (x *UsageMetricSummary) GetLimitQuantity() int64 {
+	if x != nil {
+		return x.LimitQuantity
+	}
+	return 0
+}
+
+func (x *UsageMetricSummary) GetUsagePercent() int32 {
+	if x != nil {
+		return x.UsagePercent
+	}
+	return 0
+}
+
+// 查询V6用量请求。
+type BillingUsageReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`   // 目标租户ID，0表示当前租户
+	PeriodKey     string                 `protobuf:"bytes,2,opt,name=period_key,json=periodKey,proto3" json:"period_key,omitempty"` // 周期键YYYY-MM，空表示当前订阅周期
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BillingUsageReq) Reset() {
+	*x = BillingUsageReq{}
+	mi := &file_proto_core_core_proto_msgTypes[231]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BillingUsageReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BillingUsageReq) ProtoMessage() {}
+
+func (x *BillingUsageReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[231]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BillingUsageReq.ProtoReflect.Descriptor instead.
+func (*BillingUsageReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{231}
+}
+
+func (x *BillingUsageReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *BillingUsageReq) GetPeriodKey() string {
+	if x != nil {
+		return x.PeriodKey
+	}
+	return ""
+}
+
+// V6用量汇总响应。
+type BillingUsageResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                            // 通用响应
+	PeriodKey     string                 `protobuf:"bytes,2,opt,name=period_key,json=periodKey,proto3" json:"period_key,omitempty"` // 周期键YYYY-MM
+	Data          []*UsageMetricSummary  `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`                            // 各指标用量
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BillingUsageResp) Reset() {
+	*x = BillingUsageResp{}
+	mi := &file_proto_core_core_proto_msgTypes[232]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BillingUsageResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BillingUsageResp) ProtoMessage() {}
+
+func (x *BillingUsageResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[232]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BillingUsageResp.ProtoReflect.Descriptor instead.
+func (*BillingUsageResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{232}
+}
+
+func (x *BillingUsageResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *BillingUsageResp) GetPeriodKey() string {
+	if x != nil {
+		return x.PeriodKey
+	}
+	return ""
+}
+
+func (x *BillingUsageResp) GetData() []*UsageMetricSummary {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V6不可变账单项。
+type InvoiceItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                      // 账单项ID
+	InvoiceId     int64                  `protobuf:"varint,2,opt,name=invoice_id,json=invoiceId,proto3" json:"invoice_id,omitempty"`       // 账单ID
+	LineKey       string                 `protobuf:"bytes,3,opt,name=line_key,json=lineKey,proto3" json:"line_key,omitempty"`              // 不可变行键
+	ItemType      int32                  `protobuf:"varint,4,opt,name=item_type,json=itemType,proto3" json:"item_type,omitempty"`          // 账单项类型枚举值
+	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`                     // 说明
+	Metric        BillingUsageMetric     `protobuf:"varint,6,opt,name=metric,proto3,enum=core.BillingUsageMetric" json:"metric,omitempty"` // 用量指标
+	Quantity      int64                  `protobuf:"varint,7,opt,name=quantity,proto3" json:"quantity,omitempty"`                          // 数量
+	UnitAmount    int64                  `protobuf:"varint,8,opt,name=unit_amount,json=unitAmount,proto3" json:"unit_amount,omitempty"`    // 单价整数
+	Amount        int64                  `protobuf:"varint,9,opt,name=amount,proto3" json:"amount,omitempty"`                              // 行金额整数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvoiceItem) Reset() {
+	*x = InvoiceItem{}
+	mi := &file_proto_core_core_proto_msgTypes[233]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvoiceItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvoiceItem) ProtoMessage() {}
+
+func (x *InvoiceItem) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[233]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvoiceItem.ProtoReflect.Descriptor instead.
+func (*InvoiceItem) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{233}
+}
+
+func (x *InvoiceItem) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *InvoiceItem) GetInvoiceId() int64 {
+	if x != nil {
+		return x.InvoiceId
+	}
+	return 0
+}
+
+func (x *InvoiceItem) GetLineKey() string {
+	if x != nil {
+		return x.LineKey
+	}
+	return ""
+}
+
+func (x *InvoiceItem) GetItemType() int32 {
+	if x != nil {
+		return x.ItemType
+	}
+	return 0
+}
+
+func (x *InvoiceItem) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *InvoiceItem) GetMetric() BillingUsageMetric {
+	if x != nil {
+		return x.Metric
+	}
+	return BillingUsageMetric_BILLING_USAGE_METRIC_UNKNOWN
+}
+
+func (x *InvoiceItem) GetQuantity() int64 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+func (x *InvoiceItem) GetUnitAmount() int64 {
+	if x != nil {
+		return x.UnitAmount
+	}
+	return 0
+}
+
+func (x *InvoiceItem) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+// V6不可变账单。
+type Invoice struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                         // 账单ID
+	TenantId          int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                             // 租户ID
+	InvoiceNo         string                 `protobuf:"bytes,3,opt,name=invoice_no,json=invoiceNo,proto3" json:"invoice_no,omitempty"`                           // 平台账单号
+	ExternalInvoiceId string                 `protobuf:"bytes,4,opt,name=external_invoice_id,json=externalInvoiceId,proto3" json:"external_invoice_id,omitempty"` // 支付提供商账单ID
+	Status            InvoiceStatus          `protobuf:"varint,5,opt,name=status,proto3,enum=core.InvoiceStatus" json:"status,omitempty"`                         // 账单状态
+	Currency          string                 `protobuf:"bytes,6,opt,name=currency,proto3" json:"currency,omitempty"`                                              // ISO 4217币种
+	SubtotalAmount    int64                  `protobuf:"varint,7,opt,name=subtotal_amount,json=subtotalAmount,proto3" json:"subtotal_amount,omitempty"`           // 税前小计整数
+	DiscountAmount    int64                  `protobuf:"varint,8,opt,name=discount_amount,json=discountAmount,proto3" json:"discount_amount,omitempty"`           // 折扣金额整数
+	TaxAmount         int64                  `protobuf:"varint,9,opt,name=tax_amount,json=taxAmount,proto3" json:"tax_amount,omitempty"`                          // 税费整数
+	TotalAmount       int64                  `protobuf:"varint,10,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty"`                   // 应付总额整数
+	PaidAmount        int64                  `protobuf:"varint,11,opt,name=paid_amount,json=paidAmount,proto3" json:"paid_amount,omitempty"`                      // 已支付金额整数
+	RefundedAmount    int64                  `protobuf:"varint,12,opt,name=refunded_amount,json=refundedAmount,proto3" json:"refunded_amount,omitempty"`          // 已退款金额整数
+	PeriodStart       int64                  `protobuf:"varint,13,opt,name=period_start,json=periodStart,proto3" json:"period_start,omitempty"`                   // 周期开始Unix毫秒
+	PeriodEnd         int64                  `protobuf:"varint,14,opt,name=period_end,json=periodEnd,proto3" json:"period_end,omitempty"`                         // 周期结束Unix毫秒
+	DueAt             int64                  `protobuf:"varint,15,opt,name=due_at,json=dueAt,proto3" json:"due_at,omitempty"`                                     // 到期时间Unix毫秒
+	PaidAt            int64                  `protobuf:"varint,16,opt,name=paid_at,json=paidAt,proto3" json:"paid_at,omitempty"`                                  // 支付时间Unix毫秒
+	Items             []*InvoiceItem         `protobuf:"bytes,17,rep,name=items,proto3" json:"items,omitempty"`                                                   // 不可变账单项
+	CreateTime        int64                  `protobuf:"varint,18,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                      // 创建时间Unix毫秒
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *Invoice) Reset() {
+	*x = Invoice{}
+	mi := &file_proto_core_core_proto_msgTypes[234]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Invoice) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Invoice) ProtoMessage() {}
+
+func (x *Invoice) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[234]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Invoice.ProtoReflect.Descriptor instead.
+func (*Invoice) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{234}
+}
+
+func (x *Invoice) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *Invoice) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *Invoice) GetInvoiceNo() string {
+	if x != nil {
+		return x.InvoiceNo
+	}
+	return ""
+}
+
+func (x *Invoice) GetExternalInvoiceId() string {
+	if x != nil {
+		return x.ExternalInvoiceId
+	}
+	return ""
+}
+
+func (x *Invoice) GetStatus() InvoiceStatus {
+	if x != nil {
+		return x.Status
+	}
+	return InvoiceStatus_INVOICE_STATUS_UNKNOWN
+}
+
+func (x *Invoice) GetCurrency() string {
+	if x != nil {
+		return x.Currency
+	}
+	return ""
+}
+
+func (x *Invoice) GetSubtotalAmount() int64 {
+	if x != nil {
+		return x.SubtotalAmount
+	}
+	return 0
+}
+
+func (x *Invoice) GetDiscountAmount() int64 {
+	if x != nil {
+		return x.DiscountAmount
+	}
+	return 0
+}
+
+func (x *Invoice) GetTaxAmount() int64 {
+	if x != nil {
+		return x.TaxAmount
+	}
+	return 0
+}
+
+func (x *Invoice) GetTotalAmount() int64 {
+	if x != nil {
+		return x.TotalAmount
+	}
+	return 0
+}
+
+func (x *Invoice) GetPaidAmount() int64 {
+	if x != nil {
+		return x.PaidAmount
+	}
+	return 0
+}
+
+func (x *Invoice) GetRefundedAmount() int64 {
+	if x != nil {
+		return x.RefundedAmount
+	}
+	return 0
+}
+
+func (x *Invoice) GetPeriodStart() int64 {
+	if x != nil {
+		return x.PeriodStart
+	}
+	return 0
+}
+
+func (x *Invoice) GetPeriodEnd() int64 {
+	if x != nil {
+		return x.PeriodEnd
+	}
+	return 0
+}
+
+func (x *Invoice) GetDueAt() int64 {
+	if x != nil {
+		return x.DueAt
+	}
+	return 0
+}
+
+func (x *Invoice) GetPaidAt() int64 {
+	if x != nil {
+		return x.PaidAt
+	}
+	return 0
+}
+
+func (x *Invoice) GetItems() []*InvoiceItem {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+func (x *Invoice) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+// 查询V6账单列表请求。
+type InvoiceListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`     // 目标租户ID，0表示当前租户
+	Status        InvoiceStatus          `protobuf:"varint,2,opt,name=status,proto3,enum=core.InvoiceStatus" json:"status,omitempty"` // 状态筛选，未知表示全部
+	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`                             // 页码，从1开始
+	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`     // 每页数量
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvoiceListReq) Reset() {
+	*x = InvoiceListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[235]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvoiceListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvoiceListReq) ProtoMessage() {}
+
+func (x *InvoiceListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[235]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvoiceListReq.ProtoReflect.Descriptor instead.
+func (*InvoiceListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{235}
+}
+
+func (x *InvoiceListReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *InvoiceListReq) GetStatus() InvoiceStatus {
+	if x != nil {
+		return x.Status
+	}
+	return InvoiceStatus_INVOICE_STATUS_UNKNOWN
+}
+
+func (x *InvoiceListReq) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *InvoiceListReq) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+// V6账单列表响应。
+type InvoiceListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`    // 通用响应
+	Data          []*Invoice             `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"`    // 账单列表
+	Total         int64                  `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"` // 总数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvoiceListResp) Reset() {
+	*x = InvoiceListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[236]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvoiceListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvoiceListResp) ProtoMessage() {}
+
+func (x *InvoiceListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[236]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvoiceListResp.ProtoReflect.Descriptor instead.
+func (*InvoiceListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{236}
+}
+
+func (x *InvoiceListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *InvoiceListResp) GetData() []*Invoice {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *InvoiceListResp) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+// 已完成签名验证并标准化的V6支付回调请求。
+type ApplyBillingWebhookReq struct {
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	Provider               string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`                                                             // 支付提供商：stripe
+	ProviderEventId        string                 `protobuf:"bytes,2,opt,name=provider_event_id,json=providerEventId,proto3" json:"provider_event_id,omitempty"`                      // 供应商事件ID
+	EventType              string                 `protobuf:"bytes,3,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`                                          // 供应商事件类型
+	EventCreatedAt         int64                  `protobuf:"varint,4,opt,name=event_created_at,json=eventCreatedAt,proto3" json:"event_created_at,omitempty"`                        // 供应商事件创建Unix秒
+	PayloadJson            string                 `protobuf:"bytes,5,opt,name=payload_json,json=payloadJson,proto3" json:"payload_json,omitempty"`                                    // 原始JSON，仅在Core内加密保存
+	TenantId               int64                  `protobuf:"varint,6,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                            // 事件元数据中的租户ID
+	PlanId                 int64                  `protobuf:"varint,7,opt,name=plan_id,json=planId,proto3" json:"plan_id,omitempty"`                                                  // 事件元数据中的套餐版本ID
+	ExternalCustomerId     string                 `protobuf:"bytes,8,opt,name=external_customer_id,json=externalCustomerId,proto3" json:"external_customer_id,omitempty"`             // 供应商客户ID
+	ExternalSubscriptionId string                 `protobuf:"bytes,9,opt,name=external_subscription_id,json=externalSubscriptionId,proto3" json:"external_subscription_id,omitempty"` // 供应商订阅ID
+	ExternalInvoiceId      string                 `protobuf:"bytes,10,opt,name=external_invoice_id,json=externalInvoiceId,proto3" json:"external_invoice_id,omitempty"`               // 供应商账单ID
+	ExternalTransactionId  string                 `protobuf:"bytes,11,opt,name=external_transaction_id,json=externalTransactionId,proto3" json:"external_transaction_id,omitempty"`   // 供应商支付、退款或争议ID
+	Currency               string                 `protobuf:"bytes,12,opt,name=currency,proto3" json:"currency,omitempty"`                                                            // ISO 4217币种
+	Amount                 int64                  `protobuf:"varint,13,opt,name=amount,proto3" json:"amount,omitempty"`                                                               // 事件金额，最小货币单位整数
+	PeriodStart            int64                  `protobuf:"varint,14,opt,name=period_start,json=periodStart,proto3" json:"period_start,omitempty"`                                  // 订阅或账单周期开始Unix秒
+	PeriodEnd              int64                  `protobuf:"varint,15,opt,name=period_end,json=periodEnd,proto3" json:"period_end,omitempty"`                                        // 订阅或账单周期结束Unix秒
+	CancelAtPeriodEnd      bool                   `protobuf:"varint,16,opt,name=cancel_at_period_end,json=cancelAtPeriodEnd,proto3" json:"cancel_at_period_end,omitempty"`            // 是否周期末取消
+	FailureCode            string                 `protobuf:"bytes,17,opt,name=failure_code,json=failureCode,proto3" json:"failure_code,omitempty"`                                   // 失败结构化代码
+	FailureMessage         string                 `protobuf:"bytes,18,opt,name=failure_message,json=failureMessage,proto3" json:"failure_message,omitempty"`                          // 失败脱敏摘要
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *ApplyBillingWebhookReq) Reset() {
+	*x = ApplyBillingWebhookReq{}
+	mi := &file_proto_core_core_proto_msgTypes[237]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ApplyBillingWebhookReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ApplyBillingWebhookReq) ProtoMessage() {}
+
+func (x *ApplyBillingWebhookReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[237]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ApplyBillingWebhookReq.ProtoReflect.Descriptor instead.
+func (*ApplyBillingWebhookReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{237}
+}
+
+func (x *ApplyBillingWebhookReq) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *ApplyBillingWebhookReq) GetProviderEventId() string {
+	if x != nil {
+		return x.ProviderEventId
+	}
+	return ""
+}
+
+func (x *ApplyBillingWebhookReq) GetEventType() string {
+	if x != nil {
+		return x.EventType
+	}
+	return ""
+}
+
+func (x *ApplyBillingWebhookReq) GetEventCreatedAt() int64 {
+	if x != nil {
+		return x.EventCreatedAt
+	}
+	return 0
+}
+
+func (x *ApplyBillingWebhookReq) GetPayloadJson() string {
+	if x != nil {
+		return x.PayloadJson
+	}
+	return ""
+}
+
+func (x *ApplyBillingWebhookReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *ApplyBillingWebhookReq) GetPlanId() int64 {
+	if x != nil {
+		return x.PlanId
+	}
+	return 0
+}
+
+func (x *ApplyBillingWebhookReq) GetExternalCustomerId() string {
+	if x != nil {
+		return x.ExternalCustomerId
+	}
+	return ""
+}
+
+func (x *ApplyBillingWebhookReq) GetExternalSubscriptionId() string {
+	if x != nil {
+		return x.ExternalSubscriptionId
+	}
+	return ""
+}
+
+func (x *ApplyBillingWebhookReq) GetExternalInvoiceId() string {
+	if x != nil {
+		return x.ExternalInvoiceId
+	}
+	return ""
+}
+
+func (x *ApplyBillingWebhookReq) GetExternalTransactionId() string {
+	if x != nil {
+		return x.ExternalTransactionId
+	}
+	return ""
+}
+
+func (x *ApplyBillingWebhookReq) GetCurrency() string {
+	if x != nil {
+		return x.Currency
+	}
+	return ""
+}
+
+func (x *ApplyBillingWebhookReq) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *ApplyBillingWebhookReq) GetPeriodStart() int64 {
+	if x != nil {
+		return x.PeriodStart
+	}
+	return 0
+}
+
+func (x *ApplyBillingWebhookReq) GetPeriodEnd() int64 {
+	if x != nil {
+		return x.PeriodEnd
+	}
+	return 0
+}
+
+func (x *ApplyBillingWebhookReq) GetCancelAtPeriodEnd() bool {
+	if x != nil {
+		return x.CancelAtPeriodEnd
+	}
+	return false
+}
+
+func (x *ApplyBillingWebhookReq) GetFailureCode() string {
+	if x != nil {
+		return x.FailureCode
+	}
+	return ""
+}
+
+func (x *ApplyBillingWebhookReq) GetFailureMessage() string {
+	if x != nil {
+		return x.FailureMessage
+	}
+	return ""
+}
+
+// V7 Local Agent预定义能力，能力键不能表示任意命令。
+type LocalAgentCapability struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	CapabilityKey   string                 `protobuf:"bytes,1,opt,name=capability_key,json=capabilityKey,proto3" json:"capability_key,omitempty"`       // 能力键，例如android.api、abi或signing.remote
+	CapabilityValue string                 `protobuf:"bytes,2,opt,name=capability_value,json=capabilityValue,proto3" json:"capability_value,omitempty"` // 能力版本或约束值
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *LocalAgentCapability) Reset() {
+	*x = LocalAgentCapability{}
+	mi := &file_proto_core_core_proto_msgTypes[238]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocalAgentCapability) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocalAgentCapability) ProtoMessage() {}
+
+func (x *LocalAgentCapability) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[238]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocalAgentCapability.ProtoReflect.Descriptor instead.
+func (*LocalAgentCapability) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{238}
+}
+
+func (x *LocalAgentCapability) GetCapabilityKey() string {
+	if x != nil {
+		return x.CapabilityKey
+	}
+	return ""
+}
+
+func (x *LocalAgentCapability) GetCapabilityValue() string {
+	if x != nil {
+		return x.CapabilityValue
+	}
+	return ""
+}
+
+// V7 Local Agent公开客户端证书信息，不包含私钥。
+type LocalAgentCertificate struct {
+	state             protoimpl.MessageState      `protogen:"open.v1"`
+	Id                int64                       `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                       // 证书记录ID
+	SerialNumber      string                      `protobuf:"bytes,2,opt,name=serial_number,json=serialNumber,proto3" json:"serial_number,omitempty"`                // X.509证书序列号
+	FingerprintSha256 string                      `protobuf:"bytes,3,opt,name=fingerprint_sha256,json=fingerprintSha256,proto3" json:"fingerprint_sha256,omitempty"` // 证书DER SHA-256指纹
+	CertificatePem    string                      `protobuf:"bytes,4,opt,name=certificate_pem,json=certificatePem,proto3" json:"certificate_pem,omitempty"`          // 公开客户端证书PEM
+	Status            LocalAgentCertificateStatus `protobuf:"varint,5,opt,name=status,proto3,enum=core.LocalAgentCertificateStatus" json:"status,omitempty"`         // 证书状态
+	NotBefore         int64                       `protobuf:"varint,6,opt,name=not_before,json=notBefore,proto3" json:"not_before,omitempty"`                        // 生效时间Unix毫秒
+	NotAfter          int64                       `protobuf:"varint,7,opt,name=not_after,json=notAfter,proto3" json:"not_after,omitempty"`                           // 失效时间Unix毫秒
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *LocalAgentCertificate) Reset() {
+	*x = LocalAgentCertificate{}
+	mi := &file_proto_core_core_proto_msgTypes[239]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocalAgentCertificate) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocalAgentCertificate) ProtoMessage() {}
+
+func (x *LocalAgentCertificate) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[239]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocalAgentCertificate.ProtoReflect.Descriptor instead.
+func (*LocalAgentCertificate) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{239}
+}
+
+func (x *LocalAgentCertificate) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *LocalAgentCertificate) GetSerialNumber() string {
+	if x != nil {
+		return x.SerialNumber
+	}
+	return ""
+}
+
+func (x *LocalAgentCertificate) GetFingerprintSha256() string {
+	if x != nil {
+		return x.FingerprintSha256
+	}
+	return ""
+}
+
+func (x *LocalAgentCertificate) GetCertificatePem() string {
+	if x != nil {
+		return x.CertificatePem
+	}
+	return ""
+}
+
+func (x *LocalAgentCertificate) GetStatus() LocalAgentCertificateStatus {
+	if x != nil {
+		return x.Status
+	}
+	return LocalAgentCertificateStatus_LOCAL_AGENT_CERTIFICATE_STATUS_UNKNOWN
+}
+
+func (x *LocalAgentCertificate) GetNotBefore() int64 {
+	if x != nil {
+		return x.NotBefore
+	}
+	return 0
+}
+
+func (x *LocalAgentCertificate) GetNotAfter() int64 {
+	if x != nil {
+		return x.NotAfter
+	}
+	return 0
+}
+
+// V7 Local Builder Agent。
+type LocalAgent struct {
+	state               protoimpl.MessageState  `protogen:"open.v1"`
+	Id                  int64                   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                       // Agent ID
+	TenantId            int64                   `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                           // 所属租户ID
+	AgentCode           string                  `protobuf:"bytes,3,opt,name=agent_code,json=agentCode,proto3" json:"agent_code,omitempty"`                                         // 租户内稳定编码
+	AgentName           string                  `protobuf:"bytes,4,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`                                         // 展示名称
+	PoolCode            string                  `protobuf:"bytes,5,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                            // 构建池编码
+	Status              LocalAgentStatus        `protobuf:"varint,6,opt,name=status,proto3,enum=core.LocalAgentStatus" json:"status,omitempty"`                                    // 运行状态
+	DrainStatus         LocalAgentDrainStatus   `protobuf:"varint,7,opt,name=drain_status,json=drainStatus,proto3,enum=core.LocalAgentDrainStatus" json:"drain_status,omitempty"`  // 排空状态
+	ProtocolVersion     int32                   `protobuf:"varint,8,opt,name=protocol_version,json=protocolVersion,proto3" json:"protocol_version,omitempty"`                      // 协议版本
+	AgentVersion        string                  `protobuf:"bytes,9,opt,name=agent_version,json=agentVersion,proto3" json:"agent_version,omitempty"`                                // Agent语义化版本
+	ArtifactMode        HybridArtifactMode      `protobuf:"varint,10,opt,name=artifact_mode,json=artifactMode,proto3,enum=core.HybridArtifactMode" json:"artifact_mode,omitempty"` // Artifact模式
+	CustomerStorageRef  string                  `protobuf:"bytes,11,opt,name=customer_storage_ref,json=customerStorageRef,proto3" json:"customer_storage_ref,omitempty"`           // 客户存储Secret引用
+	AllowedAppIds       []int64                 `protobuf:"varint,12,rep,packed,name=allowed_app_ids,json=allowedAppIds,proto3" json:"allowed_app_ids,omitempty"`                  // 允许构建的应用ID
+	Capabilities        []*LocalAgentCapability `protobuf:"bytes,13,rep,name=capabilities,proto3" json:"capabilities,omitempty"`                                                   // 预定义能力
+	CertificateSerial   string                  `protobuf:"bytes,14,opt,name=certificate_serial,json=certificateSerial,proto3" json:"certificate_serial,omitempty"`                // 当前证书序列号
+	CertificateNotAfter int64                   `protobuf:"varint,15,opt,name=certificate_not_after,json=certificateNotAfter,proto3" json:"certificate_not_after,omitempty"`       // 当前证书到期时间Unix毫秒
+	LastHeartbeatAt     int64                   `protobuf:"varint,16,opt,name=last_heartbeat_at,json=lastHeartbeatAt,proto3" json:"last_heartbeat_at,omitempty"`                   // 最近心跳Unix毫秒
+	CreateTime          int64                   `protobuf:"varint,17,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                                    // 创建时间Unix毫秒
+	UpdateTime          int64                   `protobuf:"varint,18,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                                    // 更新时间Unix毫秒
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *LocalAgent) Reset() {
+	*x = LocalAgent{}
+	mi := &file_proto_core_core_proto_msgTypes[240]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocalAgent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocalAgent) ProtoMessage() {}
+
+func (x *LocalAgent) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[240]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocalAgent.ProtoReflect.Descriptor instead.
+func (*LocalAgent) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{240}
+}
+
+func (x *LocalAgent) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *LocalAgent) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *LocalAgent) GetAgentCode() string {
+	if x != nil {
+		return x.AgentCode
+	}
+	return ""
+}
+
+func (x *LocalAgent) GetAgentName() string {
+	if x != nil {
+		return x.AgentName
+	}
+	return ""
+}
+
+func (x *LocalAgent) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *LocalAgent) GetStatus() LocalAgentStatus {
+	if x != nil {
+		return x.Status
+	}
+	return LocalAgentStatus_LOCAL_AGENT_STATUS_UNKNOWN
+}
+
+func (x *LocalAgent) GetDrainStatus() LocalAgentDrainStatus {
+	if x != nil {
+		return x.DrainStatus
+	}
+	return LocalAgentDrainStatus_LOCAL_AGENT_DRAIN_STATUS_UNKNOWN
+}
+
+func (x *LocalAgent) GetProtocolVersion() int32 {
+	if x != nil {
+		return x.ProtocolVersion
+	}
+	return 0
+}
+
+func (x *LocalAgent) GetAgentVersion() string {
+	if x != nil {
+		return x.AgentVersion
+	}
+	return ""
+}
+
+func (x *LocalAgent) GetArtifactMode() HybridArtifactMode {
+	if x != nil {
+		return x.ArtifactMode
+	}
+	return HybridArtifactMode_HYBRID_ARTIFACT_MODE_UNKNOWN
+}
+
+func (x *LocalAgent) GetCustomerStorageRef() string {
+	if x != nil {
+		return x.CustomerStorageRef
+	}
+	return ""
+}
+
+func (x *LocalAgent) GetAllowedAppIds() []int64 {
+	if x != nil {
+		return x.AllowedAppIds
+	}
+	return nil
+}
+
+func (x *LocalAgent) GetCapabilities() []*LocalAgentCapability {
+	if x != nil {
+		return x.Capabilities
+	}
+	return nil
+}
+
+func (x *LocalAgent) GetCertificateSerial() string {
+	if x != nil {
+		return x.CertificateSerial
+	}
+	return ""
+}
+
+func (x *LocalAgent) GetCertificateNotAfter() int64 {
+	if x != nil {
+		return x.CertificateNotAfter
+	}
+	return 0
+}
+
+func (x *LocalAgent) GetLastHeartbeatAt() int64 {
+	if x != nil {
+		return x.LastHeartbeatAt
+	}
+	return 0
+}
+
+func (x *LocalAgent) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *LocalAgent) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// 创建V7 Local Agent和一次性注册码请求。
+type CreateLocalAgentRegistrationReq struct {
+	state              protoimpl.MessageState  `protogen:"open.v1"`
+	TenantId           int64                   `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                          // 目标租户ID，0表示当前租户
+	AgentCode          string                  `protobuf:"bytes,2,opt,name=agent_code,json=agentCode,proto3" json:"agent_code,omitempty"`                                        // 租户内稳定编码
+	AgentName          string                  `protobuf:"bytes,3,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`                                        // 展示名称
+	PoolCode           string                  `protobuf:"bytes,4,opt,name=pool_code,json=poolCode,proto3" json:"pool_code,omitempty"`                                           // 构建池编码
+	ArtifactMode       HybridArtifactMode      `protobuf:"varint,5,opt,name=artifact_mode,json=artifactMode,proto3,enum=core.HybridArtifactMode" json:"artifact_mode,omitempty"` // Artifact模式
+	CustomerStorageRef string                  `protobuf:"bytes,6,opt,name=customer_storage_ref,json=customerStorageRef,proto3" json:"customer_storage_ref,omitempty"`           // 客户存储Secret引用
+	AllowedAppIds      []int64                 `protobuf:"varint,7,rep,packed,name=allowed_app_ids,json=allowedAppIds,proto3" json:"allowed_app_ids,omitempty"`                  // 允许构建的应用ID
+	Capabilities       []*LocalAgentCapability `protobuf:"bytes,8,rep,name=capabilities,proto3" json:"capabilities,omitempty"`                                                   // 初始预定义能力
+	ExpiresSeconds     int64                   `protobuf:"varint,9,opt,name=expires_seconds,json=expiresSeconds,proto3" json:"expires_seconds,omitempty"`                        // 一次性注册码有效秒数
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *CreateLocalAgentRegistrationReq) Reset() {
+	*x = CreateLocalAgentRegistrationReq{}
+	mi := &file_proto_core_core_proto_msgTypes[241]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateLocalAgentRegistrationReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateLocalAgentRegistrationReq) ProtoMessage() {}
+
+func (x *CreateLocalAgentRegistrationReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[241]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateLocalAgentRegistrationReq.ProtoReflect.Descriptor instead.
+func (*CreateLocalAgentRegistrationReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{241}
+}
+
+func (x *CreateLocalAgentRegistrationReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *CreateLocalAgentRegistrationReq) GetAgentCode() string {
+	if x != nil {
+		return x.AgentCode
+	}
+	return ""
+}
+
+func (x *CreateLocalAgentRegistrationReq) GetAgentName() string {
+	if x != nil {
+		return x.AgentName
+	}
+	return ""
+}
+
+func (x *CreateLocalAgentRegistrationReq) GetPoolCode() string {
+	if x != nil {
+		return x.PoolCode
+	}
+	return ""
+}
+
+func (x *CreateLocalAgentRegistrationReq) GetArtifactMode() HybridArtifactMode {
+	if x != nil {
+		return x.ArtifactMode
+	}
+	return HybridArtifactMode_HYBRID_ARTIFACT_MODE_UNKNOWN
+}
+
+func (x *CreateLocalAgentRegistrationReq) GetCustomerStorageRef() string {
+	if x != nil {
+		return x.CustomerStorageRef
+	}
+	return ""
+}
+
+func (x *CreateLocalAgentRegistrationReq) GetAllowedAppIds() []int64 {
+	if x != nil {
+		return x.AllowedAppIds
+	}
+	return nil
+}
+
+func (x *CreateLocalAgentRegistrationReq) GetCapabilities() []*LocalAgentCapability {
+	if x != nil {
+		return x.Capabilities
+	}
+	return nil
+}
+
+func (x *CreateLocalAgentRegistrationReq) GetExpiresSeconds() int64 {
+	if x != nil {
+		return x.ExpiresSeconds
+	}
+	return 0
+}
+
+// V7 Local Agent一次性注册码响应，注册码只返回一次。
+type LocalAgentRegistrationResp struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Base              *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                                                    // 通用响应
+	Data              *LocalAgent            `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`                                                    // 已创建Agent
+	RegistrationToken string                 `protobuf:"bytes,3,opt,name=registration_token,json=registrationToken,proto3" json:"registration_token,omitempty"` // 一次性注册码明文
+	ExpiresAt         int64                  `protobuf:"varint,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`                        // 注册码过期时间Unix毫秒
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *LocalAgentRegistrationResp) Reset() {
+	*x = LocalAgentRegistrationResp{}
+	mi := &file_proto_core_core_proto_msgTypes[242]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocalAgentRegistrationResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocalAgentRegistrationResp) ProtoMessage() {}
+
+func (x *LocalAgentRegistrationResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[242]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocalAgentRegistrationResp.ProtoReflect.Descriptor instead.
+func (*LocalAgentRegistrationResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{242}
+}
+
+func (x *LocalAgentRegistrationResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *LocalAgentRegistrationResp) GetData() *LocalAgent {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *LocalAgentRegistrationResp) GetRegistrationToken() string {
+	if x != nil {
+		return x.RegistrationToken
+	}
+	return ""
+}
+
+func (x *LocalAgentRegistrationResp) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
+// Agent首次出站注册请求，CSR私钥仅存在Agent本地。
+type RegisterLocalAgentReq struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	RegistrationToken string                 `protobuf:"bytes,1,opt,name=registration_token,json=registrationToken,proto3" json:"registration_token,omitempty"` // 一次性注册码
+	CsrPem            string                 `protobuf:"bytes,2,opt,name=csr_pem,json=csrPem,proto3" json:"csr_pem,omitempty"`                                  // PKCS#10 CSR PEM
+	AgentVersion      string                 `protobuf:"bytes,3,opt,name=agent_version,json=agentVersion,proto3" json:"agent_version,omitempty"`                // Agent语义化版本
+	ProtocolVersion   int32                  `protobuf:"varint,4,opt,name=protocol_version,json=protocolVersion,proto3" json:"protocol_version,omitempty"`      // Agent协议版本
+	Nonce             string                 `protobuf:"bytes,5,opt,name=nonce,proto3" json:"nonce,omitempty"`                                                  // 单次随机Nonce
+	Timestamp         int64                  `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                                         // 请求时间Unix毫秒
+	SourceIp          string                 `protobuf:"bytes,7,opt,name=source_ip,json=sourceIp,proto3" json:"source_ip,omitempty"`                            // API边界解析的来源IP
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *RegisterLocalAgentReq) Reset() {
+	*x = RegisterLocalAgentReq{}
+	mi := &file_proto_core_core_proto_msgTypes[243]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterLocalAgentReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterLocalAgentReq) ProtoMessage() {}
+
+func (x *RegisterLocalAgentReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[243]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterLocalAgentReq.ProtoReflect.Descriptor instead.
+func (*RegisterLocalAgentReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{243}
+}
+
+func (x *RegisterLocalAgentReq) GetRegistrationToken() string {
+	if x != nil {
+		return x.RegistrationToken
+	}
+	return ""
+}
+
+func (x *RegisterLocalAgentReq) GetCsrPem() string {
+	if x != nil {
+		return x.CsrPem
+	}
+	return ""
+}
+
+func (x *RegisterLocalAgentReq) GetAgentVersion() string {
+	if x != nil {
+		return x.AgentVersion
+	}
+	return ""
+}
+
+func (x *RegisterLocalAgentReq) GetProtocolVersion() int32 {
+	if x != nil {
+		return x.ProtocolVersion
+	}
+	return 0
+}
+
+func (x *RegisterLocalAgentReq) GetNonce() string {
+	if x != nil {
+		return x.Nonce
+	}
+	return ""
+}
+
+func (x *RegisterLocalAgentReq) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *RegisterLocalAgentReq) GetSourceIp() string {
+	if x != nil {
+		return x.SourceIp
+	}
+	return ""
+}
+
+// Agent首次注册或证书轮换响应，私钥不经过控制面。
+type RegisterLocalAgentResp struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Base             *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                                                   // 通用响应
+	Data             *LocalAgent            `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`                                                   // Agent信息
+	Certificate      *LocalAgentCertificate `protobuf:"bytes,3,opt,name=certificate,proto3" json:"certificate,omitempty"`                                     // 新签发公开证书
+	CaCertificatePem string                 `protobuf:"bytes,4,opt,name=ca_certificate_pem,json=caCertificatePem,proto3" json:"ca_certificate_pem,omitempty"` // Agent mTLS CA公开证书
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *RegisterLocalAgentResp) Reset() {
+	*x = RegisterLocalAgentResp{}
+	mi := &file_proto_core_core_proto_msgTypes[244]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterLocalAgentResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterLocalAgentResp) ProtoMessage() {}
+
+func (x *RegisterLocalAgentResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[244]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterLocalAgentResp.ProtoReflect.Descriptor instead.
+func (*RegisterLocalAgentResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{244}
+}
+
+func (x *RegisterLocalAgentResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *RegisterLocalAgentResp) GetData() *LocalAgent {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *RegisterLocalAgentResp) GetCertificate() *LocalAgentCertificate {
+	if x != nil {
+		return x.Certificate
+	}
+	return nil
+}
+
+func (x *RegisterLocalAgentResp) GetCaCertificatePem() string {
+	if x != nil {
+		return x.CaCertificatePem
+	}
+	return ""
+}
+
+// V7 Agent管理查询请求。
+type LocalAgentIdReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                             // Agent ID
+	TenantId      int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"` // 目标租户ID，0表示当前租户
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LocalAgentIdReq) Reset() {
+	*x = LocalAgentIdReq{}
+	mi := &file_proto_core_core_proto_msgTypes[245]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocalAgentIdReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocalAgentIdReq) ProtoMessage() {}
+
+func (x *LocalAgentIdReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[245]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocalAgentIdReq.ProtoReflect.Descriptor instead.
+func (*LocalAgentIdReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{245}
+}
+
+func (x *LocalAgentIdReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *LocalAgentIdReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+// V7 Agent详情响应。
+type LocalAgentResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *LocalAgent            `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // Agent信息
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LocalAgentResp) Reset() {
+	*x = LocalAgentResp{}
+	mi := &file_proto_core_core_proto_msgTypes[246]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocalAgentResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocalAgentResp) ProtoMessage() {}
+
+func (x *LocalAgentResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[246]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocalAgentResp.ProtoReflect.Descriptor instead.
+func (*LocalAgentResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{246}
+}
+
+func (x *LocalAgentResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *LocalAgentResp) GetData() *LocalAgent {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V7 Agent分页查询请求。
+type LocalAgentListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`        // 目标租户ID，0表示当前租户
+	Status        LocalAgentStatus       `protobuf:"varint,2,opt,name=status,proto3,enum=core.LocalAgentStatus" json:"status,omitempty"` // 状态筛选，未知表示全部
+	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`                                // 页码，从1开始
+	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`        // 每页数量
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LocalAgentListReq) Reset() {
+	*x = LocalAgentListReq{}
+	mi := &file_proto_core_core_proto_msgTypes[247]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocalAgentListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocalAgentListReq) ProtoMessage() {}
+
+func (x *LocalAgentListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[247]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocalAgentListReq.ProtoReflect.Descriptor instead.
+func (*LocalAgentListReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{247}
+}
+
+func (x *LocalAgentListReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *LocalAgentListReq) GetStatus() LocalAgentStatus {
+	if x != nil {
+		return x.Status
+	}
+	return LocalAgentStatus_LOCAL_AGENT_STATUS_UNKNOWN
+}
+
+func (x *LocalAgentListReq) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *LocalAgentListReq) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+// V7 Agent分页响应。
+type LocalAgentListResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`    // 通用响应
+	Data          []*LocalAgent          `protobuf:"bytes,2,rep,name=data,proto3" json:"data,omitempty"`    // Agent列表
+	Total         int64                  `protobuf:"varint,3,opt,name=total,proto3" json:"total,omitempty"` // 总数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LocalAgentListResp) Reset() {
+	*x = LocalAgentListResp{}
+	mi := &file_proto_core_core_proto_msgTypes[248]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocalAgentListResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocalAgentListResp) ProtoMessage() {}
+
+func (x *LocalAgentListResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[248]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocalAgentListResp.ProtoReflect.Descriptor instead.
+func (*LocalAgentListResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{248}
+}
+
+func (x *LocalAgentListResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *LocalAgentListResp) GetData() []*LocalAgent {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *LocalAgentListResp) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+// V7 mTLS Agent请求认证上下文，由网关根据客户端证书填充。
+type LocalAgentAuth struct {
+	state                        protoimpl.MessageState `protogen:"open.v1"`
+	AgentId                      int64                  `protobuf:"varint,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`                                                                 // Agent ID
+	CertificateSerial            string                 `protobuf:"bytes,2,opt,name=certificate_serial,json=certificateSerial,proto3" json:"certificate_serial,omitempty"`                                    // mTLS客户端证书序列号
+	CertificateFingerprintSha256 string                 `protobuf:"bytes,3,opt,name=certificate_fingerprint_sha256,json=certificateFingerprintSha256,proto3" json:"certificate_fingerprint_sha256,omitempty"` // mTLS客户端证书指纹
+	Nonce                        string                 `protobuf:"bytes,4,opt,name=nonce,proto3" json:"nonce,omitempty"`                                                                                     // 单次随机Nonce
+	Timestamp                    int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                                                                            // 请求时间Unix毫秒
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
+}
+
+func (x *LocalAgentAuth) Reset() {
+	*x = LocalAgentAuth{}
+	mi := &file_proto_core_core_proto_msgTypes[249]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocalAgentAuth) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocalAgentAuth) ProtoMessage() {}
+
+func (x *LocalAgentAuth) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[249]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocalAgentAuth.ProtoReflect.Descriptor instead.
+func (*LocalAgentAuth) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{249}
+}
+
+func (x *LocalAgentAuth) GetAgentId() int64 {
+	if x != nil {
+		return x.AgentId
+	}
+	return 0
+}
+
+func (x *LocalAgentAuth) GetCertificateSerial() string {
+	if x != nil {
+		return x.CertificateSerial
+	}
+	return ""
+}
+
+func (x *LocalAgentAuth) GetCertificateFingerprintSha256() string {
+	if x != nil {
+		return x.CertificateFingerprintSha256
+	}
+	return ""
+}
+
+func (x *LocalAgentAuth) GetNonce() string {
+	if x != nil {
+		return x.Nonce
+	}
+	return ""
+}
+
+func (x *LocalAgentAuth) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+// V7 Agent心跳请求。
+type HeartbeatLocalAgentReq struct {
+	state           protoimpl.MessageState  `protogen:"open.v1"`
+	Auth            *LocalAgentAuth         `protobuf:"bytes,1,opt,name=auth,proto3" json:"auth,omitempty"`                                                     // mTLS认证上下文
+	AgentVersion    string                  `protobuf:"bytes,2,opt,name=agent_version,json=agentVersion,proto3" json:"agent_version,omitempty"`                 // Agent语义化版本
+	ProtocolVersion int32                   `protobuf:"varint,3,opt,name=protocol_version,json=protocolVersion,proto3" json:"protocol_version,omitempty"`       // Agent协议版本
+	Capabilities    []*LocalAgentCapability `protobuf:"bytes,4,rep,name=capabilities,proto3" json:"capabilities,omitempty"`                                     // 当前能力快照
+	RunningTaskIds  []int64                 `protobuf:"varint,5,rep,packed,name=running_task_ids,json=runningTaskIds,proto3" json:"running_task_ids,omitempty"` // 当前执行任务ID
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *HeartbeatLocalAgentReq) Reset() {
+	*x = HeartbeatLocalAgentReq{}
+	mi := &file_proto_core_core_proto_msgTypes[250]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HeartbeatLocalAgentReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HeartbeatLocalAgentReq) ProtoMessage() {}
+
+func (x *HeartbeatLocalAgentReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[250]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HeartbeatLocalAgentReq.ProtoReflect.Descriptor instead.
+func (*HeartbeatLocalAgentReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{250}
+}
+
+func (x *HeartbeatLocalAgentReq) GetAuth() *LocalAgentAuth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *HeartbeatLocalAgentReq) GetAgentVersion() string {
+	if x != nil {
+		return x.AgentVersion
+	}
+	return ""
+}
+
+func (x *HeartbeatLocalAgentReq) GetProtocolVersion() int32 {
+	if x != nil {
+		return x.ProtocolVersion
+	}
+	return 0
+}
+
+func (x *HeartbeatLocalAgentReq) GetCapabilities() []*LocalAgentCapability {
+	if x != nil {
+		return x.Capabilities
+	}
+	return nil
+}
+
+func (x *HeartbeatLocalAgentReq) GetRunningTaskIds() []int64 {
+	if x != nil {
+		return x.RunningTaskIds
+	}
+	return nil
+}
+
+// V7 Agent Drain管理请求。
+type DrainLocalAgentReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                      // Agent ID
+	TenantId      int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                          // 目标租户ID，0表示当前租户
+	DrainStatus   LocalAgentDrainStatus  `protobuf:"varint,3,opt,name=drain_status,json=drainStatus,proto3,enum=core.LocalAgentDrainStatus" json:"drain_status,omitempty"` // 目标排空状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DrainLocalAgentReq) Reset() {
+	*x = DrainLocalAgentReq{}
+	mi := &file_proto_core_core_proto_msgTypes[251]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DrainLocalAgentReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DrainLocalAgentReq) ProtoMessage() {}
+
+func (x *DrainLocalAgentReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[251]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DrainLocalAgentReq.ProtoReflect.Descriptor instead.
+func (*DrainLocalAgentReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{251}
+}
+
+func (x *DrainLocalAgentReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *DrainLocalAgentReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *DrainLocalAgentReq) GetDrainStatus() LocalAgentDrainStatus {
+	if x != nil {
+		return x.DrainStatus
+	}
+	return LocalAgentDrainStatus_LOCAL_AGENT_DRAIN_STATUS_UNKNOWN
+}
+
+// V7 Agent吊销请求。
+type RevokeLocalAgentReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                             // Agent ID
+	TenantId      int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"` // 目标租户ID，0表示当前租户
+	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`                      // 吊销原因
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RevokeLocalAgentReq) Reset() {
+	*x = RevokeLocalAgentReq{}
+	mi := &file_proto_core_core_proto_msgTypes[252]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RevokeLocalAgentReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RevokeLocalAgentReq) ProtoMessage() {}
+
+func (x *RevokeLocalAgentReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[252]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RevokeLocalAgentReq.ProtoReflect.Descriptor instead.
+func (*RevokeLocalAgentReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{252}
+}
+
+func (x *RevokeLocalAgentReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *RevokeLocalAgentReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *RevokeLocalAgentReq) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+// V7 Agent证书轮换请求。
+type RotateLocalAgentCertificateReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Auth          *LocalAgentAuth        `protobuf:"bytes,1,opt,name=auth,proto3" json:"auth,omitempty"`                   // 当前有效mTLS认证上下文
+	CsrPem        string                 `protobuf:"bytes,2,opt,name=csr_pem,json=csrPem,proto3" json:"csr_pem,omitempty"` // 使用新本地私钥生成的CSR PEM
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RotateLocalAgentCertificateReq) Reset() {
+	*x = RotateLocalAgentCertificateReq{}
+	mi := &file_proto_core_core_proto_msgTypes[253]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RotateLocalAgentCertificateReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RotateLocalAgentCertificateReq) ProtoMessage() {}
+
+func (x *RotateLocalAgentCertificateReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[253]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RotateLocalAgentCertificateReq.ProtoReflect.Descriptor instead.
+func (*RotateLocalAgentCertificateReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{253}
+}
+
+func (x *RotateLocalAgentCertificateReq) GetAuth() *LocalAgentAuth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *RotateLocalAgentCertificateReq) GetCsrPem() string {
+	if x != nil {
+		return x.CsrPem
+	}
+	return ""
+}
+
+// V7 Agent领取构建任务请求。
+type ClaimLocalAgentBuildTaskReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Auth          *LocalAgentAuth        `protobuf:"bytes,1,opt,name=auth,proto3" json:"auth,omitempty"`                                      // mTLS认证上下文
+	LeaseSeconds  int32                  `protobuf:"varint,2,opt,name=lease_seconds,json=leaseSeconds,proto3" json:"lease_seconds,omitempty"` // 租约秒数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClaimLocalAgentBuildTaskReq) Reset() {
+	*x = ClaimLocalAgentBuildTaskReq{}
+	mi := &file_proto_core_core_proto_msgTypes[254]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClaimLocalAgentBuildTaskReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClaimLocalAgentBuildTaskReq) ProtoMessage() {}
+
+func (x *ClaimLocalAgentBuildTaskReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[254]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClaimLocalAgentBuildTaskReq.ProtoReflect.Descriptor instead.
+func (*ClaimLocalAgentBuildTaskReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{254}
+}
+
+func (x *ClaimLocalAgentBuildTaskReq) GetAuth() *LocalAgentAuth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *ClaimLocalAgentBuildTaskReq) GetLeaseSeconds() int32 {
+	if x != nil {
+		return x.LeaseSeconds
+	}
+	return 0
+}
+
+// V7 Agent任务响应，无任务时task为空。
+type LocalAgentBuildTaskResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                                                                   // 通用响应
+	Task          *BuildTask             `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`                                                                   // 已领取且经过租户、应用、能力检查的任务
+	ArtifactMode  HybridArtifactMode     `protobuf:"varint,3,opt,name=artifact_mode,json=artifactMode,proto3,enum=core.HybridArtifactMode" json:"artifact_mode,omitempty"` // 本任务Artifact模式
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LocalAgentBuildTaskResp) Reset() {
+	*x = LocalAgentBuildTaskResp{}
+	mi := &file_proto_core_core_proto_msgTypes[255]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocalAgentBuildTaskResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocalAgentBuildTaskResp) ProtoMessage() {}
+
+func (x *LocalAgentBuildTaskResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[255]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocalAgentBuildTaskResp.ProtoReflect.Descriptor instead.
+func (*LocalAgentBuildTaskResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{255}
+}
+
+func (x *LocalAgentBuildTaskResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *LocalAgentBuildTaskResp) GetTask() *BuildTask {
+	if x != nil {
+		return x.Task
+	}
+	return nil
+}
+
+func (x *LocalAgentBuildTaskResp) GetArtifactMode() HybridArtifactMode {
+	if x != nil {
+		return x.ArtifactMode
+	}
+	return HybridArtifactMode_HYBRID_ARTIFACT_MODE_UNKNOWN
+}
+
+// V7 Agent任务续租请求。
+type RenewLocalAgentTaskLeaseReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Auth           *LocalAgentAuth        `protobuf:"bytes,1,opt,name=auth,proto3" json:"auth,omitempty"`                                            // mTLS认证上下文
+	TaskId         int64                  `protobuf:"varint,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                         // 构建任务ID
+	BuilderAttempt int32                  `protobuf:"varint,3,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"` // fencing尝试次数
+	LeaseSeconds   int32                  `protobuf:"varint,4,opt,name=lease_seconds,json=leaseSeconds,proto3" json:"lease_seconds,omitempty"`       // 续租秒数
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RenewLocalAgentTaskLeaseReq) Reset() {
+	*x = RenewLocalAgentTaskLeaseReq{}
+	mi := &file_proto_core_core_proto_msgTypes[256]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RenewLocalAgentTaskLeaseReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RenewLocalAgentTaskLeaseReq) ProtoMessage() {}
+
+func (x *RenewLocalAgentTaskLeaseReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[256]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RenewLocalAgentTaskLeaseReq.ProtoReflect.Descriptor instead.
+func (*RenewLocalAgentTaskLeaseReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{256}
+}
+
+func (x *RenewLocalAgentTaskLeaseReq) GetAuth() *LocalAgentAuth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *RenewLocalAgentTaskLeaseReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *RenewLocalAgentTaskLeaseReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+func (x *RenewLocalAgentTaskLeaseReq) GetLeaseSeconds() int32 {
+	if x != nil {
+		return x.LeaseSeconds
+	}
+	return 0
+}
+
+// V7 Agent构建进度请求。
+type ReportLocalAgentBuildProgressReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Auth           *LocalAgentAuth        `protobuf:"bytes,1,opt,name=auth,proto3" json:"auth,omitempty"`                                            // mTLS认证上下文
+	TaskId         int64                  `protobuf:"varint,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                         // 构建任务ID
+	BuilderAttempt int32                  `protobuf:"varint,3,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"` // fencing尝试次数
+	Status         BuildTaskStatus        `protobuf:"varint,4,opt,name=status,proto3,enum=core.BuildTaskStatus" json:"status,omitempty"`             // 预定义构建阶段
+	Progress       int32                  `protobuf:"varint,5,opt,name=progress,proto3" json:"progress,omitempty"`                                   // 进度百分比
+	Message        string                 `protobuf:"bytes,6,opt,name=message,proto3" json:"message,omitempty"`                                      // 脱敏进度摘要
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ReportLocalAgentBuildProgressReq) Reset() {
+	*x = ReportLocalAgentBuildProgressReq{}
+	mi := &file_proto_core_core_proto_msgTypes[257]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReportLocalAgentBuildProgressReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReportLocalAgentBuildProgressReq) ProtoMessage() {}
+
+func (x *ReportLocalAgentBuildProgressReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[257]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReportLocalAgentBuildProgressReq.ProtoReflect.Descriptor instead.
+func (*ReportLocalAgentBuildProgressReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{257}
+}
+
+func (x *ReportLocalAgentBuildProgressReq) GetAuth() *LocalAgentAuth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *ReportLocalAgentBuildProgressReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *ReportLocalAgentBuildProgressReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+func (x *ReportLocalAgentBuildProgressReq) GetStatus() BuildTaskStatus {
+	if x != nil {
+		return x.Status
+	}
+	return BuildTaskStatus_BUILD_TASK_STATUS_UNKNOWN
+}
+
+func (x *ReportLocalAgentBuildProgressReq) GetProgress() int32 {
+	if x != nil {
+		return x.Progress
+	}
+	return 0
+}
+
+func (x *ReportLocalAgentBuildProgressReq) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+// V7 Agent构建成功请求。
+type CompleteLocalAgentBuildTaskReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Auth           *LocalAgentAuth        `protobuf:"bytes,1,opt,name=auth,proto3" json:"auth,omitempty"`                                            // mTLS认证上下文
+	TaskId         int64                  `protobuf:"varint,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                         // 构建任务ID
+	BuilderAttempt int32                  `protobuf:"varint,3,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"` // fencing尝试次数
+	ApkReference   string                 `protobuf:"bytes,4,opt,name=apk_reference,json=apkReference,proto3" json:"apk_reference,omitempty"`        // 对象引用，不包含凭证
+	ApkSha256      string                 `protobuf:"bytes,5,opt,name=apk_sha256,json=apkSha256,proto3" json:"apk_sha256,omitempty"`                 // APK SHA-256
+	ApkSize        int64                  `protobuf:"varint,6,opt,name=apk_size,json=apkSize,proto3" json:"apk_size,omitempty"`                      // APK大小字节数
+	LogReference   string                 `protobuf:"bytes,7,opt,name=log_reference,json=logReference,proto3" json:"log_reference,omitempty"`        // 日志对象引用，不包含凭证
+	LogSha256      string                 `protobuf:"bytes,8,opt,name=log_sha256,json=logSha256,proto3" json:"log_sha256,omitempty"`                 // 日志SHA-256
+	LogSize        int64                  `protobuf:"varint,9,opt,name=log_size,json=logSize,proto3" json:"log_size,omitempty"`                      // 日志大小字节数
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) Reset() {
+	*x = CompleteLocalAgentBuildTaskReq{}
+	mi := &file_proto_core_core_proto_msgTypes[258]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CompleteLocalAgentBuildTaskReq) ProtoMessage() {}
+
+func (x *CompleteLocalAgentBuildTaskReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[258]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CompleteLocalAgentBuildTaskReq.ProtoReflect.Descriptor instead.
+func (*CompleteLocalAgentBuildTaskReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{258}
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) GetAuth() *LocalAgentAuth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) GetApkReference() string {
+	if x != nil {
+		return x.ApkReference
+	}
+	return ""
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) GetApkSha256() string {
+	if x != nil {
+		return x.ApkSha256
+	}
+	return ""
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) GetApkSize() int64 {
+	if x != nil {
+		return x.ApkSize
+	}
+	return 0
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) GetLogReference() string {
+	if x != nil {
+		return x.LogReference
+	}
+	return ""
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) GetLogSha256() string {
+	if x != nil {
+		return x.LogSha256
+	}
+	return ""
+}
+
+func (x *CompleteLocalAgentBuildTaskReq) GetLogSize() int64 {
+	if x != nil {
+		return x.LogSize
+	}
+	return 0
+}
+
+// V7 Agent构建失败请求。
+type FailLocalAgentBuildTaskReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Auth           *LocalAgentAuth        `protobuf:"bytes,1,opt,name=auth,proto3" json:"auth,omitempty"`                                            // mTLS认证上下文
+	TaskId         int64                  `protobuf:"varint,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                         // 构建任务ID
+	BuilderAttempt int32                  `protobuf:"varint,3,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"` // fencing尝试次数
+	ErrorMessage   string                 `protobuf:"bytes,4,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`        // 脱敏失败摘要
+	LogReference   string                 `protobuf:"bytes,5,opt,name=log_reference,json=logReference,proto3" json:"log_reference,omitempty"`        // 日志对象引用，不包含凭证
+	LogSha256      string                 `protobuf:"bytes,6,opt,name=log_sha256,json=logSha256,proto3" json:"log_sha256,omitempty"`                 // 日志SHA-256
+	LogSize        int64                  `protobuf:"varint,7,opt,name=log_size,json=logSize,proto3" json:"log_size,omitempty"`                      // 日志大小字节数
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *FailLocalAgentBuildTaskReq) Reset() {
+	*x = FailLocalAgentBuildTaskReq{}
+	mi := &file_proto_core_core_proto_msgTypes[259]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FailLocalAgentBuildTaskReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FailLocalAgentBuildTaskReq) ProtoMessage() {}
+
+func (x *FailLocalAgentBuildTaskReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[259]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FailLocalAgentBuildTaskReq.ProtoReflect.Descriptor instead.
+func (*FailLocalAgentBuildTaskReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{259}
+}
+
+func (x *FailLocalAgentBuildTaskReq) GetAuth() *LocalAgentAuth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *FailLocalAgentBuildTaskReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *FailLocalAgentBuildTaskReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+func (x *FailLocalAgentBuildTaskReq) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+func (x *FailLocalAgentBuildTaskReq) GetLogReference() string {
+	if x != nil {
+		return x.LogReference
+	}
+	return ""
+}
+
+func (x *FailLocalAgentBuildTaskReq) GetLogSha256() string {
+	if x != nil {
+		return x.LogSha256
+	}
+	return ""
+}
+
+func (x *FailLocalAgentBuildTaskReq) GetLogSize() int64 {
+	if x != nil {
+		return x.LogSize
+	}
+	return 0
+}
+
+// V7 Hybrid Artifact完整性登记请求。
+type VerifyHybridArtifactReq struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Auth            *LocalAgentAuth        `protobuf:"bytes,1,opt,name=auth,proto3" json:"auth,omitempty"`                                                                   // mTLS认证上下文
+	TaskId          int64                  `protobuf:"varint,2,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                                                // 构建任务ID
+	BuilderAttempt  int32                  `protobuf:"varint,3,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"`                        // fencing尝试次数
+	ArtifactType    HybridArtifactType     `protobuf:"varint,4,opt,name=artifact_type,json=artifactType,proto3,enum=core.HybridArtifactType" json:"artifact_type,omitempty"` // Artifact类型
+	StorageMode     HybridArtifactMode     `protobuf:"varint,5,opt,name=storage_mode,json=storageMode,proto3,enum=core.HybridArtifactMode" json:"storage_mode,omitempty"`    // 存储模式
+	ObjectReference string                 `protobuf:"bytes,6,opt,name=object_reference,json=objectReference,proto3" json:"object_reference,omitempty"`                      // 对象引用或离线包ID
+	Sha256          string                 `protobuf:"bytes,7,opt,name=sha256,proto3" json:"sha256,omitempty"`                                                               // 内容SHA-256
+	SizeBytes       int64                  `protobuf:"varint,8,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`                                       // 内容大小字节数
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *VerifyHybridArtifactReq) Reset() {
+	*x = VerifyHybridArtifactReq{}
+	mi := &file_proto_core_core_proto_msgTypes[260]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyHybridArtifactReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyHybridArtifactReq) ProtoMessage() {}
+
+func (x *VerifyHybridArtifactReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[260]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyHybridArtifactReq.ProtoReflect.Descriptor instead.
+func (*VerifyHybridArtifactReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{260}
+}
+
+func (x *VerifyHybridArtifactReq) GetAuth() *LocalAgentAuth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *VerifyHybridArtifactReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *VerifyHybridArtifactReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+func (x *VerifyHybridArtifactReq) GetArtifactType() HybridArtifactType {
+	if x != nil {
+		return x.ArtifactType
+	}
+	return HybridArtifactType_HYBRID_ARTIFACT_TYPE_UNKNOWN
+}
+
+func (x *VerifyHybridArtifactReq) GetStorageMode() HybridArtifactMode {
+	if x != nil {
+		return x.StorageMode
+	}
+	return HybridArtifactMode_HYBRID_ARTIFACT_MODE_UNKNOWN
+}
+
+func (x *VerifyHybridArtifactReq) GetObjectReference() string {
+	if x != nil {
+		return x.ObjectReference
+	}
+	return ""
+}
+
+func (x *VerifyHybridArtifactReq) GetSha256() string {
+	if x != nil {
+		return x.Sha256
+	}
+	return ""
+}
+
+func (x *VerifyHybridArtifactReq) GetSizeBytes() int64 {
+	if x != nil {
+		return x.SizeBytes
+	}
+	return 0
 }
 
 var File_proto_core_core_proto protoreflect.FileDescriptor
@@ -8579,7 +23484,7 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\vupdate_time\x18\f \x01(\x03R\n" +
 	"updateTime\x12,\n" +
 	"\x12keystore_object_id\x18\r \x01(\x03R\x10keystoreObjectId\x12-\n" +
-	"\x12certificate_sha256\x18\x0e \x01(\tR\x11certificateSha256\"\xf8\t\n" +
+	"\x12certificate_sha256\x18\x0e \x01(\tR\x11certificateSha256\"\x96\f\n" +
 	"\tBuildTask\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
 	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
@@ -8624,7 +23529,15 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x16branding_snapshot_json\x18  \x01(\tR\x14brandingSnapshotJson\x123\n" +
 	"\x16white_label_product_id\x18! \x01(\x03R\x13whiteLabelProductId\x12+\n" +
 	"\x11template_revision\x18\" \x01(\x05R\x10templateRevision\x124\n" +
-	"\x16template_snapshot_json\x18# \x01(\tR\x14templateSnapshotJson\"\xbd\x03\n" +
+	"\x16template_snapshot_json\x18# \x01(\tR\x14templateSnapshotJson\x12\x1b\n" +
+	"\tpool_code\x18$ \x01(\tR\bpoolCode\x12\x1b\n" +
+	"\tcache_key\x18% \x01(\tR\bcacheKey\x12$\n" +
+	"\x0ecache_entry_id\x18& \x01(\x03R\fcacheEntryId\x12\x1b\n" +
+	"\tcache_hit\x18' \x01(\bR\bcacheHit\x12.\n" +
+	"\x13cancel_requested_at\x18( \x01(\x03R\x11cancelRequestedAt\x12!\n" +
+	"\fcancelled_at\x18) \x01(\x03R\vcancelledAt\x12#\n" +
+	"\rcancel_reason\x18* \x01(\tR\fcancelReason\x12'\n" +
+	"\x10retry_of_task_id\x18+ \x01(\x03R\rretryOfTaskId\"\xbd\x03\n" +
 	"\rStorageObject\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
 	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
@@ -8747,7 +23660,148 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\vcreate_time\x18\x0e \x01(\x03R\n" +
 	"createTime\x12\x1f\n" +
 	"\vupdate_time\x18\x0f \x01(\x03R\n" +
-	"updateTime\"\"\n" +
+	"updateTime\"\x98\x06\n" +
+	"\vBuilderNode\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\tnode_code\x18\x02 \x01(\tR\bnodeCode\x12\x1b\n" +
+	"\tpool_code\x18\x03 \x01(\tR\bpoolCode\x12\x1a\n" +
+	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x12/\n" +
+	"\x06status\x18\x05 \x01(\x0e2\x17.core.BuilderNodeStatusR\x06status\x12;\n" +
+	"\fdrain_status\x18\x06 \x01(\x0e2\x18.core.BuilderDrainStatusR\vdrainStatus\x12'\n" +
+	"\x0fmax_concurrency\x18\a \x01(\x05R\x0emaxConcurrency\x12#\n" +
+	"\rrunning_count\x18\b \x01(\x05R\frunningCount\x12!\n" +
+	"\fcpu_capacity\x18\t \x01(\x05R\vcpuCapacity\x12'\n" +
+	"\x0fmemory_capacity\x18\n" +
+	" \x01(\x03R\x0ememoryCapacity\x12#\n" +
+	"\rdisk_capacity\x18\v \x01(\x03R\fdiskCapacity\x12\x1b\n" +
+	"\tdisk_free\x18\f \x01(\x03R\bdiskFree\x12+\n" +
+	"\x11toolchain_version\x18\r \x01(\tR\x10toolchainVersion\x124\n" +
+	"\x16build_protocol_version\x18\x0e \x01(\x05R\x14buildProtocolVersion\x12'\n" +
+	"\x0fcapability_json\x18\x0f \x01(\tR\x0ecapabilityJson\x121\n" +
+	"\x14consecutive_failures\x18\x10 \x01(\x05R\x13consecutiveFailures\x12,\n" +
+	"\x12last_error_message\x18\x11 \x01(\tR\x10lastErrorMessage\x12*\n" +
+	"\x11last_heartbeat_at\x18\x12 \x01(\x03R\x0flastHeartbeatAt\x12\x1f\n" +
+	"\vcreate_time\x18\x13 \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\x14 \x01(\x03R\n" +
+	"updateTime\"\xf6\x02\n" +
+	"\x16BuildConcurrencyPolicy\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
+	"\x06app_id\x18\x03 \x01(\x03R\x05appId\x12\x1b\n" +
+	"\tpool_code\x18\x04 \x01(\tR\bpoolCode\x12'\n" +
+	"\x0fmax_concurrency\x18\x05 \x01(\x05R\x0emaxConcurrency\x12\x1f\n" +
+	"\vfair_weight\x18\x06 \x01(\x05R\n" +
+	"fairWeight\x12!\n" +
+	"\fmax_priority\x18\a \x01(\x05R\vmaxPriority\x12/\n" +
+	"\x06status\x18\b \x01(\x0e2\x17.core.BuildPolicyStatusR\x06status\x12\x1b\n" +
+	"\tcreate_by\x18\t \x01(\x03R\bcreateBy\x12\x1f\n" +
+	"\vcreate_time\x18\n" +
+	" \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\v \x01(\x03R\n" +
+	"updateTime\"\xdd\x04\n" +
+	"\x0fBuildCacheEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x126\n" +
+	"\vcache_scope\x18\x03 \x01(\x0e2\x15.core.BuildCacheScopeR\n" +
+	"cacheScope\x12\x1b\n" +
+	"\tcache_key\x18\x04 \x01(\tR\bcacheKey\x12+\n" +
+	"\x11toolchain_version\x18\x05 \x01(\tR\x10toolchainVersion\x124\n" +
+	"\x16build_protocol_version\x18\x06 \x01(\x05R\x14buildProtocolVersion\x12!\n" +
+	"\finput_digest\x18\a \x01(\tR\vinputDigest\x12,\n" +
+	"\x12artifact_object_id\x18\b \x01(\x03R\x10artifactObjectId\x12'\n" +
+	"\x0fartifact_sha256\x18\t \x01(\tR\x0eartifactSha256\x12\x1d\n" +
+	"\n" +
+	"size_bytes\x18\n" +
+	" \x01(\x03R\tsizeBytes\x12\x1b\n" +
+	"\thit_count\x18\v \x01(\x03R\bhitCount\x12.\n" +
+	"\x06status\x18\f \x01(\x0e2\x16.core.BuildCacheStatusR\x06status\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\r \x01(\x03R\texpiresAt\x12\x1e\n" +
+	"\vlast_hit_at\x18\x0e \x01(\x03R\tlastHitAt\x12\x1f\n" +
+	"\vcreate_time\x18\x0f \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\x10 \x01(\x03R\n" +
+	"updateTime\"\xd1\x02\n" +
+	"\x13BuildSchedulerEvent\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
+	"\x06app_id\x18\x03 \x01(\x03R\x05appId\x12\x17\n" +
+	"\atask_id\x18\x04 \x01(\x03R\x06taskId\x12\x1b\n" +
+	"\tnode_code\x18\x05 \x01(\tR\bnodeCode\x12\x1b\n" +
+	"\tpool_code\x18\x06 \x01(\tR\bpoolCode\x12<\n" +
+	"\n" +
+	"event_type\x18\a \x01(\x0e2\x1d.core.BuildSchedulerEventTypeR\teventType\x12\x1f\n" +
+	"\vreason_code\x18\b \x01(\tR\n" +
+	"reasonCode\x12#\n" +
+	"\rdecision_json\x18\t \x01(\tR\fdecisionJson\x12\x1f\n" +
+	"\vcreate_time\x18\n" +
+	" \x01(\x03R\n" +
+	"createTime\"\x90\b\n" +
+	"\x13BuildClusterMetrics\x12\x1b\n" +
+	"\tpool_code\x18\x01 \x01(\tR\bpoolCode\x12%\n" +
+	"\x0eperiod_minutes\x18\x02 \x01(\x05R\rperiodMinutes\x12!\n" +
+	"\fonline_nodes\x18\x03 \x01(\x03R\vonlineNodes\x12#\n" +
+	"\roffline_nodes\x18\x04 \x01(\x03R\fofflineNodes\x12%\n" +
+	"\x0edraining_nodes\x18\x05 \x01(\x03R\rdrainingNodes\x12\x1f\n" +
+	"\vtotal_slots\x18\x06 \x01(\x03R\n" +
+	"totalSlots\x12#\n" +
+	"\rrunning_slots\x18\a \x01(\x03R\frunningSlots\x12#\n" +
+	"\rdisk_capacity\x18\b \x01(\x03R\fdiskCapacity\x12\x1b\n" +
+	"\tdisk_free\x18\t \x01(\x03R\bdiskFree\x12!\n" +
+	"\fqueued_tasks\x18\n" +
+	" \x01(\x03R\vqueuedTasks\x12#\n" +
+	"\rrunning_tasks\x18\v \x01(\x03R\frunningTasks\x12'\n" +
+	"\x0fcompleted_tasks\x18\f \x01(\x03R\x0ecompletedTasks\x12#\n" +
+	"\rsuccess_tasks\x18\r \x01(\x03R\fsuccessTasks\x12!\n" +
+	"\ffailed_tasks\x18\x0e \x01(\x03R\vfailedTasks\x12'\n" +
+	"\x0fcancelled_tasks\x18\x0f \x01(\x03R\x0ecancelledTasks\x12(\n" +
+	"\x10average_queue_ms\x18\x10 \x01(\x03R\x0eaverageQueueMs\x12(\n" +
+	"\x10average_build_ms\x18\x11 \x01(\x03R\x0eaverageBuildMs\x12!\n" +
+	"\fsuccess_rate\x18\x12 \x01(\x01R\vsuccessRate\x12&\n" +
+	"\x0fcache_hit_tasks\x18\x13 \x01(\x03R\rcacheHitTasks\x12$\n" +
+	"\x0ecache_hit_rate\x18\x14 \x01(\x01R\fcacheHitRate\x120\n" +
+	"\x14active_cache_entries\x18\x15 \x01(\x03R\x12activeCacheEntries\x12,\n" +
+	"\x12active_cache_bytes\x18\x16 \x01(\x03R\x10activeCacheBytes\x120\n" +
+	"\x14lease_recovery_count\x18\x17 \x01(\x03R\x12leaseRecoveryCount\x12C\n" +
+	"\x1ecache_validation_failure_count\x18\x18 \x01(\x03R\x1bcacheValidationFailureCount\x12(\n" +
+	"\x10oldest_queued_ms\x18\x19 \x01(\x03R\x0eoldestQueuedMs\x12\x16\n" +
+	"\x06alerts\x18\x1a \x03(\tR\x06alerts\"\xc4\x04\n" +
+	"\x11OpenApiCredential\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12'\n" +
+	"\x0fcredential_name\x18\x03 \x01(\tR\x0ecredentialName\x12\x15\n" +
+	"\x06key_id\x18\x04 \x01(\tR\x05keyId\x12*\n" +
+	"\x06scopes\x18\x05 \x03(\x0e2\x12.core.OpenApiScopeR\x06scopes\x12\x17\n" +
+	"\aapp_ids\x18\x06 \x03(\x03R\x06appIds\x12!\n" +
+	"\fip_allowlist\x18\a \x03(\tR\vipAllowlist\x121\n" +
+	"\x15rate_limit_per_minute\x18\b \x01(\x05R\x12rateLimitPerMinute\x125\n" +
+	"\x06status\x18\t \x01(\x0e2\x1d.core.OpenApiCredentialStatusR\x06status\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\n" +
+	" \x01(\x03R\texpiresAt\x12(\n" +
+	"\x10grace_expires_at\x18\v \x01(\x03R\x0egraceExpiresAt\x12&\n" +
+	"\x0frotated_from_id\x18\f \x01(\x03R\rrotatedFromId\x12 \n" +
+	"\flast_used_at\x18\r \x01(\x03R\n" +
+	"lastUsedAt\x12\x1b\n" +
+	"\tcreate_by\x18\x0e \x01(\x03R\bcreateBy\x12\x1f\n" +
+	"\vcreate_time\x18\x0f \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\x10 \x01(\x03R\n" +
+	"updateTime\"k\n" +
+	"\x17OpenApiCredentialSecret\x127\n" +
+	"\n" +
+	"credential\x18\x01 \x01(\v2\x17.core.OpenApiCredentialR\n" +
+	"credential\x12\x17\n" +
+	"\aapi_key\x18\x02 \x01(\tR\x06apiKey\"\xe5\x01\n" +
+	"\x12OpenApiAuthContext\x12#\n" +
+	"\rcredential_id\x18\x01 \x01(\x03R\fcredentialId\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
+	"\x06key_id\x18\x03 \x01(\tR\x05keyId\x12*\n" +
+	"\x06scopes\x18\x04 \x03(\x0e2\x12.core.OpenApiScopeR\x06scopes\x12\x17\n" +
+	"\aapp_ids\x18\x05 \x03(\x03R\x06appIds\x121\n" +
+	"\x15rate_limit_per_minute\x18\x06 \x01(\x05R\x12rateLimitPerMinute\"\"\n" +
 	"\x10ApplicationIdReq\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"\x1e\n" +
 	"\fVersionIdReq\x12\x0e\n" +
@@ -8789,7 +23843,538 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x04data\x18\x02 \x03(\v2\x13.core.SigningConfigR\x04data\"Z\n" +
 	"\rBuildTaskResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12#\n" +
-	"\x04data\x18\x02 \x01(\v2\x0f.core.BuildTaskR\x04data\"f\n" +
+	"\x04data\x18\x02 \x01(\v2\x0f.core.BuildTaskR\x04data\"^\n" +
+	"\x0fBuilderNodeResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12%\n" +
+	"\x04data\x18\x02 \x01(\v2\x11.core.BuilderNodeR\x04data\"\xde\x01\n" +
+	"\x12BuilderNodeListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x12\x1b\n" +
+	"\tpool_code\x18\x02 \x01(\tR\bpoolCode\x12/\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x17.core.BuilderNodeStatusR\x06status\x12;\n" +
+	"\fdrain_status\x18\x04 \x01(\x0e2\x18.core.BuilderDrainStatusR\vdrainStatus\x12\x18\n" +
+	"\akeyword\x18\x05 \x01(\tR\akeyword\"b\n" +
+	"\x13BuilderNodeListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12%\n" +
+	"\x04data\x18\x02 \x03(\v2\x11.core.BuilderNodeR\x04data\"t\n" +
+	"\x1aBuildConcurrencyPolicyResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x120\n" +
+	"\x04data\x18\x02 \x01(\v2\x1c.core.BuildConcurrencyPolicyR\x04data\"\xc6\x01\n" +
+	"\x1dBuildConcurrencyPolicyListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
+	"\x06app_id\x18\x03 \x01(\x03R\x05appId\x12\x1b\n" +
+	"\tpool_code\x18\x04 \x01(\tR\bpoolCode\x12/\n" +
+	"\x06status\x18\x05 \x01(\x0e2\x17.core.BuildPolicyStatusR\x06status\"x\n" +
+	"\x1eBuildConcurrencyPolicyListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x120\n" +
+	"\x04data\x18\x02 \x03(\v2\x1c.core.BuildConcurrencyPolicyR\x04data\"f\n" +
+	"\x13BuildCacheEntryResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12)\n" +
+	"\x04data\x18\x02 \x01(\v2\x15.core.BuildCacheEntryR\x04data\"\xdc\x01\n" +
+	"\x16BuildCacheEntryListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x126\n" +
+	"\vcache_scope\x18\x03 \x01(\x0e2\x15.core.BuildCacheScopeR\n" +
+	"cacheScope\x12.\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x16.core.BuildCacheStatusR\x06status\x12\x18\n" +
+	"\akeyword\x18\x05 \x01(\tR\akeyword\"j\n" +
+	"\x17BuildCacheEntryListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12)\n" +
+	"\x04data\x18\x02 \x03(\v2\x15.core.BuildCacheEntryR\x04data\"\x86\x02\n" +
+	"\x1aBuildSchedulerEventListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
+	"\x06app_id\x18\x03 \x01(\x03R\x05appId\x12\x17\n" +
+	"\atask_id\x18\x04 \x01(\x03R\x06taskId\x12\x1b\n" +
+	"\tnode_code\x18\x05 \x01(\tR\bnodeCode\x12\x1b\n" +
+	"\tpool_code\x18\x06 \x01(\tR\bpoolCode\x12<\n" +
+	"\n" +
+	"event_type\x18\a \x01(\x0e2\x1d.core.BuildSchedulerEventTypeR\teventType\"r\n" +
+	"\x1bBuildSchedulerEventListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12-\n" +
+	"\x04data\x18\x02 \x03(\v2\x19.core.BuildSchedulerEventR\x04data\"\\\n" +
+	"\x16BuildClusterMetricsReq\x12\x1b\n" +
+	"\tpool_code\x18\x01 \x01(\tR\bpoolCode\x12%\n" +
+	"\x0eperiod_minutes\x18\x02 \x01(\x05R\rperiodMinutes\"n\n" +
+	"\x17BuildClusterMetricsResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12-\n" +
+	"\x04data\x18\x02 \x01(\v2\x19.core.BuildClusterMetricsR\x04data\"\x90\x01\n" +
+	"\x18OpenApiCredentialListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x125\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x1d.core.OpenApiCredentialStatusR\x06status\x12\x18\n" +
+	"\akeyword\x18\x03 \x01(\tR\akeyword\"n\n" +
+	"\x19OpenApiCredentialListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12+\n" +
+	"\x04data\x18\x02 \x03(\v2\x17.core.OpenApiCredentialR\x04data\"j\n" +
+	"\x15OpenApiCredentialResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12+\n" +
+	"\x04data\x18\x02 \x01(\v2\x17.core.OpenApiCredentialR\x04data\"v\n" +
+	"\x1bOpenApiCredentialSecretResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x121\n" +
+	"\x04data\x18\x02 \x01(\v2\x1d.core.OpenApiCredentialSecretR\x04data\"\xff\x01\n" +
+	"\x1aCreateOpenApiCredentialReq\x12'\n" +
+	"\x0fcredential_name\x18\x01 \x01(\tR\x0ecredentialName\x12*\n" +
+	"\x06scopes\x18\x02 \x03(\x0e2\x12.core.OpenApiScopeR\x06scopes\x12\x17\n" +
+	"\aapp_ids\x18\x03 \x03(\x03R\x06appIds\x12!\n" +
+	"\fip_allowlist\x18\x04 \x03(\tR\vipAllowlist\x121\n" +
+	"\x15rate_limit_per_minute\x18\x05 \x01(\x05R\x12rateLimitPerMinute\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x06 \x01(\x03R\texpiresAt\"(\n" +
+	"\x16OpenApiCredentialIdReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"Q\n" +
+	"\x1aRotateOpenApiCredentialReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12#\n" +
+	"\rgrace_seconds\x18\x02 \x01(\x03R\fgraceSeconds\"w\n" +
+	" AuthenticateOpenApiCredentialReq\x12\x15\n" +
+	"\x06key_id\x18\x01 \x01(\tR\x05keyId\x12\x1f\n" +
+	"\vsecret_hash\x18\x02 \x01(\tR\n" +
+	"secretHash\x12\x1b\n" +
+	"\tclient_ip\x18\x03 \x01(\tR\bclientIp\"l\n" +
+	"\x16OpenApiAuthContextResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12,\n" +
+	"\x04data\x18\x02 \x01(\v2\x18.core.OpenApiAuthContextR\x04data\"\x85\x02\n" +
+	"\x1aBeginOpenApiIdempotencyReq\x12#\n" +
+	"\rcredential_id\x18\x01 \x01(\x03R\fcredentialId\x12'\n" +
+	"\x0fidempotency_key\x18\x02 \x01(\tR\x0eidempotencyKey\x12%\n" +
+	"\x0erequest_method\x18\x03 \x01(\tR\rrequestMethod\x12!\n" +
+	"\frequest_path\x18\x04 \x01(\tR\vrequestPath\x12!\n" +
+	"\frequest_hash\x18\x05 \x01(\tR\vrequestHash\x12,\n" +
+	"\x12expires_in_seconds\x18\x06 \x01(\x03R\x10expiresInSeconds\"\xb6\x01\n" +
+	"\x18OpenApiIdempotencyResult\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12<\n" +
+	"\bdecision\x18\x02 \x01(\x0e2 .core.OpenApiIdempotencyDecisionR\bdecision\x12'\n" +
+	"\x0fresponse_status\x18\x03 \x01(\x05R\x0eresponseStatus\x12#\n" +
+	"\rresponse_body\x18\x04 \x01(\tR\fresponseBody\"r\n" +
+	"\x16OpenApiIdempotencyResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x122\n" +
+	"\x04data\x18\x02 \x01(\v2\x1e.core.OpenApiIdempotencyResultR\x04data\"\x86\x02\n" +
+	"\x1dCompleteOpenApiIdempotencyReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12#\n" +
+	"\rcredential_id\x18\x02 \x01(\x03R\fcredentialId\x12'\n" +
+	"\x0fresponse_status\x18\x03 \x01(\x05R\x0eresponseStatus\x12#\n" +
+	"\rresponse_body\x18\x04 \x01(\tR\fresponseBody\x12#\n" +
+	"\rresource_type\x18\x05 \x01(\tR\fresourceType\x12\x1f\n" +
+	"\vresource_id\x18\x06 \x01(\x03R\n" +
+	"resourceId\x12\x1c\n" +
+	"\tsucceeded\x18\a \x01(\bR\tsucceeded\"\xa7\x03\n" +
+	"\x15RecordOpenApiAuditReq\x12#\n" +
+	"\rcredential_id\x18\x01 \x01(\x03R\fcredentialId\x12\x15\n" +
+	"\x06key_id\x18\x02 \x01(\tR\x05keyId\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x03 \x01(\tR\trequestId\x12%\n" +
+	"\x0erequest_method\x18\x04 \x01(\tR\rrequestMethod\x12!\n" +
+	"\frequest_path\x18\x05 \x01(\tR\vrequestPath\x12\x1d\n" +
+	"\n" +
+	"scope_used\x18\x06 \x01(\tR\tscopeUsed\x12#\n" +
+	"\rresource_type\x18\a \x01(\tR\fresourceType\x12\x1f\n" +
+	"\vresource_id\x18\b \x01(\x03R\n" +
+	"resourceId\x12\x1b\n" +
+	"\tclient_ip\x18\t \x01(\tR\bclientIp\x12'\n" +
+	"\x0fresponse_status\x18\n" +
+	" \x01(\x05R\x0eresponseStatus\x12\x1f\n" +
+	"\vduration_ms\x18\v \x01(\x03R\n" +
+	"durationMs\x12\x1d\n" +
+	"\n" +
+	"error_code\x18\f \x01(\tR\terrorCode\"\xcf\x03\n" +
+	"\x0fWebhookEndpoint\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12#\n" +
+	"\rendpoint_name\x18\x03 \x01(\tR\fendpointName\x12!\n" +
+	"\fendpoint_url\x18\x04 \x01(\tR\vendpointUrl\x12\x1f\n" +
+	"\vevent_types\x18\x05 \x03(\tR\n" +
+	"eventTypes\x12\x1f\n" +
+	"\vsecret_hint\x18\x06 \x01(\tR\n" +
+	"secretHint\x12!\n" +
+	"\fmax_attempts\x18\a \x01(\x05R\vmaxAttempts\x123\n" +
+	"\x06status\x18\b \x01(\x0e2\x1b.core.WebhookEndpointStatusR\x06status\x12&\n" +
+	"\x0flast_success_at\x18\t \x01(\x03R\rlastSuccessAt\x12&\n" +
+	"\x0flast_failure_at\x18\n" +
+	" \x01(\x03R\rlastFailureAt\x12\x1b\n" +
+	"\tcreate_by\x18\v \x01(\x03R\bcreateBy\x12\x1f\n" +
+	"\vcreate_time\x18\f \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\r \x01(\x03R\n" +
+	"updateTime\"q\n" +
+	"\x15WebhookEndpointSecret\x121\n" +
+	"\bendpoint\x18\x01 \x01(\v2\x15.core.WebhookEndpointR\bendpoint\x12%\n" +
+	"\x0esigning_secret\x18\x02 \x01(\tR\rsigningSecret\"\xf3\x03\n" +
+	"\x0fWebhookDelivery\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x1f\n" +
+	"\vendpoint_id\x18\x03 \x01(\x03R\n" +
+	"endpointId\x12\x19\n" +
+	"\bevent_id\x18\x04 \x01(\tR\aeventId\x12\x1d\n" +
+	"\n" +
+	"event_type\x18\x05 \x01(\tR\teventType\x12\x18\n" +
+	"\aattempt\x18\x06 \x01(\x05R\aattempt\x123\n" +
+	"\x06status\x18\a \x01(\x0e2\x1b.core.WebhookDeliveryStatusR\x06status\x12'\n" +
+	"\x0fresponse_status\x18\b \x01(\x05R\x0eresponseStatus\x122\n" +
+	"\x15response_body_excerpt\x18\t \x01(\tR\x13responseBodyExcerpt\x12#\n" +
+	"\rerror_message\x18\n" +
+	" \x01(\tR\ferrorMessage\x12\"\n" +
+	"\rnext_retry_at\x18\v \x01(\x03R\vnextRetryAt\x12!\n" +
+	"\fdelivered_at\x18\f \x01(\x03R\vdeliveredAt\x12\x1f\n" +
+	"\vcreate_time\x18\r \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\x0e \x01(\x03R\n" +
+	"updateTime\"\xa6\x01\n" +
+	"\x18CreateWebhookEndpointReq\x12#\n" +
+	"\rendpoint_name\x18\x01 \x01(\tR\fendpointName\x12!\n" +
+	"\fendpoint_url\x18\x02 \x01(\tR\vendpointUrl\x12\x1f\n" +
+	"\vevent_types\x18\x03 \x03(\tR\n" +
+	"eventTypes\x12!\n" +
+	"\fmax_attempts\x18\x04 \x01(\x05R\vmaxAttempts\"\xeb\x01\n" +
+	"\x18UpdateWebhookEndpointReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12#\n" +
+	"\rendpoint_name\x18\x02 \x01(\tR\fendpointName\x12!\n" +
+	"\fendpoint_url\x18\x03 \x01(\tR\vendpointUrl\x12\x1f\n" +
+	"\vevent_types\x18\x04 \x03(\tR\n" +
+	"eventTypes\x12!\n" +
+	"\fmax_attempts\x18\x05 \x01(\x05R\vmaxAttempts\x123\n" +
+	"\x06status\x18\x06 \x01(\x0e2\x1b.core.WebhookEndpointStatusR\x06status\"&\n" +
+	"\x14WebhookEndpointIdReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\x8c\x01\n" +
+	"\x16WebhookEndpointListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x123\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x1b.core.WebhookEndpointStatusR\x06status\x12\x18\n" +
+	"\akeyword\x18\x03 \x01(\tR\akeyword\"f\n" +
+	"\x13WebhookEndpointResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12)\n" +
+	"\x04data\x18\x02 \x01(\v2\x15.core.WebhookEndpointR\x04data\"j\n" +
+	"\x17WebhookEndpointListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12)\n" +
+	"\x04data\x18\x02 \x03(\v2\x15.core.WebhookEndpointR\x04data\"r\n" +
+	"\x19WebhookEndpointSecretResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12/\n" +
+	"\x04data\x18\x02 \x01(\v2\x1b.core.WebhookEndpointSecretR\x04data\"\xb2\x01\n" +
+	"\x16WebhookDeliveryListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x12\x1f\n" +
+	"\vendpoint_id\x18\x02 \x01(\x03R\n" +
+	"endpointId\x123\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x1b.core.WebhookDeliveryStatusR\x06status\x12\x1d\n" +
+	"\n" +
+	"event_type\x18\x04 \x01(\tR\teventType\"j\n" +
+	"\x17WebhookDeliveryListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12)\n" +
+	"\x04data\x18\x02 \x03(\v2\x15.core.WebhookDeliveryR\x04data\"f\n" +
+	"\x13WebhookDeliveryResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12)\n" +
+	"\x04data\x18\x02 \x01(\v2\x15.core.WebhookDeliveryR\x04data\"&\n" +
+	"\x14WebhookDeliveryIdReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"<\n" +
+	"\x19CreateTestWebhookEventReq\x12\x1f\n" +
+	"\vendpoint_id\x18\x01 \x01(\x03R\n" +
+	"endpointId\"\xaa\x03\n" +
+	"\x11SourceIntegration\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x120\n" +
+	"\bplatform\x18\x03 \x01(\x0e2\x14.core.SourcePlatformR\bplatform\x12)\n" +
+	"\x10integration_name\x18\x04 \x01(\tR\x0fintegrationName\x12)\n" +
+	"\x10installation_ref\x18\x05 \x01(\tR\x0finstallationRef\x12(\n" +
+	"\x10token_expires_at\x18\x06 \x01(\x03R\x0etokenExpiresAt\x125\n" +
+	"\x06status\x18\a \x01(\x0e2\x1d.core.SourceIntegrationStatusR\x06status\x12 \n" +
+	"\flast_sync_at\x18\b \x01(\x03R\n" +
+	"lastSyncAt\x12\x1b\n" +
+	"\tcreate_by\x18\t \x01(\x03R\bcreateBy\x12\x1f\n" +
+	"\vcreate_time\x18\n" +
+	" \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\v \x01(\x03R\n" +
+	"updateTime\"\x98\x02\n" +
+	"\x1cCompleteSourceIntegrationReq\x120\n" +
+	"\bplatform\x18\x01 \x01(\x0e2\x14.core.SourcePlatformR\bplatform\x12)\n" +
+	"\x10integration_name\x18\x02 \x01(\tR\x0fintegrationName\x12)\n" +
+	"\x10installation_ref\x18\x03 \x01(\tR\x0finstallationRef\x12!\n" +
+	"\faccess_token\x18\x04 \x01(\tR\vaccessToken\x12#\n" +
+	"\rrefresh_token\x18\x05 \x01(\tR\frefreshToken\x12(\n" +
+	"\x10token_expires_at\x18\x06 \x01(\x03R\x0etokenExpiresAt\"(\n" +
+	"\x16SourceIntegrationIdReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\xc2\x01\n" +
+	"\x18SourceIntegrationListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x120\n" +
+	"\bplatform\x18\x02 \x01(\x0e2\x14.core.SourcePlatformR\bplatform\x125\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x1d.core.SourceIntegrationStatusR\x06status\x12\x18\n" +
+	"\akeyword\x18\x04 \x01(\tR\akeyword\"j\n" +
+	"\x15SourceIntegrationResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12+\n" +
+	"\x04data\x18\x02 \x01(\v2\x17.core.SourceIntegrationR\x04data\"n\n" +
+	"\x19SourceIntegrationListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12+\n" +
+	"\x04data\x18\x02 \x03(\v2\x17.core.SourceIntegrationR\x04data\"\xa0\x01\n" +
+	"\x1bSourceIntegrationCredential\x129\n" +
+	"\vintegration\x18\x01 \x01(\v2\x17.core.SourceIntegrationR\vintegration\x12!\n" +
+	"\faccess_token\x18\x02 \x01(\tR\vaccessToken\x12#\n" +
+	"\rrefresh_token\x18\x03 \x01(\tR\frefreshToken\"~\n" +
+	"\x1fSourceIntegrationCredentialResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x125\n" +
+	"\x04data\x18\x02 \x01(\v2!.core.SourceIntegrationCredentialR\x04data\"\x98\x03\n" +
+	"\x10SourceRepository\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12%\n" +
+	"\x0eintegration_id\x18\x03 \x01(\x03R\rintegrationId\x124\n" +
+	"\x16external_repository_id\x18\x04 \x01(\tR\x14externalRepositoryId\x120\n" +
+	"\x14repository_full_name\x18\x05 \x01(\tR\x12repositoryFullName\x12%\n" +
+	"\x0edefault_branch\x18\x06 \x01(\tR\rdefaultBranch\x12)\n" +
+	"\x10permission_level\x18\a \x01(\tR\x0fpermissionLevel\x124\n" +
+	"\x06status\x18\b \x01(\x0e2\x1c.core.SourceRepositoryStatusR\x06status\x12\x1f\n" +
+	"\vcreate_time\x18\t \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\n" +
+	" \x01(\x03R\n" +
+	"updateTime\"\xd4\x01\n" +
+	"\x1cAuthorizeSourceRepositoryReq\x12%\n" +
+	"\x0eintegration_id\x18\x01 \x01(\x03R\rintegrationId\x124\n" +
+	"\x16external_repository_id\x18\x02 \x01(\tR\x14externalRepositoryId\x120\n" +
+	"\x14repository_full_name\x18\x03 \x01(\tR\x12repositoryFullName\x12%\n" +
+	"\x0edefault_branch\x18\x04 \x01(\tR\rdefaultBranch\"'\n" +
+	"\x15SourceRepositoryIdReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\xb5\x01\n" +
+	"\x17SourceRepositoryListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x12%\n" +
+	"\x0eintegration_id\x18\x02 \x01(\x03R\rintegrationId\x124\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x1c.core.SourceRepositoryStatusR\x06status\x12\x18\n" +
+	"\akeyword\x18\x04 \x01(\tR\akeyword\"h\n" +
+	"\x14SourceRepositoryResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12*\n" +
+	"\x04data\x18\x02 \x01(\v2\x16.core.SourceRepositoryR\x04data\"l\n" +
+	"\x18SourceRepositoryListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12*\n" +
+	"\x04data\x18\x02 \x03(\v2\x16.core.SourceRepositoryR\x04data\"\x85\x04\n" +
+	"\x0eSourceArtifact\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
+	"\x06app_id\x18\x03 \x01(\x03R\x05appId\x12\x1d\n" +
+	"\n" +
+	"version_id\x18\x04 \x01(\x03R\tversionId\x12%\n" +
+	"\x0eintegration_id\x18\x05 \x01(\x03R\rintegrationId\x12#\n" +
+	"\rrepository_id\x18\x06 \x01(\x03R\frepositoryId\x12A\n" +
+	"\x0fartifact_source\x18\a \x01(\x0e2\x18.core.SourceArtifactTypeR\x0eartifactSource\x120\n" +
+	"\x14external_artifact_id\x18\b \x01(\tR\x12externalArtifactId\x12\x1d\n" +
+	"\n" +
+	"commit_sha\x18\t \x01(\tR\tcommitSha\x12!\n" +
+	"\fpipeline_ref\x18\n" +
+	" \x01(\tR\vpipelineRef\x12\x17\n" +
+	"\ajob_ref\x18\v \x01(\tR\x06jobRef\x12'\n" +
+	"\x0fartifact_sha256\x18\f \x01(\tR\x0eartifactSha256\x12*\n" +
+	"\x11storage_object_id\x18\r \x01(\x03R\x0fstorageObjectId\x12\x1f\n" +
+	"\vcreate_time\x18\x0e \x01(\x03R\n" +
+	"createTime\"\xc0\x03\n" +
+	"\x17RecordSourceArtifactReq\x12\x15\n" +
+	"\x06app_id\x18\x01 \x01(\x03R\x05appId\x12\x1d\n" +
+	"\n" +
+	"version_id\x18\x02 \x01(\x03R\tversionId\x12%\n" +
+	"\x0eintegration_id\x18\x03 \x01(\x03R\rintegrationId\x12#\n" +
+	"\rrepository_id\x18\x04 \x01(\x03R\frepositoryId\x12A\n" +
+	"\x0fartifact_source\x18\x05 \x01(\x0e2\x18.core.SourceArtifactTypeR\x0eartifactSource\x120\n" +
+	"\x14external_artifact_id\x18\x06 \x01(\tR\x12externalArtifactId\x12\x1d\n" +
+	"\n" +
+	"commit_sha\x18\a \x01(\tR\tcommitSha\x12!\n" +
+	"\fpipeline_ref\x18\b \x01(\tR\vpipelineRef\x12\x17\n" +
+	"\ajob_ref\x18\t \x01(\tR\x06jobRef\x12'\n" +
+	"\x0fartifact_sha256\x18\n" +
+	" \x01(\tR\x0eartifactSha256\x12*\n" +
+	"\x11storage_object_id\x18\v \x01(\x03R\x0fstorageObjectId\"d\n" +
+	"\x12SourceArtifactResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12(\n" +
+	"\x04data\x18\x02 \x01(\v2\x14.core.SourceArtifactR\x04data\"\x8c\x04\n" +
+	"\x17ImportSourceArtifactReq\x12\x15\n" +
+	"\x06app_id\x18\x01 \x01(\x03R\x05appId\x12!\n" +
+	"\fversion_code\x18\x02 \x01(\x03R\vversionCode\x12!\n" +
+	"\fversion_name\x18\x03 \x01(\tR\vversionName\x12#\n" +
+	"\rrelease_notes\x18\x04 \x01(\tR\freleaseNotes\x12%\n" +
+	"\x0eintegration_id\x18\x05 \x01(\x03R\rintegrationId\x12#\n" +
+	"\rrepository_id\x18\x06 \x01(\x03R\frepositoryId\x12A\n" +
+	"\x0fartifact_source\x18\a \x01(\x0e2\x18.core.SourceArtifactTypeR\x0eartifactSource\x120\n" +
+	"\x14external_artifact_id\x18\b \x01(\tR\x12externalArtifactId\x12\x1d\n" +
+	"\n" +
+	"commit_sha\x18\t \x01(\tR\tcommitSha\x12!\n" +
+	"\fpipeline_ref\x18\n" +
+	" \x01(\tR\vpipelineRef\x12\x17\n" +
+	"\ajob_ref\x18\v \x01(\tR\x06jobRef\x12'\n" +
+	"\x0fartifact_sha256\x18\f \x01(\tR\x0eartifactSha256\x12*\n" +
+	"\x11storage_object_id\x18\r \x01(\x03R\x0fstorageObjectId\"w\n" +
+	"\x1aSourceArtifactImportResult\x12'\n" +
+	"\aversion\x18\x01 \x01(\v2\r.core.VersionR\aversion\x120\n" +
+	"\bartifact\x18\x02 \x01(\v2\x14.core.SourceArtifactR\bartifact\"v\n" +
+	"\x18SourceArtifactImportResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x124\n" +
+	"\x04data\x18\x02 \x01(\v2 .core.SourceArtifactImportResultR\x04data\"\xa9\x06\n" +
+	"\x12SourceBuildTrigger\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12#\n" +
+	"\rrepository_id\x18\x03 \x01(\x03R\frepositoryId\x12\x15\n" +
+	"\x06app_id\x18\x04 \x01(\x03R\x05appId\x12!\n" +
+	"\ftrigger_name\x18\x05 \x01(\tR\vtriggerName\x12@\n" +
+	"\n" +
+	"event_type\x18\x06 \x01(\x0e2!.core.SourceBuildTriggerEventTypeR\teventType\x12\x1f\n" +
+	"\vref_pattern\x18\a \x01(\tR\n" +
+	"refPattern\x12+\n" +
+	"\x11artifact_selector\x18\b \x01(\tR\x10artifactSelector\x12\x1f\n" +
+	"\vchannel_ids\x18\t \x03(\x03R\n" +
+	"channelIds\x12*\n" +
+	"\x11signing_config_id\x18\n" +
+	" \x01(\x03R\x0fsigningConfigId\x12.\n" +
+	"\x13branding_profile_id\x18\v \x01(\x03R\x11brandingProfileId\x123\n" +
+	"\x16white_label_product_id\x18\f \x01(\x03R\x13whiteLabelProductId\x12\x1a\n" +
+	"\bpriority\x18\r \x01(\x05R\bpriority\x12\x1b\n" +
+	"\tpool_code\x18\x0e \x01(\tR\bpoolCode\x12.\n" +
+	"\x13version_name_prefix\x18\x0f \x01(\tR\x11versionNamePrefix\x126\n" +
+	"\x06status\x18\x10 \x01(\x0e2\x1e.core.SourceBuildTriggerStatusR\x06status\x120\n" +
+	"\bplatform\x18\x11 \x01(\x0e2\x14.core.SourcePlatformR\bplatform\x120\n" +
+	"\x14repository_full_name\x18\x12 \x01(\tR\x12repositoryFullName\x12\x1f\n" +
+	"\vcreate_time\x18\x13 \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\x14 \x01(\x03R\n" +
+	"updateTime\"\xa7\x04\n" +
+	"\x1bCreateSourceBuildTriggerReq\x12#\n" +
+	"\rrepository_id\x18\x01 \x01(\x03R\frepositoryId\x12\x15\n" +
+	"\x06app_id\x18\x02 \x01(\x03R\x05appId\x12!\n" +
+	"\ftrigger_name\x18\x03 \x01(\tR\vtriggerName\x12@\n" +
+	"\n" +
+	"event_type\x18\x04 \x01(\x0e2!.core.SourceBuildTriggerEventTypeR\teventType\x12\x1f\n" +
+	"\vref_pattern\x18\x05 \x01(\tR\n" +
+	"refPattern\x12+\n" +
+	"\x11artifact_selector\x18\x06 \x01(\tR\x10artifactSelector\x12\x1f\n" +
+	"\vchannel_ids\x18\a \x03(\x03R\n" +
+	"channelIds\x12*\n" +
+	"\x11signing_config_id\x18\b \x01(\x03R\x0fsigningConfigId\x12.\n" +
+	"\x13branding_profile_id\x18\t \x01(\x03R\x11brandingProfileId\x123\n" +
+	"\x16white_label_product_id\x18\n" +
+	" \x01(\x03R\x13whiteLabelProductId\x12\x1a\n" +
+	"\bpriority\x18\v \x01(\x05R\bpriority\x12\x1b\n" +
+	"\tpool_code\x18\f \x01(\tR\bpoolCode\x12.\n" +
+	"\x13version_name_prefix\x18\r \x01(\tR\x11versionNamePrefix\"\xb3\x04\n" +
+	"\x1bUpdateSourceBuildTriggerReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12!\n" +
+	"\ftrigger_name\x18\x02 \x01(\tR\vtriggerName\x12@\n" +
+	"\n" +
+	"event_type\x18\x03 \x01(\x0e2!.core.SourceBuildTriggerEventTypeR\teventType\x12\x1f\n" +
+	"\vref_pattern\x18\x04 \x01(\tR\n" +
+	"refPattern\x12+\n" +
+	"\x11artifact_selector\x18\x05 \x01(\tR\x10artifactSelector\x12\x1f\n" +
+	"\vchannel_ids\x18\x06 \x03(\x03R\n" +
+	"channelIds\x12*\n" +
+	"\x11signing_config_id\x18\a \x01(\x03R\x0fsigningConfigId\x12.\n" +
+	"\x13branding_profile_id\x18\b \x01(\x03R\x11brandingProfileId\x123\n" +
+	"\x16white_label_product_id\x18\t \x01(\x03R\x13whiteLabelProductId\x12\x1a\n" +
+	"\bpriority\x18\n" +
+	" \x01(\x05R\bpriority\x12\x1b\n" +
+	"\tpool_code\x18\v \x01(\tR\bpoolCode\x12.\n" +
+	"\x13version_name_prefix\x18\f \x01(\tR\x11versionNamePrefix\x126\n" +
+	"\x06status\x18\r \x01(\x0e2\x1e.core.SourceBuildTriggerStatusR\x06status\")\n" +
+	"\x17SourceBuildTriggerIdReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\xce\x01\n" +
+	"\x19SourceBuildTriggerListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x12#\n" +
+	"\rrepository_id\x18\x02 \x01(\x03R\frepositoryId\x12\x15\n" +
+	"\x06app_id\x18\x03 \x01(\x03R\x05appId\x126\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x1e.core.SourceBuildTriggerStatusR\x06status\x12\x18\n" +
+	"\akeyword\x18\x05 \x01(\tR\akeyword\"l\n" +
+	"\x16SourceBuildTriggerResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12,\n" +
+	"\x04data\x18\x02 \x01(\v2\x18.core.SourceBuildTriggerR\x04data\"p\n" +
+	"\x1aSourceBuildTriggerListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12,\n" +
+	"\x04data\x18\x02 \x03(\v2\x18.core.SourceBuildTriggerR\x04data\"\x9a\x01\n" +
+	"\x18SourceBuildTriggerSecret\x122\n" +
+	"\atrigger\x18\x01 \x01(\v2\x18.core.SourceBuildTriggerR\atrigger\x12#\n" +
+	"\rwebhook_token\x18\x02 \x01(\tR\fwebhookToken\x12%\n" +
+	"\x0ewebhook_secret\x18\x03 \x01(\tR\rwebhookSecret\"x\n" +
+	"\x1cSourceBuildTriggerSecretResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x122\n" +
+	"\x04data\x18\x02 \x01(\v2\x1e.core.SourceBuildTriggerSecretR\x04data\"C\n" +
+	"\x1cResolveSourceBuildTriggerReq\x12#\n" +
+	"\rwebhook_token\x18\x01 \x01(\tR\fwebhookToken\"\xaf\x01\n" +
+	"\x1cSourceBuildTriggerCredential\x122\n" +
+	"\atrigger\x18\x01 \x01(\v2\x18.core.SourceBuildTriggerR\atrigger\x12%\n" +
+	"\x0ewebhook_secret\x18\x02 \x01(\tR\rwebhookSecret\x124\n" +
+	"\x16external_repository_id\x18\x03 \x01(\tR\x14externalRepositoryId\"\x80\x01\n" +
+	" SourceBuildTriggerCredentialResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x126\n" +
+	"\x04data\x18\x02 \x01(\v2\".core.SourceBuildTriggerCredentialR\x04data\"\xb7\x06\n" +
+	"\x12SourceWebhookEvent\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x1d\n" +
+	"\n" +
+	"trigger_id\x18\x03 \x01(\x03R\ttriggerId\x12*\n" +
+	"\x11provider_event_id\x18\x04 \x01(\tR\x0fproviderEventId\x12.\n" +
+	"\x13provider_event_type\x18\x05 \x01(\tR\x11providerEventType\x12\x1d\n" +
+	"\n" +
+	"source_ref\x18\x06 \x01(\tR\tsourceRef\x12\x1d\n" +
+	"\n" +
+	"commit_sha\x18\a \x01(\tR\tcommitSha\x12A\n" +
+	"\x0fartifact_source\x18\b \x01(\x0e2\x18.core.SourceArtifactTypeR\x0eartifactSource\x120\n" +
+	"\x14external_artifact_id\x18\t \x01(\tR\x12externalArtifactId\x12\x1f\n" +
+	"\vrelease_ref\x18\n" +
+	" \x01(\tR\n" +
+	"releaseRef\x12!\n" +
+	"\fpipeline_ref\x18\v \x01(\tR\vpipelineRef\x12\x17\n" +
+	"\ajob_ref\x18\f \x01(\tR\x06jobRef\x12%\n" +
+	"\x0epayload_sha256\x18\r \x01(\tR\rpayloadSha256\x12!\n" +
+	"\fversion_code\x18\x0e \x01(\x03R\vversionCode\x12!\n" +
+	"\fversion_name\x18\x0f \x01(\tR\vversionName\x126\n" +
+	"\x06status\x18\x10 \x01(\x0e2\x1e.core.SourceWebhookEventStatusR\x06status\x12\x18\n" +
+	"\aattempt\x18\x11 \x01(\x05R\aattempt\x12\x1d\n" +
+	"\n" +
+	"version_id\x18\x12 \x01(\x03R\tversionId\x12$\n" +
+	"\x0ebuild_task_ids\x18\x13 \x03(\x03R\fbuildTaskIds\x12#\n" +
+	"\rerror_message\x18\x14 \x01(\tR\ferrorMessage\x12\x1f\n" +
+	"\vcreate_time\x18\x15 \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\x16 \x01(\x03R\n" +
+	"updateTime\"\x86\x04\n" +
+	"\x1cEnqueueSourceWebhookEventReq\x12\x1d\n" +
+	"\n" +
+	"trigger_id\x18\x01 \x01(\x03R\ttriggerId\x12*\n" +
+	"\x11provider_event_id\x18\x02 \x01(\tR\x0fproviderEventId\x12.\n" +
+	"\x13provider_event_type\x18\x03 \x01(\tR\x11providerEventType\x124\n" +
+	"\x16external_repository_id\x18\x04 \x01(\tR\x14externalRepositoryId\x12\x1d\n" +
+	"\n" +
+	"source_ref\x18\x05 \x01(\tR\tsourceRef\x12\x1d\n" +
+	"\n" +
+	"commit_sha\x18\x06 \x01(\tR\tcommitSha\x12A\n" +
+	"\x0fartifact_source\x18\a \x01(\x0e2\x18.core.SourceArtifactTypeR\x0eartifactSource\x120\n" +
+	"\x14external_artifact_id\x18\b \x01(\tR\x12externalArtifactId\x12\x1f\n" +
+	"\vrelease_ref\x18\t \x01(\tR\n" +
+	"releaseRef\x12!\n" +
+	"\fpipeline_ref\x18\n" +
+	" \x01(\tR\vpipelineRef\x12\x17\n" +
+	"\ajob_ref\x18\v \x01(\tR\x06jobRef\x12%\n" +
+	"\x0epayload_sha256\x18\f \x01(\tR\rpayloadSha256\"m\n" +
+	"\x1fEnqueueSourceWebhookEventResult\x12.\n" +
+	"\x05event\x18\x01 \x01(\v2\x18.core.SourceWebhookEventR\x05event\x12\x1a\n" +
+	"\baccepted\x18\x02 \x01(\bR\baccepted\"\x80\x01\n" +
+	"\x1dEnqueueSourceWebhookEventResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x129\n" +
+	"\x04data\x18\x02 \x01(\v2%.core.EnqueueSourceWebhookEventResultR\x04data\"^\n" +
+	"\x1aClaimSourceWebhookEventReq\x12\x1b\n" +
+	"\tworker_id\x18\x01 \x01(\tR\bworkerId\x12#\n" +
+	"\rlease_seconds\x18\x02 \x01(\x05R\fleaseSeconds\"\x7f\n" +
+	"\x19ClaimedSourceWebhookEvent\x12.\n" +
+	"\x05event\x18\x01 \x01(\v2\x18.core.SourceWebhookEventR\x05event\x122\n" +
+	"\atrigger\x18\x02 \x01(\v2\x18.core.SourceBuildTriggerR\atrigger\"x\n" +
+	"\x1bClaimSourceWebhookEventResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x123\n" +
+	"\x04data\x18\x02 \x01(\v2\x1f.core.ClaimedSourceWebhookEventR\x04data\"\x93\x01\n" +
+	"\x1dCompleteSourceWebhookEventReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1d\n" +
+	"\n" +
+	"version_id\x18\x02 \x01(\x03R\tversionId\x12$\n" +
+	"\x0ebuild_task_ids\x18\x03 \x03(\x03R\fbuildTaskIds\x12\x1d\n" +
+	"\n" +
+	"commit_sha\x18\x04 \x01(\tR\tcommitSha\"n\n" +
+	"\x19FailSourceWebhookEventReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12#\n" +
+	"\rerror_message\x18\x02 \x01(\tR\ferrorMessage\x12\x1c\n" +
+	"\tretryable\x18\x03 \x01(\bR\tretryable\"\x97\x01\n" +
+	"\x19SourceWebhookEventListReq\x12#\n" +
+	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x12\x1d\n" +
+	"\n" +
+	"trigger_id\x18\x02 \x01(\x03R\ttriggerId\x126\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x1e.core.SourceWebhookEventStatusR\x06status\"p\n" +
+	"\x1aSourceWebhookEventListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12,\n" +
+	"\x04data\x18\x02 \x03(\v2\x18.core.SourceWebhookEventR\x04data\"f\n" +
 	"\x13BrandingProfileResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12)\n" +
 	"\x04data\x18\x02 \x01(\v2\x15.core.BrandingProfileR\x04data\"\xa3\x01\n" +
@@ -8853,11 +24438,12 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"compatible\x18\x02 \x01(\bR\n" +
 	"compatible\x12\x1f\n" +
 	"\vreport_json\x18\x03 \x01(\tR\n" +
-	"reportJson\"\x84\x01\n" +
+	"reportJson\"\x9d\x01\n" +
 	"\x12ApplicationListReq\x12#\n" +
 	"\x04page\x18\x01 \x01(\v2\x0f.common.PageReqR\x04page\x12\x18\n" +
 	"\akeyword\x18\x02 \x01(\tR\akeyword\x12/\n" +
-	"\x06status\x18\x03 \x01(\x0e2\x17.core.ApplicationStatusR\x06status\"b\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x17.core.ApplicationStatusR\x06status\x12\x17\n" +
+	"\aapp_ids\x18\x04 \x03(\x03R\x06appIds\"b\n" +
 	"\x13ApplicationListResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12%\n" +
 	"\x04data\x18\x02 \x03(\v2\x11.core.ApplicationR\x04data\"y\n" +
@@ -8956,7 +24542,7 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"b\n" +
 	"\x11StorageObjectResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12'\n" +
-	"\x04data\x18\x02 \x01(\v2\x13.core.StorageObjectR\x04data\"\x96\x02\n" +
+	"\x04data\x18\x02 \x01(\v2\x13.core.StorageObjectR\x04data\"\xea\x02\n" +
 	"\x12CreateBuildTaskReq\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\x03R\x05appId\x12\x1d\n" +
 	"\n" +
@@ -8966,7 +24552,103 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x11signing_config_id\x18\x04 \x01(\x03R\x0fsigningConfigId\x12\x1a\n" +
 	"\bpriority\x18\x05 \x01(\x05R\bpriority\x12.\n" +
 	"\x13branding_profile_id\x18\x06 \x01(\x03R\x11brandingProfileId\x123\n" +
-	"\x16white_label_product_id\x18\a \x01(\x03R\x13whiteLabelProductId\"\x98\x02\n" +
+	"\x16white_label_product_id\x18\a \x01(\x03R\x13whiteLabelProductId\x12\x1b\n" +
+	"\tpool_code\x18\b \x01(\tR\bpoolCode\x125\n" +
+	"\x17source_webhook_event_id\x18\t \x01(\x03R\x14sourceWebhookEventId\"\"\n" +
+	"\x10BuilderNodeIdReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\xb1\x03\n" +
+	"\x16RegisterBuilderNodeReq\x12\x1b\n" +
+	"\tnode_code\x18\x01 \x01(\tR\bnodeCode\x12\x1b\n" +
+	"\tpool_code\x18\x02 \x01(\tR\bpoolCode\x12\x1a\n" +
+	"\bendpoint\x18\x03 \x01(\tR\bendpoint\x12'\n" +
+	"\x0fmax_concurrency\x18\x04 \x01(\x05R\x0emaxConcurrency\x12!\n" +
+	"\fcpu_capacity\x18\x05 \x01(\x05R\vcpuCapacity\x12'\n" +
+	"\x0fmemory_capacity\x18\x06 \x01(\x03R\x0ememoryCapacity\x12#\n" +
+	"\rdisk_capacity\x18\a \x01(\x03R\fdiskCapacity\x12\x1b\n" +
+	"\tdisk_free\x18\b \x01(\x03R\bdiskFree\x12+\n" +
+	"\x11toolchain_version\x18\t \x01(\tR\x10toolchainVersion\x124\n" +
+	"\x16build_protocol_version\x18\n" +
+	" \x01(\x05R\x14buildProtocolVersion\x12'\n" +
+	"\x0fcapability_json\x18\v \x01(\tR\x0ecapabilityJson\"\xd0\x01\n" +
+	"\x17BuilderNodeHeartbeatReq\x12\x1b\n" +
+	"\tnode_code\x18\x01 \x01(\tR\bnodeCode\x12#\n" +
+	"\rrunning_count\x18\x02 \x01(\x05R\frunningCount\x12\x1b\n" +
+	"\tdisk_free\x18\x03 \x01(\x03R\bdiskFree\x12(\n" +
+	"\x10running_task_ids\x18\x04 \x03(\x03R\x0erunningTaskIds\x12,\n" +
+	"\x12last_error_message\x18\x05 \x01(\tR\x10lastErrorMessage\"\x7f\n" +
+	"\x13DrainBuilderNodeReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\tnode_code\x18\x02 \x01(\tR\bnodeCode\x12;\n" +
+	"\fdrain_status\x18\x03 \x01(\x0e2\x18.core.BuilderDrainStatusR\vdrainStatus\"?\n" +
+	"\x15RecoverBuilderNodeReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason\"^\n" +
+	"\x1aClaimScheduledBuildTaskReq\x12\x1b\n" +
+	"\tnode_code\x18\x01 \x01(\tR\bnodeCode\x12#\n" +
+	"\rlease_seconds\x18\x02 \x01(\x05R\fleaseSeconds\"<\n" +
+	"\x12CancelBuildTaskReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason\"?\n" +
+	"\x11RetryBuildTaskReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1a\n" +
+	"\bpriority\x18\x02 \x01(\x05R\bpriority\"\xa0\x02\n" +
+	"\x1fUpsertBuildConcurrencyPolicyReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
+	"\x06app_id\x18\x03 \x01(\x03R\x05appId\x12\x1b\n" +
+	"\tpool_code\x18\x04 \x01(\tR\bpoolCode\x12'\n" +
+	"\x0fmax_concurrency\x18\x05 \x01(\x05R\x0emaxConcurrency\x12\x1f\n" +
+	"\vfair_weight\x18\x06 \x01(\x05R\n" +
+	"fairWeight\x12!\n" +
+	"\fmax_priority\x18\a \x01(\x05R\vmaxPriority\x12/\n" +
+	"\x06status\x18\b \x01(\x0e2\x17.core.BuildPolicyStatusR\x06status\"&\n" +
+	"\x14BuildCacheEntryIdReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\xf9\x01\n" +
+	"\x14ResolveBuildCacheReq\x12\x17\n" +
+	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1b\n" +
+	"\tnode_code\x18\x02 \x01(\tR\bnodeCode\x12'\n" +
+	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\x12+\n" +
+	"\x11toolchain_version\x18\x04 \x01(\tR\x10toolchainVersion\x124\n" +
+	"\x16build_protocol_version\x18\x05 \x01(\x05R\x14buildProtocolVersion\x12\x1f\n" +
+	"\vconfirm_hit\x18\x06 \x01(\bR\n" +
+	"confirmHit\"\x86\x01\n" +
+	"\x14BuildCacheResolution\x12\x10\n" +
+	"\x03hit\x18\x01 \x01(\bR\x03hit\x12+\n" +
+	"\x05entry\x18\x02 \x01(\v2\x15.core.BuildCacheEntryR\x05entry\x12/\n" +
+	"\bartifact\x18\x03 \x01(\v2\x13.core.StorageObjectR\bartifact\"p\n" +
+	"\x18BuildCacheResolutionResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12.\n" +
+	"\x04data\x18\x02 \x01(\v2\x1a.core.BuildCacheResolutionR\x04data\"\x9f\x03\n" +
+	"\x14PublishBuildCacheReq\x12\x17\n" +
+	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1b\n" +
+	"\tnode_code\x18\x02 \x01(\tR\bnodeCode\x12'\n" +
+	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\x12+\n" +
+	"\x11toolchain_version\x18\x04 \x01(\tR\x10toolchainVersion\x124\n" +
+	"\x16build_protocol_version\x18\x05 \x01(\x05R\x14buildProtocolVersion\x12,\n" +
+	"\x12artifact_object_id\x18\x06 \x01(\x03R\x10artifactObjectId\x12'\n" +
+	"\x0fartifact_sha256\x18\a \x01(\tR\x0eartifactSha256\x12\x1d\n" +
+	"\n" +
+	"size_bytes\x18\b \x01(\x03R\tsizeBytes\x12\x1f\n" +
+	"\vttl_seconds\x18\t \x01(\x03R\n" +
+	"ttlSeconds\x12.\n" +
+	"\x13artifact_object_key\x18\n" +
+	" \x01(\tR\x11artifactObjectKey\"w\n" +
+	"\x17InvalidateBuildCacheReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x17\n" +
+	"\atask_id\x18\x02 \x01(\x03R\x06taskId\x12\x1b\n" +
+	"\tnode_code\x18\x03 \x01(\tR\bnodeCode\x12\x16\n" +
+	"\x06reason\x18\x04 \x01(\tR\x06reason\"X\n" +
+	"\x14CleanupBuildCacheReq\x12\x14\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12*\n" +
+	"\x11target_free_bytes\x18\x02 \x01(\x03R\x0ftargetFreeBytes\"\x92\x01\n" +
+	"\x17CleanupBuildCacheResult\x12+\n" +
+	"\x11invalidated_count\x18\x01 \x01(\x05R\x10invalidatedCount\x12+\n" +
+	"\x11reclaimable_bytes\x18\x02 \x01(\x03R\x10reclaimableBytes\x12\x1d\n" +
+	"\n" +
+	"object_ids\x18\x03 \x03(\x03R\tobjectIds\"p\n" +
+	"\x15CleanupBuildCacheResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x121\n" +
+	"\x04data\x18\x02 \x01(\v2\x1d.core.CleanupBuildCacheResultR\x04data\"\x98\x02\n" +
 	"\x1bCreateWhiteLabelTemplateReq\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\x03R\x05appId\x12#\n" +
 	"\rtemplate_code\x18\x02 \x01(\tR\ftemplateCode\x12#\n" +
@@ -9232,7 +24914,420 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x0etemplate_files\x18\x11 \x03(\v2\x13.core.StorageObjectR\rtemplateFiles\"r\n" +
 	"\x19BuildExecutionContextResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12/\n" +
-	"\x04data\x18\x02 \x01(\v2\x1b.core.BuildExecutionContextR\x04data*t\n" +
+	"\x04data\x18\x02 \x01(\v2\x1b.core.BuildExecutionContextR\x04data\"\xf9\x05\n" +
+	"\vBillingPlan\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\tplan_code\x18\x02 \x01(\tR\bplanCode\x12\x1b\n" +
+	"\tplan_name\x18\x03 \x01(\tR\bplanName\x127\n" +
+	"\rbilling_cycle\x18\x04 \x01(\x0e2\x12.core.BillingCycleR\fbillingCycle\x12!\n" +
+	"\fprice_amount\x18\x05 \x01(\x03R\vpriceAmount\x12\x1a\n" +
+	"\bcurrency\x18\x06 \x01(\tR\bcurrency\x12!\n" +
+	"\ffeature_json\x18\a \x01(\tR\vfeatureJson\x12(\n" +
+	"\x10builds_per_cycle\x18\b \x01(\x03R\x0ebuildsPerCycle\x122\n" +
+	"\x15max_build_concurrency\x18\t \x01(\x05R\x13maxBuildConcurrency\x12#\n" +
+	"\rstorage_bytes\x18\n" +
+	" \x01(\x03R\fstorageBytes\x12(\n" +
+	"\x10max_upload_bytes\x18\v \x01(\x03R\x0emaxUploadBytes\x12\x1d\n" +
+	"\n" +
+	"team_seats\x18\f \x01(\x05R\tteamSeats\x12$\n" +
+	"\x0eapi_rate_limit\x18\r \x01(\x05R\fapiRateLimit\x12.\n" +
+	"\x13charge_failed_build\x18\x0e \x01(\bR\x11chargeFailedBuild\x12(\n" +
+	"\x10charge_cache_hit\x18\x0f \x01(\bR\x0echargeCacheHit\x12,\n" +
+	"\x12charge_retry_build\x18\x10 \x01(\bR\x10chargeRetryBuild\x12/\n" +
+	"\x06status\x18\x11 \x01(\x0e2\x17.core.BillingPlanStatusR\x06status\x12\x18\n" +
+	"\aversion\x18\x12 \x01(\x05R\aversion\x12\x1f\n" +
+	"\vcreate_time\x18\x13 \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\x14 \x01(\x03R\n" +
+	"updateTime\"\xe5\x04\n" +
+	"\x14CreateBillingPlanReq\x12\x1b\n" +
+	"\tplan_code\x18\x01 \x01(\tR\bplanCode\x12\x1b\n" +
+	"\tplan_name\x18\x02 \x01(\tR\bplanName\x127\n" +
+	"\rbilling_cycle\x18\x03 \x01(\x0e2\x12.core.BillingCycleR\fbillingCycle\x12!\n" +
+	"\fprice_amount\x18\x04 \x01(\x03R\vpriceAmount\x12\x1a\n" +
+	"\bcurrency\x18\x05 \x01(\tR\bcurrency\x12!\n" +
+	"\ffeature_json\x18\x06 \x01(\tR\vfeatureJson\x12(\n" +
+	"\x10builds_per_cycle\x18\a \x01(\x03R\x0ebuildsPerCycle\x122\n" +
+	"\x15max_build_concurrency\x18\b \x01(\x05R\x13maxBuildConcurrency\x12#\n" +
+	"\rstorage_bytes\x18\t \x01(\x03R\fstorageBytes\x12(\n" +
+	"\x10max_upload_bytes\x18\n" +
+	" \x01(\x03R\x0emaxUploadBytes\x12\x1d\n" +
+	"\n" +
+	"team_seats\x18\v \x01(\x05R\tteamSeats\x12$\n" +
+	"\x0eapi_rate_limit\x18\f \x01(\x05R\fapiRateLimit\x12.\n" +
+	"\x13charge_failed_build\x18\r \x01(\bR\x11chargeFailedBuild\x12(\n" +
+	"\x10charge_cache_hit\x18\x0e \x01(\bR\x0echargeCacheHit\x12,\n" +
+	"\x12charge_retry_build\x18\x0f \x01(\bR\x10chargeRetryBuild\"\"\n" +
+	"\x10BillingPlanIdReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"v\n" +
+	"\x12BillingPlanListReq\x12/\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x17.core.BillingPlanStatusR\x06status\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x03 \x01(\x05R\bpageSize\"^\n" +
+	"\x0fBillingPlanResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12%\n" +
+	"\x04data\x18\x02 \x01(\v2\x11.core.BillingPlanR\x04data\"x\n" +
+	"\x13BillingPlanListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12%\n" +
+	"\x04data\x18\x02 \x03(\v2\x11.core.BillingPlanR\x04data\x12\x14\n" +
+	"\x05total\x18\x03 \x01(\x03R\x05total\"\xa7\x05\n" +
+	"\x12TenantSubscription\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x17\n" +
+	"\aplan_id\x18\x03 \x01(\x03R\x06planId\x12!\n" +
+	"\fplan_version\x18\x04 \x01(\x05R\vplanVersion\x126\n" +
+	"\x06status\x18\x05 \x01(\x0e2\x1e.core.TenantSubscriptionStatusR\x06status\x126\n" +
+	"\x06source\x18\x06 \x01(\x0e2\x1e.core.TenantSubscriptionSourceR\x06source\x120\n" +
+	"\x14external_customer_id\x18\a \x01(\tR\x12externalCustomerId\x128\n" +
+	"\x18external_subscription_id\x18\b \x01(\tR\x16externalSubscriptionId\x120\n" +
+	"\x14current_period_start\x18\t \x01(\x03R\x12currentPeriodStart\x12,\n" +
+	"\x12current_period_end\x18\n" +
+	" \x01(\x03R\x10currentPeriodEnd\x12/\n" +
+	"\x14cancel_at_period_end\x18\v \x01(\bR\x11cancelAtPeriodEnd\x12\x1f\n" +
+	"\vgrace_until\x18\f \x01(\x03R\n" +
+	"graceUntil\x12&\n" +
+	"\x0fpending_plan_id\x18\r \x01(\x03R\rpendingPlanId\x120\n" +
+	"\x14pending_plan_version\x18\x0e \x01(\x05R\x12pendingPlanVersion\x12\x1f\n" +
+	"\vcreate_time\x18\x0f \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\x10 \x01(\x03R\n" +
+	"updateTime\"\xae\x05\n" +
+	"\x11TenantEntitlement\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x17\n" +
+	"\aplan_id\x18\x03 \x01(\x03R\x06planId\x12!\n" +
+	"\fplan_version\x18\x04 \x01(\x05R\vplanVersion\x12(\n" +
+	"\x10builds_per_cycle\x18\x05 \x01(\x03R\x0ebuildsPerCycle\x122\n" +
+	"\x15max_build_concurrency\x18\x06 \x01(\x05R\x13maxBuildConcurrency\x12#\n" +
+	"\rstorage_bytes\x18\a \x01(\x03R\fstorageBytes\x12(\n" +
+	"\x10max_upload_bytes\x18\b \x01(\x03R\x0emaxUploadBytes\x12\x1d\n" +
+	"\n" +
+	"team_seats\x18\t \x01(\x05R\tteamSeats\x12$\n" +
+	"\x0eapi_rate_limit\x18\n" +
+	" \x01(\x05R\fapiRateLimit\x12.\n" +
+	"\x13charge_failed_build\x18\v \x01(\bR\x11chargeFailedBuild\x12(\n" +
+	"\x10charge_cache_hit\x18\f \x01(\bR\x0echargeCacheHit\x12,\n" +
+	"\x12charge_retry_build\x18\r \x01(\bR\x10chargeRetryBuild\x12#\n" +
+	"\roverride_json\x18\x0e \x01(\tR\foverrideJson\x12\x1d\n" +
+	"\n" +
+	"valid_from\x18\x0f \x01(\x03R\tvalidFrom\x12\x1f\n" +
+	"\vvalid_until\x18\x10 \x01(\x03R\n" +
+	"validUntil\x125\n" +
+	"\x06status\x18\x11 \x01(\x0e2\x1d.core.TenantEntitlementStatusR\x06status\x12\x1a\n" +
+	"\brevision\x18\x12 \x01(\x03R\brevision\"/\n" +
+	"\x10TenantBillingReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\"\xd9\x01\n" +
+	"\x11TenantBillingResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12<\n" +
+	"\fsubscription\x18\x02 \x01(\v2\x18.core.TenantSubscriptionR\fsubscription\x129\n" +
+	"\ventitlement\x18\x03 \x01(\v2\x17.core.TenantEntitlementR\ventitlement\x12%\n" +
+	"\x04plan\x18\x04 \x01(\v2\x11.core.BillingPlanR\x04plan\"\x8a\x02\n" +
+	"\x1bUpsertManualSubscriptionReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12\x17\n" +
+	"\aplan_id\x18\x02 \x01(\x03R\x06planId\x12!\n" +
+	"\fperiod_start\x18\x03 \x01(\x03R\vperiodStart\x12\x1d\n" +
+	"\n" +
+	"period_end\x18\x04 \x01(\x03R\tperiodEnd\x12\x1f\n" +
+	"\vgrace_until\x18\x05 \x01(\x03R\n" +
+	"graceUntil\x12#\n" +
+	"\roverride_json\x18\x06 \x01(\tR\foverrideJson\x12-\n" +
+	"\x12contract_reference\x18\a \x01(\tR\x11contractReference\"\x85\x01\n" +
+	"\x1bChangeTenantSubscriptionReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12\x17\n" +
+	"\aplan_id\x18\x02 \x01(\x03R\x06planId\x120\n" +
+	"\x04mode\x18\x03 \x01(\x0e2\x1c.core.SubscriptionChangeModeR\x04mode\"\\\n" +
+	"\x1bCancelTenantSubscriptionReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12 \n" +
+	"\vimmediately\x18\x02 \x01(\bR\vimmediately\"\x85\x02\n" +
+	"\x0fReserveQuotaReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12)\n" +
+	"\x06metric\x18\x02 \x01(\x0e2\x11.core.QuotaMetricR\x06metric\x12\x1a\n" +
+	"\bquantity\x18\x03 \x01(\x03R\bquantity\x12#\n" +
+	"\rresource_type\x18\x04 \x01(\tR\fresourceType\x12\x1f\n" +
+	"\vresource_id\x18\x05 \x01(\x03R\n" +
+	"resourceId\x12'\n" +
+	"\x0fidempotency_key\x18\x06 \x01(\tR\x0eidempotencyKey\x12\x1f\n" +
+	"\vttl_seconds\x18\a \x01(\x03R\n" +
+	"ttlSeconds\"\xe2\x03\n" +
+	"\x10QuotaReservation\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12)\n" +
+	"\x06metric\x18\x03 \x01(\x0e2\x11.core.QuotaMetricR\x06metric\x12\x1a\n" +
+	"\bquantity\x18\x04 \x01(\x03R\bquantity\x12#\n" +
+	"\rresource_type\x18\x05 \x01(\tR\fresourceType\x12\x1f\n" +
+	"\vresource_id\x18\x06 \x01(\x03R\n" +
+	"resourceId\x12'\n" +
+	"\x0fidempotency_key\x18\a \x01(\tR\x0eidempotencyKey\x12\x1d\n" +
+	"\n" +
+	"period_key\x18\b \x01(\tR\tperiodKey\x124\n" +
+	"\x06status\x18\t \x01(\x0e2\x1c.core.QuotaReservationStatusR\x06status\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\n" +
+	" \x01(\x03R\texpiresAt\x12#\n" +
+	"\rused_quantity\x18\v \x01(\x03R\fusedQuantity\x12+\n" +
+	"\x11reserved_quantity\x18\f \x01(\x03R\x10reservedQuantity\x12%\n" +
+	"\x0elimit_quantity\x18\r \x01(\x03R\rlimitQuantity\"h\n" +
+	"\x14QuotaReservationResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12*\n" +
+	"\x04data\x18\x02 \x01(\v2\x16.core.QuotaReservationR\x04data\"\x9a\x02\n" +
+	"\x19QuotaReservationActionReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12)\n" +
+	"\x06metric\x18\x02 \x01(\x0e2\x11.core.QuotaMetricR\x06metric\x12'\n" +
+	"\x0fidempotency_key\x18\x03 \x01(\tR\x0eidempotencyKey\x12\x1f\n" +
+	"\vresource_id\x18\x04 \x01(\x03R\n" +
+	"resourceId\x12;\n" +
+	"\fusage_metric\x18\x05 \x01(\x0e2\x18.core.BillingUsageMetricR\vusageMetric\x12.\n" +
+	"\x13usage_metadata_json\x18\x06 \x01(\tR\x11usageMetadataJson\"\xb0\x02\n" +
+	"\x0eRecordUsageReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x120\n" +
+	"\x06metric\x18\x02 \x01(\x0e2\x18.core.BillingUsageMetricR\x06metric\x12\x1a\n" +
+	"\bquantity\x18\x03 \x01(\x03R\bquantity\x12#\n" +
+	"\rresource_type\x18\x04 \x01(\tR\fresourceType\x12\x1f\n" +
+	"\vresource_id\x18\x05 \x01(\x03R\n" +
+	"resourceId\x12'\n" +
+	"\x0fidempotency_key\x18\x06 \x01(\tR\x0eidempotencyKey\x12\x1f\n" +
+	"\voccurred_at\x18\a \x01(\x03R\n" +
+	"occurredAt\x12#\n" +
+	"\rmetadata_json\x18\b \x01(\tR\fmetadataJson\"\xe4\x01\n" +
+	"\x12UsageMetricSummary\x120\n" +
+	"\x06metric\x18\x01 \x01(\x0e2\x18.core.BillingUsageMetricR\x06metric\x12#\n" +
+	"\rused_quantity\x18\x02 \x01(\x03R\fusedQuantity\x12+\n" +
+	"\x11reserved_quantity\x18\x03 \x01(\x03R\x10reservedQuantity\x12%\n" +
+	"\x0elimit_quantity\x18\x04 \x01(\x03R\rlimitQuantity\x12#\n" +
+	"\rusage_percent\x18\x05 \x01(\x05R\fusagePercent\"M\n" +
+	"\x0fBillingUsageReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12\x1d\n" +
+	"\n" +
+	"period_key\x18\x02 \x01(\tR\tperiodKey\"\x85\x01\n" +
+	"\x10BillingUsageResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12\x1d\n" +
+	"\n" +
+	"period_key\x18\x02 \x01(\tR\tperiodKey\x12,\n" +
+	"\x04data\x18\x03 \x03(\v2\x18.core.UsageMetricSummaryR\x04data\"\x9d\x02\n" +
+	"\vInvoiceItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1d\n" +
+	"\n" +
+	"invoice_id\x18\x02 \x01(\x03R\tinvoiceId\x12\x19\n" +
+	"\bline_key\x18\x03 \x01(\tR\alineKey\x12\x1b\n" +
+	"\titem_type\x18\x04 \x01(\x05R\bitemType\x12 \n" +
+	"\vdescription\x18\x05 \x01(\tR\vdescription\x120\n" +
+	"\x06metric\x18\x06 \x01(\x0e2\x18.core.BillingUsageMetricR\x06metric\x12\x1a\n" +
+	"\bquantity\x18\a \x01(\x03R\bquantity\x12\x1f\n" +
+	"\vunit_amount\x18\b \x01(\x03R\n" +
+	"unitAmount\x12\x16\n" +
+	"\x06amount\x18\t \x01(\x03R\x06amount\"\xe8\x04\n" +
+	"\aInvoice\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x1d\n" +
+	"\n" +
+	"invoice_no\x18\x03 \x01(\tR\tinvoiceNo\x12.\n" +
+	"\x13external_invoice_id\x18\x04 \x01(\tR\x11externalInvoiceId\x12+\n" +
+	"\x06status\x18\x05 \x01(\x0e2\x13.core.InvoiceStatusR\x06status\x12\x1a\n" +
+	"\bcurrency\x18\x06 \x01(\tR\bcurrency\x12'\n" +
+	"\x0fsubtotal_amount\x18\a \x01(\x03R\x0esubtotalAmount\x12'\n" +
+	"\x0fdiscount_amount\x18\b \x01(\x03R\x0ediscountAmount\x12\x1d\n" +
+	"\n" +
+	"tax_amount\x18\t \x01(\x03R\ttaxAmount\x12!\n" +
+	"\ftotal_amount\x18\n" +
+	" \x01(\x03R\vtotalAmount\x12\x1f\n" +
+	"\vpaid_amount\x18\v \x01(\x03R\n" +
+	"paidAmount\x12'\n" +
+	"\x0frefunded_amount\x18\f \x01(\x03R\x0erefundedAmount\x12!\n" +
+	"\fperiod_start\x18\r \x01(\x03R\vperiodStart\x12\x1d\n" +
+	"\n" +
+	"period_end\x18\x0e \x01(\x03R\tperiodEnd\x12\x15\n" +
+	"\x06due_at\x18\x0f \x01(\x03R\x05dueAt\x12\x17\n" +
+	"\apaid_at\x18\x10 \x01(\x03R\x06paidAt\x12'\n" +
+	"\x05items\x18\x11 \x03(\v2\x11.core.InvoiceItemR\x05items\x12\x1f\n" +
+	"\vcreate_time\x18\x12 \x01(\x03R\n" +
+	"createTime\"\x8b\x01\n" +
+	"\x0eInvoiceListReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12+\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x13.core.InvoiceStatusR\x06status\x12\x12\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"p\n" +
+	"\x0fInvoiceListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12!\n" +
+	"\x04data\x18\x02 \x03(\v2\r.core.InvoiceR\x04data\x12\x14\n" +
+	"\x05total\x18\x03 \x01(\x03R\x05total\"\xc9\x05\n" +
+	"\x16ApplyBillingWebhookReq\x12\x1a\n" +
+	"\bprovider\x18\x01 \x01(\tR\bprovider\x12*\n" +
+	"\x11provider_event_id\x18\x02 \x01(\tR\x0fproviderEventId\x12\x1d\n" +
+	"\n" +
+	"event_type\x18\x03 \x01(\tR\teventType\x12(\n" +
+	"\x10event_created_at\x18\x04 \x01(\x03R\x0eeventCreatedAt\x12!\n" +
+	"\fpayload_json\x18\x05 \x01(\tR\vpayloadJson\x12\x1b\n" +
+	"\ttenant_id\x18\x06 \x01(\x03R\btenantId\x12\x17\n" +
+	"\aplan_id\x18\a \x01(\x03R\x06planId\x120\n" +
+	"\x14external_customer_id\x18\b \x01(\tR\x12externalCustomerId\x128\n" +
+	"\x18external_subscription_id\x18\t \x01(\tR\x16externalSubscriptionId\x12.\n" +
+	"\x13external_invoice_id\x18\n" +
+	" \x01(\tR\x11externalInvoiceId\x126\n" +
+	"\x17external_transaction_id\x18\v \x01(\tR\x15externalTransactionId\x12\x1a\n" +
+	"\bcurrency\x18\f \x01(\tR\bcurrency\x12\x16\n" +
+	"\x06amount\x18\r \x01(\x03R\x06amount\x12!\n" +
+	"\fperiod_start\x18\x0e \x01(\x03R\vperiodStart\x12\x1d\n" +
+	"\n" +
+	"period_end\x18\x0f \x01(\x03R\tperiodEnd\x12/\n" +
+	"\x14cancel_at_period_end\x18\x10 \x01(\bR\x11cancelAtPeriodEnd\x12!\n" +
+	"\ffailure_code\x18\x11 \x01(\tR\vfailureCode\x12'\n" +
+	"\x0ffailure_message\x18\x12 \x01(\tR\x0efailureMessage\"h\n" +
+	"\x14LocalAgentCapability\x12%\n" +
+	"\x0ecapability_key\x18\x01 \x01(\tR\rcapabilityKey\x12)\n" +
+	"\x10capability_value\x18\x02 \x01(\tR\x0fcapabilityValue\"\x9b\x02\n" +
+	"\x15LocalAgentCertificate\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12#\n" +
+	"\rserial_number\x18\x02 \x01(\tR\fserialNumber\x12-\n" +
+	"\x12fingerprint_sha256\x18\x03 \x01(\tR\x11fingerprintSha256\x12'\n" +
+	"\x0fcertificate_pem\x18\x04 \x01(\tR\x0ecertificatePem\x129\n" +
+	"\x06status\x18\x05 \x01(\x0e2!.core.LocalAgentCertificateStatusR\x06status\x12\x1d\n" +
+	"\n" +
+	"not_before\x18\x06 \x01(\x03R\tnotBefore\x12\x1b\n" +
+	"\tnot_after\x18\a \x01(\x03R\bnotAfter\"\xfe\x05\n" +
+	"\n" +
+	"LocalAgent\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x1d\n" +
+	"\n" +
+	"agent_code\x18\x03 \x01(\tR\tagentCode\x12\x1d\n" +
+	"\n" +
+	"agent_name\x18\x04 \x01(\tR\tagentName\x12\x1b\n" +
+	"\tpool_code\x18\x05 \x01(\tR\bpoolCode\x12.\n" +
+	"\x06status\x18\x06 \x01(\x0e2\x16.core.LocalAgentStatusR\x06status\x12>\n" +
+	"\fdrain_status\x18\a \x01(\x0e2\x1b.core.LocalAgentDrainStatusR\vdrainStatus\x12)\n" +
+	"\x10protocol_version\x18\b \x01(\x05R\x0fprotocolVersion\x12#\n" +
+	"\ragent_version\x18\t \x01(\tR\fagentVersion\x12=\n" +
+	"\rartifact_mode\x18\n" +
+	" \x01(\x0e2\x18.core.HybridArtifactModeR\fartifactMode\x120\n" +
+	"\x14customer_storage_ref\x18\v \x01(\tR\x12customerStorageRef\x12&\n" +
+	"\x0fallowed_app_ids\x18\f \x03(\x03R\rallowedAppIds\x12>\n" +
+	"\fcapabilities\x18\r \x03(\v2\x1a.core.LocalAgentCapabilityR\fcapabilities\x12-\n" +
+	"\x12certificate_serial\x18\x0e \x01(\tR\x11certificateSerial\x122\n" +
+	"\x15certificate_not_after\x18\x0f \x01(\x03R\x13certificateNotAfter\x12*\n" +
+	"\x11last_heartbeat_at\x18\x10 \x01(\x03R\x0flastHeartbeatAt\x12\x1f\n" +
+	"\vcreate_time\x18\x11 \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\x12 \x01(\x03R\n" +
+	"updateTime\"\x9b\x03\n" +
+	"\x1fCreateLocalAgentRegistrationReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12\x1d\n" +
+	"\n" +
+	"agent_code\x18\x02 \x01(\tR\tagentCode\x12\x1d\n" +
+	"\n" +
+	"agent_name\x18\x03 \x01(\tR\tagentName\x12\x1b\n" +
+	"\tpool_code\x18\x04 \x01(\tR\bpoolCode\x12=\n" +
+	"\rartifact_mode\x18\x05 \x01(\x0e2\x18.core.HybridArtifactModeR\fartifactMode\x120\n" +
+	"\x14customer_storage_ref\x18\x06 \x01(\tR\x12customerStorageRef\x12&\n" +
+	"\x0fallowed_app_ids\x18\a \x03(\x03R\rallowedAppIds\x12>\n" +
+	"\fcapabilities\x18\b \x03(\v2\x1a.core.LocalAgentCapabilityR\fcapabilities\x12'\n" +
+	"\x0fexpires_seconds\x18\t \x01(\x03R\x0eexpiresSeconds\"\xb6\x01\n" +
+	"\x1aLocalAgentRegistrationResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12$\n" +
+	"\x04data\x18\x02 \x01(\v2\x10.core.LocalAgentR\x04data\x12-\n" +
+	"\x12registration_token\x18\x03 \x01(\tR\x11registrationToken\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x04 \x01(\x03R\texpiresAt\"\x80\x02\n" +
+	"\x15RegisterLocalAgentReq\x12-\n" +
+	"\x12registration_token\x18\x01 \x01(\tR\x11registrationToken\x12\x17\n" +
+	"\acsr_pem\x18\x02 \x01(\tR\x06csrPem\x12#\n" +
+	"\ragent_version\x18\x03 \x01(\tR\fagentVersion\x12)\n" +
+	"\x10protocol_version\x18\x04 \x01(\x05R\x0fprotocolVersion\x12\x14\n" +
+	"\x05nonce\x18\x05 \x01(\tR\x05nonce\x12\x1c\n" +
+	"\ttimestamp\x18\x06 \x01(\x03R\ttimestamp\x12\x1b\n" +
+	"\tsource_ip\x18\a \x01(\tR\bsourceIp\"\xd1\x01\n" +
+	"\x16RegisterLocalAgentResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12$\n" +
+	"\x04data\x18\x02 \x01(\v2\x10.core.LocalAgentR\x04data\x12=\n" +
+	"\vcertificate\x18\x03 \x01(\v2\x1b.core.LocalAgentCertificateR\vcertificate\x12,\n" +
+	"\x12ca_certificate_pem\x18\x04 \x01(\tR\x10caCertificatePem\">\n" +
+	"\x0fLocalAgentIdReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\"\\\n" +
+	"\x0eLocalAgentResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12$\n" +
+	"\x04data\x18\x02 \x01(\v2\x10.core.LocalAgentR\x04data\"\x91\x01\n" +
+	"\x11LocalAgentListReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12.\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x16.core.LocalAgentStatusR\x06status\x12\x12\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"v\n" +
+	"\x12LocalAgentListResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12$\n" +
+	"\x04data\x18\x02 \x03(\v2\x10.core.LocalAgentR\x04data\x12\x14\n" +
+	"\x05total\x18\x03 \x01(\x03R\x05total\"\xd4\x01\n" +
+	"\x0eLocalAgentAuth\x12\x19\n" +
+	"\bagent_id\x18\x01 \x01(\x03R\aagentId\x12-\n" +
+	"\x12certificate_serial\x18\x02 \x01(\tR\x11certificateSerial\x12D\n" +
+	"\x1ecertificate_fingerprint_sha256\x18\x03 \x01(\tR\x1ccertificateFingerprintSha256\x12\x14\n" +
+	"\x05nonce\x18\x04 \x01(\tR\x05nonce\x12\x1c\n" +
+	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\"\xfc\x01\n" +
+	"\x16HeartbeatLocalAgentReq\x12(\n" +
+	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12#\n" +
+	"\ragent_version\x18\x02 \x01(\tR\fagentVersion\x12)\n" +
+	"\x10protocol_version\x18\x03 \x01(\x05R\x0fprotocolVersion\x12>\n" +
+	"\fcapabilities\x18\x04 \x03(\v2\x1a.core.LocalAgentCapabilityR\fcapabilities\x12(\n" +
+	"\x10running_task_ids\x18\x05 \x03(\x03R\x0erunningTaskIds\"\x81\x01\n" +
+	"\x12DrainLocalAgentReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12>\n" +
+	"\fdrain_status\x18\x03 \x01(\x0e2\x1b.core.LocalAgentDrainStatusR\vdrainStatus\"Z\n" +
+	"\x13RevokeLocalAgentReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x16\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\"c\n" +
+	"\x1eRotateLocalAgentCertificateReq\x12(\n" +
+	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12\x17\n" +
+	"\acsr_pem\x18\x02 \x01(\tR\x06csrPem\"l\n" +
+	"\x1bClaimLocalAgentBuildTaskReq\x12(\n" +
+	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12#\n" +
+	"\rlease_seconds\x18\x02 \x01(\x05R\fleaseSeconds\"\xa3\x01\n" +
+	"\x17LocalAgentBuildTaskResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12#\n" +
+	"\x04task\x18\x02 \x01(\v2\x0f.core.BuildTaskR\x04task\x12=\n" +
+	"\rartifact_mode\x18\x03 \x01(\x0e2\x18.core.HybridArtifactModeR\fartifactMode\"\xae\x01\n" +
+	"\x1bRenewLocalAgentTaskLeaseReq\x12(\n" +
+	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12\x17\n" +
+	"\atask_id\x18\x02 \x01(\x03R\x06taskId\x12'\n" +
+	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\x12#\n" +
+	"\rlease_seconds\x18\x04 \x01(\x05R\fleaseSeconds\"\xf3\x01\n" +
+	" ReportLocalAgentBuildProgressReq\x12(\n" +
+	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12\x17\n" +
+	"\atask_id\x18\x02 \x01(\x03R\x06taskId\x12'\n" +
+	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\x12-\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x15.core.BuildTaskStatusR\x06status\x12\x1a\n" +
+	"\bprogress\x18\x05 \x01(\x05R\bprogress\x12\x18\n" +
+	"\amessage\x18\x06 \x01(\tR\amessage\"\xca\x02\n" +
+	"\x1eCompleteLocalAgentBuildTaskReq\x12(\n" +
+	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12\x17\n" +
+	"\atask_id\x18\x02 \x01(\x03R\x06taskId\x12'\n" +
+	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\x12#\n" +
+	"\rapk_reference\x18\x04 \x01(\tR\fapkReference\x12\x1d\n" +
+	"\n" +
+	"apk_sha256\x18\x05 \x01(\tR\tapkSha256\x12\x19\n" +
+	"\bapk_size\x18\x06 \x01(\x03R\aapkSize\x12#\n" +
+	"\rlog_reference\x18\a \x01(\tR\flogReference\x12\x1d\n" +
+	"\n" +
+	"log_sha256\x18\b \x01(\tR\tlogSha256\x12\x19\n" +
+	"\blog_size\x18\t \x01(\x03R\alogSize\"\x8c\x02\n" +
+	"\x1aFailLocalAgentBuildTaskReq\x12(\n" +
+	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12\x17\n" +
+	"\atask_id\x18\x02 \x01(\x03R\x06taskId\x12'\n" +
+	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\x12#\n" +
+	"\rerror_message\x18\x04 \x01(\tR\ferrorMessage\x12#\n" +
+	"\rlog_reference\x18\x05 \x01(\tR\flogReference\x12\x1d\n" +
+	"\n" +
+	"log_sha256\x18\x06 \x01(\tR\tlogSha256\x12\x19\n" +
+	"\blog_size\x18\a \x01(\x03R\alogSize\"\xe3\x02\n" +
+	"\x17VerifyHybridArtifactReq\x12(\n" +
+	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12\x17\n" +
+	"\atask_id\x18\x02 \x01(\x03R\x06taskId\x12'\n" +
+	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\x12=\n" +
+	"\rartifact_type\x18\x04 \x01(\x0e2\x18.core.HybridArtifactTypeR\fartifactType\x12;\n" +
+	"\fstorage_mode\x18\x05 \x01(\x0e2\x18.core.HybridArtifactModeR\vstorageMode\x12)\n" +
+	"\x10object_reference\x18\x06 \x01(\tR\x0fobjectReference\x12\x16\n" +
+	"\x06sha256\x18\a \x01(\tR\x06sha256\x12\x1d\n" +
+	"\n" +
+	"size_bytes\x18\b \x01(\x03R\tsizeBytes*t\n" +
 	"\x11ApplicationStatus\x12\x1e\n" +
 	"\x1aAPPLICATION_STATUS_UNKNOWN\x10\x00\x12\x1e\n" +
 	"\x1aAPPLICATION_STATUS_ENABLED\x10\x01\x12\x1f\n" +
@@ -9245,7 +25340,7 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\rChannelStatus\x12\x1a\n" +
 	"\x16CHANNEL_STATUS_UNKNOWN\x10\x00\x12\x1a\n" +
 	"\x16CHANNEL_STATUS_ENABLED\x10\x01\x12\x1b\n" +
-	"\x17CHANNEL_STATUS_DISABLED\x10\x02*\xec\x01\n" +
+	"\x17CHANNEL_STATUS_DISABLED\x10\x02*\x8d\x02\n" +
 	"\x0fBuildTaskStatus\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_UNKNOWN\x10\x00\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_PENDING\x10\x01\x12\x1e\n" +
@@ -9253,7 +25348,8 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x19BUILD_TASK_STATUS_SIGNING\x10\x03\x12\x1f\n" +
 	"\x1bBUILD_TASK_STATUS_UPLOADING\x10\x04\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_SUCCESS\x10\x05\x12\x1c\n" +
-	"\x18BUILD_TASK_STATUS_FAILED\x10\x06*\xb1\x02\n" +
+	"\x18BUILD_TASK_STATUS_FAILED\x10\x06\x12\x1f\n" +
+	"\x1bBUILD_TASK_STATUS_CANCELLED\x10\a*\xd6\x02\n" +
 	"\x11StorageObjectType\x12\x1f\n" +
 	"\x1bSTORAGE_OBJECT_TYPE_UNKNOWN\x10\x00\x12\"\n" +
 	"\x1eSTORAGE_OBJECT_TYPE_SOURCE_APK\x10\x01\x12 \n" +
@@ -9262,7 +25358,219 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x1dSTORAGE_OBJECT_TYPE_BUILD_LOG\x10\x04\x12\"\n" +
 	"\x1eSTORAGE_OBJECT_TYPE_BRAND_LOGO\x10\x05\x12$\n" +
 	" STORAGE_OBJECT_TYPE_BRAND_SPLASH\x10\x06\x12%\n" +
-	"!STORAGE_OBJECT_TYPE_TEMPLATE_FILE\x10\a*\xe4\x01\n" +
+	"!STORAGE_OBJECT_TYPE_TEMPLATE_FILE\x10\a\x12#\n" +
+	"\x1fSTORAGE_OBJECT_TYPE_BUILD_CACHE\x10\b*\x97\x01\n" +
+	"\x11BuilderNodeStatus\x12\x1f\n" +
+	"\x1bBUILDER_NODE_STATUS_UNKNOWN\x10\x00\x12\x1e\n" +
+	"\x1aBUILDER_NODE_STATUS_ONLINE\x10\x01\x12\x1f\n" +
+	"\x1bBUILDER_NODE_STATUS_OFFLINE\x10\x02\x12 \n" +
+	"\x1cBUILDER_NODE_STATUS_ISOLATED\x10\x03*}\n" +
+	"\x12BuilderDrainStatus\x12 \n" +
+	"\x1cBUILDER_DRAIN_STATUS_UNKNOWN\x10\x00\x12\"\n" +
+	"\x1eBUILDER_DRAIN_STATUS_ACCEPTING\x10\x01\x12!\n" +
+	"\x1dBUILDER_DRAIN_STATUS_DRAINING\x10\x02*w\n" +
+	"\x11BuildPolicyStatus\x12\x1f\n" +
+	"\x1bBUILD_POLICY_STATUS_UNKNOWN\x10\x00\x12\x1f\n" +
+	"\x1bBUILD_POLICY_STATUS_ENABLED\x10\x01\x12 \n" +
+	"\x1cBUILD_POLICY_STATUS_DISABLED\x10\x02*\xd1\x01\n" +
+	"\x14BuildSlotLeaseStatus\x12#\n" +
+	"\x1fBUILD_SLOT_LEASE_STATUS_UNKNOWN\x10\x00\x12\"\n" +
+	"\x1eBUILD_SLOT_LEASE_STATUS_ACTIVE\x10\x01\x12$\n" +
+	" BUILD_SLOT_LEASE_STATUS_RELEASED\x10\x02\x12#\n" +
+	"\x1fBUILD_SLOT_LEASE_STATUS_EXPIRED\x10\x03\x12%\n" +
+	"!BUILD_SLOT_LEASE_STATUS_CANCELLED\x10\x04*\x88\x01\n" +
+	"\x0fBuildCacheScope\x12\x1d\n" +
+	"\x19BUILD_CACHE_SCOPE_UNKNOWN\x10\x00\x12)\n" +
+	"%BUILD_CACHE_SCOPE_TENANT_INTERMEDIATE\x10\x01\x12+\n" +
+	"'BUILD_CACHE_SCOPE_PLATFORM_INTERMEDIATE\x10\x02*\x95\x01\n" +
+	"\x10BuildCacheStatus\x12\x1e\n" +
+	"\x1aBUILD_CACHE_STATUS_UNKNOWN\x10\x00\x12\x1d\n" +
+	"\x19BUILD_CACHE_STATUS_ACTIVE\x10\x01\x12\"\n" +
+	"\x1eBUILD_CACHE_STATUS_INVALIDATED\x10\x02\x12\x1e\n" +
+	"\x1aBUILD_CACHE_STATUS_EXPIRED\x10\x03*\x8b\x04\n" +
+	"\x17BuildSchedulerEventType\x12&\n" +
+	"\"BUILD_SCHEDULER_EVENT_TYPE_UNKNOWN\x10\x00\x12%\n" +
+	"!BUILD_SCHEDULER_EVENT_TYPE_QUEUED\x10\x01\x12&\n" +
+	"\"BUILD_SCHEDULER_EVENT_TYPE_CLAIMED\x10\x02\x12(\n" +
+	"$BUILD_SCHEDULER_EVENT_TYPE_THROTTLED\x10\x03\x12(\n" +
+	"$BUILD_SCHEDULER_EVENT_TYPE_RECOVERED\x10\x04\x12&\n" +
+	"\"BUILD_SCHEDULER_EVENT_TYPE_DRAINED\x10\x05\x12(\n" +
+	"$BUILD_SCHEDULER_EVENT_TYPE_CANCELLED\x10\x06\x12&\n" +
+	"\"BUILD_SCHEDULER_EVENT_TYPE_RETRIED\x10\a\x12(\n" +
+	"$BUILD_SCHEDULER_EVENT_TYPE_CACHE_HIT\x10\b\x120\n" +
+	",BUILD_SCHEDULER_EVENT_TYPE_CACHE_INVALIDATED\x10\t\x12(\n" +
+	"$BUILD_SCHEDULER_EVENT_TYPE_COMPLETED\x10\n" +
+	"\x12%\n" +
+	"!BUILD_SCHEDULER_EVENT_TYPE_FAILED\x10\v*\xe7\x01\n" +
+	"\x17OpenApiCredentialStatus\x12&\n" +
+	"\"OPEN_API_CREDENTIAL_STATUS_UNKNOWN\x10\x00\x12%\n" +
+	"!OPEN_API_CREDENTIAL_STATUS_ACTIVE\x10\x01\x12-\n" +
+	")OPEN_API_CREDENTIAL_STATUS_ROTATION_GRACE\x10\x02\x12&\n" +
+	"\"OPEN_API_CREDENTIAL_STATUS_REVOKED\x10\x03\x12&\n" +
+	"\"OPEN_API_CREDENTIAL_STATUS_EXPIRED\x10\x04*\xb9\x03\n" +
+	"\fOpenApiScope\x12\x1a\n" +
+	"\x16OPEN_API_SCOPE_UNKNOWN\x10\x00\x12\x1c\n" +
+	"\x18OPEN_API_SCOPE_APPS_READ\x10\x01\x12\x1d\n" +
+	"\x19OPEN_API_SCOPE_APPS_WRITE\x10\x02\x12 \n" +
+	"\x1cOPEN_API_SCOPE_VERSIONS_READ\x10\x03\x12!\n" +
+	"\x1dOPEN_API_SCOPE_VERSIONS_WRITE\x10\x04\x12 \n" +
+	"\x1cOPEN_API_SCOPE_CHANNELS_READ\x10\x05\x12!\n" +
+	"\x1dOPEN_API_SCOPE_CHANNELS_WRITE\x10\x06\x12 \n" +
+	"\x1cOPEN_API_SCOPE_BRANDING_READ\x10\a\x12!\n" +
+	"\x1dOPEN_API_SCOPE_BRANDING_WRITE\x10\b\x12\x1e\n" +
+	"\x1aOPEN_API_SCOPE_BUILDS_READ\x10\t\x12\x1f\n" +
+	"\x1bOPEN_API_SCOPE_BUILDS_WRITE\x10\n" +
+	"\x12!\n" +
+	"\x1dOPEN_API_SCOPE_ARTIFACTS_READ\x10\v\x12\x1d\n" +
+	"\x19OPEN_API_SCOPE_STATS_READ\x10\f*\xf8\x01\n" +
+	"\x1aOpenApiIdempotencyDecision\x12)\n" +
+	"%OPEN_API_IDEMPOTENCY_DECISION_UNKNOWN\x10\x00\x12*\n" +
+	"&OPEN_API_IDEMPOTENCY_DECISION_ACQUIRED\x10\x01\x12(\n" +
+	"$OPEN_API_IDEMPOTENCY_DECISION_REPLAY\x10\x02\x12-\n" +
+	")OPEN_API_IDEMPOTENCY_DECISION_IN_PROGRESS\x10\x03\x12*\n" +
+	"&OPEN_API_IDEMPOTENCY_DECISION_CONFLICT\x10\x04*\xa9\x01\n" +
+	"\x15WebhookEndpointStatus\x12#\n" +
+	"\x1fWEBHOOK_ENDPOINT_STATUS_UNKNOWN\x10\x00\x12\"\n" +
+	"\x1eWEBHOOK_ENDPOINT_STATUS_ACTIVE\x10\x01\x12\"\n" +
+	"\x1eWEBHOOK_ENDPOINT_STATUS_PAUSED\x10\x02\x12#\n" +
+	"\x1fWEBHOOK_ENDPOINT_STATUS_REVOKED\x10\x03*\xff\x01\n" +
+	"\x15WebhookDeliveryStatus\x12#\n" +
+	"\x1fWEBHOOK_DELIVERY_STATUS_UNKNOWN\x10\x00\x12#\n" +
+	"\x1fWEBHOOK_DELIVERY_STATUS_PENDING\x10\x01\x12&\n" +
+	"\"WEBHOOK_DELIVERY_STATUS_DELIVERING\x10\x02\x12%\n" +
+	"!WEBHOOK_DELIVERY_STATUS_SUCCEEDED\x10\x03\x12$\n" +
+	" WEBHOOK_DELIVERY_STATUS_RETRYING\x10\x04\x12'\n" +
+	"#WEBHOOK_DELIVERY_STATUS_DEAD_LETTER\x10\x05*e\n" +
+	"\x0eSourcePlatform\x12\x1b\n" +
+	"\x17SOURCE_PLATFORM_UNKNOWN\x10\x00\x12\x1a\n" +
+	"\x16SOURCE_PLATFORM_GITHUB\x10\x01\x12\x1a\n" +
+	"\x16SOURCE_PLATFORM_GITLAB\x10\x02*\xb7\x01\n" +
+	"\x17SourceIntegrationStatus\x12%\n" +
+	"!SOURCE_INTEGRATION_STATUS_UNKNOWN\x10\x00\x12$\n" +
+	" SOURCE_INTEGRATION_STATUS_ACTIVE\x10\x01\x12*\n" +
+	"&SOURCE_INTEGRATION_STATUS_DISCONNECTED\x10\x02\x12#\n" +
+	"\x1fSOURCE_INTEGRATION_STATUS_ERROR\x10\x03*\x8d\x01\n" +
+	"\x16SourceRepositoryStatus\x12$\n" +
+	" SOURCE_REPOSITORY_STATUS_UNKNOWN\x10\x00\x12'\n" +
+	"#SOURCE_REPOSITORY_STATUS_AUTHORIZED\x10\x01\x12$\n" +
+	" SOURCE_REPOSITORY_STATUS_REVOKED\x10\x02*y\n" +
+	"\x12SourceArtifactType\x12 \n" +
+	"\x1cSOURCE_ARTIFACT_TYPE_UNKNOWN\x10\x00\x12 \n" +
+	"\x1cSOURCE_ARTIFACT_TYPE_RELEASE\x10\x01\x12\x1f\n" +
+	"\x1bSOURCE_ARTIFACT_TYPE_CI_JOB\x10\x02*\xb3\x01\n" +
+	"\x1bSourceBuildTriggerEventType\x12+\n" +
+	"'SOURCE_BUILD_TRIGGER_EVENT_TYPE_UNKNOWN\x10\x00\x125\n" +
+	"1SOURCE_BUILD_TRIGGER_EVENT_TYPE_RELEASE_PUBLISHED\x10\x01\x120\n" +
+	",SOURCE_BUILD_TRIGGER_EVENT_TYPE_CI_SUCCEEDED\x10\x02*\x95\x01\n" +
+	"\x18SourceBuildTriggerStatus\x12'\n" +
+	"#SOURCE_BUILD_TRIGGER_STATUS_UNKNOWN\x10\x00\x12&\n" +
+	"\"SOURCE_BUILD_TRIGGER_STATUS_ACTIVE\x10\x01\x12(\n" +
+	"$SOURCE_BUILD_TRIGGER_STATUS_DISABLED\x10\x02*\x94\x02\n" +
+	"\x18SourceWebhookEventStatus\x12'\n" +
+	"#SOURCE_WEBHOOK_EVENT_STATUS_UNKNOWN\x10\x00\x12'\n" +
+	"#SOURCE_WEBHOOK_EVENT_STATUS_PENDING\x10\x01\x12*\n" +
+	"&SOURCE_WEBHOOK_EVENT_STATUS_PROCESSING\x10\x02\x12)\n" +
+	"%SOURCE_WEBHOOK_EVENT_STATUS_SUCCEEDED\x10\x03\x12'\n" +
+	"#SOURCE_WEBHOOK_EVENT_STATUS_IGNORED\x10\x04\x12&\n" +
+	"\"SOURCE_WEBHOOK_EVENT_STATUS_FAILED\x10\x05*^\n" +
+	"\fBillingCycle\x12\x19\n" +
+	"\x15BILLING_CYCLE_UNKNOWN\x10\x00\x12\x19\n" +
+	"\x15BILLING_CYCLE_MONTHLY\x10\x01\x12\x18\n" +
+	"\x14BILLING_CYCLE_YEARLY\x10\x02*u\n" +
+	"\x11BillingPlanStatus\x12\x1f\n" +
+	"\x1bBILLING_PLAN_STATUS_UNKNOWN\x10\x00\x12\x1e\n" +
+	"\x1aBILLING_PLAN_STATUS_ACTIVE\x10\x01\x12\x1f\n" +
+	"\x1bBILLING_PLAN_STATUS_RETIRED\x10\x02*\xb0\x02\n" +
+	"\x18TenantSubscriptionStatus\x12&\n" +
+	"\"TENANT_SUBSCRIPTION_STATUS_UNKNOWN\x10\x00\x12%\n" +
+	"!TENANT_SUBSCRIPTION_STATUS_ACTIVE\x10\x01\x12'\n" +
+	"#TENANT_SUBSCRIPTION_STATUS_PAST_DUE\x10\x02\x12$\n" +
+	" TENANT_SUBSCRIPTION_STATUS_GRACE\x10\x03\x12%\n" +
+	"!TENANT_SUBSCRIPTION_STATUS_PAUSED\x10\x04\x12'\n" +
+	"#TENANT_SUBSCRIPTION_STATUS_CANCELED\x10\x05\x12&\n" +
+	"\"TENANT_SUBSCRIPTION_STATUS_PENDING\x10\x06*\xb6\x01\n" +
+	"\x18TenantSubscriptionSource\x12&\n" +
+	"\"TENANT_SUBSCRIPTION_SOURCE_UNKNOWN\x10\x00\x12%\n" +
+	"!TENANT_SUBSCRIPTION_SOURCE_STRIPE\x10\x01\x12%\n" +
+	"!TENANT_SUBSCRIPTION_SOURCE_MANUAL\x10\x02\x12$\n" +
+	" TENANT_SUBSCRIPTION_SOURCE_GRANT\x10\x03*\x8c\x01\n" +
+	"\x17TenantEntitlementStatus\x12%\n" +
+	"!TENANT_ENTITLEMENT_STATUS_UNKNOWN\x10\x00\x12$\n" +
+	" TENANT_ENTITLEMENT_STATUS_ACTIVE\x10\x01\x12$\n" +
+	" TENANT_ENTITLEMENT_STATUS_PAUSED\x10\x02*\x97\x03\n" +
+	"\x12BillingUsageMetric\x12 \n" +
+	"\x1cBILLING_USAGE_METRIC_UNKNOWN\x10\x00\x12&\n" +
+	"\"BILLING_USAGE_METRIC_BUILD_STARTED\x10\x01\x12(\n" +
+	"$BILLING_USAGE_METRIC_BUILD_SUCCEEDED\x10\x02\x12.\n" +
+	"*BILLING_USAGE_METRIC_BUILD_COMPUTE_SECONDS\x10\x03\x12-\n" +
+	")BILLING_USAGE_METRIC_STORAGE_SOURCE_BYTES\x10\x04\x12/\n" +
+	"+BILLING_USAGE_METRIC_STORAGE_ARTIFACT_BYTES\x10\x05\x12*\n" +
+	"&BILLING_USAGE_METRIC_STORAGE_LOG_BYTES\x10\x06\x12%\n" +
+	"!BILLING_USAGE_METRIC_API_REQUESTS\x10\a\x12*\n" +
+	"&BILLING_USAGE_METRIC_TEAM_ACTIVE_SEATS\x10\b*\x82\x01\n" +
+	"\vQuotaMetric\x12\x18\n" +
+	"\x14QUOTA_METRIC_UNKNOWN\x10\x00\x12\x1c\n" +
+	"\x18QUOTA_METRIC_BUILD_COUNT\x10\x01\x12\x1e\n" +
+	"\x1aQUOTA_METRIC_STORAGE_BYTES\x10\x02\x12\x1b\n" +
+	"\x17QUOTA_METRIC_TEAM_SEATS\x10\x03*\xda\x01\n" +
+	"\x16QuotaReservationStatus\x12$\n" +
+	" QUOTA_RESERVATION_STATUS_UNKNOWN\x10\x00\x12%\n" +
+	"!QUOTA_RESERVATION_STATUS_RESERVED\x10\x01\x12&\n" +
+	"\"QUOTA_RESERVATION_STATUS_CONFIRMED\x10\x02\x12%\n" +
+	"!QUOTA_RESERVATION_STATUS_RELEASED\x10\x03\x12$\n" +
+	" QUOTA_RESERVATION_STATUS_EXPIRED\x10\x04*\x8f\x01\n" +
+	"\x16SubscriptionChangeMode\x12$\n" +
+	" SUBSCRIPTION_CHANGE_MODE_UNKNOWN\x10\x00\x12&\n" +
+	"\"SUBSCRIPTION_CHANGE_MODE_IMMEDIATE\x10\x01\x12'\n" +
+	"#SUBSCRIPTION_CHANGE_MODE_PERIOD_END\x10\x02*\xd0\x01\n" +
+	"\rInvoiceStatus\x12\x1a\n" +
+	"\x16INVOICE_STATUS_UNKNOWN\x10\x00\x12\x18\n" +
+	"\x14INVOICE_STATUS_DRAFT\x10\x01\x12\x17\n" +
+	"\x13INVOICE_STATUS_OPEN\x10\x02\x12\x17\n" +
+	"\x13INVOICE_STATUS_PAID\x10\x03\x12!\n" +
+	"\x1dINVOICE_STATUS_PAYMENT_FAILED\x10\x04\x12\x17\n" +
+	"\x13INVOICE_STATUS_VOID\x10\x05\x12\x1b\n" +
+	"\x17INVOICE_STATUS_REFUNDED\x10\x06*\xae\x01\n" +
+	"\x16PaymentTransactionType\x12$\n" +
+	" PAYMENT_TRANSACTION_TYPE_UNKNOWN\x10\x00\x12#\n" +
+	"\x1fPAYMENT_TRANSACTION_TYPE_CHARGE\x10\x01\x12#\n" +
+	"\x1fPAYMENT_TRANSACTION_TYPE_REFUND\x10\x02\x12$\n" +
+	" PAYMENT_TRANSACTION_TYPE_DISPUTE\x10\x03*\xe4\x01\n" +
+	"\x18PaymentTransactionStatus\x12&\n" +
+	"\"PAYMENT_TRANSACTION_STATUS_UNKNOWN\x10\x00\x12&\n" +
+	"\"PAYMENT_TRANSACTION_STATUS_PENDING\x10\x01\x12(\n" +
+	"$PAYMENT_TRANSACTION_STATUS_SUCCEEDED\x10\x02\x12%\n" +
+	"!PAYMENT_TRANSACTION_STATUS_FAILED\x10\x03\x12'\n" +
+	"#PAYMENT_TRANSACTION_STATUS_REVERSED\x10\x04*\xda\x01\n" +
+	"\x10LocalAgentStatus\x12\x1e\n" +
+	"\x1aLOCAL_AGENT_STATUS_UNKNOWN\x10\x00\x12\x1e\n" +
+	"\x1aLOCAL_AGENT_STATUS_PENDING\x10\x01\x12\x1d\n" +
+	"\x19LOCAL_AGENT_STATUS_ONLINE\x10\x02\x12\x1e\n" +
+	"\x1aLOCAL_AGENT_STATUS_OFFLINE\x10\x03\x12\x1e\n" +
+	"\x1aLOCAL_AGENT_STATUS_REVOKED\x10\x04\x12'\n" +
+	"#LOCAL_AGENT_STATUS_UPGRADE_REQUIRED\x10\x05*\xb2\x01\n" +
+	"\x15LocalAgentDrainStatus\x12$\n" +
+	" LOCAL_AGENT_DRAIN_STATUS_UNKNOWN\x10\x00\x12&\n" +
+	"\"LOCAL_AGENT_DRAIN_STATUS_ACCEPTING\x10\x01\x12%\n" +
+	"!LOCAL_AGENT_DRAIN_STATUS_DRAINING\x10\x02\x12$\n" +
+	" LOCAL_AGENT_DRAIN_STATUS_DRAINED\x10\x03*\xb6\x01\n" +
+	"\x12HybridArtifactMode\x12 \n" +
+	"\x1cHYBRID_ARTIFACT_MODE_UNKNOWN\x10\x00\x12.\n" +
+	"*HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE\x10\x01\x12)\n" +
+	"%HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE\x10\x02\x12#\n" +
+	"\x1fHYBRID_ARTIFACT_MODE_AIR_GAPPED\x10\x03*\xf8\x01\n" +
+	"\x1bLocalAgentCertificateStatus\x12*\n" +
+	"&LOCAL_AGENT_CERTIFICATE_STATUS_UNKNOWN\x10\x00\x12)\n" +
+	"%LOCAL_AGENT_CERTIFICATE_STATUS_ACTIVE\x10\x01\x12*\n" +
+	"&LOCAL_AGENT_CERTIFICATE_STATUS_ROTATED\x10\x02\x12*\n" +
+	"&LOCAL_AGENT_CERTIFICATE_STATUS_REVOKED\x10\x03\x12*\n" +
+	"&LOCAL_AGENT_CERTIFICATE_STATUS_EXPIRED\x10\x04*\xd2\x01\n" +
+	"\x12HybridArtifactType\x12 \n" +
+	"\x1cHYBRID_ARTIFACT_TYPE_UNKNOWN\x10\x00\x12#\n" +
+	"\x1fHYBRID_ARTIFACT_TYPE_SOURCE_APK\x10\x01\x12\"\n" +
+	"\x1eHYBRID_ARTIFACT_TYPE_BUILT_APK\x10\x02\x12\"\n" +
+	"\x1eHYBRID_ARTIFACT_TYPE_BUILD_LOG\x10\x03\x12-\n" +
+	")HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE\x10\x04*\xe4\x01\n" +
 	"\x13StorageObjectStatus\x12!\n" +
 	"\x1dSTORAGE_OBJECT_STATUS_UNKNOWN\x10\x00\x12#\n" +
 	"\x1fSTORAGE_OBJECT_STATUS_UPLOADING\x10\x01\x12\x1f\n" +
@@ -9299,7 +25607,7 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\"WHITE_LABEL_PRODUCT_STATUS_UNKNOWN\x10\x00\x12$\n" +
 	" WHITE_LABEL_PRODUCT_STATUS_DRAFT\x10\x01\x12&\n" +
 	"\"WHITE_LABEL_PRODUCT_STATUS_ENABLED\x10\x02\x12'\n" +
-	"#WHITE_LABEL_PRODUCT_STATUS_DISABLED\x10\x032\xe4&\n" +
+	"#WHITE_LABEL_PRODUCT_STATUS_DISABLED\x10\x032\xdf]\n" +
 	"\x04Core\x12F\n" +
 	"\x11CreateApplication\x12\x1a.core.CreateApplicationReq\x1a\x15.core.ApplicationResp\x12?\n" +
 	"\x0eGetApplication\x12\x16.core.ApplicationIdReq\x1a\x15.core.ApplicationResp\x12G\n" +
@@ -9353,12 +25661,97 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x1aPreflightWhiteLabelProduct\x12\x1c.core.WhiteLabelProductIdReq\x1a$.core.WhiteLabelProductPreflightResp\x12@\n" +
 	"\x0fCreateBuildTask\x12\x18.core.CreateBuildTaskReq\x1a\x13.core.BuildTaskResp\x129\n" +
 	"\fGetBuildTask\x12\x14.core.BuildTaskIdReq\x1a\x13.core.BuildTaskResp\x12A\n" +
-	"\x0eListBuildTasks\x12\x16.core.BuildTaskListReq\x1a\x17.core.BuildTaskListResp\x127\n" +
+	"\x0eListBuildTasks\x12\x16.core.BuildTaskListReq\x1a\x17.core.BuildTaskListResp\x12@\n" +
+	"\x0fCancelBuildTask\x12\x18.core.CancelBuildTaskReq\x1a\x13.core.BuildTaskResp\x12>\n" +
+	"\x0eRetryBuildTask\x12\x17.core.RetryBuildTaskReq\x1a\x13.core.BuildTaskResp\x12?\n" +
+	"\x0eGetBuilderNode\x12\x16.core.BuilderNodeIdReq\x1a\x15.core.BuilderNodeResp\x12G\n" +
+	"\x10ListBuilderNodes\x12\x18.core.BuilderNodeListReq\x1a\x19.core.BuilderNodeListResp\x12D\n" +
+	"\x10DrainBuilderNode\x12\x19.core.DrainBuilderNodeReq\x1a\x15.core.BuilderNodeResp\x12H\n" +
+	"\x12RecoverBuilderNode\x12\x1b.core.RecoverBuilderNodeReq\x1a\x15.core.BuilderNodeResp\x12g\n" +
+	"\x1cUpsertBuildConcurrencyPolicy\x12%.core.UpsertBuildConcurrencyPolicyReq\x1a .core.BuildConcurrencyPolicyResp\x12i\n" +
+	"\x1cListBuildConcurrencyPolicies\x12#.core.BuildConcurrencyPolicyListReq\x1a$.core.BuildConcurrencyPolicyListResp\x12T\n" +
+	"\x15ListBuildCacheEntries\x12\x1c.core.BuildCacheEntryListReq\x1a\x1d.core.BuildCacheEntryListResp\x12P\n" +
+	"\x14InvalidateBuildCache\x12\x1d.core.InvalidateBuildCacheReq\x1a\x19.core.BuildCacheEntryResp\x12_\n" +
+	"\x18ListBuildSchedulerEvents\x12 .core.BuildSchedulerEventListReq\x1a!.core.BuildSchedulerEventListResp\x12U\n" +
+	"\x16GetBuildClusterMetrics\x12\x1c.core.BuildClusterMetricsReq\x1a\x1d.core.BuildClusterMetricsResp\x12^\n" +
+	"\x17CreateOpenApiCredential\x12 .core.CreateOpenApiCredentialReq\x1a!.core.OpenApiCredentialSecretResp\x12Y\n" +
+	"\x16ListOpenApiCredentials\x12\x1e.core.OpenApiCredentialListReq\x1a\x1f.core.OpenApiCredentialListResp\x12^\n" +
+	"\x17RotateOpenApiCredential\x12 .core.RotateOpenApiCredentialReq\x1a!.core.OpenApiCredentialSecretResp\x12T\n" +
+	"\x17RevokeOpenApiCredential\x12\x1c.core.OpenApiCredentialIdReq\x1a\x1b.core.OpenApiCredentialResp\x12e\n" +
+	"\x1dAuthenticateOpenApiCredential\x12&.core.AuthenticateOpenApiCredentialReq\x1a\x1c.core.OpenApiAuthContextResp\x12Y\n" +
+	"\x17BeginOpenApiIdempotency\x12 .core.BeginOpenApiIdempotencyReq\x1a\x1c.core.OpenApiIdempotencyResp\x12Q\n" +
+	"\x1aCompleteOpenApiIdempotency\x12#.core.CompleteOpenApiIdempotencyReq\x1a\x0e.core.RespBase\x12A\n" +
+	"\x12RecordOpenApiAudit\x12\x1b.core.RecordOpenApiAuditReq\x1a\x0e.core.RespBase\x12X\n" +
+	"\x15CreateWebhookEndpoint\x12\x1e.core.CreateWebhookEndpointReq\x1a\x1f.core.WebhookEndpointSecretResp\x12R\n" +
+	"\x15UpdateWebhookEndpoint\x12\x1e.core.UpdateWebhookEndpointReq\x1a\x19.core.WebhookEndpointResp\x12K\n" +
+	"\x12GetWebhookEndpoint\x12\x1a.core.WebhookEndpointIdReq\x1a\x19.core.WebhookEndpointResp\x12S\n" +
+	"\x14ListWebhookEndpoints\x12\x1c.core.WebhookEndpointListReq\x1a\x1d.core.WebhookEndpointListResp\x12Z\n" +
+	"\x1bRotateWebhookEndpointSecret\x12\x1a.core.WebhookEndpointIdReq\x1a\x1f.core.WebhookEndpointSecretResp\x12T\n" +
+	"\x15ListWebhookDeliveries\x12\x1c.core.WebhookDeliveryListReq\x1a\x1d.core.WebhookDeliveryListResp\x12N\n" +
+	"\x15ReplayWebhookDelivery\x12\x1a.core.WebhookDeliveryIdReq\x1a\x19.core.WebhookDeliveryResp\x12I\n" +
+	"\x16CreateTestWebhookEvent\x12\x1f.core.CreateTestWebhookEventReq\x1a\x0e.core.RespBase\x12\\\n" +
+	"\x19CompleteSourceIntegration\x12\".core.CompleteSourceIntegrationReq\x1a\x1b.core.SourceIntegrationResp\x12Q\n" +
+	"\x14GetSourceIntegration\x12\x1c.core.SourceIntegrationIdReq\x1a\x1b.core.SourceIntegrationResp\x12Y\n" +
+	"\x16ListSourceIntegrations\x12\x1e.core.SourceIntegrationListReq\x1a\x1f.core.SourceIntegrationListResp\x12e\n" +
+	"\x1eGetSourceIntegrationCredential\x12\x1c.core.SourceIntegrationIdReq\x1a%.core.SourceIntegrationCredentialResp\x12X\n" +
+	"\x1bDisconnectSourceIntegration\x12\x1c.core.SourceIntegrationIdReq\x1a\x1b.core.SourceIntegrationResp\x12[\n" +
+	"\x19AuthorizeSourceRepository\x12\".core.AuthorizeSourceRepositoryReq\x1a\x1a.core.SourceRepositoryResp\x12N\n" +
+	"\x13GetSourceRepository\x12\x1b.core.SourceRepositoryIdReq\x1a\x1a.core.SourceRepositoryResp\x12W\n" +
+	"\x16ListSourceRepositories\x12\x1d.core.SourceRepositoryListReq\x1a\x1e.core.SourceRepositoryListResp\x12Q\n" +
+	"\x16RevokeSourceRepository\x12\x1b.core.SourceRepositoryIdReq\x1a\x1a.core.SourceRepositoryResp\x12O\n" +
+	"\x14RecordSourceArtifact\x12\x1d.core.RecordSourceArtifactReq\x1a\x18.core.SourceArtifactResp\x12U\n" +
+	"\x14ImportSourceArtifact\x12\x1d.core.ImportSourceArtifactReq\x1a\x1e.core.SourceArtifactImportResp\x12a\n" +
+	"\x18CreateSourceBuildTrigger\x12!.core.CreateSourceBuildTriggerReq\x1a\".core.SourceBuildTriggerSecretResp\x12[\n" +
+	"\x18UpdateSourceBuildTrigger\x12!.core.UpdateSourceBuildTriggerReq\x1a\x1c.core.SourceBuildTriggerResp\x12T\n" +
+	"\x15GetSourceBuildTrigger\x12\x1d.core.SourceBuildTriggerIdReq\x1a\x1c.core.SourceBuildTriggerResp\x12\\\n" +
+	"\x17ListSourceBuildTriggers\x12\x1f.core.SourceBuildTriggerListReq\x1a .core.SourceBuildTriggerListResp\x12c\n" +
+	"\x1eRotateSourceBuildTriggerSecret\x12\x1d.core.SourceBuildTriggerIdReq\x1a\".core.SourceBuildTriggerSecretResp\x12g\n" +
+	"\x19ResolveSourceBuildTrigger\x12\".core.ResolveSourceBuildTriggerReq\x1a&.core.SourceBuildTriggerCredentialResp\x12d\n" +
+	"\x19EnqueueSourceWebhookEvent\x12\".core.EnqueueSourceWebhookEventReq\x1a#.core.EnqueueSourceWebhookEventResp\x12^\n" +
+	"\x17ClaimSourceWebhookEvent\x12 .core.ClaimSourceWebhookEventReq\x1a!.core.ClaimSourceWebhookEventResp\x12Q\n" +
+	"\x1aCompleteSourceWebhookEvent\x12#.core.CompleteSourceWebhookEventReq\x1a\x0e.core.RespBase\x12I\n" +
+	"\x16FailSourceWebhookEvent\x12\x1f.core.FailSourceWebhookEventReq\x1a\x0e.core.RespBase\x12\\\n" +
+	"\x17ListSourceWebhookEvents\x12\x1f.core.SourceWebhookEventListReq\x1a .core.SourceWebhookEventListResp\x12F\n" +
+	"\x11CreateBillingPlan\x12\x1a.core.CreateBillingPlanReq\x1a\x15.core.BillingPlanResp\x12?\n" +
+	"\x0eGetBillingPlan\x12\x16.core.BillingPlanIdReq\x1a\x15.core.BillingPlanResp\x12G\n" +
+	"\x10ListBillingPlans\x12\x18.core.BillingPlanListReq\x1a\x19.core.BillingPlanListResp\x12B\n" +
+	"\x11RetireBillingPlan\x12\x16.core.BillingPlanIdReq\x1a\x15.core.BillingPlanResp\x12C\n" +
+	"\x10GetTenantBilling\x12\x16.core.TenantBillingReq\x1a\x17.core.TenantBillingResp\x12V\n" +
+	"\x18UpsertManualSubscription\x12!.core.UpsertManualSubscriptionReq\x1a\x17.core.TenantBillingResp\x12V\n" +
+	"\x18ChangeTenantSubscription\x12!.core.ChangeTenantSubscriptionReq\x1a\x17.core.TenantBillingResp\x12V\n" +
+	"\x18CancelTenantSubscription\x12!.core.CancelTenantSubscriptionReq\x1a\x17.core.TenantBillingResp\x12A\n" +
+	"\fReserveQuota\x12\x15.core.ReserveQuotaReq\x1a\x1a.core.QuotaReservationResp\x12K\n" +
+	"\fConfirmQuota\x12\x1f.core.QuotaReservationActionReq\x1a\x1a.core.QuotaReservationResp\x12K\n" +
+	"\fReleaseQuota\x12\x1f.core.QuotaReservationActionReq\x1a\x1a.core.QuotaReservationResp\x123\n" +
+	"\vRecordUsage\x12\x14.core.RecordUsageReq\x1a\x0e.core.RespBase\x12@\n" +
+	"\x0fGetBillingUsage\x12\x15.core.BillingUsageReq\x1a\x16.core.BillingUsageResp\x12;\n" +
+	"\fListInvoices\x12\x14.core.InvoiceListReq\x1a\x15.core.InvoiceListResp\x12C\n" +
+	"\x13ApplyBillingWebhook\x12\x1c.core.ApplyBillingWebhookReq\x1a\x0e.core.RespBase\x12g\n" +
+	"\x1cCreateLocalAgentRegistration\x12%.core.CreateLocalAgentRegistrationReq\x1a .core.LocalAgentRegistrationResp\x12O\n" +
+	"\x12RegisterLocalAgent\x12\x1b.core.RegisterLocalAgentReq\x1a\x1c.core.RegisterLocalAgentResp\x12<\n" +
+	"\rGetLocalAgent\x12\x15.core.LocalAgentIdReq\x1a\x14.core.LocalAgentResp\x12D\n" +
+	"\x0fListLocalAgents\x12\x17.core.LocalAgentListReq\x1a\x18.core.LocalAgentListResp\x12I\n" +
+	"\x13HeartbeatLocalAgent\x12\x1c.core.HeartbeatLocalAgentReq\x1a\x14.core.LocalAgentResp\x12A\n" +
+	"\x0fDrainLocalAgent\x12\x18.core.DrainLocalAgentReq\x1a\x14.core.LocalAgentResp\x12C\n" +
+	"\x10RevokeLocalAgent\x12\x19.core.RevokeLocalAgentReq\x1a\x14.core.LocalAgentResp\x12a\n" +
+	"\x1bRotateLocalAgentCertificate\x12$.core.RotateLocalAgentCertificateReq\x1a\x1c.core.RegisterLocalAgentResp\x12\\\n" +
+	"\x18ClaimLocalAgentBuildTask\x12!.core.ClaimLocalAgentBuildTaskReq\x1a\x1d.core.LocalAgentBuildTaskResp\x12M\n" +
+	"\x18RenewLocalAgentTaskLease\x12!.core.RenewLocalAgentTaskLeaseReq\x1a\x0e.core.RespBase\x12W\n" +
+	"\x1dReportLocalAgentBuildProgress\x12&.core.ReportLocalAgentBuildProgressReq\x1a\x0e.core.RespBase\x12S\n" +
+	"\x1bCompleteLocalAgentBuildTask\x12$.core.CompleteLocalAgentBuildTaskReq\x1a\x0e.core.RespBase\x12K\n" +
+	"\x17FailLocalAgentBuildTask\x12 .core.FailLocalAgentBuildTaskReq\x1a\x0e.core.RespBase\x12E\n" +
+	"\x14VerifyHybridArtifact\x12\x1d.core.VerifyHybridArtifactReq\x1a\x0e.core.RespBase\x127\n" +
 	"\rReportInstall\x12\x16.core.InstallReportReq\x1a\x0e.core.RespBase\x12A\n" +
 	"\x12ReportChannelEvent\x12\x1b.core.ReportChannelEventReq\x1a\x0e.core.RespBase\x12@\n" +
 	"\x0fGetChannelStats\x12\x15.core.ChannelStatsReq\x1a\x16.core.ChannelStatsResp\x12\\\n" +
 	"\x16ResolveChannelDownload\x12\x1f.core.ResolveChannelDownloadReq\x1a!.core.ChannelDownloadArtifactResp\x12>\n" +
-	"\x0eClaimBuildTask\x12\x17.core.ClaimBuildTaskReq\x1a\x13.core.BuildTaskResp\x12^\n" +
+	"\x0eClaimBuildTask\x12\x17.core.ClaimBuildTaskReq\x1a\x13.core.BuildTaskResp\x12J\n" +
+	"\x13RegisterBuilderNode\x12\x1c.core.RegisterBuilderNodeReq\x1a\x15.core.BuilderNodeResp\x12L\n" +
+	"\x14BuilderNodeHeartbeat\x12\x1d.core.BuilderNodeHeartbeatReq\x1a\x15.core.BuilderNodeResp\x12P\n" +
+	"\x17ClaimScheduledBuildTask\x12 .core.ClaimScheduledBuildTaskReq\x1a\x13.core.BuildTaskResp\x12O\n" +
+	"\x11ResolveBuildCache\x12\x1a.core.ResolveBuildCacheReq\x1a\x1e.core.BuildCacheResolutionResp\x12J\n" +
+	"\x11PublishBuildCache\x12\x1a.core.PublishBuildCacheReq\x1a\x19.core.BuildCacheEntryResp\x12L\n" +
+	"\x11CleanupBuildCache\x12\x1a.core.CleanupBuildCacheReq\x1a\x1b.core.CleanupBuildCacheResp\x12^\n" +
 	"\x18GetBuildExecutionContext\x12!.core.GetBuildExecutionContextReq\x1a\x1f.core.BuildExecutionContextResp\x12A\n" +
 	"\x12HeartbeatBuildTask\x12\x1b.core.HeartbeatBuildTaskReq\x1a\x0e.core.RespBase\x12C\n" +
 	"\x13ReportBuildProgress\x12\x1c.core.ReportBuildProgressReq\x1a\x0e.core.RespBase\x12?\n" +
@@ -9377,358 +25770,927 @@ func file_proto_core_core_proto_rawDescGZIP() []byte {
 	return file_proto_core_core_proto_rawDescData
 }
 
-var file_proto_core_core_proto_enumTypes = make([]protoimpl.EnumInfo, 12)
-var file_proto_core_core_proto_msgTypes = make([]protoimpl.MessageInfo, 101)
+var file_proto_core_core_proto_enumTypes = make([]protoimpl.EnumInfo, 48)
+var file_proto_core_core_proto_msgTypes = make([]protoimpl.MessageInfo, 261)
 var file_proto_core_core_proto_goTypes = []any{
 	(ApplicationStatus)(0),                        // 0: core.ApplicationStatus
 	(VersionStatus)(0),                            // 1: core.VersionStatus
 	(ChannelStatus)(0),                            // 2: core.ChannelStatus
 	(BuildTaskStatus)(0),                          // 3: core.BuildTaskStatus
 	(StorageObjectType)(0),                        // 4: core.StorageObjectType
-	(StorageObjectStatus)(0),                      // 5: core.StorageObjectStatus
-	(BrandingRewriteMode)(0),                      // 6: core.BrandingRewriteMode
-	(BrandingProfileStatus)(0),                    // 7: core.BrandingProfileStatus
-	(BrandingPreflightStatus)(0),                  // 8: core.BrandingPreflightStatus
-	(WhiteLabelTemplateStatus)(0),                 // 9: core.WhiteLabelTemplateStatus
-	(WhiteLabelRevisionStatus)(0),                 // 10: core.WhiteLabelRevisionStatus
-	(WhiteLabelProductStatus)(0),                  // 11: core.WhiteLabelProductStatus
-	(*RespBase)(nil),                              // 12: core.RespBase
-	(*Application)(nil),                           // 13: core.Application
-	(*Version)(nil),                               // 14: core.Version
-	(*Channel)(nil),                               // 15: core.Channel
-	(*SigningConfig)(nil),                         // 16: core.SigningConfig
-	(*BuildTask)(nil),                             // 17: core.BuildTask
-	(*StorageObject)(nil),                         // 18: core.StorageObject
-	(*BrandingProfile)(nil),                       // 19: core.BrandingProfile
-	(*BrandingPreflight)(nil),                     // 20: core.BrandingPreflight
-	(*WhiteLabelTemplate)(nil),                    // 21: core.WhiteLabelTemplate
-	(*WhiteLabelTemplateRevision)(nil),            // 22: core.WhiteLabelTemplateRevision
-	(*WhiteLabelProduct)(nil),                     // 23: core.WhiteLabelProduct
-	(*ApplicationIdReq)(nil),                      // 24: core.ApplicationIdReq
-	(*VersionIdReq)(nil),                          // 25: core.VersionIdReq
-	(*ChannelIdReq)(nil),                          // 26: core.ChannelIdReq
-	(*BuildTaskIdReq)(nil),                        // 27: core.BuildTaskIdReq
-	(*BrandingProfileIdReq)(nil),                  // 28: core.BrandingProfileIdReq
-	(*BrandingPreflightIdReq)(nil),                // 29: core.BrandingPreflightIdReq
-	(*WhiteLabelTemplateIdReq)(nil),               // 30: core.WhiteLabelTemplateIdReq
-	(*WhiteLabelTemplateRevisionIdReq)(nil),       // 31: core.WhiteLabelTemplateRevisionIdReq
-	(*WhiteLabelProductIdReq)(nil),                // 32: core.WhiteLabelProductIdReq
-	(*ApplicationResp)(nil),                       // 33: core.ApplicationResp
-	(*VersionResp)(nil),                           // 34: core.VersionResp
-	(*ChannelResp)(nil),                           // 35: core.ChannelResp
-	(*SigningConfigResp)(nil),                     // 36: core.SigningConfigResp
-	(*SigningConfigListReq)(nil),                  // 37: core.SigningConfigListReq
-	(*SigningConfigListResp)(nil),                 // 38: core.SigningConfigListResp
-	(*BuildTaskResp)(nil),                         // 39: core.BuildTaskResp
-	(*BrandingProfileResp)(nil),                   // 40: core.BrandingProfileResp
-	(*BrandingProfileListReq)(nil),                // 41: core.BrandingProfileListReq
-	(*BrandingProfileListResp)(nil),               // 42: core.BrandingProfileListResp
-	(*BrandingPreflightResp)(nil),                 // 43: core.BrandingPreflightResp
-	(*BrandingPreflightListReq)(nil),              // 44: core.BrandingPreflightListReq
-	(*BrandingPreflightListResp)(nil),             // 45: core.BrandingPreflightListResp
-	(*WhiteLabelTemplateResp)(nil),                // 46: core.WhiteLabelTemplateResp
-	(*WhiteLabelTemplateListReq)(nil),             // 47: core.WhiteLabelTemplateListReq
-	(*WhiteLabelTemplateListResp)(nil),            // 48: core.WhiteLabelTemplateListResp
-	(*WhiteLabelTemplateRevisionResp)(nil),        // 49: core.WhiteLabelTemplateRevisionResp
-	(*WhiteLabelTemplateRevisionListReq)(nil),     // 50: core.WhiteLabelTemplateRevisionListReq
-	(*WhiteLabelTemplateRevisionListResp)(nil),    // 51: core.WhiteLabelTemplateRevisionListResp
-	(*WhiteLabelProductResp)(nil),                 // 52: core.WhiteLabelProductResp
-	(*WhiteLabelProductListReq)(nil),              // 53: core.WhiteLabelProductListReq
-	(*WhiteLabelProductListResp)(nil),             // 54: core.WhiteLabelProductListResp
-	(*WhiteLabelProductPreflightResp)(nil),        // 55: core.WhiteLabelProductPreflightResp
-	(*ApplicationListReq)(nil),                    // 56: core.ApplicationListReq
-	(*ApplicationListResp)(nil),                   // 57: core.ApplicationListResp
-	(*VersionListReq)(nil),                        // 58: core.VersionListReq
-	(*VersionListResp)(nil),                       // 59: core.VersionListResp
-	(*ChannelListReq)(nil),                        // 60: core.ChannelListReq
-	(*ChannelListResp)(nil),                       // 61: core.ChannelListResp
-	(*BuildTaskListReq)(nil),                      // 62: core.BuildTaskListReq
-	(*BuildTaskListResp)(nil),                     // 63: core.BuildTaskListResp
-	(*CreateApplicationReq)(nil),                  // 64: core.CreateApplicationReq
-	(*CreateVersionReq)(nil),                      // 65: core.CreateVersionReq
-	(*CreateChannelReq)(nil),                      // 66: core.CreateChannelReq
-	(*SigningConfigIdReq)(nil),                    // 67: core.SigningConfigIdReq
-	(*CreateSigningConfigReq)(nil),                // 68: core.CreateSigningConfigReq
-	(*CreateStorageObjectReq)(nil),                // 69: core.CreateStorageObjectReq
-	(*CompleteStorageObjectReq)(nil),              // 70: core.CompleteStorageObjectReq
-	(*FailStorageObjectReq)(nil),                  // 71: core.FailStorageObjectReq
-	(*ExpiredStorageObject)(nil),                  // 72: core.ExpiredStorageObject
-	(*ClaimExpiredStorageObjectsReq)(nil),         // 73: core.ClaimExpiredStorageObjectsReq
-	(*ClaimExpiredStorageObjectsResp)(nil),        // 74: core.ClaimExpiredStorageObjectsResp
-	(*MarkStorageObjectDeletedReq)(nil),           // 75: core.MarkStorageObjectDeletedReq
-	(*StorageObjectIdReq)(nil),                    // 76: core.StorageObjectIdReq
-	(*StorageObjectResp)(nil),                     // 77: core.StorageObjectResp
-	(*CreateBuildTaskReq)(nil),                    // 78: core.CreateBuildTaskReq
-	(*CreateWhiteLabelTemplateReq)(nil),           // 79: core.CreateWhiteLabelTemplateReq
-	(*UpdateWhiteLabelTemplateReq)(nil),           // 80: core.UpdateWhiteLabelTemplateReq
-	(*CopyWhiteLabelTemplateReq)(nil),             // 81: core.CopyWhiteLabelTemplateReq
-	(*CreateWhiteLabelTemplateRevisionReq)(nil),   // 82: core.CreateWhiteLabelTemplateRevisionReq
-	(*UpdateWhiteLabelTemplateRevisionReq)(nil),   // 83: core.UpdateWhiteLabelTemplateRevisionReq
-	(*PublishWhiteLabelTemplateReq)(nil),          // 84: core.PublishWhiteLabelTemplateReq
-	(*CreateWhiteLabelProductReq)(nil),            // 85: core.CreateWhiteLabelProductReq
-	(*UpdateWhiteLabelProductReq)(nil),            // 86: core.UpdateWhiteLabelProductReq
-	(*ChangeWhiteLabelTemplateStatusReq)(nil),     // 87: core.ChangeWhiteLabelTemplateStatusReq
-	(*ChangeWhiteLabelProductStatusReq)(nil),      // 88: core.ChangeWhiteLabelProductStatusReq
-	(*CreateBrandingProfileReq)(nil),              // 89: core.CreateBrandingProfileReq
-	(*UpdateBrandingProfileReq)(nil),              // 90: core.UpdateBrandingProfileReq
-	(*ChangeBrandingProfileStatusReq)(nil),        // 91: core.ChangeBrandingProfileStatusReq
-	(*CreateBrandingPreflightReq)(nil),            // 92: core.CreateBrandingPreflightReq
-	(*CompleteBrandingPreflightReq)(nil),          // 93: core.CompleteBrandingPreflightReq
-	(*ClaimBrandingPreflightReq)(nil),             // 94: core.ClaimBrandingPreflightReq
-	(*BrandingPreflightExecutionContext)(nil),     // 95: core.BrandingPreflightExecutionContext
-	(*BrandingPreflightExecutionContextResp)(nil), // 96: core.BrandingPreflightExecutionContextResp
-	(*InstallReportReq)(nil),                      // 97: core.InstallReportReq
-	(*ChannelStatsReq)(nil),                       // 98: core.ChannelStatsReq
-	(*ChannelStats)(nil),                          // 99: core.ChannelStats
-	(*ChannelStatsResp)(nil),                      // 100: core.ChannelStatsResp
-	(*ReportChannelEventReq)(nil),                 // 101: core.ReportChannelEventReq
-	(*ResolveChannelDownloadReq)(nil),             // 102: core.ResolveChannelDownloadReq
-	(*ChannelDownloadArtifact)(nil),               // 103: core.ChannelDownloadArtifact
-	(*ChannelDownloadArtifactResp)(nil),           // 104: core.ChannelDownloadArtifactResp
-	(*ClaimBuildTaskReq)(nil),                     // 105: core.ClaimBuildTaskReq
-	(*HeartbeatBuildTaskReq)(nil),                 // 106: core.HeartbeatBuildTaskReq
-	(*ReportBuildProgressReq)(nil),                // 107: core.ReportBuildProgressReq
-	(*CompleteBuildTaskReq)(nil),                  // 108: core.CompleteBuildTaskReq
-	(*FailBuildTaskReq)(nil),                      // 109: core.FailBuildTaskReq
-	(*GetBuildExecutionContextReq)(nil),           // 110: core.GetBuildExecutionContextReq
-	(*BuildExecutionContext)(nil),                 // 111: core.BuildExecutionContext
-	(*BuildExecutionContextResp)(nil),             // 112: core.BuildExecutionContextResp
-	(*common.RespBase)(nil),                       // 113: common.RespBase
-	(*common.PageReq)(nil),                        // 114: common.PageReq
+	(BuilderNodeStatus)(0),                        // 5: core.BuilderNodeStatus
+	(BuilderDrainStatus)(0),                       // 6: core.BuilderDrainStatus
+	(BuildPolicyStatus)(0),                        // 7: core.BuildPolicyStatus
+	(BuildSlotLeaseStatus)(0),                     // 8: core.BuildSlotLeaseStatus
+	(BuildCacheScope)(0),                          // 9: core.BuildCacheScope
+	(BuildCacheStatus)(0),                         // 10: core.BuildCacheStatus
+	(BuildSchedulerEventType)(0),                  // 11: core.BuildSchedulerEventType
+	(OpenApiCredentialStatus)(0),                  // 12: core.OpenApiCredentialStatus
+	(OpenApiScope)(0),                             // 13: core.OpenApiScope
+	(OpenApiIdempotencyDecision)(0),               // 14: core.OpenApiIdempotencyDecision
+	(WebhookEndpointStatus)(0),                    // 15: core.WebhookEndpointStatus
+	(WebhookDeliveryStatus)(0),                    // 16: core.WebhookDeliveryStatus
+	(SourcePlatform)(0),                           // 17: core.SourcePlatform
+	(SourceIntegrationStatus)(0),                  // 18: core.SourceIntegrationStatus
+	(SourceRepositoryStatus)(0),                   // 19: core.SourceRepositoryStatus
+	(SourceArtifactType)(0),                       // 20: core.SourceArtifactType
+	(SourceBuildTriggerEventType)(0),              // 21: core.SourceBuildTriggerEventType
+	(SourceBuildTriggerStatus)(0),                 // 22: core.SourceBuildTriggerStatus
+	(SourceWebhookEventStatus)(0),                 // 23: core.SourceWebhookEventStatus
+	(BillingCycle)(0),                             // 24: core.BillingCycle
+	(BillingPlanStatus)(0),                        // 25: core.BillingPlanStatus
+	(TenantSubscriptionStatus)(0),                 // 26: core.TenantSubscriptionStatus
+	(TenantSubscriptionSource)(0),                 // 27: core.TenantSubscriptionSource
+	(TenantEntitlementStatus)(0),                  // 28: core.TenantEntitlementStatus
+	(BillingUsageMetric)(0),                       // 29: core.BillingUsageMetric
+	(QuotaMetric)(0),                              // 30: core.QuotaMetric
+	(QuotaReservationStatus)(0),                   // 31: core.QuotaReservationStatus
+	(SubscriptionChangeMode)(0),                   // 32: core.SubscriptionChangeMode
+	(InvoiceStatus)(0),                            // 33: core.InvoiceStatus
+	(PaymentTransactionType)(0),                   // 34: core.PaymentTransactionType
+	(PaymentTransactionStatus)(0),                 // 35: core.PaymentTransactionStatus
+	(LocalAgentStatus)(0),                         // 36: core.LocalAgentStatus
+	(LocalAgentDrainStatus)(0),                    // 37: core.LocalAgentDrainStatus
+	(HybridArtifactMode)(0),                       // 38: core.HybridArtifactMode
+	(LocalAgentCertificateStatus)(0),              // 39: core.LocalAgentCertificateStatus
+	(HybridArtifactType)(0),                       // 40: core.HybridArtifactType
+	(StorageObjectStatus)(0),                      // 41: core.StorageObjectStatus
+	(BrandingRewriteMode)(0),                      // 42: core.BrandingRewriteMode
+	(BrandingProfileStatus)(0),                    // 43: core.BrandingProfileStatus
+	(BrandingPreflightStatus)(0),                  // 44: core.BrandingPreflightStatus
+	(WhiteLabelTemplateStatus)(0),                 // 45: core.WhiteLabelTemplateStatus
+	(WhiteLabelRevisionStatus)(0),                 // 46: core.WhiteLabelRevisionStatus
+	(WhiteLabelProductStatus)(0),                  // 47: core.WhiteLabelProductStatus
+	(*RespBase)(nil),                              // 48: core.RespBase
+	(*Application)(nil),                           // 49: core.Application
+	(*Version)(nil),                               // 50: core.Version
+	(*Channel)(nil),                               // 51: core.Channel
+	(*SigningConfig)(nil),                         // 52: core.SigningConfig
+	(*BuildTask)(nil),                             // 53: core.BuildTask
+	(*StorageObject)(nil),                         // 54: core.StorageObject
+	(*BrandingProfile)(nil),                       // 55: core.BrandingProfile
+	(*BrandingPreflight)(nil),                     // 56: core.BrandingPreflight
+	(*WhiteLabelTemplate)(nil),                    // 57: core.WhiteLabelTemplate
+	(*WhiteLabelTemplateRevision)(nil),            // 58: core.WhiteLabelTemplateRevision
+	(*WhiteLabelProduct)(nil),                     // 59: core.WhiteLabelProduct
+	(*BuilderNode)(nil),                           // 60: core.BuilderNode
+	(*BuildConcurrencyPolicy)(nil),                // 61: core.BuildConcurrencyPolicy
+	(*BuildCacheEntry)(nil),                       // 62: core.BuildCacheEntry
+	(*BuildSchedulerEvent)(nil),                   // 63: core.BuildSchedulerEvent
+	(*BuildClusterMetrics)(nil),                   // 64: core.BuildClusterMetrics
+	(*OpenApiCredential)(nil),                     // 65: core.OpenApiCredential
+	(*OpenApiCredentialSecret)(nil),               // 66: core.OpenApiCredentialSecret
+	(*OpenApiAuthContext)(nil),                    // 67: core.OpenApiAuthContext
+	(*ApplicationIdReq)(nil),                      // 68: core.ApplicationIdReq
+	(*VersionIdReq)(nil),                          // 69: core.VersionIdReq
+	(*ChannelIdReq)(nil),                          // 70: core.ChannelIdReq
+	(*BuildTaskIdReq)(nil),                        // 71: core.BuildTaskIdReq
+	(*BrandingProfileIdReq)(nil),                  // 72: core.BrandingProfileIdReq
+	(*BrandingPreflightIdReq)(nil),                // 73: core.BrandingPreflightIdReq
+	(*WhiteLabelTemplateIdReq)(nil),               // 74: core.WhiteLabelTemplateIdReq
+	(*WhiteLabelTemplateRevisionIdReq)(nil),       // 75: core.WhiteLabelTemplateRevisionIdReq
+	(*WhiteLabelProductIdReq)(nil),                // 76: core.WhiteLabelProductIdReq
+	(*ApplicationResp)(nil),                       // 77: core.ApplicationResp
+	(*VersionResp)(nil),                           // 78: core.VersionResp
+	(*ChannelResp)(nil),                           // 79: core.ChannelResp
+	(*SigningConfigResp)(nil),                     // 80: core.SigningConfigResp
+	(*SigningConfigListReq)(nil),                  // 81: core.SigningConfigListReq
+	(*SigningConfigListResp)(nil),                 // 82: core.SigningConfigListResp
+	(*BuildTaskResp)(nil),                         // 83: core.BuildTaskResp
+	(*BuilderNodeResp)(nil),                       // 84: core.BuilderNodeResp
+	(*BuilderNodeListReq)(nil),                    // 85: core.BuilderNodeListReq
+	(*BuilderNodeListResp)(nil),                   // 86: core.BuilderNodeListResp
+	(*BuildConcurrencyPolicyResp)(nil),            // 87: core.BuildConcurrencyPolicyResp
+	(*BuildConcurrencyPolicyListReq)(nil),         // 88: core.BuildConcurrencyPolicyListReq
+	(*BuildConcurrencyPolicyListResp)(nil),        // 89: core.BuildConcurrencyPolicyListResp
+	(*BuildCacheEntryResp)(nil),                   // 90: core.BuildCacheEntryResp
+	(*BuildCacheEntryListReq)(nil),                // 91: core.BuildCacheEntryListReq
+	(*BuildCacheEntryListResp)(nil),               // 92: core.BuildCacheEntryListResp
+	(*BuildSchedulerEventListReq)(nil),            // 93: core.BuildSchedulerEventListReq
+	(*BuildSchedulerEventListResp)(nil),           // 94: core.BuildSchedulerEventListResp
+	(*BuildClusterMetricsReq)(nil),                // 95: core.BuildClusterMetricsReq
+	(*BuildClusterMetricsResp)(nil),               // 96: core.BuildClusterMetricsResp
+	(*OpenApiCredentialListReq)(nil),              // 97: core.OpenApiCredentialListReq
+	(*OpenApiCredentialListResp)(nil),             // 98: core.OpenApiCredentialListResp
+	(*OpenApiCredentialResp)(nil),                 // 99: core.OpenApiCredentialResp
+	(*OpenApiCredentialSecretResp)(nil),           // 100: core.OpenApiCredentialSecretResp
+	(*CreateOpenApiCredentialReq)(nil),            // 101: core.CreateOpenApiCredentialReq
+	(*OpenApiCredentialIdReq)(nil),                // 102: core.OpenApiCredentialIdReq
+	(*RotateOpenApiCredentialReq)(nil),            // 103: core.RotateOpenApiCredentialReq
+	(*AuthenticateOpenApiCredentialReq)(nil),      // 104: core.AuthenticateOpenApiCredentialReq
+	(*OpenApiAuthContextResp)(nil),                // 105: core.OpenApiAuthContextResp
+	(*BeginOpenApiIdempotencyReq)(nil),            // 106: core.BeginOpenApiIdempotencyReq
+	(*OpenApiIdempotencyResult)(nil),              // 107: core.OpenApiIdempotencyResult
+	(*OpenApiIdempotencyResp)(nil),                // 108: core.OpenApiIdempotencyResp
+	(*CompleteOpenApiIdempotencyReq)(nil),         // 109: core.CompleteOpenApiIdempotencyReq
+	(*RecordOpenApiAuditReq)(nil),                 // 110: core.RecordOpenApiAuditReq
+	(*WebhookEndpoint)(nil),                       // 111: core.WebhookEndpoint
+	(*WebhookEndpointSecret)(nil),                 // 112: core.WebhookEndpointSecret
+	(*WebhookDelivery)(nil),                       // 113: core.WebhookDelivery
+	(*CreateWebhookEndpointReq)(nil),              // 114: core.CreateWebhookEndpointReq
+	(*UpdateWebhookEndpointReq)(nil),              // 115: core.UpdateWebhookEndpointReq
+	(*WebhookEndpointIdReq)(nil),                  // 116: core.WebhookEndpointIdReq
+	(*WebhookEndpointListReq)(nil),                // 117: core.WebhookEndpointListReq
+	(*WebhookEndpointResp)(nil),                   // 118: core.WebhookEndpointResp
+	(*WebhookEndpointListResp)(nil),               // 119: core.WebhookEndpointListResp
+	(*WebhookEndpointSecretResp)(nil),             // 120: core.WebhookEndpointSecretResp
+	(*WebhookDeliveryListReq)(nil),                // 121: core.WebhookDeliveryListReq
+	(*WebhookDeliveryListResp)(nil),               // 122: core.WebhookDeliveryListResp
+	(*WebhookDeliveryResp)(nil),                   // 123: core.WebhookDeliveryResp
+	(*WebhookDeliveryIdReq)(nil),                  // 124: core.WebhookDeliveryIdReq
+	(*CreateTestWebhookEventReq)(nil),             // 125: core.CreateTestWebhookEventReq
+	(*SourceIntegration)(nil),                     // 126: core.SourceIntegration
+	(*CompleteSourceIntegrationReq)(nil),          // 127: core.CompleteSourceIntegrationReq
+	(*SourceIntegrationIdReq)(nil),                // 128: core.SourceIntegrationIdReq
+	(*SourceIntegrationListReq)(nil),              // 129: core.SourceIntegrationListReq
+	(*SourceIntegrationResp)(nil),                 // 130: core.SourceIntegrationResp
+	(*SourceIntegrationListResp)(nil),             // 131: core.SourceIntegrationListResp
+	(*SourceIntegrationCredential)(nil),           // 132: core.SourceIntegrationCredential
+	(*SourceIntegrationCredentialResp)(nil),       // 133: core.SourceIntegrationCredentialResp
+	(*SourceRepository)(nil),                      // 134: core.SourceRepository
+	(*AuthorizeSourceRepositoryReq)(nil),          // 135: core.AuthorizeSourceRepositoryReq
+	(*SourceRepositoryIdReq)(nil),                 // 136: core.SourceRepositoryIdReq
+	(*SourceRepositoryListReq)(nil),               // 137: core.SourceRepositoryListReq
+	(*SourceRepositoryResp)(nil),                  // 138: core.SourceRepositoryResp
+	(*SourceRepositoryListResp)(nil),              // 139: core.SourceRepositoryListResp
+	(*SourceArtifact)(nil),                        // 140: core.SourceArtifact
+	(*RecordSourceArtifactReq)(nil),               // 141: core.RecordSourceArtifactReq
+	(*SourceArtifactResp)(nil),                    // 142: core.SourceArtifactResp
+	(*ImportSourceArtifactReq)(nil),               // 143: core.ImportSourceArtifactReq
+	(*SourceArtifactImportResult)(nil),            // 144: core.SourceArtifactImportResult
+	(*SourceArtifactImportResp)(nil),              // 145: core.SourceArtifactImportResp
+	(*SourceBuildTrigger)(nil),                    // 146: core.SourceBuildTrigger
+	(*CreateSourceBuildTriggerReq)(nil),           // 147: core.CreateSourceBuildTriggerReq
+	(*UpdateSourceBuildTriggerReq)(nil),           // 148: core.UpdateSourceBuildTriggerReq
+	(*SourceBuildTriggerIdReq)(nil),               // 149: core.SourceBuildTriggerIdReq
+	(*SourceBuildTriggerListReq)(nil),             // 150: core.SourceBuildTriggerListReq
+	(*SourceBuildTriggerResp)(nil),                // 151: core.SourceBuildTriggerResp
+	(*SourceBuildTriggerListResp)(nil),            // 152: core.SourceBuildTriggerListResp
+	(*SourceBuildTriggerSecret)(nil),              // 153: core.SourceBuildTriggerSecret
+	(*SourceBuildTriggerSecretResp)(nil),          // 154: core.SourceBuildTriggerSecretResp
+	(*ResolveSourceBuildTriggerReq)(nil),          // 155: core.ResolveSourceBuildTriggerReq
+	(*SourceBuildTriggerCredential)(nil),          // 156: core.SourceBuildTriggerCredential
+	(*SourceBuildTriggerCredentialResp)(nil),      // 157: core.SourceBuildTriggerCredentialResp
+	(*SourceWebhookEvent)(nil),                    // 158: core.SourceWebhookEvent
+	(*EnqueueSourceWebhookEventReq)(nil),          // 159: core.EnqueueSourceWebhookEventReq
+	(*EnqueueSourceWebhookEventResult)(nil),       // 160: core.EnqueueSourceWebhookEventResult
+	(*EnqueueSourceWebhookEventResp)(nil),         // 161: core.EnqueueSourceWebhookEventResp
+	(*ClaimSourceWebhookEventReq)(nil),            // 162: core.ClaimSourceWebhookEventReq
+	(*ClaimedSourceWebhookEvent)(nil),             // 163: core.ClaimedSourceWebhookEvent
+	(*ClaimSourceWebhookEventResp)(nil),           // 164: core.ClaimSourceWebhookEventResp
+	(*CompleteSourceWebhookEventReq)(nil),         // 165: core.CompleteSourceWebhookEventReq
+	(*FailSourceWebhookEventReq)(nil),             // 166: core.FailSourceWebhookEventReq
+	(*SourceWebhookEventListReq)(nil),             // 167: core.SourceWebhookEventListReq
+	(*SourceWebhookEventListResp)(nil),            // 168: core.SourceWebhookEventListResp
+	(*BrandingProfileResp)(nil),                   // 169: core.BrandingProfileResp
+	(*BrandingProfileListReq)(nil),                // 170: core.BrandingProfileListReq
+	(*BrandingProfileListResp)(nil),               // 171: core.BrandingProfileListResp
+	(*BrandingPreflightResp)(nil),                 // 172: core.BrandingPreflightResp
+	(*BrandingPreflightListReq)(nil),              // 173: core.BrandingPreflightListReq
+	(*BrandingPreflightListResp)(nil),             // 174: core.BrandingPreflightListResp
+	(*WhiteLabelTemplateResp)(nil),                // 175: core.WhiteLabelTemplateResp
+	(*WhiteLabelTemplateListReq)(nil),             // 176: core.WhiteLabelTemplateListReq
+	(*WhiteLabelTemplateListResp)(nil),            // 177: core.WhiteLabelTemplateListResp
+	(*WhiteLabelTemplateRevisionResp)(nil),        // 178: core.WhiteLabelTemplateRevisionResp
+	(*WhiteLabelTemplateRevisionListReq)(nil),     // 179: core.WhiteLabelTemplateRevisionListReq
+	(*WhiteLabelTemplateRevisionListResp)(nil),    // 180: core.WhiteLabelTemplateRevisionListResp
+	(*WhiteLabelProductResp)(nil),                 // 181: core.WhiteLabelProductResp
+	(*WhiteLabelProductListReq)(nil),              // 182: core.WhiteLabelProductListReq
+	(*WhiteLabelProductListResp)(nil),             // 183: core.WhiteLabelProductListResp
+	(*WhiteLabelProductPreflightResp)(nil),        // 184: core.WhiteLabelProductPreflightResp
+	(*ApplicationListReq)(nil),                    // 185: core.ApplicationListReq
+	(*ApplicationListResp)(nil),                   // 186: core.ApplicationListResp
+	(*VersionListReq)(nil),                        // 187: core.VersionListReq
+	(*VersionListResp)(nil),                       // 188: core.VersionListResp
+	(*ChannelListReq)(nil),                        // 189: core.ChannelListReq
+	(*ChannelListResp)(nil),                       // 190: core.ChannelListResp
+	(*BuildTaskListReq)(nil),                      // 191: core.BuildTaskListReq
+	(*BuildTaskListResp)(nil),                     // 192: core.BuildTaskListResp
+	(*CreateApplicationReq)(nil),                  // 193: core.CreateApplicationReq
+	(*CreateVersionReq)(nil),                      // 194: core.CreateVersionReq
+	(*CreateChannelReq)(nil),                      // 195: core.CreateChannelReq
+	(*SigningConfigIdReq)(nil),                    // 196: core.SigningConfigIdReq
+	(*CreateSigningConfigReq)(nil),                // 197: core.CreateSigningConfigReq
+	(*CreateStorageObjectReq)(nil),                // 198: core.CreateStorageObjectReq
+	(*CompleteStorageObjectReq)(nil),              // 199: core.CompleteStorageObjectReq
+	(*FailStorageObjectReq)(nil),                  // 200: core.FailStorageObjectReq
+	(*ExpiredStorageObject)(nil),                  // 201: core.ExpiredStorageObject
+	(*ClaimExpiredStorageObjectsReq)(nil),         // 202: core.ClaimExpiredStorageObjectsReq
+	(*ClaimExpiredStorageObjectsResp)(nil),        // 203: core.ClaimExpiredStorageObjectsResp
+	(*MarkStorageObjectDeletedReq)(nil),           // 204: core.MarkStorageObjectDeletedReq
+	(*StorageObjectIdReq)(nil),                    // 205: core.StorageObjectIdReq
+	(*StorageObjectResp)(nil),                     // 206: core.StorageObjectResp
+	(*CreateBuildTaskReq)(nil),                    // 207: core.CreateBuildTaskReq
+	(*BuilderNodeIdReq)(nil),                      // 208: core.BuilderNodeIdReq
+	(*RegisterBuilderNodeReq)(nil),                // 209: core.RegisterBuilderNodeReq
+	(*BuilderNodeHeartbeatReq)(nil),               // 210: core.BuilderNodeHeartbeatReq
+	(*DrainBuilderNodeReq)(nil),                   // 211: core.DrainBuilderNodeReq
+	(*RecoverBuilderNodeReq)(nil),                 // 212: core.RecoverBuilderNodeReq
+	(*ClaimScheduledBuildTaskReq)(nil),            // 213: core.ClaimScheduledBuildTaskReq
+	(*CancelBuildTaskReq)(nil),                    // 214: core.CancelBuildTaskReq
+	(*RetryBuildTaskReq)(nil),                     // 215: core.RetryBuildTaskReq
+	(*UpsertBuildConcurrencyPolicyReq)(nil),       // 216: core.UpsertBuildConcurrencyPolicyReq
+	(*BuildCacheEntryIdReq)(nil),                  // 217: core.BuildCacheEntryIdReq
+	(*ResolveBuildCacheReq)(nil),                  // 218: core.ResolveBuildCacheReq
+	(*BuildCacheResolution)(nil),                  // 219: core.BuildCacheResolution
+	(*BuildCacheResolutionResp)(nil),              // 220: core.BuildCacheResolutionResp
+	(*PublishBuildCacheReq)(nil),                  // 221: core.PublishBuildCacheReq
+	(*InvalidateBuildCacheReq)(nil),               // 222: core.InvalidateBuildCacheReq
+	(*CleanupBuildCacheReq)(nil),                  // 223: core.CleanupBuildCacheReq
+	(*CleanupBuildCacheResult)(nil),               // 224: core.CleanupBuildCacheResult
+	(*CleanupBuildCacheResp)(nil),                 // 225: core.CleanupBuildCacheResp
+	(*CreateWhiteLabelTemplateReq)(nil),           // 226: core.CreateWhiteLabelTemplateReq
+	(*UpdateWhiteLabelTemplateReq)(nil),           // 227: core.UpdateWhiteLabelTemplateReq
+	(*CopyWhiteLabelTemplateReq)(nil),             // 228: core.CopyWhiteLabelTemplateReq
+	(*CreateWhiteLabelTemplateRevisionReq)(nil),   // 229: core.CreateWhiteLabelTemplateRevisionReq
+	(*UpdateWhiteLabelTemplateRevisionReq)(nil),   // 230: core.UpdateWhiteLabelTemplateRevisionReq
+	(*PublishWhiteLabelTemplateReq)(nil),          // 231: core.PublishWhiteLabelTemplateReq
+	(*CreateWhiteLabelProductReq)(nil),            // 232: core.CreateWhiteLabelProductReq
+	(*UpdateWhiteLabelProductReq)(nil),            // 233: core.UpdateWhiteLabelProductReq
+	(*ChangeWhiteLabelTemplateStatusReq)(nil),     // 234: core.ChangeWhiteLabelTemplateStatusReq
+	(*ChangeWhiteLabelProductStatusReq)(nil),      // 235: core.ChangeWhiteLabelProductStatusReq
+	(*CreateBrandingProfileReq)(nil),              // 236: core.CreateBrandingProfileReq
+	(*UpdateBrandingProfileReq)(nil),              // 237: core.UpdateBrandingProfileReq
+	(*ChangeBrandingProfileStatusReq)(nil),        // 238: core.ChangeBrandingProfileStatusReq
+	(*CreateBrandingPreflightReq)(nil),            // 239: core.CreateBrandingPreflightReq
+	(*CompleteBrandingPreflightReq)(nil),          // 240: core.CompleteBrandingPreflightReq
+	(*ClaimBrandingPreflightReq)(nil),             // 241: core.ClaimBrandingPreflightReq
+	(*BrandingPreflightExecutionContext)(nil),     // 242: core.BrandingPreflightExecutionContext
+	(*BrandingPreflightExecutionContextResp)(nil), // 243: core.BrandingPreflightExecutionContextResp
+	(*InstallReportReq)(nil),                      // 244: core.InstallReportReq
+	(*ChannelStatsReq)(nil),                       // 245: core.ChannelStatsReq
+	(*ChannelStats)(nil),                          // 246: core.ChannelStats
+	(*ChannelStatsResp)(nil),                      // 247: core.ChannelStatsResp
+	(*ReportChannelEventReq)(nil),                 // 248: core.ReportChannelEventReq
+	(*ResolveChannelDownloadReq)(nil),             // 249: core.ResolveChannelDownloadReq
+	(*ChannelDownloadArtifact)(nil),               // 250: core.ChannelDownloadArtifact
+	(*ChannelDownloadArtifactResp)(nil),           // 251: core.ChannelDownloadArtifactResp
+	(*ClaimBuildTaskReq)(nil),                     // 252: core.ClaimBuildTaskReq
+	(*HeartbeatBuildTaskReq)(nil),                 // 253: core.HeartbeatBuildTaskReq
+	(*ReportBuildProgressReq)(nil),                // 254: core.ReportBuildProgressReq
+	(*CompleteBuildTaskReq)(nil),                  // 255: core.CompleteBuildTaskReq
+	(*FailBuildTaskReq)(nil),                      // 256: core.FailBuildTaskReq
+	(*GetBuildExecutionContextReq)(nil),           // 257: core.GetBuildExecutionContextReq
+	(*BuildExecutionContext)(nil),                 // 258: core.BuildExecutionContext
+	(*BuildExecutionContextResp)(nil),             // 259: core.BuildExecutionContextResp
+	(*BillingPlan)(nil),                           // 260: core.BillingPlan
+	(*CreateBillingPlanReq)(nil),                  // 261: core.CreateBillingPlanReq
+	(*BillingPlanIdReq)(nil),                      // 262: core.BillingPlanIdReq
+	(*BillingPlanListReq)(nil),                    // 263: core.BillingPlanListReq
+	(*BillingPlanResp)(nil),                       // 264: core.BillingPlanResp
+	(*BillingPlanListResp)(nil),                   // 265: core.BillingPlanListResp
+	(*TenantSubscription)(nil),                    // 266: core.TenantSubscription
+	(*TenantEntitlement)(nil),                     // 267: core.TenantEntitlement
+	(*TenantBillingReq)(nil),                      // 268: core.TenantBillingReq
+	(*TenantBillingResp)(nil),                     // 269: core.TenantBillingResp
+	(*UpsertManualSubscriptionReq)(nil),           // 270: core.UpsertManualSubscriptionReq
+	(*ChangeTenantSubscriptionReq)(nil),           // 271: core.ChangeTenantSubscriptionReq
+	(*CancelTenantSubscriptionReq)(nil),           // 272: core.CancelTenantSubscriptionReq
+	(*ReserveQuotaReq)(nil),                       // 273: core.ReserveQuotaReq
+	(*QuotaReservation)(nil),                      // 274: core.QuotaReservation
+	(*QuotaReservationResp)(nil),                  // 275: core.QuotaReservationResp
+	(*QuotaReservationActionReq)(nil),             // 276: core.QuotaReservationActionReq
+	(*RecordUsageReq)(nil),                        // 277: core.RecordUsageReq
+	(*UsageMetricSummary)(nil),                    // 278: core.UsageMetricSummary
+	(*BillingUsageReq)(nil),                       // 279: core.BillingUsageReq
+	(*BillingUsageResp)(nil),                      // 280: core.BillingUsageResp
+	(*InvoiceItem)(nil),                           // 281: core.InvoiceItem
+	(*Invoice)(nil),                               // 282: core.Invoice
+	(*InvoiceListReq)(nil),                        // 283: core.InvoiceListReq
+	(*InvoiceListResp)(nil),                       // 284: core.InvoiceListResp
+	(*ApplyBillingWebhookReq)(nil),                // 285: core.ApplyBillingWebhookReq
+	(*LocalAgentCapability)(nil),                  // 286: core.LocalAgentCapability
+	(*LocalAgentCertificate)(nil),                 // 287: core.LocalAgentCertificate
+	(*LocalAgent)(nil),                            // 288: core.LocalAgent
+	(*CreateLocalAgentRegistrationReq)(nil),       // 289: core.CreateLocalAgentRegistrationReq
+	(*LocalAgentRegistrationResp)(nil),            // 290: core.LocalAgentRegistrationResp
+	(*RegisterLocalAgentReq)(nil),                 // 291: core.RegisterLocalAgentReq
+	(*RegisterLocalAgentResp)(nil),                // 292: core.RegisterLocalAgentResp
+	(*LocalAgentIdReq)(nil),                       // 293: core.LocalAgentIdReq
+	(*LocalAgentResp)(nil),                        // 294: core.LocalAgentResp
+	(*LocalAgentListReq)(nil),                     // 295: core.LocalAgentListReq
+	(*LocalAgentListResp)(nil),                    // 296: core.LocalAgentListResp
+	(*LocalAgentAuth)(nil),                        // 297: core.LocalAgentAuth
+	(*HeartbeatLocalAgentReq)(nil),                // 298: core.HeartbeatLocalAgentReq
+	(*DrainLocalAgentReq)(nil),                    // 299: core.DrainLocalAgentReq
+	(*RevokeLocalAgentReq)(nil),                   // 300: core.RevokeLocalAgentReq
+	(*RotateLocalAgentCertificateReq)(nil),        // 301: core.RotateLocalAgentCertificateReq
+	(*ClaimLocalAgentBuildTaskReq)(nil),           // 302: core.ClaimLocalAgentBuildTaskReq
+	(*LocalAgentBuildTaskResp)(nil),               // 303: core.LocalAgentBuildTaskResp
+	(*RenewLocalAgentTaskLeaseReq)(nil),           // 304: core.RenewLocalAgentTaskLeaseReq
+	(*ReportLocalAgentBuildProgressReq)(nil),      // 305: core.ReportLocalAgentBuildProgressReq
+	(*CompleteLocalAgentBuildTaskReq)(nil),        // 306: core.CompleteLocalAgentBuildTaskReq
+	(*FailLocalAgentBuildTaskReq)(nil),            // 307: core.FailLocalAgentBuildTaskReq
+	(*VerifyHybridArtifactReq)(nil),               // 308: core.VerifyHybridArtifactReq
+	(*common.RespBase)(nil),                       // 309: common.RespBase
+	(*common.PageReq)(nil),                        // 310: common.PageReq
 }
 var file_proto_core_core_proto_depIdxs = []int32{
-	113, // 0: core.RespBase.base:type_name -> common.RespBase
+	309, // 0: core.RespBase.base:type_name -> common.RespBase
 	0,   // 1: core.Application.status:type_name -> core.ApplicationStatus
 	1,   // 2: core.Version.status:type_name -> core.VersionStatus
 	2,   // 3: core.Channel.status:type_name -> core.ChannelStatus
 	3,   // 4: core.BuildTask.status:type_name -> core.BuildTaskStatus
 	4,   // 5: core.StorageObject.object_type:type_name -> core.StorageObjectType
-	5,   // 6: core.StorageObject.status:type_name -> core.StorageObjectStatus
-	6,   // 7: core.BrandingProfile.rewrite_mode:type_name -> core.BrandingRewriteMode
-	7,   // 8: core.BrandingProfile.status:type_name -> core.BrandingProfileStatus
-	8,   // 9: core.BrandingPreflight.status:type_name -> core.BrandingPreflightStatus
-	9,   // 10: core.WhiteLabelTemplate.status:type_name -> core.WhiteLabelTemplateStatus
-	10,  // 11: core.WhiteLabelTemplateRevision.status:type_name -> core.WhiteLabelRevisionStatus
-	11,  // 12: core.WhiteLabelProduct.status:type_name -> core.WhiteLabelProductStatus
-	113, // 13: core.ApplicationResp.base:type_name -> common.RespBase
-	13,  // 14: core.ApplicationResp.data:type_name -> core.Application
-	113, // 15: core.VersionResp.base:type_name -> common.RespBase
-	14,  // 16: core.VersionResp.data:type_name -> core.Version
-	113, // 17: core.ChannelResp.base:type_name -> common.RespBase
-	15,  // 18: core.ChannelResp.data:type_name -> core.Channel
-	113, // 19: core.SigningConfigResp.base:type_name -> common.RespBase
-	16,  // 20: core.SigningConfigResp.data:type_name -> core.SigningConfig
-	114, // 21: core.SigningConfigListReq.page:type_name -> common.PageReq
-	113, // 22: core.SigningConfigListResp.base:type_name -> common.RespBase
-	16,  // 23: core.SigningConfigListResp.data:type_name -> core.SigningConfig
-	113, // 24: core.BuildTaskResp.base:type_name -> common.RespBase
-	17,  // 25: core.BuildTaskResp.data:type_name -> core.BuildTask
-	113, // 26: core.BrandingProfileResp.base:type_name -> common.RespBase
-	19,  // 27: core.BrandingProfileResp.data:type_name -> core.BrandingProfile
-	114, // 28: core.BrandingProfileListReq.page:type_name -> common.PageReq
-	7,   // 29: core.BrandingProfileListReq.status:type_name -> core.BrandingProfileStatus
-	113, // 30: core.BrandingProfileListResp.base:type_name -> common.RespBase
-	19,  // 31: core.BrandingProfileListResp.data:type_name -> core.BrandingProfile
-	113, // 32: core.BrandingPreflightResp.base:type_name -> common.RespBase
-	20,  // 33: core.BrandingPreflightResp.data:type_name -> core.BrandingPreflight
-	114, // 34: core.BrandingPreflightListReq.page:type_name -> common.PageReq
-	8,   // 35: core.BrandingPreflightListReq.status:type_name -> core.BrandingPreflightStatus
-	113, // 36: core.BrandingPreflightListResp.base:type_name -> common.RespBase
-	20,  // 37: core.BrandingPreflightListResp.data:type_name -> core.BrandingPreflight
-	113, // 38: core.WhiteLabelTemplateResp.base:type_name -> common.RespBase
-	21,  // 39: core.WhiteLabelTemplateResp.data:type_name -> core.WhiteLabelTemplate
-	114, // 40: core.WhiteLabelTemplateListReq.page:type_name -> common.PageReq
-	9,   // 41: core.WhiteLabelTemplateListReq.status:type_name -> core.WhiteLabelTemplateStatus
-	113, // 42: core.WhiteLabelTemplateListResp.base:type_name -> common.RespBase
-	21,  // 43: core.WhiteLabelTemplateListResp.data:type_name -> core.WhiteLabelTemplate
-	113, // 44: core.WhiteLabelTemplateRevisionResp.base:type_name -> common.RespBase
-	22,  // 45: core.WhiteLabelTemplateRevisionResp.data:type_name -> core.WhiteLabelTemplateRevision
-	114, // 46: core.WhiteLabelTemplateRevisionListReq.page:type_name -> common.PageReq
-	10,  // 47: core.WhiteLabelTemplateRevisionListReq.status:type_name -> core.WhiteLabelRevisionStatus
-	113, // 48: core.WhiteLabelTemplateRevisionListResp.base:type_name -> common.RespBase
-	22,  // 49: core.WhiteLabelTemplateRevisionListResp.data:type_name -> core.WhiteLabelTemplateRevision
-	113, // 50: core.WhiteLabelProductResp.base:type_name -> common.RespBase
-	23,  // 51: core.WhiteLabelProductResp.data:type_name -> core.WhiteLabelProduct
-	114, // 52: core.WhiteLabelProductListReq.page:type_name -> common.PageReq
-	11,  // 53: core.WhiteLabelProductListReq.status:type_name -> core.WhiteLabelProductStatus
-	113, // 54: core.WhiteLabelProductListResp.base:type_name -> common.RespBase
-	23,  // 55: core.WhiteLabelProductListResp.data:type_name -> core.WhiteLabelProduct
-	113, // 56: core.WhiteLabelProductPreflightResp.base:type_name -> common.RespBase
-	114, // 57: core.ApplicationListReq.page:type_name -> common.PageReq
-	0,   // 58: core.ApplicationListReq.status:type_name -> core.ApplicationStatus
-	113, // 59: core.ApplicationListResp.base:type_name -> common.RespBase
-	13,  // 60: core.ApplicationListResp.data:type_name -> core.Application
-	114, // 61: core.VersionListReq.page:type_name -> common.PageReq
-	1,   // 62: core.VersionListReq.status:type_name -> core.VersionStatus
-	113, // 63: core.VersionListResp.base:type_name -> common.RespBase
-	14,  // 64: core.VersionListResp.data:type_name -> core.Version
-	114, // 65: core.ChannelListReq.page:type_name -> common.PageReq
-	2,   // 66: core.ChannelListReq.status:type_name -> core.ChannelStatus
-	113, // 67: core.ChannelListResp.base:type_name -> common.RespBase
-	15,  // 68: core.ChannelListResp.data:type_name -> core.Channel
-	114, // 69: core.BuildTaskListReq.page:type_name -> common.PageReq
-	3,   // 70: core.BuildTaskListReq.status:type_name -> core.BuildTaskStatus
-	113, // 71: core.BuildTaskListResp.base:type_name -> common.RespBase
-	17,  // 72: core.BuildTaskListResp.data:type_name -> core.BuildTask
-	4,   // 73: core.CreateStorageObjectReq.object_type:type_name -> core.StorageObjectType
-	113, // 74: core.ClaimExpiredStorageObjectsResp.base:type_name -> common.RespBase
-	72,  // 75: core.ClaimExpiredStorageObjectsResp.data:type_name -> core.ExpiredStorageObject
-	113, // 76: core.StorageObjectResp.base:type_name -> common.RespBase
-	18,  // 77: core.StorageObjectResp.data:type_name -> core.StorageObject
-	9,   // 78: core.ChangeWhiteLabelTemplateStatusReq.status:type_name -> core.WhiteLabelTemplateStatus
-	11,  // 79: core.ChangeWhiteLabelProductStatusReq.status:type_name -> core.WhiteLabelProductStatus
-	6,   // 80: core.CreateBrandingProfileReq.rewrite_mode:type_name -> core.BrandingRewriteMode
-	6,   // 81: core.UpdateBrandingProfileReq.rewrite_mode:type_name -> core.BrandingRewriteMode
-	7,   // 82: core.ChangeBrandingProfileStatusReq.status:type_name -> core.BrandingProfileStatus
-	8,   // 83: core.CompleteBrandingPreflightReq.status:type_name -> core.BrandingPreflightStatus
-	20,  // 84: core.BrandingPreflightExecutionContext.preflight:type_name -> core.BrandingPreflight
-	19,  // 85: core.BrandingPreflightExecutionContext.profile:type_name -> core.BrandingProfile
-	14,  // 86: core.BrandingPreflightExecutionContext.version:type_name -> core.Version
-	18,  // 87: core.BrandingPreflightExecutionContext.source_apk:type_name -> core.StorageObject
-	18,  // 88: core.BrandingPreflightExecutionContext.brand_logo:type_name -> core.StorageObject
-	18,  // 89: core.BrandingPreflightExecutionContext.brand_splash:type_name -> core.StorageObject
-	113, // 90: core.BrandingPreflightExecutionContextResp.base:type_name -> common.RespBase
-	95,  // 91: core.BrandingPreflightExecutionContextResp.data:type_name -> core.BrandingPreflightExecutionContext
-	113, // 92: core.ChannelStatsResp.base:type_name -> common.RespBase
-	99,  // 93: core.ChannelStatsResp.data:type_name -> core.ChannelStats
-	113, // 94: core.ChannelDownloadArtifactResp.base:type_name -> common.RespBase
-	103, // 95: core.ChannelDownloadArtifactResp.data:type_name -> core.ChannelDownloadArtifact
-	3,   // 96: core.ReportBuildProgressReq.status:type_name -> core.BuildTaskStatus
-	17,  // 97: core.BuildExecutionContext.task:type_name -> core.BuildTask
-	18,  // 98: core.BuildExecutionContext.source_apk:type_name -> core.StorageObject
-	18,  // 99: core.BuildExecutionContext.keystore:type_name -> core.StorageObject
-	18,  // 100: core.BuildExecutionContext.brand_logo:type_name -> core.StorageObject
-	18,  // 101: core.BuildExecutionContext.brand_splash:type_name -> core.StorageObject
-	18,  // 102: core.BuildExecutionContext.template_files:type_name -> core.StorageObject
-	113, // 103: core.BuildExecutionContextResp.base:type_name -> common.RespBase
-	111, // 104: core.BuildExecutionContextResp.data:type_name -> core.BuildExecutionContext
-	64,  // 105: core.Core.CreateApplication:input_type -> core.CreateApplicationReq
-	24,  // 106: core.Core.GetApplication:input_type -> core.ApplicationIdReq
-	56,  // 107: core.Core.ListApplications:input_type -> core.ApplicationListReq
-	69,  // 108: core.Core.CreateStorageObject:input_type -> core.CreateStorageObjectReq
-	76,  // 109: core.Core.GetStorageObject:input_type -> core.StorageObjectIdReq
-	70,  // 110: core.Core.CompleteStorageObject:input_type -> core.CompleteStorageObjectReq
-	71,  // 111: core.Core.FailStorageObject:input_type -> core.FailStorageObjectReq
-	73,  // 112: core.Core.ClaimExpiredStorageObjects:input_type -> core.ClaimExpiredStorageObjectsReq
-	75,  // 113: core.Core.MarkStorageObjectDeleted:input_type -> core.MarkStorageObjectDeletedReq
-	65,  // 114: core.Core.CreateVersion:input_type -> core.CreateVersionReq
-	25,  // 115: core.Core.GetVersion:input_type -> core.VersionIdReq
-	58,  // 116: core.Core.ListVersions:input_type -> core.VersionListReq
-	66,  // 117: core.Core.CreateChannel:input_type -> core.CreateChannelReq
-	26,  // 118: core.Core.GetChannel:input_type -> core.ChannelIdReq
-	60,  // 119: core.Core.ListChannels:input_type -> core.ChannelListReq
-	68,  // 120: core.Core.CreateSigningConfig:input_type -> core.CreateSigningConfigReq
-	67,  // 121: core.Core.GetSigningConfig:input_type -> core.SigningConfigIdReq
-	37,  // 122: core.Core.ListSigningConfigs:input_type -> core.SigningConfigListReq
-	89,  // 123: core.Core.CreateBrandingProfile:input_type -> core.CreateBrandingProfileReq
-	90,  // 124: core.Core.UpdateBrandingProfile:input_type -> core.UpdateBrandingProfileReq
-	28,  // 125: core.Core.GetBrandingProfile:input_type -> core.BrandingProfileIdReq
-	41,  // 126: core.Core.ListBrandingProfiles:input_type -> core.BrandingProfileListReq
-	91,  // 127: core.Core.ChangeBrandingProfileStatus:input_type -> core.ChangeBrandingProfileStatusReq
-	92,  // 128: core.Core.CreateBrandingPreflight:input_type -> core.CreateBrandingPreflightReq
-	29,  // 129: core.Core.GetBrandingPreflight:input_type -> core.BrandingPreflightIdReq
-	44,  // 130: core.Core.ListBrandingPreflights:input_type -> core.BrandingPreflightListReq
-	94,  // 131: core.Core.ClaimBrandingPreflight:input_type -> core.ClaimBrandingPreflightReq
-	93,  // 132: core.Core.CompleteBrandingPreflight:input_type -> core.CompleteBrandingPreflightReq
-	79,  // 133: core.Core.CreateWhiteLabelTemplate:input_type -> core.CreateWhiteLabelTemplateReq
-	80,  // 134: core.Core.UpdateWhiteLabelTemplate:input_type -> core.UpdateWhiteLabelTemplateReq
-	81,  // 135: core.Core.CopyWhiteLabelTemplate:input_type -> core.CopyWhiteLabelTemplateReq
-	30,  // 136: core.Core.DeleteWhiteLabelTemplate:input_type -> core.WhiteLabelTemplateIdReq
-	30,  // 137: core.Core.GetWhiteLabelTemplate:input_type -> core.WhiteLabelTemplateIdReq
-	47,  // 138: core.Core.ListWhiteLabelTemplates:input_type -> core.WhiteLabelTemplateListReq
-	82,  // 139: core.Core.CreateWhiteLabelTemplateRevision:input_type -> core.CreateWhiteLabelTemplateRevisionReq
-	31,  // 140: core.Core.GetWhiteLabelTemplateRevision:input_type -> core.WhiteLabelTemplateRevisionIdReq
-	83,  // 141: core.Core.UpdateWhiteLabelTemplateRevision:input_type -> core.UpdateWhiteLabelTemplateRevisionReq
-	31,  // 142: core.Core.DeleteWhiteLabelTemplateRevision:input_type -> core.WhiteLabelTemplateRevisionIdReq
-	50,  // 143: core.Core.ListWhiteLabelTemplateRevisions:input_type -> core.WhiteLabelTemplateRevisionListReq
-	84,  // 144: core.Core.PublishWhiteLabelTemplate:input_type -> core.PublishWhiteLabelTemplateReq
-	87,  // 145: core.Core.ChangeWhiteLabelTemplateStatus:input_type -> core.ChangeWhiteLabelTemplateStatusReq
-	85,  // 146: core.Core.CreateWhiteLabelProduct:input_type -> core.CreateWhiteLabelProductReq
-	86,  // 147: core.Core.UpdateWhiteLabelProduct:input_type -> core.UpdateWhiteLabelProductReq
-	32,  // 148: core.Core.DeleteWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
-	32,  // 149: core.Core.GetWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
-	53,  // 150: core.Core.ListWhiteLabelProducts:input_type -> core.WhiteLabelProductListReq
-	88,  // 151: core.Core.ChangeWhiteLabelProductStatus:input_type -> core.ChangeWhiteLabelProductStatusReq
-	32,  // 152: core.Core.PreflightWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
-	78,  // 153: core.Core.CreateBuildTask:input_type -> core.CreateBuildTaskReq
-	27,  // 154: core.Core.GetBuildTask:input_type -> core.BuildTaskIdReq
-	62,  // 155: core.Core.ListBuildTasks:input_type -> core.BuildTaskListReq
-	97,  // 156: core.Core.ReportInstall:input_type -> core.InstallReportReq
-	101, // 157: core.Core.ReportChannelEvent:input_type -> core.ReportChannelEventReq
-	98,  // 158: core.Core.GetChannelStats:input_type -> core.ChannelStatsReq
-	102, // 159: core.Core.ResolveChannelDownload:input_type -> core.ResolveChannelDownloadReq
-	105, // 160: core.Core.ClaimBuildTask:input_type -> core.ClaimBuildTaskReq
-	110, // 161: core.Core.GetBuildExecutionContext:input_type -> core.GetBuildExecutionContextReq
-	106, // 162: core.Core.HeartbeatBuildTask:input_type -> core.HeartbeatBuildTaskReq
-	107, // 163: core.Core.ReportBuildProgress:input_type -> core.ReportBuildProgressReq
-	108, // 164: core.Core.CompleteBuildTask:input_type -> core.CompleteBuildTaskReq
-	109, // 165: core.Core.FailBuildTask:input_type -> core.FailBuildTaskReq
-	33,  // 166: core.Core.CreateApplication:output_type -> core.ApplicationResp
-	33,  // 167: core.Core.GetApplication:output_type -> core.ApplicationResp
-	57,  // 168: core.Core.ListApplications:output_type -> core.ApplicationListResp
-	77,  // 169: core.Core.CreateStorageObject:output_type -> core.StorageObjectResp
-	77,  // 170: core.Core.GetStorageObject:output_type -> core.StorageObjectResp
-	77,  // 171: core.Core.CompleteStorageObject:output_type -> core.StorageObjectResp
-	12,  // 172: core.Core.FailStorageObject:output_type -> core.RespBase
-	74,  // 173: core.Core.ClaimExpiredStorageObjects:output_type -> core.ClaimExpiredStorageObjectsResp
-	12,  // 174: core.Core.MarkStorageObjectDeleted:output_type -> core.RespBase
-	34,  // 175: core.Core.CreateVersion:output_type -> core.VersionResp
-	34,  // 176: core.Core.GetVersion:output_type -> core.VersionResp
-	59,  // 177: core.Core.ListVersions:output_type -> core.VersionListResp
-	35,  // 178: core.Core.CreateChannel:output_type -> core.ChannelResp
-	35,  // 179: core.Core.GetChannel:output_type -> core.ChannelResp
-	61,  // 180: core.Core.ListChannels:output_type -> core.ChannelListResp
-	36,  // 181: core.Core.CreateSigningConfig:output_type -> core.SigningConfigResp
-	36,  // 182: core.Core.GetSigningConfig:output_type -> core.SigningConfigResp
-	38,  // 183: core.Core.ListSigningConfigs:output_type -> core.SigningConfigListResp
-	40,  // 184: core.Core.CreateBrandingProfile:output_type -> core.BrandingProfileResp
-	40,  // 185: core.Core.UpdateBrandingProfile:output_type -> core.BrandingProfileResp
-	40,  // 186: core.Core.GetBrandingProfile:output_type -> core.BrandingProfileResp
-	42,  // 187: core.Core.ListBrandingProfiles:output_type -> core.BrandingProfileListResp
-	40,  // 188: core.Core.ChangeBrandingProfileStatus:output_type -> core.BrandingProfileResp
-	43,  // 189: core.Core.CreateBrandingPreflight:output_type -> core.BrandingPreflightResp
-	43,  // 190: core.Core.GetBrandingPreflight:output_type -> core.BrandingPreflightResp
-	45,  // 191: core.Core.ListBrandingPreflights:output_type -> core.BrandingPreflightListResp
-	96,  // 192: core.Core.ClaimBrandingPreflight:output_type -> core.BrandingPreflightExecutionContextResp
-	43,  // 193: core.Core.CompleteBrandingPreflight:output_type -> core.BrandingPreflightResp
-	46,  // 194: core.Core.CreateWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
-	46,  // 195: core.Core.UpdateWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
-	46,  // 196: core.Core.CopyWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
-	12,  // 197: core.Core.DeleteWhiteLabelTemplate:output_type -> core.RespBase
-	46,  // 198: core.Core.GetWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
-	48,  // 199: core.Core.ListWhiteLabelTemplates:output_type -> core.WhiteLabelTemplateListResp
-	49,  // 200: core.Core.CreateWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
-	49,  // 201: core.Core.GetWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
-	49,  // 202: core.Core.UpdateWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
-	12,  // 203: core.Core.DeleteWhiteLabelTemplateRevision:output_type -> core.RespBase
-	51,  // 204: core.Core.ListWhiteLabelTemplateRevisions:output_type -> core.WhiteLabelTemplateRevisionListResp
-	46,  // 205: core.Core.PublishWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
-	46,  // 206: core.Core.ChangeWhiteLabelTemplateStatus:output_type -> core.WhiteLabelTemplateResp
-	52,  // 207: core.Core.CreateWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
-	52,  // 208: core.Core.UpdateWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
-	12,  // 209: core.Core.DeleteWhiteLabelProduct:output_type -> core.RespBase
-	52,  // 210: core.Core.GetWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
-	54,  // 211: core.Core.ListWhiteLabelProducts:output_type -> core.WhiteLabelProductListResp
-	52,  // 212: core.Core.ChangeWhiteLabelProductStatus:output_type -> core.WhiteLabelProductResp
-	55,  // 213: core.Core.PreflightWhiteLabelProduct:output_type -> core.WhiteLabelProductPreflightResp
-	39,  // 214: core.Core.CreateBuildTask:output_type -> core.BuildTaskResp
-	39,  // 215: core.Core.GetBuildTask:output_type -> core.BuildTaskResp
-	63,  // 216: core.Core.ListBuildTasks:output_type -> core.BuildTaskListResp
-	12,  // 217: core.Core.ReportInstall:output_type -> core.RespBase
-	12,  // 218: core.Core.ReportChannelEvent:output_type -> core.RespBase
-	100, // 219: core.Core.GetChannelStats:output_type -> core.ChannelStatsResp
-	104, // 220: core.Core.ResolveChannelDownload:output_type -> core.ChannelDownloadArtifactResp
-	39,  // 221: core.Core.ClaimBuildTask:output_type -> core.BuildTaskResp
-	112, // 222: core.Core.GetBuildExecutionContext:output_type -> core.BuildExecutionContextResp
-	12,  // 223: core.Core.HeartbeatBuildTask:output_type -> core.RespBase
-	12,  // 224: core.Core.ReportBuildProgress:output_type -> core.RespBase
-	12,  // 225: core.Core.CompleteBuildTask:output_type -> core.RespBase
-	12,  // 226: core.Core.FailBuildTask:output_type -> core.RespBase
-	166, // [166:227] is the sub-list for method output_type
-	105, // [105:166] is the sub-list for method input_type
-	105, // [105:105] is the sub-list for extension type_name
-	105, // [105:105] is the sub-list for extension extendee
-	0,   // [0:105] is the sub-list for field type_name
+	41,  // 6: core.StorageObject.status:type_name -> core.StorageObjectStatus
+	42,  // 7: core.BrandingProfile.rewrite_mode:type_name -> core.BrandingRewriteMode
+	43,  // 8: core.BrandingProfile.status:type_name -> core.BrandingProfileStatus
+	44,  // 9: core.BrandingPreflight.status:type_name -> core.BrandingPreflightStatus
+	45,  // 10: core.WhiteLabelTemplate.status:type_name -> core.WhiteLabelTemplateStatus
+	46,  // 11: core.WhiteLabelTemplateRevision.status:type_name -> core.WhiteLabelRevisionStatus
+	47,  // 12: core.WhiteLabelProduct.status:type_name -> core.WhiteLabelProductStatus
+	5,   // 13: core.BuilderNode.status:type_name -> core.BuilderNodeStatus
+	6,   // 14: core.BuilderNode.drain_status:type_name -> core.BuilderDrainStatus
+	7,   // 15: core.BuildConcurrencyPolicy.status:type_name -> core.BuildPolicyStatus
+	9,   // 16: core.BuildCacheEntry.cache_scope:type_name -> core.BuildCacheScope
+	10,  // 17: core.BuildCacheEntry.status:type_name -> core.BuildCacheStatus
+	11,  // 18: core.BuildSchedulerEvent.event_type:type_name -> core.BuildSchedulerEventType
+	13,  // 19: core.OpenApiCredential.scopes:type_name -> core.OpenApiScope
+	12,  // 20: core.OpenApiCredential.status:type_name -> core.OpenApiCredentialStatus
+	65,  // 21: core.OpenApiCredentialSecret.credential:type_name -> core.OpenApiCredential
+	13,  // 22: core.OpenApiAuthContext.scopes:type_name -> core.OpenApiScope
+	309, // 23: core.ApplicationResp.base:type_name -> common.RespBase
+	49,  // 24: core.ApplicationResp.data:type_name -> core.Application
+	309, // 25: core.VersionResp.base:type_name -> common.RespBase
+	50,  // 26: core.VersionResp.data:type_name -> core.Version
+	309, // 27: core.ChannelResp.base:type_name -> common.RespBase
+	51,  // 28: core.ChannelResp.data:type_name -> core.Channel
+	309, // 29: core.SigningConfigResp.base:type_name -> common.RespBase
+	52,  // 30: core.SigningConfigResp.data:type_name -> core.SigningConfig
+	310, // 31: core.SigningConfigListReq.page:type_name -> common.PageReq
+	309, // 32: core.SigningConfigListResp.base:type_name -> common.RespBase
+	52,  // 33: core.SigningConfigListResp.data:type_name -> core.SigningConfig
+	309, // 34: core.BuildTaskResp.base:type_name -> common.RespBase
+	53,  // 35: core.BuildTaskResp.data:type_name -> core.BuildTask
+	309, // 36: core.BuilderNodeResp.base:type_name -> common.RespBase
+	60,  // 37: core.BuilderNodeResp.data:type_name -> core.BuilderNode
+	310, // 38: core.BuilderNodeListReq.page:type_name -> common.PageReq
+	5,   // 39: core.BuilderNodeListReq.status:type_name -> core.BuilderNodeStatus
+	6,   // 40: core.BuilderNodeListReq.drain_status:type_name -> core.BuilderDrainStatus
+	309, // 41: core.BuilderNodeListResp.base:type_name -> common.RespBase
+	60,  // 42: core.BuilderNodeListResp.data:type_name -> core.BuilderNode
+	309, // 43: core.BuildConcurrencyPolicyResp.base:type_name -> common.RespBase
+	61,  // 44: core.BuildConcurrencyPolicyResp.data:type_name -> core.BuildConcurrencyPolicy
+	310, // 45: core.BuildConcurrencyPolicyListReq.page:type_name -> common.PageReq
+	7,   // 46: core.BuildConcurrencyPolicyListReq.status:type_name -> core.BuildPolicyStatus
+	309, // 47: core.BuildConcurrencyPolicyListResp.base:type_name -> common.RespBase
+	61,  // 48: core.BuildConcurrencyPolicyListResp.data:type_name -> core.BuildConcurrencyPolicy
+	309, // 49: core.BuildCacheEntryResp.base:type_name -> common.RespBase
+	62,  // 50: core.BuildCacheEntryResp.data:type_name -> core.BuildCacheEntry
+	310, // 51: core.BuildCacheEntryListReq.page:type_name -> common.PageReq
+	9,   // 52: core.BuildCacheEntryListReq.cache_scope:type_name -> core.BuildCacheScope
+	10,  // 53: core.BuildCacheEntryListReq.status:type_name -> core.BuildCacheStatus
+	309, // 54: core.BuildCacheEntryListResp.base:type_name -> common.RespBase
+	62,  // 55: core.BuildCacheEntryListResp.data:type_name -> core.BuildCacheEntry
+	310, // 56: core.BuildSchedulerEventListReq.page:type_name -> common.PageReq
+	11,  // 57: core.BuildSchedulerEventListReq.event_type:type_name -> core.BuildSchedulerEventType
+	309, // 58: core.BuildSchedulerEventListResp.base:type_name -> common.RespBase
+	63,  // 59: core.BuildSchedulerEventListResp.data:type_name -> core.BuildSchedulerEvent
+	309, // 60: core.BuildClusterMetricsResp.base:type_name -> common.RespBase
+	64,  // 61: core.BuildClusterMetricsResp.data:type_name -> core.BuildClusterMetrics
+	310, // 62: core.OpenApiCredentialListReq.page:type_name -> common.PageReq
+	12,  // 63: core.OpenApiCredentialListReq.status:type_name -> core.OpenApiCredentialStatus
+	309, // 64: core.OpenApiCredentialListResp.base:type_name -> common.RespBase
+	65,  // 65: core.OpenApiCredentialListResp.data:type_name -> core.OpenApiCredential
+	309, // 66: core.OpenApiCredentialResp.base:type_name -> common.RespBase
+	65,  // 67: core.OpenApiCredentialResp.data:type_name -> core.OpenApiCredential
+	309, // 68: core.OpenApiCredentialSecretResp.base:type_name -> common.RespBase
+	66,  // 69: core.OpenApiCredentialSecretResp.data:type_name -> core.OpenApiCredentialSecret
+	13,  // 70: core.CreateOpenApiCredentialReq.scopes:type_name -> core.OpenApiScope
+	309, // 71: core.OpenApiAuthContextResp.base:type_name -> common.RespBase
+	67,  // 72: core.OpenApiAuthContextResp.data:type_name -> core.OpenApiAuthContext
+	14,  // 73: core.OpenApiIdempotencyResult.decision:type_name -> core.OpenApiIdempotencyDecision
+	309, // 74: core.OpenApiIdempotencyResp.base:type_name -> common.RespBase
+	107, // 75: core.OpenApiIdempotencyResp.data:type_name -> core.OpenApiIdempotencyResult
+	15,  // 76: core.WebhookEndpoint.status:type_name -> core.WebhookEndpointStatus
+	111, // 77: core.WebhookEndpointSecret.endpoint:type_name -> core.WebhookEndpoint
+	16,  // 78: core.WebhookDelivery.status:type_name -> core.WebhookDeliveryStatus
+	15,  // 79: core.UpdateWebhookEndpointReq.status:type_name -> core.WebhookEndpointStatus
+	310, // 80: core.WebhookEndpointListReq.page:type_name -> common.PageReq
+	15,  // 81: core.WebhookEndpointListReq.status:type_name -> core.WebhookEndpointStatus
+	309, // 82: core.WebhookEndpointResp.base:type_name -> common.RespBase
+	111, // 83: core.WebhookEndpointResp.data:type_name -> core.WebhookEndpoint
+	309, // 84: core.WebhookEndpointListResp.base:type_name -> common.RespBase
+	111, // 85: core.WebhookEndpointListResp.data:type_name -> core.WebhookEndpoint
+	309, // 86: core.WebhookEndpointSecretResp.base:type_name -> common.RespBase
+	112, // 87: core.WebhookEndpointSecretResp.data:type_name -> core.WebhookEndpointSecret
+	310, // 88: core.WebhookDeliveryListReq.page:type_name -> common.PageReq
+	16,  // 89: core.WebhookDeliveryListReq.status:type_name -> core.WebhookDeliveryStatus
+	309, // 90: core.WebhookDeliveryListResp.base:type_name -> common.RespBase
+	113, // 91: core.WebhookDeliveryListResp.data:type_name -> core.WebhookDelivery
+	309, // 92: core.WebhookDeliveryResp.base:type_name -> common.RespBase
+	113, // 93: core.WebhookDeliveryResp.data:type_name -> core.WebhookDelivery
+	17,  // 94: core.SourceIntegration.platform:type_name -> core.SourcePlatform
+	18,  // 95: core.SourceIntegration.status:type_name -> core.SourceIntegrationStatus
+	17,  // 96: core.CompleteSourceIntegrationReq.platform:type_name -> core.SourcePlatform
+	310, // 97: core.SourceIntegrationListReq.page:type_name -> common.PageReq
+	17,  // 98: core.SourceIntegrationListReq.platform:type_name -> core.SourcePlatform
+	18,  // 99: core.SourceIntegrationListReq.status:type_name -> core.SourceIntegrationStatus
+	309, // 100: core.SourceIntegrationResp.base:type_name -> common.RespBase
+	126, // 101: core.SourceIntegrationResp.data:type_name -> core.SourceIntegration
+	309, // 102: core.SourceIntegrationListResp.base:type_name -> common.RespBase
+	126, // 103: core.SourceIntegrationListResp.data:type_name -> core.SourceIntegration
+	126, // 104: core.SourceIntegrationCredential.integration:type_name -> core.SourceIntegration
+	309, // 105: core.SourceIntegrationCredentialResp.base:type_name -> common.RespBase
+	132, // 106: core.SourceIntegrationCredentialResp.data:type_name -> core.SourceIntegrationCredential
+	19,  // 107: core.SourceRepository.status:type_name -> core.SourceRepositoryStatus
+	310, // 108: core.SourceRepositoryListReq.page:type_name -> common.PageReq
+	19,  // 109: core.SourceRepositoryListReq.status:type_name -> core.SourceRepositoryStatus
+	309, // 110: core.SourceRepositoryResp.base:type_name -> common.RespBase
+	134, // 111: core.SourceRepositoryResp.data:type_name -> core.SourceRepository
+	309, // 112: core.SourceRepositoryListResp.base:type_name -> common.RespBase
+	134, // 113: core.SourceRepositoryListResp.data:type_name -> core.SourceRepository
+	20,  // 114: core.SourceArtifact.artifact_source:type_name -> core.SourceArtifactType
+	20,  // 115: core.RecordSourceArtifactReq.artifact_source:type_name -> core.SourceArtifactType
+	309, // 116: core.SourceArtifactResp.base:type_name -> common.RespBase
+	140, // 117: core.SourceArtifactResp.data:type_name -> core.SourceArtifact
+	20,  // 118: core.ImportSourceArtifactReq.artifact_source:type_name -> core.SourceArtifactType
+	50,  // 119: core.SourceArtifactImportResult.version:type_name -> core.Version
+	140, // 120: core.SourceArtifactImportResult.artifact:type_name -> core.SourceArtifact
+	309, // 121: core.SourceArtifactImportResp.base:type_name -> common.RespBase
+	144, // 122: core.SourceArtifactImportResp.data:type_name -> core.SourceArtifactImportResult
+	21,  // 123: core.SourceBuildTrigger.event_type:type_name -> core.SourceBuildTriggerEventType
+	22,  // 124: core.SourceBuildTrigger.status:type_name -> core.SourceBuildTriggerStatus
+	17,  // 125: core.SourceBuildTrigger.platform:type_name -> core.SourcePlatform
+	21,  // 126: core.CreateSourceBuildTriggerReq.event_type:type_name -> core.SourceBuildTriggerEventType
+	21,  // 127: core.UpdateSourceBuildTriggerReq.event_type:type_name -> core.SourceBuildTriggerEventType
+	22,  // 128: core.UpdateSourceBuildTriggerReq.status:type_name -> core.SourceBuildTriggerStatus
+	310, // 129: core.SourceBuildTriggerListReq.page:type_name -> common.PageReq
+	22,  // 130: core.SourceBuildTriggerListReq.status:type_name -> core.SourceBuildTriggerStatus
+	309, // 131: core.SourceBuildTriggerResp.base:type_name -> common.RespBase
+	146, // 132: core.SourceBuildTriggerResp.data:type_name -> core.SourceBuildTrigger
+	309, // 133: core.SourceBuildTriggerListResp.base:type_name -> common.RespBase
+	146, // 134: core.SourceBuildTriggerListResp.data:type_name -> core.SourceBuildTrigger
+	146, // 135: core.SourceBuildTriggerSecret.trigger:type_name -> core.SourceBuildTrigger
+	309, // 136: core.SourceBuildTriggerSecretResp.base:type_name -> common.RespBase
+	153, // 137: core.SourceBuildTriggerSecretResp.data:type_name -> core.SourceBuildTriggerSecret
+	146, // 138: core.SourceBuildTriggerCredential.trigger:type_name -> core.SourceBuildTrigger
+	309, // 139: core.SourceBuildTriggerCredentialResp.base:type_name -> common.RespBase
+	156, // 140: core.SourceBuildTriggerCredentialResp.data:type_name -> core.SourceBuildTriggerCredential
+	20,  // 141: core.SourceWebhookEvent.artifact_source:type_name -> core.SourceArtifactType
+	23,  // 142: core.SourceWebhookEvent.status:type_name -> core.SourceWebhookEventStatus
+	20,  // 143: core.EnqueueSourceWebhookEventReq.artifact_source:type_name -> core.SourceArtifactType
+	158, // 144: core.EnqueueSourceWebhookEventResult.event:type_name -> core.SourceWebhookEvent
+	309, // 145: core.EnqueueSourceWebhookEventResp.base:type_name -> common.RespBase
+	160, // 146: core.EnqueueSourceWebhookEventResp.data:type_name -> core.EnqueueSourceWebhookEventResult
+	158, // 147: core.ClaimedSourceWebhookEvent.event:type_name -> core.SourceWebhookEvent
+	146, // 148: core.ClaimedSourceWebhookEvent.trigger:type_name -> core.SourceBuildTrigger
+	309, // 149: core.ClaimSourceWebhookEventResp.base:type_name -> common.RespBase
+	163, // 150: core.ClaimSourceWebhookEventResp.data:type_name -> core.ClaimedSourceWebhookEvent
+	310, // 151: core.SourceWebhookEventListReq.page:type_name -> common.PageReq
+	23,  // 152: core.SourceWebhookEventListReq.status:type_name -> core.SourceWebhookEventStatus
+	309, // 153: core.SourceWebhookEventListResp.base:type_name -> common.RespBase
+	158, // 154: core.SourceWebhookEventListResp.data:type_name -> core.SourceWebhookEvent
+	309, // 155: core.BrandingProfileResp.base:type_name -> common.RespBase
+	55,  // 156: core.BrandingProfileResp.data:type_name -> core.BrandingProfile
+	310, // 157: core.BrandingProfileListReq.page:type_name -> common.PageReq
+	43,  // 158: core.BrandingProfileListReq.status:type_name -> core.BrandingProfileStatus
+	309, // 159: core.BrandingProfileListResp.base:type_name -> common.RespBase
+	55,  // 160: core.BrandingProfileListResp.data:type_name -> core.BrandingProfile
+	309, // 161: core.BrandingPreflightResp.base:type_name -> common.RespBase
+	56,  // 162: core.BrandingPreflightResp.data:type_name -> core.BrandingPreflight
+	310, // 163: core.BrandingPreflightListReq.page:type_name -> common.PageReq
+	44,  // 164: core.BrandingPreflightListReq.status:type_name -> core.BrandingPreflightStatus
+	309, // 165: core.BrandingPreflightListResp.base:type_name -> common.RespBase
+	56,  // 166: core.BrandingPreflightListResp.data:type_name -> core.BrandingPreflight
+	309, // 167: core.WhiteLabelTemplateResp.base:type_name -> common.RespBase
+	57,  // 168: core.WhiteLabelTemplateResp.data:type_name -> core.WhiteLabelTemplate
+	310, // 169: core.WhiteLabelTemplateListReq.page:type_name -> common.PageReq
+	45,  // 170: core.WhiteLabelTemplateListReq.status:type_name -> core.WhiteLabelTemplateStatus
+	309, // 171: core.WhiteLabelTemplateListResp.base:type_name -> common.RespBase
+	57,  // 172: core.WhiteLabelTemplateListResp.data:type_name -> core.WhiteLabelTemplate
+	309, // 173: core.WhiteLabelTemplateRevisionResp.base:type_name -> common.RespBase
+	58,  // 174: core.WhiteLabelTemplateRevisionResp.data:type_name -> core.WhiteLabelTemplateRevision
+	310, // 175: core.WhiteLabelTemplateRevisionListReq.page:type_name -> common.PageReq
+	46,  // 176: core.WhiteLabelTemplateRevisionListReq.status:type_name -> core.WhiteLabelRevisionStatus
+	309, // 177: core.WhiteLabelTemplateRevisionListResp.base:type_name -> common.RespBase
+	58,  // 178: core.WhiteLabelTemplateRevisionListResp.data:type_name -> core.WhiteLabelTemplateRevision
+	309, // 179: core.WhiteLabelProductResp.base:type_name -> common.RespBase
+	59,  // 180: core.WhiteLabelProductResp.data:type_name -> core.WhiteLabelProduct
+	310, // 181: core.WhiteLabelProductListReq.page:type_name -> common.PageReq
+	47,  // 182: core.WhiteLabelProductListReq.status:type_name -> core.WhiteLabelProductStatus
+	309, // 183: core.WhiteLabelProductListResp.base:type_name -> common.RespBase
+	59,  // 184: core.WhiteLabelProductListResp.data:type_name -> core.WhiteLabelProduct
+	309, // 185: core.WhiteLabelProductPreflightResp.base:type_name -> common.RespBase
+	310, // 186: core.ApplicationListReq.page:type_name -> common.PageReq
+	0,   // 187: core.ApplicationListReq.status:type_name -> core.ApplicationStatus
+	309, // 188: core.ApplicationListResp.base:type_name -> common.RespBase
+	49,  // 189: core.ApplicationListResp.data:type_name -> core.Application
+	310, // 190: core.VersionListReq.page:type_name -> common.PageReq
+	1,   // 191: core.VersionListReq.status:type_name -> core.VersionStatus
+	309, // 192: core.VersionListResp.base:type_name -> common.RespBase
+	50,  // 193: core.VersionListResp.data:type_name -> core.Version
+	310, // 194: core.ChannelListReq.page:type_name -> common.PageReq
+	2,   // 195: core.ChannelListReq.status:type_name -> core.ChannelStatus
+	309, // 196: core.ChannelListResp.base:type_name -> common.RespBase
+	51,  // 197: core.ChannelListResp.data:type_name -> core.Channel
+	310, // 198: core.BuildTaskListReq.page:type_name -> common.PageReq
+	3,   // 199: core.BuildTaskListReq.status:type_name -> core.BuildTaskStatus
+	309, // 200: core.BuildTaskListResp.base:type_name -> common.RespBase
+	53,  // 201: core.BuildTaskListResp.data:type_name -> core.BuildTask
+	4,   // 202: core.CreateStorageObjectReq.object_type:type_name -> core.StorageObjectType
+	309, // 203: core.ClaimExpiredStorageObjectsResp.base:type_name -> common.RespBase
+	201, // 204: core.ClaimExpiredStorageObjectsResp.data:type_name -> core.ExpiredStorageObject
+	309, // 205: core.StorageObjectResp.base:type_name -> common.RespBase
+	54,  // 206: core.StorageObjectResp.data:type_name -> core.StorageObject
+	6,   // 207: core.DrainBuilderNodeReq.drain_status:type_name -> core.BuilderDrainStatus
+	7,   // 208: core.UpsertBuildConcurrencyPolicyReq.status:type_name -> core.BuildPolicyStatus
+	62,  // 209: core.BuildCacheResolution.entry:type_name -> core.BuildCacheEntry
+	54,  // 210: core.BuildCacheResolution.artifact:type_name -> core.StorageObject
+	309, // 211: core.BuildCacheResolutionResp.base:type_name -> common.RespBase
+	219, // 212: core.BuildCacheResolutionResp.data:type_name -> core.BuildCacheResolution
+	309, // 213: core.CleanupBuildCacheResp.base:type_name -> common.RespBase
+	224, // 214: core.CleanupBuildCacheResp.data:type_name -> core.CleanupBuildCacheResult
+	45,  // 215: core.ChangeWhiteLabelTemplateStatusReq.status:type_name -> core.WhiteLabelTemplateStatus
+	47,  // 216: core.ChangeWhiteLabelProductStatusReq.status:type_name -> core.WhiteLabelProductStatus
+	42,  // 217: core.CreateBrandingProfileReq.rewrite_mode:type_name -> core.BrandingRewriteMode
+	42,  // 218: core.UpdateBrandingProfileReq.rewrite_mode:type_name -> core.BrandingRewriteMode
+	43,  // 219: core.ChangeBrandingProfileStatusReq.status:type_name -> core.BrandingProfileStatus
+	44,  // 220: core.CompleteBrandingPreflightReq.status:type_name -> core.BrandingPreflightStatus
+	56,  // 221: core.BrandingPreflightExecutionContext.preflight:type_name -> core.BrandingPreflight
+	55,  // 222: core.BrandingPreflightExecutionContext.profile:type_name -> core.BrandingProfile
+	50,  // 223: core.BrandingPreflightExecutionContext.version:type_name -> core.Version
+	54,  // 224: core.BrandingPreflightExecutionContext.source_apk:type_name -> core.StorageObject
+	54,  // 225: core.BrandingPreflightExecutionContext.brand_logo:type_name -> core.StorageObject
+	54,  // 226: core.BrandingPreflightExecutionContext.brand_splash:type_name -> core.StorageObject
+	309, // 227: core.BrandingPreflightExecutionContextResp.base:type_name -> common.RespBase
+	242, // 228: core.BrandingPreflightExecutionContextResp.data:type_name -> core.BrandingPreflightExecutionContext
+	309, // 229: core.ChannelStatsResp.base:type_name -> common.RespBase
+	246, // 230: core.ChannelStatsResp.data:type_name -> core.ChannelStats
+	309, // 231: core.ChannelDownloadArtifactResp.base:type_name -> common.RespBase
+	250, // 232: core.ChannelDownloadArtifactResp.data:type_name -> core.ChannelDownloadArtifact
+	3,   // 233: core.ReportBuildProgressReq.status:type_name -> core.BuildTaskStatus
+	53,  // 234: core.BuildExecutionContext.task:type_name -> core.BuildTask
+	54,  // 235: core.BuildExecutionContext.source_apk:type_name -> core.StorageObject
+	54,  // 236: core.BuildExecutionContext.keystore:type_name -> core.StorageObject
+	54,  // 237: core.BuildExecutionContext.brand_logo:type_name -> core.StorageObject
+	54,  // 238: core.BuildExecutionContext.brand_splash:type_name -> core.StorageObject
+	54,  // 239: core.BuildExecutionContext.template_files:type_name -> core.StorageObject
+	309, // 240: core.BuildExecutionContextResp.base:type_name -> common.RespBase
+	258, // 241: core.BuildExecutionContextResp.data:type_name -> core.BuildExecutionContext
+	24,  // 242: core.BillingPlan.billing_cycle:type_name -> core.BillingCycle
+	25,  // 243: core.BillingPlan.status:type_name -> core.BillingPlanStatus
+	24,  // 244: core.CreateBillingPlanReq.billing_cycle:type_name -> core.BillingCycle
+	25,  // 245: core.BillingPlanListReq.status:type_name -> core.BillingPlanStatus
+	309, // 246: core.BillingPlanResp.base:type_name -> common.RespBase
+	260, // 247: core.BillingPlanResp.data:type_name -> core.BillingPlan
+	309, // 248: core.BillingPlanListResp.base:type_name -> common.RespBase
+	260, // 249: core.BillingPlanListResp.data:type_name -> core.BillingPlan
+	26,  // 250: core.TenantSubscription.status:type_name -> core.TenantSubscriptionStatus
+	27,  // 251: core.TenantSubscription.source:type_name -> core.TenantSubscriptionSource
+	28,  // 252: core.TenantEntitlement.status:type_name -> core.TenantEntitlementStatus
+	309, // 253: core.TenantBillingResp.base:type_name -> common.RespBase
+	266, // 254: core.TenantBillingResp.subscription:type_name -> core.TenantSubscription
+	267, // 255: core.TenantBillingResp.entitlement:type_name -> core.TenantEntitlement
+	260, // 256: core.TenantBillingResp.plan:type_name -> core.BillingPlan
+	32,  // 257: core.ChangeTenantSubscriptionReq.mode:type_name -> core.SubscriptionChangeMode
+	30,  // 258: core.ReserveQuotaReq.metric:type_name -> core.QuotaMetric
+	30,  // 259: core.QuotaReservation.metric:type_name -> core.QuotaMetric
+	31,  // 260: core.QuotaReservation.status:type_name -> core.QuotaReservationStatus
+	309, // 261: core.QuotaReservationResp.base:type_name -> common.RespBase
+	274, // 262: core.QuotaReservationResp.data:type_name -> core.QuotaReservation
+	30,  // 263: core.QuotaReservationActionReq.metric:type_name -> core.QuotaMetric
+	29,  // 264: core.QuotaReservationActionReq.usage_metric:type_name -> core.BillingUsageMetric
+	29,  // 265: core.RecordUsageReq.metric:type_name -> core.BillingUsageMetric
+	29,  // 266: core.UsageMetricSummary.metric:type_name -> core.BillingUsageMetric
+	309, // 267: core.BillingUsageResp.base:type_name -> common.RespBase
+	278, // 268: core.BillingUsageResp.data:type_name -> core.UsageMetricSummary
+	29,  // 269: core.InvoiceItem.metric:type_name -> core.BillingUsageMetric
+	33,  // 270: core.Invoice.status:type_name -> core.InvoiceStatus
+	281, // 271: core.Invoice.items:type_name -> core.InvoiceItem
+	33,  // 272: core.InvoiceListReq.status:type_name -> core.InvoiceStatus
+	309, // 273: core.InvoiceListResp.base:type_name -> common.RespBase
+	282, // 274: core.InvoiceListResp.data:type_name -> core.Invoice
+	39,  // 275: core.LocalAgentCertificate.status:type_name -> core.LocalAgentCertificateStatus
+	36,  // 276: core.LocalAgent.status:type_name -> core.LocalAgentStatus
+	37,  // 277: core.LocalAgent.drain_status:type_name -> core.LocalAgentDrainStatus
+	38,  // 278: core.LocalAgent.artifact_mode:type_name -> core.HybridArtifactMode
+	286, // 279: core.LocalAgent.capabilities:type_name -> core.LocalAgentCapability
+	38,  // 280: core.CreateLocalAgentRegistrationReq.artifact_mode:type_name -> core.HybridArtifactMode
+	286, // 281: core.CreateLocalAgentRegistrationReq.capabilities:type_name -> core.LocalAgentCapability
+	309, // 282: core.LocalAgentRegistrationResp.base:type_name -> common.RespBase
+	288, // 283: core.LocalAgentRegistrationResp.data:type_name -> core.LocalAgent
+	309, // 284: core.RegisterLocalAgentResp.base:type_name -> common.RespBase
+	288, // 285: core.RegisterLocalAgentResp.data:type_name -> core.LocalAgent
+	287, // 286: core.RegisterLocalAgentResp.certificate:type_name -> core.LocalAgentCertificate
+	309, // 287: core.LocalAgentResp.base:type_name -> common.RespBase
+	288, // 288: core.LocalAgentResp.data:type_name -> core.LocalAgent
+	36,  // 289: core.LocalAgentListReq.status:type_name -> core.LocalAgentStatus
+	309, // 290: core.LocalAgentListResp.base:type_name -> common.RespBase
+	288, // 291: core.LocalAgentListResp.data:type_name -> core.LocalAgent
+	297, // 292: core.HeartbeatLocalAgentReq.auth:type_name -> core.LocalAgentAuth
+	286, // 293: core.HeartbeatLocalAgentReq.capabilities:type_name -> core.LocalAgentCapability
+	37,  // 294: core.DrainLocalAgentReq.drain_status:type_name -> core.LocalAgentDrainStatus
+	297, // 295: core.RotateLocalAgentCertificateReq.auth:type_name -> core.LocalAgentAuth
+	297, // 296: core.ClaimLocalAgentBuildTaskReq.auth:type_name -> core.LocalAgentAuth
+	309, // 297: core.LocalAgentBuildTaskResp.base:type_name -> common.RespBase
+	53,  // 298: core.LocalAgentBuildTaskResp.task:type_name -> core.BuildTask
+	38,  // 299: core.LocalAgentBuildTaskResp.artifact_mode:type_name -> core.HybridArtifactMode
+	297, // 300: core.RenewLocalAgentTaskLeaseReq.auth:type_name -> core.LocalAgentAuth
+	297, // 301: core.ReportLocalAgentBuildProgressReq.auth:type_name -> core.LocalAgentAuth
+	3,   // 302: core.ReportLocalAgentBuildProgressReq.status:type_name -> core.BuildTaskStatus
+	297, // 303: core.CompleteLocalAgentBuildTaskReq.auth:type_name -> core.LocalAgentAuth
+	297, // 304: core.FailLocalAgentBuildTaskReq.auth:type_name -> core.LocalAgentAuth
+	297, // 305: core.VerifyHybridArtifactReq.auth:type_name -> core.LocalAgentAuth
+	40,  // 306: core.VerifyHybridArtifactReq.artifact_type:type_name -> core.HybridArtifactType
+	38,  // 307: core.VerifyHybridArtifactReq.storage_mode:type_name -> core.HybridArtifactMode
+	193, // 308: core.Core.CreateApplication:input_type -> core.CreateApplicationReq
+	68,  // 309: core.Core.GetApplication:input_type -> core.ApplicationIdReq
+	185, // 310: core.Core.ListApplications:input_type -> core.ApplicationListReq
+	198, // 311: core.Core.CreateStorageObject:input_type -> core.CreateStorageObjectReq
+	205, // 312: core.Core.GetStorageObject:input_type -> core.StorageObjectIdReq
+	199, // 313: core.Core.CompleteStorageObject:input_type -> core.CompleteStorageObjectReq
+	200, // 314: core.Core.FailStorageObject:input_type -> core.FailStorageObjectReq
+	202, // 315: core.Core.ClaimExpiredStorageObjects:input_type -> core.ClaimExpiredStorageObjectsReq
+	204, // 316: core.Core.MarkStorageObjectDeleted:input_type -> core.MarkStorageObjectDeletedReq
+	194, // 317: core.Core.CreateVersion:input_type -> core.CreateVersionReq
+	69,  // 318: core.Core.GetVersion:input_type -> core.VersionIdReq
+	187, // 319: core.Core.ListVersions:input_type -> core.VersionListReq
+	195, // 320: core.Core.CreateChannel:input_type -> core.CreateChannelReq
+	70,  // 321: core.Core.GetChannel:input_type -> core.ChannelIdReq
+	189, // 322: core.Core.ListChannels:input_type -> core.ChannelListReq
+	197, // 323: core.Core.CreateSigningConfig:input_type -> core.CreateSigningConfigReq
+	196, // 324: core.Core.GetSigningConfig:input_type -> core.SigningConfigIdReq
+	81,  // 325: core.Core.ListSigningConfigs:input_type -> core.SigningConfigListReq
+	236, // 326: core.Core.CreateBrandingProfile:input_type -> core.CreateBrandingProfileReq
+	237, // 327: core.Core.UpdateBrandingProfile:input_type -> core.UpdateBrandingProfileReq
+	72,  // 328: core.Core.GetBrandingProfile:input_type -> core.BrandingProfileIdReq
+	170, // 329: core.Core.ListBrandingProfiles:input_type -> core.BrandingProfileListReq
+	238, // 330: core.Core.ChangeBrandingProfileStatus:input_type -> core.ChangeBrandingProfileStatusReq
+	239, // 331: core.Core.CreateBrandingPreflight:input_type -> core.CreateBrandingPreflightReq
+	73,  // 332: core.Core.GetBrandingPreflight:input_type -> core.BrandingPreflightIdReq
+	173, // 333: core.Core.ListBrandingPreflights:input_type -> core.BrandingPreflightListReq
+	241, // 334: core.Core.ClaimBrandingPreflight:input_type -> core.ClaimBrandingPreflightReq
+	240, // 335: core.Core.CompleteBrandingPreflight:input_type -> core.CompleteBrandingPreflightReq
+	226, // 336: core.Core.CreateWhiteLabelTemplate:input_type -> core.CreateWhiteLabelTemplateReq
+	227, // 337: core.Core.UpdateWhiteLabelTemplate:input_type -> core.UpdateWhiteLabelTemplateReq
+	228, // 338: core.Core.CopyWhiteLabelTemplate:input_type -> core.CopyWhiteLabelTemplateReq
+	74,  // 339: core.Core.DeleteWhiteLabelTemplate:input_type -> core.WhiteLabelTemplateIdReq
+	74,  // 340: core.Core.GetWhiteLabelTemplate:input_type -> core.WhiteLabelTemplateIdReq
+	176, // 341: core.Core.ListWhiteLabelTemplates:input_type -> core.WhiteLabelTemplateListReq
+	229, // 342: core.Core.CreateWhiteLabelTemplateRevision:input_type -> core.CreateWhiteLabelTemplateRevisionReq
+	75,  // 343: core.Core.GetWhiteLabelTemplateRevision:input_type -> core.WhiteLabelTemplateRevisionIdReq
+	230, // 344: core.Core.UpdateWhiteLabelTemplateRevision:input_type -> core.UpdateWhiteLabelTemplateRevisionReq
+	75,  // 345: core.Core.DeleteWhiteLabelTemplateRevision:input_type -> core.WhiteLabelTemplateRevisionIdReq
+	179, // 346: core.Core.ListWhiteLabelTemplateRevisions:input_type -> core.WhiteLabelTemplateRevisionListReq
+	231, // 347: core.Core.PublishWhiteLabelTemplate:input_type -> core.PublishWhiteLabelTemplateReq
+	234, // 348: core.Core.ChangeWhiteLabelTemplateStatus:input_type -> core.ChangeWhiteLabelTemplateStatusReq
+	232, // 349: core.Core.CreateWhiteLabelProduct:input_type -> core.CreateWhiteLabelProductReq
+	233, // 350: core.Core.UpdateWhiteLabelProduct:input_type -> core.UpdateWhiteLabelProductReq
+	76,  // 351: core.Core.DeleteWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
+	76,  // 352: core.Core.GetWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
+	182, // 353: core.Core.ListWhiteLabelProducts:input_type -> core.WhiteLabelProductListReq
+	235, // 354: core.Core.ChangeWhiteLabelProductStatus:input_type -> core.ChangeWhiteLabelProductStatusReq
+	76,  // 355: core.Core.PreflightWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
+	207, // 356: core.Core.CreateBuildTask:input_type -> core.CreateBuildTaskReq
+	71,  // 357: core.Core.GetBuildTask:input_type -> core.BuildTaskIdReq
+	191, // 358: core.Core.ListBuildTasks:input_type -> core.BuildTaskListReq
+	214, // 359: core.Core.CancelBuildTask:input_type -> core.CancelBuildTaskReq
+	215, // 360: core.Core.RetryBuildTask:input_type -> core.RetryBuildTaskReq
+	208, // 361: core.Core.GetBuilderNode:input_type -> core.BuilderNodeIdReq
+	85,  // 362: core.Core.ListBuilderNodes:input_type -> core.BuilderNodeListReq
+	211, // 363: core.Core.DrainBuilderNode:input_type -> core.DrainBuilderNodeReq
+	212, // 364: core.Core.RecoverBuilderNode:input_type -> core.RecoverBuilderNodeReq
+	216, // 365: core.Core.UpsertBuildConcurrencyPolicy:input_type -> core.UpsertBuildConcurrencyPolicyReq
+	88,  // 366: core.Core.ListBuildConcurrencyPolicies:input_type -> core.BuildConcurrencyPolicyListReq
+	91,  // 367: core.Core.ListBuildCacheEntries:input_type -> core.BuildCacheEntryListReq
+	222, // 368: core.Core.InvalidateBuildCache:input_type -> core.InvalidateBuildCacheReq
+	93,  // 369: core.Core.ListBuildSchedulerEvents:input_type -> core.BuildSchedulerEventListReq
+	95,  // 370: core.Core.GetBuildClusterMetrics:input_type -> core.BuildClusterMetricsReq
+	101, // 371: core.Core.CreateOpenApiCredential:input_type -> core.CreateOpenApiCredentialReq
+	97,  // 372: core.Core.ListOpenApiCredentials:input_type -> core.OpenApiCredentialListReq
+	103, // 373: core.Core.RotateOpenApiCredential:input_type -> core.RotateOpenApiCredentialReq
+	102, // 374: core.Core.RevokeOpenApiCredential:input_type -> core.OpenApiCredentialIdReq
+	104, // 375: core.Core.AuthenticateOpenApiCredential:input_type -> core.AuthenticateOpenApiCredentialReq
+	106, // 376: core.Core.BeginOpenApiIdempotency:input_type -> core.BeginOpenApiIdempotencyReq
+	109, // 377: core.Core.CompleteOpenApiIdempotency:input_type -> core.CompleteOpenApiIdempotencyReq
+	110, // 378: core.Core.RecordOpenApiAudit:input_type -> core.RecordOpenApiAuditReq
+	114, // 379: core.Core.CreateWebhookEndpoint:input_type -> core.CreateWebhookEndpointReq
+	115, // 380: core.Core.UpdateWebhookEndpoint:input_type -> core.UpdateWebhookEndpointReq
+	116, // 381: core.Core.GetWebhookEndpoint:input_type -> core.WebhookEndpointIdReq
+	117, // 382: core.Core.ListWebhookEndpoints:input_type -> core.WebhookEndpointListReq
+	116, // 383: core.Core.RotateWebhookEndpointSecret:input_type -> core.WebhookEndpointIdReq
+	121, // 384: core.Core.ListWebhookDeliveries:input_type -> core.WebhookDeliveryListReq
+	124, // 385: core.Core.ReplayWebhookDelivery:input_type -> core.WebhookDeliveryIdReq
+	125, // 386: core.Core.CreateTestWebhookEvent:input_type -> core.CreateTestWebhookEventReq
+	127, // 387: core.Core.CompleteSourceIntegration:input_type -> core.CompleteSourceIntegrationReq
+	128, // 388: core.Core.GetSourceIntegration:input_type -> core.SourceIntegrationIdReq
+	129, // 389: core.Core.ListSourceIntegrations:input_type -> core.SourceIntegrationListReq
+	128, // 390: core.Core.GetSourceIntegrationCredential:input_type -> core.SourceIntegrationIdReq
+	128, // 391: core.Core.DisconnectSourceIntegration:input_type -> core.SourceIntegrationIdReq
+	135, // 392: core.Core.AuthorizeSourceRepository:input_type -> core.AuthorizeSourceRepositoryReq
+	136, // 393: core.Core.GetSourceRepository:input_type -> core.SourceRepositoryIdReq
+	137, // 394: core.Core.ListSourceRepositories:input_type -> core.SourceRepositoryListReq
+	136, // 395: core.Core.RevokeSourceRepository:input_type -> core.SourceRepositoryIdReq
+	141, // 396: core.Core.RecordSourceArtifact:input_type -> core.RecordSourceArtifactReq
+	143, // 397: core.Core.ImportSourceArtifact:input_type -> core.ImportSourceArtifactReq
+	147, // 398: core.Core.CreateSourceBuildTrigger:input_type -> core.CreateSourceBuildTriggerReq
+	148, // 399: core.Core.UpdateSourceBuildTrigger:input_type -> core.UpdateSourceBuildTriggerReq
+	149, // 400: core.Core.GetSourceBuildTrigger:input_type -> core.SourceBuildTriggerIdReq
+	150, // 401: core.Core.ListSourceBuildTriggers:input_type -> core.SourceBuildTriggerListReq
+	149, // 402: core.Core.RotateSourceBuildTriggerSecret:input_type -> core.SourceBuildTriggerIdReq
+	155, // 403: core.Core.ResolveSourceBuildTrigger:input_type -> core.ResolveSourceBuildTriggerReq
+	159, // 404: core.Core.EnqueueSourceWebhookEvent:input_type -> core.EnqueueSourceWebhookEventReq
+	162, // 405: core.Core.ClaimSourceWebhookEvent:input_type -> core.ClaimSourceWebhookEventReq
+	165, // 406: core.Core.CompleteSourceWebhookEvent:input_type -> core.CompleteSourceWebhookEventReq
+	166, // 407: core.Core.FailSourceWebhookEvent:input_type -> core.FailSourceWebhookEventReq
+	167, // 408: core.Core.ListSourceWebhookEvents:input_type -> core.SourceWebhookEventListReq
+	261, // 409: core.Core.CreateBillingPlan:input_type -> core.CreateBillingPlanReq
+	262, // 410: core.Core.GetBillingPlan:input_type -> core.BillingPlanIdReq
+	263, // 411: core.Core.ListBillingPlans:input_type -> core.BillingPlanListReq
+	262, // 412: core.Core.RetireBillingPlan:input_type -> core.BillingPlanIdReq
+	268, // 413: core.Core.GetTenantBilling:input_type -> core.TenantBillingReq
+	270, // 414: core.Core.UpsertManualSubscription:input_type -> core.UpsertManualSubscriptionReq
+	271, // 415: core.Core.ChangeTenantSubscription:input_type -> core.ChangeTenantSubscriptionReq
+	272, // 416: core.Core.CancelTenantSubscription:input_type -> core.CancelTenantSubscriptionReq
+	273, // 417: core.Core.ReserveQuota:input_type -> core.ReserveQuotaReq
+	276, // 418: core.Core.ConfirmQuota:input_type -> core.QuotaReservationActionReq
+	276, // 419: core.Core.ReleaseQuota:input_type -> core.QuotaReservationActionReq
+	277, // 420: core.Core.RecordUsage:input_type -> core.RecordUsageReq
+	279, // 421: core.Core.GetBillingUsage:input_type -> core.BillingUsageReq
+	283, // 422: core.Core.ListInvoices:input_type -> core.InvoiceListReq
+	285, // 423: core.Core.ApplyBillingWebhook:input_type -> core.ApplyBillingWebhookReq
+	289, // 424: core.Core.CreateLocalAgentRegistration:input_type -> core.CreateLocalAgentRegistrationReq
+	291, // 425: core.Core.RegisterLocalAgent:input_type -> core.RegisterLocalAgentReq
+	293, // 426: core.Core.GetLocalAgent:input_type -> core.LocalAgentIdReq
+	295, // 427: core.Core.ListLocalAgents:input_type -> core.LocalAgentListReq
+	298, // 428: core.Core.HeartbeatLocalAgent:input_type -> core.HeartbeatLocalAgentReq
+	299, // 429: core.Core.DrainLocalAgent:input_type -> core.DrainLocalAgentReq
+	300, // 430: core.Core.RevokeLocalAgent:input_type -> core.RevokeLocalAgentReq
+	301, // 431: core.Core.RotateLocalAgentCertificate:input_type -> core.RotateLocalAgentCertificateReq
+	302, // 432: core.Core.ClaimLocalAgentBuildTask:input_type -> core.ClaimLocalAgentBuildTaskReq
+	304, // 433: core.Core.RenewLocalAgentTaskLease:input_type -> core.RenewLocalAgentTaskLeaseReq
+	305, // 434: core.Core.ReportLocalAgentBuildProgress:input_type -> core.ReportLocalAgentBuildProgressReq
+	306, // 435: core.Core.CompleteLocalAgentBuildTask:input_type -> core.CompleteLocalAgentBuildTaskReq
+	307, // 436: core.Core.FailLocalAgentBuildTask:input_type -> core.FailLocalAgentBuildTaskReq
+	308, // 437: core.Core.VerifyHybridArtifact:input_type -> core.VerifyHybridArtifactReq
+	244, // 438: core.Core.ReportInstall:input_type -> core.InstallReportReq
+	248, // 439: core.Core.ReportChannelEvent:input_type -> core.ReportChannelEventReq
+	245, // 440: core.Core.GetChannelStats:input_type -> core.ChannelStatsReq
+	249, // 441: core.Core.ResolveChannelDownload:input_type -> core.ResolveChannelDownloadReq
+	252, // 442: core.Core.ClaimBuildTask:input_type -> core.ClaimBuildTaskReq
+	209, // 443: core.Core.RegisterBuilderNode:input_type -> core.RegisterBuilderNodeReq
+	210, // 444: core.Core.BuilderNodeHeartbeat:input_type -> core.BuilderNodeHeartbeatReq
+	213, // 445: core.Core.ClaimScheduledBuildTask:input_type -> core.ClaimScheduledBuildTaskReq
+	218, // 446: core.Core.ResolveBuildCache:input_type -> core.ResolveBuildCacheReq
+	221, // 447: core.Core.PublishBuildCache:input_type -> core.PublishBuildCacheReq
+	223, // 448: core.Core.CleanupBuildCache:input_type -> core.CleanupBuildCacheReq
+	257, // 449: core.Core.GetBuildExecutionContext:input_type -> core.GetBuildExecutionContextReq
+	253, // 450: core.Core.HeartbeatBuildTask:input_type -> core.HeartbeatBuildTaskReq
+	254, // 451: core.Core.ReportBuildProgress:input_type -> core.ReportBuildProgressReq
+	255, // 452: core.Core.CompleteBuildTask:input_type -> core.CompleteBuildTaskReq
+	256, // 453: core.Core.FailBuildTask:input_type -> core.FailBuildTaskReq
+	77,  // 454: core.Core.CreateApplication:output_type -> core.ApplicationResp
+	77,  // 455: core.Core.GetApplication:output_type -> core.ApplicationResp
+	186, // 456: core.Core.ListApplications:output_type -> core.ApplicationListResp
+	206, // 457: core.Core.CreateStorageObject:output_type -> core.StorageObjectResp
+	206, // 458: core.Core.GetStorageObject:output_type -> core.StorageObjectResp
+	206, // 459: core.Core.CompleteStorageObject:output_type -> core.StorageObjectResp
+	48,  // 460: core.Core.FailStorageObject:output_type -> core.RespBase
+	203, // 461: core.Core.ClaimExpiredStorageObjects:output_type -> core.ClaimExpiredStorageObjectsResp
+	48,  // 462: core.Core.MarkStorageObjectDeleted:output_type -> core.RespBase
+	78,  // 463: core.Core.CreateVersion:output_type -> core.VersionResp
+	78,  // 464: core.Core.GetVersion:output_type -> core.VersionResp
+	188, // 465: core.Core.ListVersions:output_type -> core.VersionListResp
+	79,  // 466: core.Core.CreateChannel:output_type -> core.ChannelResp
+	79,  // 467: core.Core.GetChannel:output_type -> core.ChannelResp
+	190, // 468: core.Core.ListChannels:output_type -> core.ChannelListResp
+	80,  // 469: core.Core.CreateSigningConfig:output_type -> core.SigningConfigResp
+	80,  // 470: core.Core.GetSigningConfig:output_type -> core.SigningConfigResp
+	82,  // 471: core.Core.ListSigningConfigs:output_type -> core.SigningConfigListResp
+	169, // 472: core.Core.CreateBrandingProfile:output_type -> core.BrandingProfileResp
+	169, // 473: core.Core.UpdateBrandingProfile:output_type -> core.BrandingProfileResp
+	169, // 474: core.Core.GetBrandingProfile:output_type -> core.BrandingProfileResp
+	171, // 475: core.Core.ListBrandingProfiles:output_type -> core.BrandingProfileListResp
+	169, // 476: core.Core.ChangeBrandingProfileStatus:output_type -> core.BrandingProfileResp
+	172, // 477: core.Core.CreateBrandingPreflight:output_type -> core.BrandingPreflightResp
+	172, // 478: core.Core.GetBrandingPreflight:output_type -> core.BrandingPreflightResp
+	174, // 479: core.Core.ListBrandingPreflights:output_type -> core.BrandingPreflightListResp
+	243, // 480: core.Core.ClaimBrandingPreflight:output_type -> core.BrandingPreflightExecutionContextResp
+	172, // 481: core.Core.CompleteBrandingPreflight:output_type -> core.BrandingPreflightResp
+	175, // 482: core.Core.CreateWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
+	175, // 483: core.Core.UpdateWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
+	175, // 484: core.Core.CopyWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
+	48,  // 485: core.Core.DeleteWhiteLabelTemplate:output_type -> core.RespBase
+	175, // 486: core.Core.GetWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
+	177, // 487: core.Core.ListWhiteLabelTemplates:output_type -> core.WhiteLabelTemplateListResp
+	178, // 488: core.Core.CreateWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
+	178, // 489: core.Core.GetWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
+	178, // 490: core.Core.UpdateWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
+	48,  // 491: core.Core.DeleteWhiteLabelTemplateRevision:output_type -> core.RespBase
+	180, // 492: core.Core.ListWhiteLabelTemplateRevisions:output_type -> core.WhiteLabelTemplateRevisionListResp
+	175, // 493: core.Core.PublishWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
+	175, // 494: core.Core.ChangeWhiteLabelTemplateStatus:output_type -> core.WhiteLabelTemplateResp
+	181, // 495: core.Core.CreateWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
+	181, // 496: core.Core.UpdateWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
+	48,  // 497: core.Core.DeleteWhiteLabelProduct:output_type -> core.RespBase
+	181, // 498: core.Core.GetWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
+	183, // 499: core.Core.ListWhiteLabelProducts:output_type -> core.WhiteLabelProductListResp
+	181, // 500: core.Core.ChangeWhiteLabelProductStatus:output_type -> core.WhiteLabelProductResp
+	184, // 501: core.Core.PreflightWhiteLabelProduct:output_type -> core.WhiteLabelProductPreflightResp
+	83,  // 502: core.Core.CreateBuildTask:output_type -> core.BuildTaskResp
+	83,  // 503: core.Core.GetBuildTask:output_type -> core.BuildTaskResp
+	192, // 504: core.Core.ListBuildTasks:output_type -> core.BuildTaskListResp
+	83,  // 505: core.Core.CancelBuildTask:output_type -> core.BuildTaskResp
+	83,  // 506: core.Core.RetryBuildTask:output_type -> core.BuildTaskResp
+	84,  // 507: core.Core.GetBuilderNode:output_type -> core.BuilderNodeResp
+	86,  // 508: core.Core.ListBuilderNodes:output_type -> core.BuilderNodeListResp
+	84,  // 509: core.Core.DrainBuilderNode:output_type -> core.BuilderNodeResp
+	84,  // 510: core.Core.RecoverBuilderNode:output_type -> core.BuilderNodeResp
+	87,  // 511: core.Core.UpsertBuildConcurrencyPolicy:output_type -> core.BuildConcurrencyPolicyResp
+	89,  // 512: core.Core.ListBuildConcurrencyPolicies:output_type -> core.BuildConcurrencyPolicyListResp
+	92,  // 513: core.Core.ListBuildCacheEntries:output_type -> core.BuildCacheEntryListResp
+	90,  // 514: core.Core.InvalidateBuildCache:output_type -> core.BuildCacheEntryResp
+	94,  // 515: core.Core.ListBuildSchedulerEvents:output_type -> core.BuildSchedulerEventListResp
+	96,  // 516: core.Core.GetBuildClusterMetrics:output_type -> core.BuildClusterMetricsResp
+	100, // 517: core.Core.CreateOpenApiCredential:output_type -> core.OpenApiCredentialSecretResp
+	98,  // 518: core.Core.ListOpenApiCredentials:output_type -> core.OpenApiCredentialListResp
+	100, // 519: core.Core.RotateOpenApiCredential:output_type -> core.OpenApiCredentialSecretResp
+	99,  // 520: core.Core.RevokeOpenApiCredential:output_type -> core.OpenApiCredentialResp
+	105, // 521: core.Core.AuthenticateOpenApiCredential:output_type -> core.OpenApiAuthContextResp
+	108, // 522: core.Core.BeginOpenApiIdempotency:output_type -> core.OpenApiIdempotencyResp
+	48,  // 523: core.Core.CompleteOpenApiIdempotency:output_type -> core.RespBase
+	48,  // 524: core.Core.RecordOpenApiAudit:output_type -> core.RespBase
+	120, // 525: core.Core.CreateWebhookEndpoint:output_type -> core.WebhookEndpointSecretResp
+	118, // 526: core.Core.UpdateWebhookEndpoint:output_type -> core.WebhookEndpointResp
+	118, // 527: core.Core.GetWebhookEndpoint:output_type -> core.WebhookEndpointResp
+	119, // 528: core.Core.ListWebhookEndpoints:output_type -> core.WebhookEndpointListResp
+	120, // 529: core.Core.RotateWebhookEndpointSecret:output_type -> core.WebhookEndpointSecretResp
+	122, // 530: core.Core.ListWebhookDeliveries:output_type -> core.WebhookDeliveryListResp
+	123, // 531: core.Core.ReplayWebhookDelivery:output_type -> core.WebhookDeliveryResp
+	48,  // 532: core.Core.CreateTestWebhookEvent:output_type -> core.RespBase
+	130, // 533: core.Core.CompleteSourceIntegration:output_type -> core.SourceIntegrationResp
+	130, // 534: core.Core.GetSourceIntegration:output_type -> core.SourceIntegrationResp
+	131, // 535: core.Core.ListSourceIntegrations:output_type -> core.SourceIntegrationListResp
+	133, // 536: core.Core.GetSourceIntegrationCredential:output_type -> core.SourceIntegrationCredentialResp
+	130, // 537: core.Core.DisconnectSourceIntegration:output_type -> core.SourceIntegrationResp
+	138, // 538: core.Core.AuthorizeSourceRepository:output_type -> core.SourceRepositoryResp
+	138, // 539: core.Core.GetSourceRepository:output_type -> core.SourceRepositoryResp
+	139, // 540: core.Core.ListSourceRepositories:output_type -> core.SourceRepositoryListResp
+	138, // 541: core.Core.RevokeSourceRepository:output_type -> core.SourceRepositoryResp
+	142, // 542: core.Core.RecordSourceArtifact:output_type -> core.SourceArtifactResp
+	145, // 543: core.Core.ImportSourceArtifact:output_type -> core.SourceArtifactImportResp
+	154, // 544: core.Core.CreateSourceBuildTrigger:output_type -> core.SourceBuildTriggerSecretResp
+	151, // 545: core.Core.UpdateSourceBuildTrigger:output_type -> core.SourceBuildTriggerResp
+	151, // 546: core.Core.GetSourceBuildTrigger:output_type -> core.SourceBuildTriggerResp
+	152, // 547: core.Core.ListSourceBuildTriggers:output_type -> core.SourceBuildTriggerListResp
+	154, // 548: core.Core.RotateSourceBuildTriggerSecret:output_type -> core.SourceBuildTriggerSecretResp
+	157, // 549: core.Core.ResolveSourceBuildTrigger:output_type -> core.SourceBuildTriggerCredentialResp
+	161, // 550: core.Core.EnqueueSourceWebhookEvent:output_type -> core.EnqueueSourceWebhookEventResp
+	164, // 551: core.Core.ClaimSourceWebhookEvent:output_type -> core.ClaimSourceWebhookEventResp
+	48,  // 552: core.Core.CompleteSourceWebhookEvent:output_type -> core.RespBase
+	48,  // 553: core.Core.FailSourceWebhookEvent:output_type -> core.RespBase
+	168, // 554: core.Core.ListSourceWebhookEvents:output_type -> core.SourceWebhookEventListResp
+	264, // 555: core.Core.CreateBillingPlan:output_type -> core.BillingPlanResp
+	264, // 556: core.Core.GetBillingPlan:output_type -> core.BillingPlanResp
+	265, // 557: core.Core.ListBillingPlans:output_type -> core.BillingPlanListResp
+	264, // 558: core.Core.RetireBillingPlan:output_type -> core.BillingPlanResp
+	269, // 559: core.Core.GetTenantBilling:output_type -> core.TenantBillingResp
+	269, // 560: core.Core.UpsertManualSubscription:output_type -> core.TenantBillingResp
+	269, // 561: core.Core.ChangeTenantSubscription:output_type -> core.TenantBillingResp
+	269, // 562: core.Core.CancelTenantSubscription:output_type -> core.TenantBillingResp
+	275, // 563: core.Core.ReserveQuota:output_type -> core.QuotaReservationResp
+	275, // 564: core.Core.ConfirmQuota:output_type -> core.QuotaReservationResp
+	275, // 565: core.Core.ReleaseQuota:output_type -> core.QuotaReservationResp
+	48,  // 566: core.Core.RecordUsage:output_type -> core.RespBase
+	280, // 567: core.Core.GetBillingUsage:output_type -> core.BillingUsageResp
+	284, // 568: core.Core.ListInvoices:output_type -> core.InvoiceListResp
+	48,  // 569: core.Core.ApplyBillingWebhook:output_type -> core.RespBase
+	290, // 570: core.Core.CreateLocalAgentRegistration:output_type -> core.LocalAgentRegistrationResp
+	292, // 571: core.Core.RegisterLocalAgent:output_type -> core.RegisterLocalAgentResp
+	294, // 572: core.Core.GetLocalAgent:output_type -> core.LocalAgentResp
+	296, // 573: core.Core.ListLocalAgents:output_type -> core.LocalAgentListResp
+	294, // 574: core.Core.HeartbeatLocalAgent:output_type -> core.LocalAgentResp
+	294, // 575: core.Core.DrainLocalAgent:output_type -> core.LocalAgentResp
+	294, // 576: core.Core.RevokeLocalAgent:output_type -> core.LocalAgentResp
+	292, // 577: core.Core.RotateLocalAgentCertificate:output_type -> core.RegisterLocalAgentResp
+	303, // 578: core.Core.ClaimLocalAgentBuildTask:output_type -> core.LocalAgentBuildTaskResp
+	48,  // 579: core.Core.RenewLocalAgentTaskLease:output_type -> core.RespBase
+	48,  // 580: core.Core.ReportLocalAgentBuildProgress:output_type -> core.RespBase
+	48,  // 581: core.Core.CompleteLocalAgentBuildTask:output_type -> core.RespBase
+	48,  // 582: core.Core.FailLocalAgentBuildTask:output_type -> core.RespBase
+	48,  // 583: core.Core.VerifyHybridArtifact:output_type -> core.RespBase
+	48,  // 584: core.Core.ReportInstall:output_type -> core.RespBase
+	48,  // 585: core.Core.ReportChannelEvent:output_type -> core.RespBase
+	247, // 586: core.Core.GetChannelStats:output_type -> core.ChannelStatsResp
+	251, // 587: core.Core.ResolveChannelDownload:output_type -> core.ChannelDownloadArtifactResp
+	83,  // 588: core.Core.ClaimBuildTask:output_type -> core.BuildTaskResp
+	84,  // 589: core.Core.RegisterBuilderNode:output_type -> core.BuilderNodeResp
+	84,  // 590: core.Core.BuilderNodeHeartbeat:output_type -> core.BuilderNodeResp
+	83,  // 591: core.Core.ClaimScheduledBuildTask:output_type -> core.BuildTaskResp
+	220, // 592: core.Core.ResolveBuildCache:output_type -> core.BuildCacheResolutionResp
+	90,  // 593: core.Core.PublishBuildCache:output_type -> core.BuildCacheEntryResp
+	225, // 594: core.Core.CleanupBuildCache:output_type -> core.CleanupBuildCacheResp
+	259, // 595: core.Core.GetBuildExecutionContext:output_type -> core.BuildExecutionContextResp
+	48,  // 596: core.Core.HeartbeatBuildTask:output_type -> core.RespBase
+	48,  // 597: core.Core.ReportBuildProgress:output_type -> core.RespBase
+	48,  // 598: core.Core.CompleteBuildTask:output_type -> core.RespBase
+	48,  // 599: core.Core.FailBuildTask:output_type -> core.RespBase
+	454, // [454:600] is the sub-list for method output_type
+	308, // [308:454] is the sub-list for method input_type
+	308, // [308:308] is the sub-list for extension type_name
+	308, // [308:308] is the sub-list for extension extendee
+	0,   // [0:308] is the sub-list for field type_name
 }
 
 func init() { file_proto_core_core_proto_init() }
@@ -9741,8 +26703,8 @@ func file_proto_core_core_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_core_core_proto_rawDesc), len(file_proto_core_core_proto_rawDesc)),
-			NumEnums:      12,
-			NumMessages:   101,
+			NumEnums:      48,
+			NumMessages:   261,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

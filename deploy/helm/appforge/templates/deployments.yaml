@@ -1,0 +1,151 @@
+{{- $root := . -}}
+{{- $components := list
+  (dict "name" "api" "replicas" .Values.replicas.api "image" "api" "port" 8888 "probe" "http" "role" "")
+  (dict "name" "system" "replicas" .Values.replicas.system "image" "system" "port" 8080 "probe" "tcp" "role" "")
+  (dict "name" "core" "replicas" .Values.replicas.core "image" "core" "port" 8081 "probe" "tcp" "role" "")
+  (dict "name" "builder" "replicas" .Values.replicas.builder "image" "builder" "port" 8082 "probe" "tcp" "role" "")
+  (dict "name" "builder-worker" "replicas" .Values.replicas.builderWorker "image" "builder-worker" "port" 0 "probe" "none" "role" "")
+  (dict "name" "webhook-worker" "replicas" .Values.replicas.worker "image" "core" "port" 0 "probe" "none" "role" "webhook-worker")
+  (dict "name" "billing-worker" "replicas" .Values.replicas.worker "image" "core" "port" 0 "probe" "none" "role" "billing-worker")
+  (dict "name" "enterprise-worker" "replicas" .Values.replicas.worker "image" "core" "port" 0 "probe" "none" "role" "enterprise-worker")
+  (dict "name" "source-trigger-worker" "replicas" .Values.replicas.sourceWorker "image" "api" "port" 0 "probe" "none" "role" "source-trigger-worker")
+-}}
+{{- range $component := $components }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appforge-{{ $component.name }}
+  labels:
+    {{- include "appforge.labels" $root | nindent 4 }}
+    app.kubernetes.io/component: {{ $component.name }}
+spec:
+  replicas: {{ $component.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxUnavailable: 0, maxSurge: 1}
+  selector:
+    matchLabels: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: {{ $component.name }}}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: {{ $component.name }}}
+      annotations:
+        prometheus.io/scrape: {{ $root.Values.observability.prometheus | quote }}
+        checksum/runtime-config: {{ $root.Values.external.runtimeConfigSecret | sha256sum }}
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext: {{ toYaml $root.Values.podSecurityContext | nindent 8 }}
+      {{- with $root.Values.global.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $component.name }}
+          image: "{{ $root.Values.global.imageRegistry }}/{{ $component.image }}:{{ $root.Values.image.tag }}"
+          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          args:
+            - -etcd
+            - {{ $root.Values.external.etcdEndpoints | quote }}
+            {{- if $component.role }}
+            - -role
+            - {{ $component.role | quote }}
+            {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          envFrom:
+            - secretRef: {name: {{ $root.Values.external.etcdAuthSecret }}}
+          {{- if eq $component.name "builder-worker" }}
+          env:
+            - name: APPFORGE_BUILDER_ID
+              valueFrom: {fieldRef: {fieldPath: metadata.name}}
+            - name: APPFORGE_BUILDER_ENDPOINT
+              valueFrom: {fieldRef: {fieldPath: metadata.name}}
+          {{- end }}
+          {{- if eq $component.name "api" }}
+          env:
+            - {name: APPFORGE_SIEM_ENDPOINT, value: {{ $root.Values.observability.siemWebhook | quote }}}
+            - {name: APPFORGE_SIEM_TOKEN_FILE, value: /etc/appforge/siem/token}
+            - {name: APPFORGE_SIEM_CA_FILE, value: /etc/appforge/siem/ca.crt}
+          {{- end }}
+          {{- if gt ($component.port | int) 0 }}
+          ports:
+            - {name: service, containerPort: {{ $component.port }}}
+            {{- if eq $component.name "api" }}
+            - {name: agent-mtls, containerPort: 9443}
+            {{- end }}
+          readinessProbe:
+            {{- if eq $component.probe "http" }}
+            httpGet: {path: /readyz, port: service}
+            {{- else }}
+            tcpSocket: {port: service}
+            {{- end }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            {{- if eq $component.probe "http" }}
+            httpGet: {path: /healthz, port: service}
+            {{- else }}
+            tcpSocket: {port: service}
+            {{- end }}
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          {{- end }}
+          resources:
+            {{- if or (hasSuffix "worker" $component.name) (eq $component.name "builder") }}
+            {{- toYaml $root.Values.resources.worker | nindent 12 }}
+            {{- else if eq $component.name "api" }}
+            {{- toYaml $root.Values.resources.api | nindent 12 }}
+            {{- else }}
+            {{- toYaml $root.Values.resources.rpc | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+            - {name: etcd-auth, mountPath: /etc/appforge/etcd, readOnly: true}
+            {{- if or (eq $component.name "core") (eq $component.image "core") }}
+            - {name: agent-ca, mountPath: /etc/appforge/agent-ca.crt, subPath: ca.crt, readOnly: true}
+            - {name: agent-ca, mountPath: /etc/appforge/agent-ca.key, subPath: ca.key, readOnly: true}
+            {{- end }}
+            {{- if eq $component.name "api" }}
+            - {name: agent-ca, mountPath: /etc/appforge/agent-ca.crt, subPath: ca.crt, readOnly: true}
+            - {name: gateway-tls, mountPath: /etc/appforge/tls, readOnly: true}
+            {{- end }}
+            {{- if eq $component.image "api" }}
+            - {name: offline-license, mountPath: /etc/appforge/license, readOnly: true}
+            - {name: license-state, mountPath: /var/lib/appforge-license}
+            {{- end }}
+            {{- if eq $component.name "api" }}
+            - {name: siem, mountPath: /etc/appforge/siem, readOnly: true}
+            {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {sizeLimit: 2Gi}
+        - name: etcd-auth
+          secret: {secretName: {{ $root.Values.external.etcdAuthSecret }}}
+        {{- if or (eq $component.name "core") (eq $component.image "core") (eq $component.name "api") }}
+        - name: agent-ca
+          secret: {secretName: {{ $root.Values.secrets.localAgentCaSecret }}}
+        {{- end }}
+        {{- if eq $component.name "api" }}
+        - name: gateway-tls
+          secret: {secretName: {{ $root.Values.ingress.tlsSecretName }}}
+        {{- end }}
+        {{- if eq $component.image "api" }}
+        - name: offline-license
+          secret:
+            secretName: {{ $root.Values.secrets.offlineLicenseSecret }}
+            items:
+              - {key: license.json, path: license.json}
+              - {key: vendor-public.pem, path: vendor-public.pem}
+        - name: license-state
+          persistentVolumeClaim: {claimName: {{ $root.Values.offlineLicense.existingStateClaim }}}
+        {{- end }}
+        {{- if eq $component.name "api" }}
+        - name: siem
+          secret:
+            secretName: {{ $root.Values.secrets.siemSecret }}
+            items:
+              - {key: token, path: token}
+              - {key: ca.crt, path: ca.crt}
+        {{- end }}
+{{- end }}

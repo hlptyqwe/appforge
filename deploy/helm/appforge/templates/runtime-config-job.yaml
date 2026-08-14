@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "appforge-runtime-config-{{ .Release.Revision }}"
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-10"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: etcd-config
+          image: "{{ .Values.global.imageRegistry }}/etcd-init:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - {name: ETCD_ENDPOINTS, value: {{ .Values.external.etcdEndpoints | quote }}}
+          envFrom:
+            - secretRef: {name: {{ .Values.external.etcdAuthSecret }}}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: ["ALL"]}}
+          volumeMounts:
+            - {name: runtime-config, mountPath: /config, readOnly: true}
+            - {name: etcd-auth, mountPath: /etc/appforge/etcd, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: runtime-config
+          secret: {secretName: {{ .Values.external.runtimeConfigSecret }}}
+        - name: etcd-auth
+          secret: {secretName: {{ .Values.external.etcdAuthSecret }}}
+        - name: tmp
+          emptyDir: {sizeLimit: 16Mi}

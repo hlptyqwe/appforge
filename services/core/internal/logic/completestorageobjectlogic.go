@@ -7,8 +7,10 @@ import (
 
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
+	"appforge/services/core/models"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -44,27 +46,31 @@ func (l *CompleteStorageObjectLogic) CompleteStorageObject(in *core.CompleteStor
 	if decodeErr != nil || len(decoded) != 32 {
 		return nil, status.Error(codes.InvalidArgument, "sha256 must be 64 hexadecimal characters")
 	}
-	item, err := l.svcCtx.StorageObjectModel.FindOne(l.ctx, in.Id)
+	var item models.TStorageObject
+	err = l.svcCtx.DB.TransactCtx(l.ctx, func(txCtx context.Context, session sqlx.Session) error {
+		if err := session.QueryRowCtx(txCtx, &item, storageObjectSelect+` WHERE id=? AND tenant_id=? FOR UPDATE`, in.Id, tenant); err != nil {
+			return notFoundOrInternal(err, "storage object")
+		}
+		if item.Status != storageStatusUploading {
+			return status.Error(codes.FailedPrecondition, "storage object is not uploading")
+		}
+		if item.SizeBytes != in.SizeBytes {
+			return status.Error(codes.FailedPrecondition, "uploaded object size does not match declaration")
+		}
+		usageMetric, _ := mapUsageMetric(storageUsageMetric(item.ObjectType))
+		if err := confirmQuotaInSession(txCtx, session, tenant, "storage.bytes", storageQuotaKey(item.ObjectKey),
+			usageMetric, item.Id, billingUsageMetadata(map[string]any{"objectType": item.ObjectType})); err != nil {
+			return err
+		}
+		item.Sha256 = nullString(sha256Value)
+		item.Status = storageStatusReady
+		if err := l.svcCtx.StorageObjectModel.WithSession(session).Update(txCtx, &item); err != nil {
+			return status.Errorf(codes.Internal, "complete storage object failed: %v", err)
+		}
+		return nil
+	})
 	if err != nil {
-		return nil, notFoundOrInternal(err, "storage object")
-	}
-	if err := ensureTenant(item.TenantId, tenant); err != nil {
 		return nil, err
 	}
-	if item.Status != storageStatusUploading {
-		return nil, status.Error(codes.FailedPrecondition, "storage object is not uploading")
-	}
-	if item.SizeBytes != in.SizeBytes {
-		return nil, status.Error(codes.FailedPrecondition, "uploaded object size does not match declaration")
-	}
-	item.Sha256 = nullString(sha256Value)
-	item.Status = storageStatusReady
-	if err := l.svcCtx.StorageObjectModel.Update(l.ctx, item); err != nil {
-		return nil, status.Errorf(codes.Internal, "complete storage object failed: %v", err)
-	}
-	item, err = l.svcCtx.StorageObjectModel.FindOne(l.ctx, in.Id)
-	if err != nil {
-		return nil, notFoundOrInternal(err, "storage object")
-	}
-	return &core.StorageObjectResp{Base: okBase(), Data: mapStorageObject(item)}, nil
+	return &core.StorageObjectResp{Base: okBase(), Data: mapStorageObject(&item)}, nil
 }

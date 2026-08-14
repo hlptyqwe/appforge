@@ -45,6 +45,20 @@ func (l *ListApplicationsLogic) ListApplications(in *core.ApplicationListReq) (*
 		where = append(where, "status = ?")
 		args = append(args, int64(value))
 	}
+	if appIDs := in.GetAppIds(); len(appIDs) > 0 {
+		placeholders := make([]string, 0, len(appIDs))
+		for _, appID := range appIDs {
+			if appID <= 0 {
+				continue
+			}
+			placeholders = append(placeholders, "?")
+			args = append(args, appID)
+		}
+		if len(placeholders) == 0 {
+			return &core.ApplicationListResp{Base: baseWithTotal(0, false, 0), Data: []*core.Application{}}, nil
+		}
+		where = append(where, "id IN ("+strings.Join(placeholders, ",")+")")
+	}
 	whereSQL := strings.Join(where, " AND ")
 	var total int64
 	if err := l.svcCtx.DB.QueryRowCtx(l.ctx, &total, fmt.Sprintf("SELECT COUNT(1) FROM t_app_application WHERE %s", whereSQL), args...); err != nil {

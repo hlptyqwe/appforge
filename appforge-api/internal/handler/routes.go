@@ -9,6 +9,7 @@ import (
 
 	auth_private "appforge/admin-api/internal/handler/auth_private"
 	auth_public "appforge/admin-api/internal/handler/auth_public"
+	open_v1 "appforge/admin-api/internal/handler/open_v1"
 	platform_private "appforge/admin-api/internal/handler/platform_private"
 	platform_public "appforge/admin-api/internal/handler/platform_public"
 	system "appforge/admin-api/internal/handler/system"
@@ -54,6 +55,143 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				Method:  http.MethodGet,
+				Path:    "/apps",
+				Handler: open_v1.OpenV1ListApplicationsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/apps",
+				Handler: open_v1.OpenV1CreateApplicationHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/apps/:id",
+				Handler: open_v1.OpenV1GetApplicationHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/artifacts/:id/download",
+				Handler: open_v1.OpenV1GetArtifactDownloadHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/branding-profiles",
+				Handler: open_v1.OpenV1ListBrandingProfilesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/branding-profiles",
+				Handler: open_v1.OpenV1CreateBrandingProfileHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/branding-profiles/:id",
+				Handler: open_v1.OpenV1UpdateBrandingProfileHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/branding-profiles/:id",
+				Handler: open_v1.OpenV1GetBrandingProfileHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/builds",
+				Handler: open_v1.OpenV1ListBuildsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/builds",
+				Handler: open_v1.OpenV1CreateBuildHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/builds/:id",
+				Handler: open_v1.OpenV1GetBuildHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/builds/:id/cancel",
+				Handler: open_v1.OpenV1CancelBuildHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/builds/:id/retry",
+				Handler: open_v1.OpenV1RetryBuildHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/channels",
+				Handler: open_v1.OpenV1ListChannelsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/channels",
+				Handler: open_v1.OpenV1CreateChannelHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/channels/:id",
+				Handler: open_v1.OpenV1GetChannelHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/stats/channels",
+				Handler: open_v1.OpenV1GetChannelStatsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/uploads",
+				Handler: open_v1.OpenV1InitiateUploadHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/uploads/:id/complete",
+				Handler: open_v1.OpenV1CompleteUploadHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/versions",
+				Handler: open_v1.OpenV1ListVersionsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/versions",
+				Handler: open_v1.OpenV1CreateVersionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/versions/:id",
+				Handler: open_v1.OpenV1GetVersionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/white-label/products",
+				Handler: open_v1.OpenV1ListWhiteLabelProductsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/white-label/products",
+				Handler: open_v1.OpenV1CreateWhiteLabelProductHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/white-label/products/:id",
+				Handler: open_v1.OpenV1UpdateWhiteLabelProductHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/white-label/products/:id",
+				Handler: open_v1.OpenV1GetWhiteLabelProductHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/open/v1"),
+		rest.WithTimeout(600000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
 				Method:  http.MethodPost,
 				Path:    "/applications",
 				Handler: platform_private.CreatePlatformApplicationHandler(serverCtx),
@@ -67,6 +205,56 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/applications/:id",
 				Handler: platform_private.GetPlatformApplicationHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/billing/checkout",
+				Handler: platform_private.CreatePlatformBillingCheckoutHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/billing/contracts",
+				Handler: platform_private.UpsertPlatformManualSubscriptionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/billing/invoices",
+				Handler: platform_private.ListPlatformInvoicesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/billing/plans",
+				Handler: platform_private.CreatePlatformBillingPlanHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/billing/plans",
+				Handler: platform_private.ListPlatformBillingPlansHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/billing/plans/:id/retire",
+				Handler: platform_private.RetirePlatformBillingPlanHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/billing/subscription",
+				Handler: platform_private.GetPlatformTenantBillingHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/billing/subscription/cancel",
+				Handler: platform_private.CancelPlatformSubscriptionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/billing/subscription/change",
+				Handler: platform_private.ChangePlatformSubscriptionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/billing/usage",
+				Handler: platform_private.GetPlatformBillingUsageHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
@@ -109,6 +297,56 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: platform_private.ChangePlatformBrandingProfileStatusHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodGet,
+				Path:    "/build-cluster/cache",
+				Handler: platform_private.ListPlatformBuildCacheEntriesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/build-cluster/cache/:id/invalidate",
+				Handler: platform_private.InvalidatePlatformBuildCacheHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/build-cluster/cache/cleanup",
+				Handler: platform_private.CleanupPlatformBuildCacheHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/build-cluster/events",
+				Handler: platform_private.ListPlatformBuildSchedulerEventsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/build-cluster/metrics",
+				Handler: platform_private.GetPlatformBuildClusterMetricsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/build-cluster/nodes",
+				Handler: platform_private.ListPlatformBuilderNodesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/build-cluster/nodes/:id/drain",
+				Handler: platform_private.DrainPlatformBuilderNodeHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/build-cluster/nodes/:id/recover",
+				Handler: platform_private.RecoverPlatformBuilderNodeHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/build-cluster/policies",
+				Handler: platform_private.ListPlatformBuildConcurrencyPoliciesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/build-cluster/policies",
+				Handler: platform_private.UpsertPlatformBuildConcurrencyPolicyHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodPost,
 				Path:    "/build-tasks",
 				Handler: platform_private.CreatePlatformBuildTaskHandler(serverCtx),
@@ -122,6 +360,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/build-tasks/:id",
 				Handler: platform_private.GetPlatformBuildTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/build-tasks/:id/cancel",
+				Handler: platform_private.CancelPlatformBuildTaskHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/build-tasks/:id/retry",
+				Handler: platform_private.RetryPlatformBuildTaskHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
@@ -142,6 +390,166 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/channels/:id",
 				Handler: platform_private.GetPlatformChannelHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/credentials",
+				Handler: platform_private.CreatePlatformOpenApiCredentialHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/credentials",
+				Handler: platform_private.ListPlatformOpenApiCredentialsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/credentials/:id/revoke",
+				Handler: platform_private.RevokePlatformOpenApiCredentialHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/credentials/:id/rotate",
+				Handler: platform_private.RotatePlatformOpenApiCredentialHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/source-artifacts/import",
+				Handler: platform_private.ImportPlatformSourceArtifactHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/source-build-triggers",
+				Handler: platform_private.CreatePlatformSourceBuildTriggerHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/source-build-triggers",
+				Handler: platform_private.ListPlatformSourceBuildTriggersHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/source-build-triggers/:id",
+				Handler: platform_private.GetPlatformSourceBuildTriggerHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/developer/source-build-triggers/:id",
+				Handler: platform_private.UpdatePlatformSourceBuildTriggerHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/source-build-triggers/:id/rotate-secret",
+				Handler: platform_private.RotatePlatformSourceBuildTriggerSecretHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/source-integrations",
+				Handler: platform_private.ListPlatformSourceIntegrationsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/source-integrations/:id",
+				Handler: platform_private.GetPlatformSourceIntegrationHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/source-integrations/:id/available-repositories",
+				Handler: platform_private.ListPlatformSourceAvailableRepositoriesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/source-integrations/:id/disconnect",
+				Handler: platform_private.DisconnectPlatformSourceIntegrationHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/source-integrations/:id/repositories/:repositoryId/authorize",
+				Handler: platform_private.AuthorizePlatformSourceRepositoryHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/source-integrations/:platform/authorize",
+				Handler: platform_private.CreatePlatformSourceOAuthAuthorizationHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/source-repositories",
+				Handler: platform_private.ListPlatformSourceRepositoriesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/source-repositories/:id/revoke",
+				Handler: platform_private.RevokePlatformSourceRepositoryHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/source-webhook-events",
+				Handler: platform_private.ListPlatformSourceWebhookEventsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/webhook-deliveries",
+				Handler: platform_private.ListPlatformWebhookDeliveriesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/webhook-deliveries/:id/replay",
+				Handler: platform_private.ReplayPlatformWebhookDeliveryHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/webhooks",
+				Handler: platform_private.CreatePlatformWebhookEndpointHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/webhooks",
+				Handler: platform_private.ListPlatformWebhookEndpointsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/developer/webhooks/:id",
+				Handler: platform_private.GetPlatformWebhookEndpointHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/developer/webhooks/:id",
+				Handler: platform_private.UpdatePlatformWebhookEndpointHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/webhooks/:id/rotate-secret",
+				Handler: platform_private.RotatePlatformWebhookEndpointSecretHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/developer/webhooks/:id/test",
+				Handler: platform_private.TestPlatformWebhookEndpointHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/enterprise/local-agents",
+				Handler: platform_private.CreatePlatformLocalAgentRegistrationHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/enterprise/local-agents",
+				Handler: platform_private.ListPlatformLocalAgentsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/enterprise/local-agents/:id",
+				Handler: platform_private.GetPlatformLocalAgentHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/enterprise/local-agents/:id/drain",
+				Handler: platform_private.DrainPlatformLocalAgentHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/enterprise/local-agents/:id/revoke",
+				Handler: platform_private.RevokePlatformLocalAgentHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,

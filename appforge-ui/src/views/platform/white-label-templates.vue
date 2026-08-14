@@ -488,7 +488,9 @@ onMounted(loadData)
             <el-button
               link
               type="primary"
-              @click="schemaFields.push({ name: '', type: 'string', required: false, sensitive: false })"
+              @click="
+                schemaFields.push({ name: '', type: 'string', required: false, sensitive: false })
+              "
               >+ 添加参数</el-button
             >
           </div>

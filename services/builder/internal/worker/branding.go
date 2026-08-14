@@ -57,7 +57,7 @@ func decodeBuildBrandingSnapshot(value string) (*buildBrandingSnapshot, error) {
 
 func buildBrandedAPK(ctx context.Context, logFile io.Writer, sourcePath, logoPath, splashPath, workDir string,
 	snapshot *buildBrandingSnapshot, whiteLabel *whiteLabelBuildSnapshot, templateFiles map[int64]string,
-	logo, splash *core.StorageObject, channel channelPayload) (string, error) {
+	logo, splash *core.StorageObject) (string, error) {
 	decodedDir := filepath.Join(workDir, "decoded")
 	if err := runAndLog(ctx, logFile, nil, "apktool", "d", "-f", "-o", decodedDir, sourcePath); err != nil {
 		return "", fmt.Errorf("decode APK for branding: %w", err)
@@ -105,19 +105,16 @@ func buildBrandedAPK(ctx context.Context, logFile io.Writer, sourcePath, logoPat
 	if err := writeJSONFile(filepath.Join(decodedDir, brandingAssetPath), brandingPayload); err != nil {
 		return "", err
 	}
-	if err := writeJSONFile(filepath.Join(decodedDir, channelAssetPath), channel); err != nil {
-		return "", err
-	}
 	if whiteLabel != nil {
 		if err := writeJSONFile(filepath.Join(decodedDir, whiteLabelAssetPath), whiteLabel.publicAsset()); err != nil {
 			return "", err
 		}
 	}
-	unsignedPath := filepath.Join(workDir, "unsigned.apk")
-	if err := runAndLog(ctx, logFile, nil, "apktool", "b", decodedDir, "-o", unsignedPath); err != nil {
+	intermediatePath := filepath.Join(workDir, "branded-intermediate.apk")
+	if err := runAndLog(ctx, logFile, nil, "apktool", "b", decodedDir, "-o", intermediatePath); err != nil {
 		return "", fmt.Errorf("rebuild branded APK: %w", err)
 	}
-	return unsignedPath, nil
+	return intermediatePath, nil
 }
 
 func replaceApplicationLabel(decodedDir, manifestPath string, manifest []byte, appName string) error {

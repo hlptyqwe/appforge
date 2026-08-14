@@ -52,7 +52,69 @@ func MapPlatformBuildTask(item *core.BuildTask) types.PlatformBuildTask {
 	if item == nil {
 		return types.PlatformBuildTask{}
 	}
-	return types.PlatformBuildTask{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId, VersionId: item.VersionId, ChannelId: item.ChannelId, SigningConfigId: item.SigningConfigId, ChannelCode: item.ChannelCode, VersionCode: item.VersionCode, VersionName: item.VersionName, Status: int32(item.Status), BuilderId: item.BuilderId, BuilderAttempt: item.BuilderAttempt, Priority: item.Priority, ApkUrl: item.ApkUrl, ApkSha256: item.ApkSha256, ApkSize: item.ApkSize, LogUrl: item.LogUrl, SourceApkObjectId: item.SourceApkObjectId, ApkObjectId: item.ApkObjectId, LogObjectId: item.LogObjectId, ErrorMessage: item.ErrorMessage, QueuedAt: item.QueuedAt, StartTime: item.StartTime, FinishTime: item.FinishTime, CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime, BrandingProfileId: item.BrandingProfileId, BrandingRevision: item.BrandingRevision, BrandingSnapshotJson: item.BrandingSnapshotJson, WhiteLabelProductId: item.WhiteLabelProductId, TemplateRevision: item.TemplateRevision, TemplateSnapshotJson: maskTemplateSnapshot(item.TemplateSnapshotJson)}
+	return types.PlatformBuildTask{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId, VersionId: item.VersionId, ChannelId: item.ChannelId, SigningConfigId: item.SigningConfigId, ChannelCode: item.ChannelCode, VersionCode: item.VersionCode, VersionName: item.VersionName, Status: int32(item.Status), BuilderId: item.BuilderId, BuilderAttempt: item.BuilderAttempt, Priority: item.Priority, ApkUrl: item.ApkUrl, ApkSha256: item.ApkSha256, ApkSize: item.ApkSize, LogUrl: item.LogUrl, SourceApkObjectId: item.SourceApkObjectId, ApkObjectId: item.ApkObjectId, LogObjectId: item.LogObjectId, ErrorMessage: item.ErrorMessage, QueuedAt: item.QueuedAt, StartTime: item.StartTime, FinishTime: item.FinishTime, CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime, BrandingProfileId: item.BrandingProfileId, BrandingRevision: item.BrandingRevision, BrandingSnapshotJson: item.BrandingSnapshotJson, WhiteLabelProductId: item.WhiteLabelProductId, TemplateRevision: item.TemplateRevision, TemplateSnapshotJson: maskTemplateSnapshot(item.TemplateSnapshotJson), PoolCode: item.PoolCode, CacheKey: item.CacheKey, CacheEntryId: item.CacheEntryId, CacheHit: item.CacheHit, CancelRequestedAt: item.CancelRequestedAt, CancelledAt: item.CancelledAt, CancelReason: item.CancelReason, RetryOfTaskId: item.RetryOfTaskId}
+}
+
+func MapPlatformBuilderNode(item *core.BuilderNode) types.PlatformBuilderNode {
+	if item == nil {
+		return types.PlatformBuilderNode{}
+	}
+	return types.PlatformBuilderNode{Id: item.Id, NodeCode: item.NodeCode, PoolCode: item.PoolCode,
+		Endpoint: item.Endpoint, Status: int32(item.Status), DrainStatus: int32(item.DrainStatus),
+		MaxConcurrency: item.MaxConcurrency, RunningCount: item.RunningCount, CpuCapacity: item.CpuCapacity,
+		MemoryCapacity: item.MemoryCapacity, DiskCapacity: item.DiskCapacity, DiskFree: item.DiskFree,
+		ToolchainVersion: item.ToolchainVersion, BuildProtocolVersion: item.BuildProtocolVersion,
+		CapabilityJson: item.CapabilityJson, LastErrorMessage: item.LastErrorMessage,
+		LastHeartbeatAt: item.LastHeartbeatAt, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime}
+}
+
+func MapPlatformBuildConcurrencyPolicy(item *core.BuildConcurrencyPolicy) types.PlatformBuildConcurrencyPolicy {
+	if item == nil {
+		return types.PlatformBuildConcurrencyPolicy{}
+	}
+	return types.PlatformBuildConcurrencyPolicy{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId,
+		PoolCode: item.PoolCode, MaxConcurrency: item.MaxConcurrency, FairWeight: item.FairWeight,
+		MaxPriority: item.MaxPriority, Status: int32(item.Status), CreateBy: item.CreateBy,
+		CreateTime: item.CreateTime, UpdateTime: item.UpdateTime}
+}
+
+func MapPlatformBuildCacheEntry(item *core.BuildCacheEntry) types.PlatformBuildCacheEntry {
+	if item == nil {
+		return types.PlatformBuildCacheEntry{}
+	}
+	return types.PlatformBuildCacheEntry{Id: item.Id, TenantId: item.TenantId, CacheScope: int32(item.CacheScope),
+		CacheKey: item.CacheKey, ToolchainVersion: item.ToolchainVersion,
+		BuildProtocolVersion: item.BuildProtocolVersion, InputDigest: item.InputDigest,
+		ArtifactObjectId: item.ArtifactObjectId, ArtifactSha256: item.ArtifactSha256,
+		SizeBytes: item.SizeBytes, HitCount: item.HitCount, Status: int32(item.Status),
+		ExpiresAt: item.ExpiresAt, LastHitAt: item.LastHitAt, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime}
+}
+
+func MapPlatformBuildSchedulerEvent(item *core.BuildSchedulerEvent) types.PlatformBuildSchedulerEvent {
+	if item == nil {
+		return types.PlatformBuildSchedulerEvent{}
+	}
+	return types.PlatformBuildSchedulerEvent{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId,
+		TaskId: item.TaskId, NodeCode: item.NodeCode, PoolCode: item.PoolCode, EventType: int32(item.EventType),
+		ReasonCode: item.ReasonCode, DecisionJson: item.DecisionJson, CreateTime: item.CreateTime}
+}
+
+func MapPlatformOpenApiCredential(item *core.OpenApiCredential) types.PlatformOpenApiCredential {
+	if item == nil {
+		return types.PlatformOpenApiCredential{}
+	}
+	scopes := make([]int32, 0, len(item.Scopes))
+	for _, scope := range item.Scopes {
+		scopes = append(scopes, int32(scope))
+	}
+	return types.PlatformOpenApiCredential{
+		Id: item.Id, TenantId: item.TenantId, CredentialName: item.CredentialName, KeyId: item.KeyId,
+		Scopes: scopes, AppIds: item.AppIds, IpAllowlist: item.IpAllowlist,
+		RateLimitPerMinute: item.RateLimitPerMinute, Status: int32(item.Status),
+		ExpiresAt: item.ExpiresAt, GraceExpiresAt: item.GraceExpiresAt,
+		RotatedFromId: item.RotatedFromId, LastUsedAt: item.LastUsedAt,
+		CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime,
+	}
 }
 
 func MapPlatformWhiteLabelTemplate(item *core.WhiteLabelTemplate) types.PlatformWhiteLabelTemplate {

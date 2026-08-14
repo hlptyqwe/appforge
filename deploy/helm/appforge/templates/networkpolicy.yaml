@@ -1,0 +1,32 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: appforge-default-deny
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: appforge}}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - podSelector: {matchLabels: {app.kubernetes.io/name: appforge}}
+    - from:
+        - namespaceSelector:
+            matchLabels: {{ toYaml .Values.networkPolicy.ingressNamespaceLabels | nindent 14 }}
+      ports:
+        - {protocol: TCP, port: 8888}
+        - {protocol: TCP, port: 8080}
+    {{- if .Values.localAgentGateway.enabled }}
+    - ports:
+        - {protocol: TCP, port: 9443}
+    {{- end }}
+  egress:
+    - to:
+        - podSelector: {matchLabels: {app.kubernetes.io/name: appforge}}
+    - ports:
+        - {protocol: UDP, port: 53}
+        - {protocol: TCP, port: 53}
+    {{- range .Values.networkPolicy.egressCIDRs }}
+    - to:
+        - ipBlock: {cidr: {{ . | quote }}}
+    {{- end }}
+{{- end }}

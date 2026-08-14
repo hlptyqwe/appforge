@@ -1,0 +1,38 @@
+{{- $root := . -}}
+{{- range $component := list "admin-ui" "agent-ui" }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appforge-{{ $component }}
+  labels:
+    {{- include "appforge.labels" $root | nindent 4 }}
+    app.kubernetes.io/component: {{ $component }}
+spec:
+  replicas: {{ $root.Values.replicas.ui }}
+  strategy: {type: RollingUpdate, rollingUpdate: {maxUnavailable: 0, maxSurge: 1}}
+  selector:
+    matchLabels: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: {{ $component }}}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: {{ $component }}}
+    spec:
+      securityContext: {{ toYaml $root.Values.podSecurityContext | nindent 8 }}
+      {{- with $root.Values.global.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $component }}
+          image: "{{ $root.Values.global.imageRegistry }}/{{ $component }}:{{ $root.Values.image.tag }}"
+          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          ports: [{name: http, containerPort: 8080}]
+          readinessProbe: {httpGet: {path: /healthz, port: http}, initialDelaySeconds: 3}
+          livenessProbe: {httpGet: {path: /healthz, port: http}, initialDelaySeconds: 10}
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: ["ALL"]}}
+          resources: {{ toYaml $root.Values.resources.ui | nindent 12 }}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: tmp
+          emptyDir: {sizeLimit: 64Mi}
+{{- end }}

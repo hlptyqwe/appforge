@@ -1,0 +1,11 @@
+{{- range $component := list "api" "system" "core" "admin-ui" "agent-ui" }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: appforge-{{ $component }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: {{ $component }}}
+{{- end }}

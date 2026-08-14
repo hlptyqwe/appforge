@@ -13,9 +13,7 @@ const missingComponent = String((route.meta as Record<string, unknown>).missing 
     :sub-title="t('error.missingComponentSubtitle')"
   >
     <template #extra>
-      <div style="color: #666">
-        missing: {{ missingComponent }}
-      </div>
+      <div style="color: #666">missing: {{ missingComponent }}</div>
       <el-button style="margin-top: 12px" @click="$router.push('/')">
         {{ t('common.goHome') }}
       </el-button>

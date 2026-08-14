@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
 	"appforge/services/core/models"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -51,24 +53,35 @@ func (l *CreateStorageObjectLogic) CreateStorageObject(in *core.CreateStorageObj
 		}
 	}
 
-	result, err := l.svcCtx.StorageObjectModel.Insert(l.ctx, &models.TStorageObject{
+	created := &models.TStorageObject{
 		TenantId: tenant, AppId: in.AppId, ObjectType: int64(in.ObjectType),
 		ObjectKey: strings.TrimSpace(in.ObjectKey), OriginalName: strings.TrimSpace(in.OriginalName),
 		ContentType: strings.TrimSpace(in.ContentType), SizeBytes: in.SizeBytes,
 		Status: storageStatusUploading, CreateBy: actorID(l.ctx),
+	}
+	var item models.TStorageObject
+	err = l.svcCtx.DB.TransactCtx(l.ctx, func(txCtx context.Context, session sqlx.Session) error {
+		result, err := l.svcCtx.StorageObjectModel.WithSession(session).Insert(txCtx, created)
+		if err != nil {
+			return status.Errorf(codes.Internal, "create storage object failed: %v", err)
+		}
+		id, err := result.LastInsertId()
+		if err != nil {
+			return status.Errorf(codes.Internal, "read storage object id failed: %v", err)
+		}
+		if _, err := reserveQuotaInSession(txCtx, session, tenant, "storage.bytes", in.SizeBytes,
+			"storage", id, storageQuotaKey(in.ObjectKey), 24*time.Hour); err != nil {
+			return err
+		}
+		if err := session.QueryRowCtx(txCtx, &item, storageObjectSelect+` WHERE id=? AND tenant_id=?`, id, tenant); err != nil {
+			return status.Errorf(codes.Internal, "load created storage object failed: %v", err)
+		}
+		return nil
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "create storage object failed: %v", err)
+		return nil, err
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "read storage object id failed: %v", err)
-	}
-	item, err := l.svcCtx.StorageObjectModel.FindOne(l.ctx, id)
-	if err != nil {
-		return nil, notFoundOrInternal(err, "storage object")
-	}
-	return &core.StorageObjectResp{Base: okBase(), Data: mapStorageObject(item)}, nil
+	return &core.StorageObjectResp{Base: okBase(), Data: mapStorageObject(&item)}, nil
 }
 
 func validateStorageObjectInput(in *core.CreateStorageObjectReq, tenant int64) error {
@@ -78,7 +91,8 @@ func validateStorageObjectInput(in *core.CreateStorageObjectReq, tenant int64) e
 		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG &&
 		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO &&
 		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH &&
-		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE {
+		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE &&
+		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_CACHE {
 		return status.Error(codes.InvalidArgument, "invalid storage object type")
 	}
 	if err := requireText(in.ObjectKey, "object_key", 500); err != nil {
@@ -99,6 +113,10 @@ func validateStorageObjectInput(in *core.CreateStorageObjectReq, tenant int64) e
 	case core.StorageObjectType_STORAGE_OBJECT_TYPE_SOURCE_APK:
 		if ext != ".apk" || in.SizeBytes > 2*1024*1024*1024 {
 			return status.Error(codes.InvalidArgument, "source APK must be an .apk file no larger than 2 GiB")
+		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_CACHE:
+		if ext != ".apk" || in.SizeBytes > 2*1024*1024*1024 {
+			return status.Error(codes.InvalidArgument, "build cache must be an .apk file no larger than 2 GiB")
 		}
 	case core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE:
 		if ext != ".jks" && ext != ".keystore" && ext != ".p12" && ext != ".pfx" {

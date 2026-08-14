@@ -314,6 +314,480 @@ func (s *CoreServer) ListBuildTasks(ctx context.Context, in *core.BuildTaskListR
 	return l.ListBuildTasks(in)
 }
 
+// 取消待处理或执行中的V4构建任务并立即推进fencing代次。
+func (s *CoreServer) CancelBuildTask(ctx context.Context, in *core.CancelBuildTaskReq) (*core.BuildTaskResp, error) {
+	l := logic.NewCancelBuildTaskLogic(ctx, s.svcCtx)
+	return l.CancelBuildTask(in)
+}
+
+// 根据不可变历史快照创建V4重试任务。
+func (s *CoreServer) RetryBuildTask(ctx context.Context, in *core.RetryBuildTaskReq) (*core.BuildTaskResp, error) {
+	l := logic.NewRetryBuildTaskLogic(ctx, s.svcCtx)
+	return l.RetryBuildTask(in)
+}
+
+// 查询V4 Builder节点详情。
+func (s *CoreServer) GetBuilderNode(ctx context.Context, in *core.BuilderNodeIdReq) (*core.BuilderNodeResp, error) {
+	l := logic.NewGetBuilderNodeLogic(ctx, s.svcCtx)
+	return l.GetBuilderNode(in)
+}
+
+// 分页查询V4 Builder集群节点。
+func (s *CoreServer) ListBuilderNodes(ctx context.Context, in *core.BuilderNodeListReq) (*core.BuilderNodeListResp, error) {
+	l := logic.NewListBuilderNodesLogic(ctx, s.svcCtx)
+	return l.ListBuilderNodes(in)
+}
+
+// 修改V4 Builder节点排空状态。
+func (s *CoreServer) DrainBuilderNode(ctx context.Context, in *core.DrainBuilderNodeReq) (*core.BuilderNodeResp, error) {
+	l := logic.NewDrainBuilderNodeLogic(ctx, s.svcCtx)
+	return l.DrainBuilderNode(in)
+}
+
+// 在心跳、失败次数和磁盘容量均恢复后人工解除V4 Builder节点隔离。
+func (s *CoreServer) RecoverBuilderNode(ctx context.Context, in *core.RecoverBuilderNodeReq) (*core.BuilderNodeResp, error) {
+	l := logic.NewRecoverBuilderNodeLogic(ctx, s.svcCtx)
+	return l.RecoverBuilderNode(in)
+}
+
+// 创建或更新V4构建并发与公平调度策略。
+func (s *CoreServer) UpsertBuildConcurrencyPolicy(ctx context.Context, in *core.UpsertBuildConcurrencyPolicyReq) (*core.BuildConcurrencyPolicyResp, error) {
+	l := logic.NewUpsertBuildConcurrencyPolicyLogic(ctx, s.svcCtx)
+	return l.UpsertBuildConcurrencyPolicy(in)
+}
+
+// 分页查询V4构建并发与公平调度策略。
+func (s *CoreServer) ListBuildConcurrencyPolicies(ctx context.Context, in *core.BuildConcurrencyPolicyListReq) (*core.BuildConcurrencyPolicyListResp, error) {
+	l := logic.NewListBuildConcurrencyPoliciesLogic(ctx, s.svcCtx)
+	return l.ListBuildConcurrencyPolicies(in)
+}
+
+// 分页查询V4构建缓存条目。
+func (s *CoreServer) ListBuildCacheEntries(ctx context.Context, in *core.BuildCacheEntryListReq) (*core.BuildCacheEntryListResp, error) {
+	l := logic.NewListBuildCacheEntriesLogic(ctx, s.svcCtx)
+	return l.ListBuildCacheEntries(in)
+}
+
+// 管理端失效V4构建缓存条目。
+func (s *CoreServer) InvalidateBuildCache(ctx context.Context, in *core.InvalidateBuildCacheReq) (*core.BuildCacheEntryResp, error) {
+	l := logic.NewInvalidateBuildCacheLogic(ctx, s.svcCtx)
+	return l.InvalidateBuildCache(in)
+}
+
+// 分页查询V4结构化调度事件。
+func (s *CoreServer) ListBuildSchedulerEvents(ctx context.Context, in *core.BuildSchedulerEventListReq) (*core.BuildSchedulerEventListResp, error) {
+	l := logic.NewListBuildSchedulerEventsLogic(ctx, s.svcCtx)
+	return l.ListBuildSchedulerEvents(in)
+}
+
+// 查询V4构建集群运行指标与告警摘要。
+func (s *CoreServer) GetBuildClusterMetrics(ctx context.Context, in *core.BuildClusterMetricsReq) (*core.BuildClusterMetricsResp, error) {
+	l := logic.NewGetBuildClusterMetricsLogic(ctx, s.svcCtx)
+	return l.GetBuildClusterMetrics(in)
+}
+
+// 创建V5 Open API凭证并一次性返回Secret。
+func (s *CoreServer) CreateOpenApiCredential(ctx context.Context, in *core.CreateOpenApiCredentialReq) (*core.OpenApiCredentialSecretResp, error) {
+	l := logic.NewCreateOpenApiCredentialLogic(ctx, s.svcCtx)
+	return l.CreateOpenApiCredential(in)
+}
+
+// 分页查询V5 Open API凭证。
+func (s *CoreServer) ListOpenApiCredentials(ctx context.Context, in *core.OpenApiCredentialListReq) (*core.OpenApiCredentialListResp, error) {
+	l := logic.NewListOpenApiCredentialsLogic(ctx, s.svcCtx)
+	return l.ListOpenApiCredentials(in)
+}
+
+// 轮换V5 Open API凭证并一次性返回新Secret。
+func (s *CoreServer) RotateOpenApiCredential(ctx context.Context, in *core.RotateOpenApiCredentialReq) (*core.OpenApiCredentialSecretResp, error) {
+	l := logic.NewRotateOpenApiCredentialLogic(ctx, s.svcCtx)
+	return l.RotateOpenApiCredential(in)
+}
+
+// 立即吊销V5 Open API凭证。
+func (s *CoreServer) RevokeOpenApiCredential(ctx context.Context, in *core.OpenApiCredentialIdReq) (*core.OpenApiCredentialResp, error) {
+	l := logic.NewRevokeOpenApiCredentialLogic(ctx, s.svcCtx)
+	return l.RevokeOpenApiCredential(in)
+}
+
+// 验证V5 Open API凭证、IP、状态和有效期。
+func (s *CoreServer) AuthenticateOpenApiCredential(ctx context.Context, in *core.AuthenticateOpenApiCredentialReq) (*core.OpenApiAuthContextResp, error) {
+	l := logic.NewAuthenticateOpenApiCredentialLogic(ctx, s.svcCtx)
+	return l.AuthenticateOpenApiCredential(in)
+}
+
+// 申请或读取Open API幂等执行记录。
+func (s *CoreServer) BeginOpenApiIdempotency(ctx context.Context, in *core.BeginOpenApiIdempotencyReq) (*core.OpenApiIdempotencyResp, error) {
+	l := logic.NewBeginOpenApiIdempotencyLogic(ctx, s.svcCtx)
+	return l.BeginOpenApiIdempotency(in)
+}
+
+// 保存Open API幂等请求的最终响应。
+func (s *CoreServer) CompleteOpenApiIdempotency(ctx context.Context, in *core.CompleteOpenApiIdempotencyReq) (*core.RespBase, error) {
+	l := logic.NewCompleteOpenApiIdempotencyLogic(ctx, s.svcCtx)
+	return l.CompleteOpenApiIdempotency(in)
+}
+
+// 写入Open API调用审计。
+func (s *CoreServer) RecordOpenApiAudit(ctx context.Context, in *core.RecordOpenApiAuditReq) (*core.RespBase, error) {
+	l := logic.NewRecordOpenApiAuditLogic(ctx, s.svcCtx)
+	return l.RecordOpenApiAudit(in)
+}
+
+// 创建Webhook订阅端点并一次性返回签名Secret。
+func (s *CoreServer) CreateWebhookEndpoint(ctx context.Context, in *core.CreateWebhookEndpointReq) (*core.WebhookEndpointSecretResp, error) {
+	l := logic.NewCreateWebhookEndpointLogic(ctx, s.svcCtx)
+	return l.CreateWebhookEndpoint(in)
+}
+
+// 更新Webhook订阅端点。
+func (s *CoreServer) UpdateWebhookEndpoint(ctx context.Context, in *core.UpdateWebhookEndpointReq) (*core.WebhookEndpointResp, error) {
+	l := logic.NewUpdateWebhookEndpointLogic(ctx, s.svcCtx)
+	return l.UpdateWebhookEndpoint(in)
+}
+
+// 查询Webhook订阅端点。
+func (s *CoreServer) GetWebhookEndpoint(ctx context.Context, in *core.WebhookEndpointIdReq) (*core.WebhookEndpointResp, error) {
+	l := logic.NewGetWebhookEndpointLogic(ctx, s.svcCtx)
+	return l.GetWebhookEndpoint(in)
+}
+
+// 查询Webhook订阅端点列表。
+func (s *CoreServer) ListWebhookEndpoints(ctx context.Context, in *core.WebhookEndpointListReq) (*core.WebhookEndpointListResp, error) {
+	l := logic.NewListWebhookEndpointsLogic(ctx, s.svcCtx)
+	return l.ListWebhookEndpoints(in)
+}
+
+// 重置Webhook签名Secret并一次性返回新Secret。
+func (s *CoreServer) RotateWebhookEndpointSecret(ctx context.Context, in *core.WebhookEndpointIdReq) (*core.WebhookEndpointSecretResp, error) {
+	l := logic.NewRotateWebhookEndpointSecretLogic(ctx, s.svcCtx)
+	return l.RotateWebhookEndpointSecret(in)
+}
+
+// 查询Webhook投递日志。
+func (s *CoreServer) ListWebhookDeliveries(ctx context.Context, in *core.WebhookDeliveryListReq) (*core.WebhookDeliveryListResp, error) {
+	l := logic.NewListWebhookDeliveriesLogic(ctx, s.svcCtx)
+	return l.ListWebhookDeliveries(in)
+}
+
+// 重放失败或死信的Webhook投递。
+func (s *CoreServer) ReplayWebhookDelivery(ctx context.Context, in *core.WebhookDeliveryIdReq) (*core.WebhookDeliveryResp, error) {
+	l := logic.NewReplayWebhookDeliveryLogic(ctx, s.svcCtx)
+	return l.ReplayWebhookDelivery(in)
+}
+
+// 创建只投递到指定端点的测试事件。
+func (s *CoreServer) CreateTestWebhookEvent(ctx context.Context, in *core.CreateTestWebhookEventReq) (*core.RespBase, error) {
+	l := logic.NewCreateTestWebhookEventLogic(ctx, s.svcCtx)
+	return l.CreateTestWebhookEvent(in)
+}
+
+// 完成受信任的GitHub/GitLab OAuth回调或App安装同步，并加密保存令牌。
+func (s *CoreServer) CompleteSourceIntegration(ctx context.Context, in *core.CompleteSourceIntegrationReq) (*core.SourceIntegrationResp, error) {
+	l := logic.NewCompleteSourceIntegrationLogic(ctx, s.svcCtx)
+	return l.CompleteSourceIntegration(in)
+}
+
+// 查询代码平台集成。
+func (s *CoreServer) GetSourceIntegration(ctx context.Context, in *core.SourceIntegrationIdReq) (*core.SourceIntegrationResp, error) {
+	l := logic.NewGetSourceIntegrationLogic(ctx, s.svcCtx)
+	return l.GetSourceIntegration(in)
+}
+
+// 分页查询代码平台集成。
+func (s *CoreServer) ListSourceIntegrations(ctx context.Context, in *core.SourceIntegrationListReq) (*core.SourceIntegrationListResp, error) {
+	l := logic.NewListSourceIntegrationsLogic(ctx, s.svcCtx)
+	return l.ListSourceIntegrations(in)
+}
+
+// 读取有效集成令牌，仅供受内部认证保护的供应商客户端调用，禁止暴露到HTTP。
+func (s *CoreServer) GetSourceIntegrationCredential(ctx context.Context, in *core.SourceIntegrationIdReq) (*core.SourceIntegrationCredentialResp, error) {
+	l := logic.NewGetSourceIntegrationCredentialLogic(ctx, s.svcCtx)
+	return l.GetSourceIntegrationCredential(in)
+}
+
+// 断开集成并使令牌立即不可用。
+func (s *CoreServer) DisconnectSourceIntegration(ctx context.Context, in *core.SourceIntegrationIdReq) (*core.SourceIntegrationResp, error) {
+	l := logic.NewDisconnectSourceIntegrationLogic(ctx, s.svcCtx)
+	return l.DisconnectSourceIntegration(in)
+}
+
+// 同步OAuth/App明确授权的只读仓库。
+func (s *CoreServer) AuthorizeSourceRepository(ctx context.Context, in *core.AuthorizeSourceRepositoryReq) (*core.SourceRepositoryResp, error) {
+	l := logic.NewAuthorizeSourceRepositoryLogic(ctx, s.svcCtx)
+	return l.AuthorizeSourceRepository(in)
+}
+
+// 查询单个授权仓库。
+func (s *CoreServer) GetSourceRepository(ctx context.Context, in *core.SourceRepositoryIdReq) (*core.SourceRepositoryResp, error) {
+	l := logic.NewGetSourceRepositoryLogic(ctx, s.svcCtx)
+	return l.GetSourceRepository(in)
+}
+
+// 分页查询授权仓库。
+func (s *CoreServer) ListSourceRepositories(ctx context.Context, in *core.SourceRepositoryListReq) (*core.SourceRepositoryListResp, error) {
+	l := logic.NewListSourceRepositoriesLogic(ctx, s.svcCtx)
+	return l.ListSourceRepositories(in)
+}
+
+// 撤销仓库授权。
+func (s *CoreServer) RevokeSourceRepository(ctx context.Context, in *core.SourceRepositoryIdReq) (*core.SourceRepositoryResp, error) {
+	l := logic.NewRevokeSourceRepositoryLogic(ctx, s.svcCtx)
+	return l.RevokeSourceRepository(in)
+}
+
+// 记录从授权仓库导入并完成校验的APK Artifact来源。
+func (s *CoreServer) RecordSourceArtifact(ctx context.Context, in *core.RecordSourceArtifactReq) (*core.SourceArtifactResp, error) {
+	l := logic.NewRecordSourceArtifactLogic(ctx, s.svcCtx)
+	return l.RecordSourceArtifact(in)
+}
+
+// 在同一数据库事务中创建版本、绑定存储对象并记录供应商Artifact来源。
+func (s *CoreServer) ImportSourceArtifact(ctx context.Context, in *core.ImportSourceArtifactReq) (*core.SourceArtifactImportResp, error) {
+	l := logic.NewImportSourceArtifactLogic(ctx, s.svcCtx)
+	return l.ImportSourceArtifact(in)
+}
+
+// 创建预定义源码平台构建触发策略并一次性返回回调令牌和签名Secret。
+func (s *CoreServer) CreateSourceBuildTrigger(ctx context.Context, in *core.CreateSourceBuildTriggerReq) (*core.SourceBuildTriggerSecretResp, error) {
+	l := logic.NewCreateSourceBuildTriggerLogic(ctx, s.svcCtx)
+	return l.CreateSourceBuildTrigger(in)
+}
+
+// 更新预定义源码平台构建触发策略，不能修改授权仓库和应用。
+func (s *CoreServer) UpdateSourceBuildTrigger(ctx context.Context, in *core.UpdateSourceBuildTriggerReq) (*core.SourceBuildTriggerResp, error) {
+	l := logic.NewUpdateSourceBuildTriggerLogic(ctx, s.svcCtx)
+	return l.UpdateSourceBuildTrigger(in)
+}
+
+// 查询预定义源码平台构建触发策略。
+func (s *CoreServer) GetSourceBuildTrigger(ctx context.Context, in *core.SourceBuildTriggerIdReq) (*core.SourceBuildTriggerResp, error) {
+	l := logic.NewGetSourceBuildTriggerLogic(ctx, s.svcCtx)
+	return l.GetSourceBuildTrigger(in)
+}
+
+// 分页查询预定义源码平台构建触发策略。
+func (s *CoreServer) ListSourceBuildTriggers(ctx context.Context, in *core.SourceBuildTriggerListReq) (*core.SourceBuildTriggerListResp, error) {
+	l := logic.NewListSourceBuildTriggersLogic(ctx, s.svcCtx)
+	return l.ListSourceBuildTriggers(in)
+}
+
+// 轮换回调随机令牌和供应商签名Secret并一次性返回。
+func (s *CoreServer) RotateSourceBuildTriggerSecret(ctx context.Context, in *core.SourceBuildTriggerIdReq) (*core.SourceBuildTriggerSecretResp, error) {
+	l := logic.NewRotateSourceBuildTriggerSecretLogic(ctx, s.svcCtx)
+	return l.RotateSourceBuildTriggerSecret(in)
+}
+
+// 解析回调随机令牌和内部签名材料，仅供受内部认证保护的公开入口调用。
+func (s *CoreServer) ResolveSourceBuildTrigger(ctx context.Context, in *core.ResolveSourceBuildTriggerReq) (*core.SourceBuildTriggerCredentialResp, error) {
+	l := logic.NewResolveSourceBuildTriggerLogic(ctx, s.svcCtx)
+	return l.ResolveSourceBuildTrigger(in)
+}
+
+// 将已完成供应商签名验证的标准化事件可靠且幂等地写入队列。
+func (s *CoreServer) EnqueueSourceWebhookEvent(ctx context.Context, in *core.EnqueueSourceWebhookEventReq) (*core.EnqueueSourceWebhookEventResp, error) {
+	l := logic.NewEnqueueSourceWebhookEventLogic(ctx, s.svcCtx)
+	return l.EnqueueSourceWebhookEvent(in)
+}
+
+// Worker使用租约原子领取待处理或超时事件。
+func (s *CoreServer) ClaimSourceWebhookEvent(ctx context.Context, in *core.ClaimSourceWebhookEventReq) (*core.ClaimSourceWebhookEventResp, error) {
+	l := logic.NewClaimSourceWebhookEventLogic(ctx, s.svcCtx)
+	return l.ClaimSourceWebhookEvent(in)
+}
+
+// Worker记录Artifact导入和构建任务创建成功。
+func (s *CoreServer) CompleteSourceWebhookEvent(ctx context.Context, in *core.CompleteSourceWebhookEventReq) (*core.RespBase, error) {
+	l := logic.NewCompleteSourceWebhookEventLogic(ctx, s.svcCtx)
+	return l.CompleteSourceWebhookEvent(in)
+}
+
+// Worker按可重试性记录失败、指数退避或最终失败。
+func (s *CoreServer) FailSourceWebhookEvent(ctx context.Context, in *core.FailSourceWebhookEventReq) (*core.RespBase, error) {
+	l := logic.NewFailSourceWebhookEventLogic(ctx, s.svcCtx)
+	return l.FailSourceWebhookEvent(in)
+}
+
+// 分页查询源码平台入站事件审计记录。
+func (s *CoreServer) ListSourceWebhookEvents(ctx context.Context, in *core.SourceWebhookEventListReq) (*core.SourceWebhookEventListResp, error) {
+	l := logic.NewListSourceWebhookEventsLogic(ctx, s.svcCtx)
+	return l.ListSourceWebhookEvents(in)
+}
+
+// 创建V6不可变套餐版本，同编码自动分配下一版本号。
+func (s *CoreServer) CreateBillingPlan(ctx context.Context, in *core.CreateBillingPlanReq) (*core.BillingPlanResp, error) {
+	l := logic.NewCreateBillingPlanLogic(ctx, s.svcCtx)
+	return l.CreateBillingPlan(in)
+}
+
+// 查询V6套餐版本。
+func (s *CoreServer) GetBillingPlan(ctx context.Context, in *core.BillingPlanIdReq) (*core.BillingPlanResp, error) {
+	l := logic.NewGetBillingPlanLogic(ctx, s.svcCtx)
+	return l.GetBillingPlan(in)
+}
+
+// 查询V6套餐版本列表。
+func (s *CoreServer) ListBillingPlans(ctx context.Context, in *core.BillingPlanListReq) (*core.BillingPlanListResp, error) {
+	l := logic.NewListBillingPlansLogic(ctx, s.svcCtx)
+	return l.ListBillingPlans(in)
+}
+
+// 退役V6套餐版本，不影响历史订阅。
+func (s *CoreServer) RetireBillingPlan(ctx context.Context, in *core.BillingPlanIdReq) (*core.BillingPlanResp, error) {
+	l := logic.NewRetireBillingPlanLogic(ctx, s.svcCtx)
+	return l.RetireBillingPlan(in)
+}
+
+// 查询租户当前订阅、权益和固化套餐版本。
+func (s *CoreServer) GetTenantBilling(ctx context.Context, in *core.TenantBillingReq) (*core.TenantBillingResp, error) {
+	l := logic.NewGetTenantBillingLogic(ctx, s.svcCtx)
+	return l.GetTenantBilling(in)
+}
+
+// 创建或更新人工合同订阅并原子刷新权益。
+func (s *CoreServer) UpsertManualSubscription(ctx context.Context, in *core.UpsertManualSubscriptionReq) (*core.TenantBillingResp, error) {
+	l := logic.NewUpsertManualSubscriptionLogic(ctx, s.svcCtx)
+	return l.UpsertManualSubscription(in)
+}
+
+// 立即或周期末变更套餐。
+func (s *CoreServer) ChangeTenantSubscription(ctx context.Context, in *core.ChangeTenantSubscriptionReq) (*core.TenantBillingResp, error) {
+	l := logic.NewChangeTenantSubscriptionLogic(ctx, s.svcCtx)
+	return l.ChangeTenantSubscription(in)
+}
+
+// 立即或周期末取消订阅。
+func (s *CoreServer) CancelTenantSubscription(ctx context.Context, in *core.CancelTenantSubscriptionReq) (*core.TenantBillingResp, error) {
+	l := logic.NewCancelTenantSubscriptionLogic(ctx, s.svcCtx)
+	return l.CancelTenantSubscription(in)
+}
+
+// 并发安全地预占构建、存储或席位额度。
+func (s *CoreServer) ReserveQuota(ctx context.Context, in *core.ReserveQuotaReq) (*core.QuotaReservationResp, error) {
+	l := logic.NewReserveQuotaLogic(ctx, s.svcCtx)
+	return l.ReserveQuota(in)
+}
+
+// 幂等确认额度预占并写不可变用量账本。
+func (s *CoreServer) ConfirmQuota(ctx context.Context, in *core.QuotaReservationActionReq) (*core.QuotaReservationResp, error) {
+	l := logic.NewConfirmQuotaLogic(ctx, s.svcCtx)
+	return l.ConfirmQuota(in)
+}
+
+// 幂等释放未使用额度预占。
+func (s *CoreServer) ReleaseQuota(ctx context.Context, in *core.QuotaReservationActionReq) (*core.QuotaReservationResp, error) {
+	l := logic.NewReleaseQuotaLogic(ctx, s.svcCtx)
+	return l.ReleaseQuota(in)
+}
+
+// 追加一条幂等不可变用量记录。
+func (s *CoreServer) RecordUsage(ctx context.Context, in *core.RecordUsageReq) (*core.RespBase, error) {
+	l := logic.NewRecordUsageLogic(ctx, s.svcCtx)
+	return l.RecordUsage(in)
+}
+
+// 查询周期用量、预占和当前限额。
+func (s *CoreServer) GetBillingUsage(ctx context.Context, in *core.BillingUsageReq) (*core.BillingUsageResp, error) {
+	l := logic.NewGetBillingUsageLogic(ctx, s.svcCtx)
+	return l.GetBillingUsage(in)
+}
+
+// 查询租户不可变账单及账单项。
+func (s *CoreServer) ListInvoices(ctx context.Context, in *core.InvoiceListReq) (*core.InvoiceListResp, error) {
+	l := logic.NewListInvoicesLogic(ctx, s.svcCtx)
+	return l.ListInvoices(in)
+}
+
+// 应用已验签支付事件，事件幂等且拒绝乱序覆盖新状态。
+func (s *CoreServer) ApplyBillingWebhook(ctx context.Context, in *core.ApplyBillingWebhookReq) (*core.RespBase, error) {
+	l := logic.NewApplyBillingWebhookLogic(ctx, s.svcCtx)
+	return l.ApplyBillingWebhook(in)
+}
+
+// 创建V7 Local Agent并一次性返回注册码。
+func (s *CoreServer) CreateLocalAgentRegistration(ctx context.Context, in *core.CreateLocalAgentRegistrationReq) (*core.LocalAgentRegistrationResp, error) {
+	l := logic.NewCreateLocalAgentRegistrationLogic(ctx, s.svcCtx)
+	return l.CreateLocalAgentRegistration(in)
+}
+
+// Agent使用一次性注册码和本地CSR完成首次注册。
+func (s *CoreServer) RegisterLocalAgent(ctx context.Context, in *core.RegisterLocalAgentReq) (*core.RegisterLocalAgentResp, error) {
+	l := logic.NewRegisterLocalAgentLogic(ctx, s.svcCtx)
+	return l.RegisterLocalAgent(in)
+}
+
+// 查询V7 Local Agent详情。
+func (s *CoreServer) GetLocalAgent(ctx context.Context, in *core.LocalAgentIdReq) (*core.LocalAgentResp, error) {
+	l := logic.NewGetLocalAgentLogic(ctx, s.svcCtx)
+	return l.GetLocalAgent(in)
+}
+
+// 分页查询V7 Local Agent。
+func (s *CoreServer) ListLocalAgents(ctx context.Context, in *core.LocalAgentListReq) (*core.LocalAgentListResp, error) {
+	l := logic.NewListLocalAgentsLogic(ctx, s.svcCtx)
+	return l.ListLocalAgents(in)
+}
+
+// Agent通过mTLS出站连接上报心跳和预定义能力。
+func (s *CoreServer) HeartbeatLocalAgent(ctx context.Context, in *core.HeartbeatLocalAgentReq) (*core.LocalAgentResp, error) {
+	l := logic.NewHeartbeatLocalAgentLogic(ctx, s.svcCtx)
+	return l.HeartbeatLocalAgent(in)
+}
+
+// 管理员远程设置Agent Drain状态。
+func (s *CoreServer) DrainLocalAgent(ctx context.Context, in *core.DrainLocalAgentReq) (*core.LocalAgentResp, error) {
+	l := logic.NewDrainLocalAgentLogic(ctx, s.svcCtx)
+	return l.DrainLocalAgent(in)
+}
+
+// 管理员吊销Agent及其全部有效证书。
+func (s *CoreServer) RevokeLocalAgent(ctx context.Context, in *core.RevokeLocalAgentReq) (*core.LocalAgentResp, error) {
+	l := logic.NewRevokeLocalAgentLogic(ctx, s.svcCtx)
+	return l.RevokeLocalAgent(in)
+}
+
+// Agent使用当前有效证书和新CSR轮换客户端证书。
+func (s *CoreServer) RotateLocalAgentCertificate(ctx context.Context, in *core.RotateLocalAgentCertificateReq) (*core.RegisterLocalAgentResp, error) {
+	l := logic.NewRotateLocalAgentCertificateLogic(ctx, s.svcCtx)
+	return l.RotateLocalAgentCertificate(in)
+}
+
+// Agent领取经过租户、应用、能力和协议范围校验的构建任务。
+func (s *CoreServer) ClaimLocalAgentBuildTask(ctx context.Context, in *core.ClaimLocalAgentBuildTaskReq) (*core.LocalAgentBuildTaskResp, error) {
+	l := logic.NewClaimLocalAgentBuildTaskLogic(ctx, s.svcCtx)
+	return l.ClaimLocalAgentBuildTask(in)
+}
+
+// Agent按任务attempt续租，旧进程不能回写。
+func (s *CoreServer) RenewLocalAgentTaskLease(ctx context.Context, in *core.RenewLocalAgentTaskLeaseReq) (*core.RespBase, error) {
+	l := logic.NewRenewLocalAgentTaskLeaseLogic(ctx, s.svcCtx)
+	return l.RenewLocalAgentTaskLease(in)
+}
+
+// Agent回报预定义构建阶段，不支持任意命令。
+func (s *CoreServer) ReportLocalAgentBuildProgress(ctx context.Context, in *core.ReportLocalAgentBuildProgressReq) (*core.RespBase, error) {
+	l := logic.NewReportLocalAgentBuildProgressLogic(ctx, s.svcCtx)
+	return l.ReportLocalAgentBuildProgress(in)
+}
+
+// Agent校验Artifact后完成构建任务。
+func (s *CoreServer) CompleteLocalAgentBuildTask(ctx context.Context, in *core.CompleteLocalAgentBuildTaskReq) (*core.RespBase, error) {
+	l := logic.NewCompleteLocalAgentBuildTaskLogic(ctx, s.svcCtx)
+	return l.CompleteLocalAgentBuildTask(in)
+}
+
+// Agent记录脱敏失败摘要并结束任务。
+func (s *CoreServer) FailLocalAgentBuildTask(ctx context.Context, in *core.FailLocalAgentBuildTaskReq) (*core.RespBase, error) {
+	l := logic.NewFailLocalAgentBuildTaskLogic(ctx, s.svcCtx)
+	return l.FailLocalAgentBuildTask(in)
+}
+
+// 校验并登记三种存储模式下的Artifact引用。
+func (s *CoreServer) VerifyHybridArtifact(ctx context.Context, in *core.VerifyHybridArtifactReq) (*core.RespBase, error) {
+	l := logic.NewVerifyHybridArtifactLogic(ctx, s.svcCtx)
+	return l.VerifyHybridArtifact(in)
+}
+
 func (s *CoreServer) ReportInstall(ctx context.Context, in *core.InstallReportReq) (*core.RespBase, error) {
 	l := logic.NewReportInstallLogic(ctx, s.svcCtx)
 	return l.ReportInstall(in)
@@ -338,6 +812,42 @@ func (s *CoreServer) ResolveChannelDownload(ctx context.Context, in *core.Resolv
 func (s *CoreServer) ClaimBuildTask(ctx context.Context, in *core.ClaimBuildTaskReq) (*core.BuildTaskResp, error) {
 	l := logic.NewClaimBuildTaskLogic(ctx, s.svcCtx)
 	return l.ClaimBuildTask(in)
+}
+
+// 注册或刷新V4 Builder节点能力。
+func (s *CoreServer) RegisterBuilderNode(ctx context.Context, in *core.RegisterBuilderNodeReq) (*core.BuilderNodeResp, error) {
+	l := logic.NewRegisterBuilderNodeLogic(ctx, s.svcCtx)
+	return l.RegisterBuilderNode(in)
+}
+
+// 上报V4 Builder节点心跳、容量和运行任务。
+func (s *CoreServer) BuilderNodeHeartbeat(ctx context.Context, in *core.BuilderNodeHeartbeatReq) (*core.BuilderNodeResp, error) {
+	l := logic.NewBuilderNodeHeartbeatLogic(ctx, s.svcCtx)
+	return l.BuilderNodeHeartbeat(in)
+}
+
+// 结合节点能力、公平队列和并发槽位原子领取V4构建任务。
+func (s *CoreServer) ClaimScheduledBuildTask(ctx context.Context, in *core.ClaimScheduledBuildTaskReq) (*core.BuildTaskResp, error) {
+	l := logic.NewClaimScheduledBuildTaskLogic(ctx, s.svcCtx)
+	return l.ClaimScheduledBuildTask(in)
+}
+
+// 解析并记录V4输入可寻址构建缓存命中。
+func (s *CoreServer) ResolveBuildCache(ctx context.Context, in *core.ResolveBuildCacheReq) (*core.BuildCacheResolutionResp, error) {
+	l := logic.NewResolveBuildCacheLogic(ctx, s.svcCtx)
+	return l.ResolveBuildCache(in)
+}
+
+// 发布独立V4构建缓存产物。
+func (s *CoreServer) PublishBuildCache(ctx context.Context, in *core.PublishBuildCacheReq) (*core.BuildCacheEntryResp, error) {
+	l := logic.NewPublishBuildCacheLogic(ctx, s.svcCtx)
+	return l.PublishBuildCache(in)
+}
+
+// 执行V4构建缓存TTL/LRU清理并返回可物理删除对象。
+func (s *CoreServer) CleanupBuildCache(ctx context.Context, in *core.CleanupBuildCacheReq) (*core.CleanupBuildCacheResp, error) {
+	l := logic.NewCleanupBuildCacheLogic(ctx, s.svcCtx)
+	return l.CleanupBuildCache(in)
 }
 
 // 读取当前Builder已领取任务的内部执行上下文。

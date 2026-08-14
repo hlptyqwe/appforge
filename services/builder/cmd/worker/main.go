@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"log"
+	"os"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -32,6 +33,12 @@ func main() {
 	}
 	if err := rpcauth.ValidateToken(c.InternalRpc.Token); err != nil {
 		log.Fatal(err)
+	}
+	if value := strings.TrimSpace(os.Getenv("APPFORGE_BUILDER_ID")); value != "" {
+		c.Builder.Id = value
+	}
+	if value := strings.TrimSpace(os.Getenv("APPFORGE_BUILDER_ENDPOINT")); value != "" {
+		c.Builder.Endpoint = value
 	}
 	clientAuth := zrpc.WithUnaryClientInterceptor(rpcauth.UnaryClientInterceptor(c.InternalRpc.Token))
 	builderConnection := zrpc.MustNewClient(c.BuilderRpc, clientAuth)

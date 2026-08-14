@@ -1,0 +1,91 @@
+type OpenListApplicationsReq {
+	PageReq
+	keyword string `form:"keyword,optional"`
+	status  int32  `form:"status,optional"`
+}
+
+@server (
+	prefix:  /open/v1
+	group:   open_v1
+	timeout: 10m
+)
+service admin {
+	@handler OpenV1ListApplications
+	get /apps (OpenListApplicationsReq) returns (PlatformApplicationListResp)
+
+	@handler OpenV1CreateApplication
+	post /apps (CreatePlatformApplicationReq) returns (PlatformApplicationResp)
+
+	@handler OpenV1GetApplication
+	get /apps/:id (PlatformIdReq) returns (PlatformApplicationResp)
+
+	@handler OpenV1InitiateUpload
+	post /uploads (InitiatePlatformUploadReq) returns (InitiatePlatformUploadResp)
+
+	@handler OpenV1CompleteUpload
+	post /uploads/:id/complete (CompletePlatformUploadReq) returns (CompletePlatformUploadResp)
+
+	@handler OpenV1ListVersions
+	get /versions (ListPlatformVersionsReq) returns (PlatformVersionListResp)
+
+	@handler OpenV1CreateVersion
+	post /versions (CreatePlatformVersionReq) returns (PlatformVersionResp)
+
+	@handler OpenV1GetVersion
+	get /versions/:id (PlatformIdReq) returns (PlatformVersionResp)
+
+	@handler OpenV1ListChannels
+	get /channels (ListPlatformChannelsReq) returns (PlatformChannelListResp)
+
+	@handler OpenV1CreateChannel
+	post /channels (CreatePlatformChannelReq) returns (PlatformChannelResp)
+
+	@handler OpenV1GetChannel
+	get /channels/:id (PlatformIdReq) returns (PlatformChannelResp)
+
+	@handler OpenV1ListBrandingProfiles
+	get /branding-profiles (ListPlatformBrandingProfilesReq) returns (PlatformBrandingProfileListResp)
+
+	@handler OpenV1CreateBrandingProfile
+	post /branding-profiles (CreatePlatformBrandingProfileReq) returns (PlatformBrandingProfileResp)
+
+	@handler OpenV1UpdateBrandingProfile
+	put /branding-profiles/:id (UpdatePlatformBrandingProfileReq) returns (PlatformBrandingProfileResp)
+
+	@handler OpenV1GetBrandingProfile
+	get /branding-profiles/:id (PlatformIdReq) returns (PlatformBrandingProfileResp)
+
+	@handler OpenV1ListWhiteLabelProducts
+	get /white-label/products (ListPlatformWhiteLabelProductsReq) returns (PlatformWhiteLabelProductListResp)
+
+	@handler OpenV1CreateWhiteLabelProduct
+	post /white-label/products (CreatePlatformWhiteLabelProductReq) returns (PlatformWhiteLabelProductResp)
+
+	@handler OpenV1UpdateWhiteLabelProduct
+	put /white-label/products/:id (UpdatePlatformWhiteLabelProductReq) returns (PlatformWhiteLabelProductResp)
+
+	@handler OpenV1GetWhiteLabelProduct
+	get /white-label/products/:id (PlatformIdReq) returns (PlatformWhiteLabelProductResp)
+
+	@handler OpenV1ListBuilds
+	get /builds (ListPlatformBuildTasksReq) returns (PlatformBuildTaskListResp)
+
+	@handler OpenV1CreateBuild
+	post /builds (CreatePlatformBuildTaskReq) returns (PlatformBuildTaskResp)
+
+	@handler OpenV1GetBuild
+	get /builds/:id (PlatformIdReq) returns (PlatformBuildTaskResp)
+
+	@handler OpenV1CancelBuild
+	post /builds/:id/cancel (CancelPlatformBuildTaskReq) returns (PlatformBuildTaskResp)
+
+	@handler OpenV1RetryBuild
+	post /builds/:id/retry (RetryPlatformBuildTaskReq) returns (PlatformBuildTaskResp)
+
+	@handler OpenV1GetArtifactDownload
+	get /artifacts/:id/download (PlatformStorageObjectIdReq) returns (PlatformStorageDownloadResp)
+
+	@handler OpenV1GetChannelStats
+	get /stats/channels (GetPlatformChannelStatsReq) returns (PlatformChannelStatsResp)
+}
+

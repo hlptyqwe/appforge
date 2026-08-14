@@ -2,7 +2,7 @@ API_DIR := api
 API_FILE := $(API_DIR)/core.api
 
 # 被 core.api import 的子文件，只用于检查
-SUB_APIS := auth_public auth_private system platform
+SUB_APIS := auth_public auth_private system platform open
 
 GOCTL ?= $(shell go env GOPATH)/bin/goctl
 SERVICE_NAME ?= admin

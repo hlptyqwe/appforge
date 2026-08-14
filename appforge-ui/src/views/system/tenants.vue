@@ -48,18 +48,8 @@
     </CrudQueryCard>
 
     <el-card class="table-card" shadow="never">
-      <el-table
-        v-loading="loading"
-        :data="list"
-        :empty-text="t('common.noData')"
-        stripe
-      >
-        <el-table-column
-          prop="id"
-          :label="t('common.id')"
-          width="80"
-          align="center"
-        />
+      <el-table v-loading="loading" :data="list" :empty-text="t('common.noData')" stripe>
+        <el-table-column prop="id" :label="t('common.id')" width="80" align="center" />
         <el-table-column prop="tenantCode" :label="t('system.tenantCode')" min-width="150" />
         <el-table-column prop="tenantName" :label="t('system.tenantName')" min-width="150" />
         <el-table-column prop="contactName" :label="t('system.contactName')" min-width="120" />
@@ -92,12 +82,7 @@
             {{ formatDate(row.createTimes) }}
           </template>
         </el-table-column>
-        <el-table-column
-          :label="t('common.actions')"
-          width="140"
-          align="center"
-          fixed="right"
-        >
+        <el-table-column :label="t('common.actions')" width="140" align="center" fixed="right">
           <template #default="{ row }">
             <el-button
               v-perm="'sys:tenant:update'"
@@ -136,12 +121,7 @@
       width="700px"
       :close-on-click-modal="false"
     >
-      <el-form
-        ref="formRef"
-        :model="formData"
-        :rules="formRules"
-        label-width="120px"
-      >
+      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="120px">
         <el-row :gutter="20">
           <el-col v-if="isEdit" :span="12">
             <el-form-item :label="t('system.tenantCode')" prop="tenantCode">

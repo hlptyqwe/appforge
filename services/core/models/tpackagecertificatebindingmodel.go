@@ -12,6 +12,7 @@ type (
 	// and implement the added methods in customTPackageCertificateBindingModel.
 	TPackageCertificateBindingModel interface {
 		tPackageCertificateBindingModel
+		WithSession(session sqlx.Session) TPackageCertificateBindingModel
 	}
 
 	customTPackageCertificateBindingModel struct {
@@ -23,5 +24,15 @@ type (
 func NewTPackageCertificateBindingModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Option) TPackageCertificateBindingModel {
 	return &customTPackageCertificateBindingModel{
 		defaultTPackageCertificateBindingModel: newTPackageCertificateBindingModel(conn, c, opts...),
+	}
+}
+
+// WithSession returns a package-certificate model bound to the supplied transaction.
+func (m *customTPackageCertificateBindingModel) WithSession(session sqlx.Session) TPackageCertificateBindingModel {
+	return &customTPackageCertificateBindingModel{
+		defaultTPackageCertificateBindingModel: &defaultTPackageCertificateBindingModel{
+			CachedConn: m.CachedConn.WithSession(session),
+			table:      m.table,
+		},
 	}
 }

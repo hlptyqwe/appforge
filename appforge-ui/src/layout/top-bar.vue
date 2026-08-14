@@ -173,7 +173,9 @@ function handleCommand(command: string) {
       </el-select>
       <el-dropdown @command="handleCommand">
         <div class="account">
-          <el-avatar :size="32"><el-icon><User /></el-icon></el-avatar>
+          <el-avatar :size="32"
+            ><el-icon><User /></el-icon
+          ></el-avatar>
           <span>{{ auth.user?.nickname || auth.user?.username }}</span>
         </div>
         <template #dropdown>

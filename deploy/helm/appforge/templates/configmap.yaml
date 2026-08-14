@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "appforge.name" . }}-runtime
+  labels:
+    {{- include "appforge.labels" . | nindent 4 }}
+data:
+  deployment-mode: {{ .Values.global.deploymentMode | quote }}
+  public-origin: {{ .Values.global.publicOrigin | quote }}
+  schema-version: {{ .Values.upgrade.schemaVersion | quote }}
+  otlp-endpoint: {{ .Values.observability.otlpEndpoint | quote }}
+  siem-webhook: {{ .Values.observability.siemWebhook | quote }}

@@ -9,11 +9,11 @@ export function apiUserList(params: {
   limit?: number
   appScope?: number
 }): Promise<RespBase<SysUserItem[]>> {
-	return get<SysUserItem[]>(`${TEAM_API_BASE}/users`, params)
+  return get<SysUserItem[]>(`${TEAM_API_BASE}/users`, params)
 }
 
 export function apiUserDetail(id: number): Promise<RespBase<SysUserItem>> {
-	return get<SysUserItem>(`${TEAM_API_BASE}/users/${id}`)
+  return get<SysUserItem>(`${TEAM_API_BASE}/users/${id}`)
 }
 
 export function apiUserCreate(data: {
@@ -24,7 +24,7 @@ export function apiUserCreate(data: {
   roleIds?: number[]
   appScope: number
 }): Promise<RespBase> {
-	return post<RespBase>(`${TEAM_API_BASE}/users`, data)
+  return post<RespBase>(`${TEAM_API_BASE}/users`, data)
 }
 
 export function apiUserUpdate(data: {
@@ -34,23 +34,23 @@ export function apiUserUpdate(data: {
   roleIds?: number[]
   appScope?: number
 }): Promise<RespBase> {
-	return put<RespBase>(`${TEAM_API_BASE}/users`, data)
+  return put<RespBase>(`${TEAM_API_BASE}/users`, data)
 }
 
 export function apiUserDelete(id: number): Promise<RespBase> {
-	return del<RespBase>(`${TEAM_API_BASE}/users/${id}`)
+  return del<RespBase>(`${TEAM_API_BASE}/users/${id}`)
 }
 
 export function apiChangeUserEnabled(data: { id: number; enabled: number }): Promise<RespBase> {
-	return post<RespBase>(`${TEAM_API_BASE}/users/status`, data)
+  return post<RespBase>(`${TEAM_API_BASE}/users/status`, data)
 }
 
 export function apiResetUserPwd(data: { id: number; password: string }): Promise<RespBase> {
-	return post<RespBase>(`${TEAM_API_BASE}/users/resetPwd`, data)
+  return post<RespBase>(`${TEAM_API_BASE}/users/resetPwd`, data)
 }
 
 export function apiAssignUserRoles(data: { userId: number; roleIds: number[] }): Promise<RespBase> {
-	return post<RespBase>(`${TEAM_API_BASE}/users/assignRoles`, data)
+  return post<RespBase>(`${TEAM_API_BASE}/users/assignRoles`, data)
 }
 
 // ---- Google 2FA ----

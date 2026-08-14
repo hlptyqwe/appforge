@@ -11,7 +11,7 @@ type SystemCore = {
 }
 
 export function getSystemCore(): Promise<RespBase<SystemCore>> {
-	return get<SystemCore>(`${AUTH_API_BASE}/core`)
+  return get<SystemCore>(`${AUTH_API_BASE}/core`)
 }
 
 let coreOptionsPromise: Promise<RespBase<OptionGroup[]>> | null = null

@@ -11,3 +11,27 @@ CacheRedis:
   - Host: redis:6379
     Type: node
 
+# 仅用于本地开发，生产环境必须由 Secret Manager 注入并定期轮换。
+SigningSecrets:
+  MasterKeyBase64: YXBwZm9yZ2UtZGV2LXNpZ25pbmcta2V5LTAwMDAwMSE=
+
+WebhookWorker:
+  Enabled: true
+  PollInterval: 1s
+  HttpTimeout: 10s
+  BatchSize: 20
+
+BillingWorker:
+  Enabled: true
+  PollInterval: 30s
+
+EnterpriseWorker:
+  Enabled: true
+  PollInterval: 15s
+  OfflineAfter: 90s
+
+# 本地开发为空时每次Core启动生成临时CA；生产必须配置持久化客户CA文件。
+AgentPKI:
+  CACertificateFile: ""
+  CAPrivateKeyFile: ""
+  CertificateTTL: 24h

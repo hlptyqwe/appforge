@@ -10,7 +10,7 @@ export const ENV = {
 
   // 应用配置
   APP_NAME: import.meta.env.VITE_APP_NAME || 'Admin UI',
-	APP_MODE: import.meta.env.VITE_APP_MODE === 'agent' ? 'agent' : 'admin',
+  APP_MODE: import.meta.env.VITE_APP_MODE === 'agent' ? 'agent' : 'admin',
   APP_ENV: import.meta.env.MODE,
   IS_DEV: import.meta.env.DEV,
   IS_PROD: import.meta.env.PROD,

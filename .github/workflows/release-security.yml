@@ -1,0 +1,92 @@
+name: release-security
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  security-events: write
+
+jobs:
+  images:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - component: system
+            dockerfile: deploy/docker/go.Dockerfile
+            build_args: MODULE_DIR=services/system
+          - component: core
+            dockerfile: deploy/docker/go.Dockerfile
+            build_args: MODULE_DIR=services/core
+          - component: builder
+            dockerfile: deploy/docker/builder-rpc.Dockerfile
+            build_args: ""
+          - component: builder-worker
+            dockerfile: deploy/docker/builder-worker.Dockerfile
+            build_args: ""
+          - component: api
+            dockerfile: deploy/docker/go.Dockerfile
+            build_args: MODULE_DIR=appforge-api
+          - component: admin-ui
+            dockerfile: deploy/docker/ui-production.Dockerfile
+            build_args: |
+              VITE_APP_MODE=admin
+              VITE_APP_NAME=AppForge 管理端
+          - component: agent-ui
+            dockerfile: deploy/docker/ui-production.Dockerfile
+            build_args: |
+              VITE_APP_MODE=agent
+              VITE_APP_NAME=AppForge 代理端
+          - component: local-agent
+            dockerfile: deploy/docker/local-agent.Dockerfile
+            build_args: ""
+          - component: etcd-init
+            dockerfile: deploy/docker/etcd-init.Dockerfile
+            build_args: ""
+          - component: migrate
+            dockerfile: deploy/docker/migrate.Dockerfile
+            build_args: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push immutable image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          build-args: ${{ matrix.build_args }}
+          push: true
+          provenance: mode=max
+          sbom: true
+          tags: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}:${{ github.ref_name }}
+      - name: Generate SPDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}:${{ github.ref_name }}
+          format: spdx-json
+          output-file: ${{ matrix.component }}.spdx.json
+      - name: Vulnerability gate
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}:${{ github.ref_name }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+      - uses: sigstore/cosign-installer@v3
+      - name: Keyless image signing
+        run: cosign sign --yes ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}:${{ github.ref_name }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.component }}
+          path: ${{ matrix.component }}.spdx.json

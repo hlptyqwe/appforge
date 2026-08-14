@@ -63,7 +63,7 @@ function isSuperRole(r: SysRole | null | undefined) {
 }
 
 function isProtectedRole(r: SysRole | null | undefined) {
-	return isSuperRole(r)
+  return isSuperRole(r)
 }
 
 function isTenantOwnerRole(r: SysRole | null | undefined) {
@@ -94,7 +94,11 @@ const { pagination, updateFromResponse, resetAndLoad, nextAndLoad, prevAndLoad }
 const { loading, withLoading } = useLoading()
 const { confirm } = useConfirm()
 const { form: queryForm } = useForm({
-	initialData: { keyword: '', enabled: 0 as 0 | 1 | 2, appScope: currentAppScope as number | undefined },
+  initialData: {
+    keyword: '',
+    enabled: 0 as 0 | 1 | 2,
+    appScope: currentAppScope as number | undefined,
+  },
 })
 
 const tableData = ref<SysRole[]>([])
@@ -169,7 +173,7 @@ function loadList() {
 function resetQuery() {
   queryForm.keyword = ''
   queryForm.enabled = 0
-	queryForm.appScope = currentAppScope
+  queryForm.appScope = currentAppScope
   loadList()
 }
 
@@ -454,12 +458,7 @@ onMounted(async () => {
 
         <el-table-column prop="remark" :label="t('common.remark')" min-width="200" />
 
-        <el-table-column
-          :label="t('common.actions')"
-          align="center"
-          width="320"
-          fixed="right"
-        >
+        <el-table-column :label="t('common.actions')" align="center" width="320" fixed="right">
           <template #default="{ row }">
             <el-button
               v-if="!isReadonlyRole(row)"
@@ -479,12 +478,7 @@ onMounted(async () => {
               {{ t('system.viewGrant') }}
             </el-button>
 
-            <el-button
-              v-else
-              v-perm="'sys:role:grant'"
-              size="small"
-              @click="openGrant(row)"
-            >
+            <el-button v-else v-perm="'sys:role:grant'" size="small" @click="openGrant(row)">
               {{ t('system.grant') }}
             </el-button>
 

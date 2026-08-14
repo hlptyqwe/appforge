@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"path"
 	"strings"
+	"time"
 
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
@@ -21,8 +22,9 @@ const buildTaskSelect = `SELECT id, tenant_id, app_id, version_id, channel_id, s
 channel_code, version_code, version_name, source_apk_object_id, source_apk_url, build_config,
 branding_profile_id, branding_revision, branding_snapshot, status, builder_id,
 white_label_product_id, template_revision, template_snapshot,
-builder_attempt, priority, apk_object_id, apk_url, apk_sha256, apk_size, log_object_id, log_url, error_message, queued_at,
-start_time, finish_time, lease_until, create_by, create_time, update_time FROM t_build_task`
+pool_code, cache_key, source_webhook_event_id, cache_entry_id, cache_hit, builder_attempt, priority, apk_object_id, apk_url,
+apk_sha256, apk_size, log_object_id, log_url, error_message, queued_at, start_time, finish_time, lease_until,
+cancel_requested_at, cancelled_at, cancel_reason, retry_of_task_id, create_by, create_time, update_time FROM t_build_task`
 
 func validateBuilderRequest(builderID string) error {
 	if strings.TrimSpace(builderID) == "" {
@@ -134,5 +136,19 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`, tenantID, appID, artifact.ObjectType, ar
 	if err != nil {
 		return 0, err
 	}
-	return result.LastInsertId()
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	key := storageQuotaKey(artifact.ObjectKey)
+	if _, err := reserveQuotaInSession(ctx, session, tenantID, "storage.bytes", artifact.Size,
+		"storage", id, key, 15*time.Minute); err != nil {
+		return 0, err
+	}
+	usageMetric, _ := mapUsageMetric(storageUsageMetric(artifact.ObjectType))
+	if err := confirmQuotaInSession(ctx, session, tenantID, "storage.bytes", key, usageMetric, id,
+		billingUsageMetadata(map[string]any{"objectType": artifact.ObjectType, "builderArtifact": true})); err != nil {
+		return 0, err
+	}
+	return id, nil
 }

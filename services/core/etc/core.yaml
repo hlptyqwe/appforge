@@ -10,3 +10,11 @@ Mysql:
 CacheRedis:
   - Host: 127.0.0.1:6379
     Type: node
+EnterpriseWorker:
+  Enabled: true
+  PollInterval: 15s
+  OfflineAfter: 90s
+AgentPKI:
+  CACertificateFile: ""
+  CAPrivateKeyFile: ""
+  CertificateTTL: 24h

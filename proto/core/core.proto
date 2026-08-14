@@ -41,6 +41,7 @@ enum BuildTaskStatus {
   BUILD_TASK_STATUS_UPLOADING = 4; // 上传中
   BUILD_TASK_STATUS_SUCCESS = 5; // 成功
   BUILD_TASK_STATUS_FAILED = 6; // 失败
+  BUILD_TASK_STATUS_CANCELLED = 7; // 已取消
 }
 
 // 私有对象存储中的业务对象类型。
@@ -53,6 +54,324 @@ enum StorageObjectType {
   STORAGE_OBJECT_TYPE_BRAND_LOGO = 5; // 品牌Logo图片
   STORAGE_OBJECT_TYPE_BRAND_SPLASH = 6; // 品牌启动图图片
   STORAGE_OBJECT_TYPE_TEMPLATE_FILE = 7; // V3模板声明式补丁引用的受控文件
+  STORAGE_OBJECT_TYPE_BUILD_CACHE = 8; // V4独立构建缓存产物
+}
+
+// V4 Builder节点状态。
+enum BuilderNodeStatus {
+  BUILDER_NODE_STATUS_UNKNOWN = 0; // 未知状态
+  BUILDER_NODE_STATUS_ONLINE = 1; // 在线且健康
+  BUILDER_NODE_STATUS_OFFLINE = 2; // 心跳超时离线
+  BUILDER_NODE_STATUS_ISOLATED = 3; // 因容量、工具链或连续失败被隔离
+}
+
+// V4 Builder节点排空状态。
+enum BuilderDrainStatus {
+  BUILDER_DRAIN_STATUS_UNKNOWN = 0; // 未知状态
+  BUILDER_DRAIN_STATUS_ACCEPTING = 1; // 接收新任务
+  BUILDER_DRAIN_STATUS_DRAINING = 2; // 排空中，不领取新任务
+}
+
+// V4 构建并发策略状态。
+enum BuildPolicyStatus {
+  BUILD_POLICY_STATUS_UNKNOWN = 0; // 未知状态
+  BUILD_POLICY_STATUS_ENABLED = 1; // 启用
+  BUILD_POLICY_STATUS_DISABLED = 2; // 停用
+}
+
+// V4 构建槽位租约状态。
+enum BuildSlotLeaseStatus {
+  BUILD_SLOT_LEASE_STATUS_UNKNOWN = 0; // 未知状态
+  BUILD_SLOT_LEASE_STATUS_ACTIVE = 1; // 生效中
+  BUILD_SLOT_LEASE_STATUS_RELEASED = 2; // 正常释放
+  BUILD_SLOT_LEASE_STATUS_EXPIRED = 3; // 租约过期
+  BUILD_SLOT_LEASE_STATUS_CANCELLED = 4; // 因任务取消释放
+}
+
+// V4 构建缓存作用域。
+enum BuildCacheScope {
+  BUILD_CACHE_SCOPE_UNKNOWN = 0; // 未知作用域
+  BUILD_CACHE_SCOPE_TENANT_INTERMEDIATE = 1; // 租户隔离的白标中间APK，尚未注入任务渠道元数据和签名
+  BUILD_CACHE_SCOPE_PLATFORM_INTERMEDIATE = 2; // 不含租户敏感信息的平台中间产物
+}
+
+// V4 构建缓存状态。
+enum BuildCacheStatus {
+  BUILD_CACHE_STATUS_UNKNOWN = 0; // 未知状态
+  BUILD_CACHE_STATUS_ACTIVE = 1; // 有效
+  BUILD_CACHE_STATUS_INVALIDATED = 2; // 已失效
+  BUILD_CACHE_STATUS_EXPIRED = 3; // 已过期
+}
+
+// V4 调度事件类型。
+enum BuildSchedulerEventType {
+  BUILD_SCHEDULER_EVENT_TYPE_UNKNOWN = 0; // 未知事件
+  BUILD_SCHEDULER_EVENT_TYPE_QUEUED = 1; // 任务进入队列
+  BUILD_SCHEDULER_EVENT_TYPE_CLAIMED = 2; // 节点领取任务
+  BUILD_SCHEDULER_EVENT_TYPE_THROTTLED = 3; // 并发或能力限制
+  BUILD_SCHEDULER_EVENT_TYPE_RECOVERED = 4; // 租约恢复
+  BUILD_SCHEDULER_EVENT_TYPE_DRAINED = 5; // 节点排空状态变化
+  BUILD_SCHEDULER_EVENT_TYPE_CANCELLED = 6; // 任务取消
+  BUILD_SCHEDULER_EVENT_TYPE_RETRIED = 7; // 任务重试
+  BUILD_SCHEDULER_EVENT_TYPE_CACHE_HIT = 8; // 构建缓存命中
+  BUILD_SCHEDULER_EVENT_TYPE_CACHE_INVALIDATED = 9; // 构建缓存失效
+  BUILD_SCHEDULER_EVENT_TYPE_COMPLETED = 10; // 任务完成
+  BUILD_SCHEDULER_EVENT_TYPE_FAILED = 11; // 任务失败
+}
+
+// V5 Open API凭证状态。
+enum OpenApiCredentialStatus {
+  OPEN_API_CREDENTIAL_STATUS_UNKNOWN = 0; // 未知状态
+  OPEN_API_CREDENTIAL_STATUS_ACTIVE = 1; // 启用
+  OPEN_API_CREDENTIAL_STATUS_ROTATION_GRACE = 2; // 轮换过渡期
+  OPEN_API_CREDENTIAL_STATUS_REVOKED = 3; // 已吊销
+  OPEN_API_CREDENTIAL_STATUS_EXPIRED = 4; // 已过期
+}
+
+// V5 Open API权限范围。
+enum OpenApiScope {
+  OPEN_API_SCOPE_UNKNOWN = 0; // 未知Scope
+  OPEN_API_SCOPE_APPS_READ = 1; // 读取应用
+  OPEN_API_SCOPE_APPS_WRITE = 2; // 管理应用
+  OPEN_API_SCOPE_VERSIONS_READ = 3; // 读取版本
+  OPEN_API_SCOPE_VERSIONS_WRITE = 4; // 管理版本
+  OPEN_API_SCOPE_CHANNELS_READ = 5; // 读取渠道
+  OPEN_API_SCOPE_CHANNELS_WRITE = 6; // 管理渠道
+  OPEN_API_SCOPE_BRANDING_READ = 7; // 读取品牌和白标产品
+  OPEN_API_SCOPE_BRANDING_WRITE = 8; // 管理品牌和白标产品
+  OPEN_API_SCOPE_BUILDS_READ = 9; // 读取构建
+  OPEN_API_SCOPE_BUILDS_WRITE = 10; // 创建、取消和重试构建
+  OPEN_API_SCOPE_ARTIFACTS_READ = 11; // 下载构建产物
+  OPEN_API_SCOPE_STATS_READ = 12; // 读取归因统计
+}
+
+// V5 Open API幂等键处理结果。
+enum OpenApiIdempotencyDecision {
+  OPEN_API_IDEMPOTENCY_DECISION_UNKNOWN = 0; // 未知结果
+  OPEN_API_IDEMPOTENCY_DECISION_ACQUIRED = 1; // 当前请求取得执行权
+  OPEN_API_IDEMPOTENCY_DECISION_REPLAY = 2; // 返回已完成请求的响应
+  OPEN_API_IDEMPOTENCY_DECISION_IN_PROGRESS = 3; // 相同请求正在处理中
+  OPEN_API_IDEMPOTENCY_DECISION_CONFLICT = 4; // 相同幂等键对应不同请求
+}
+
+// V5 Webhook端点状态。
+enum WebhookEndpointStatus {
+  WEBHOOK_ENDPOINT_STATUS_UNKNOWN = 0; // 未知状态
+  WEBHOOK_ENDPOINT_STATUS_ACTIVE = 1; // 启用
+  WEBHOOK_ENDPOINT_STATUS_PAUSED = 2; // 暂停
+  WEBHOOK_ENDPOINT_STATUS_REVOKED = 3; // 已吊销
+}
+
+// V5 Webhook投递状态。
+enum WebhookDeliveryStatus {
+  WEBHOOK_DELIVERY_STATUS_UNKNOWN = 0; // 未知状态
+  WEBHOOK_DELIVERY_STATUS_PENDING = 1; // 待投递
+  WEBHOOK_DELIVERY_STATUS_DELIVERING = 2; // 投递中
+  WEBHOOK_DELIVERY_STATUS_SUCCEEDED = 3; // 投递成功
+  WEBHOOK_DELIVERY_STATUS_RETRYING = 4; // 等待重试
+  WEBHOOK_DELIVERY_STATUS_DEAD_LETTER = 5; // 已进入死信
+}
+
+// V5 代码托管平台类型。
+enum SourcePlatform {
+  SOURCE_PLATFORM_UNKNOWN = 0; // 未知平台
+  SOURCE_PLATFORM_GITHUB = 1; // GitHub App或OAuth
+  SOURCE_PLATFORM_GITLAB = 2; // GitLab OAuth
+}
+
+// V5 代码平台集成状态。
+enum SourceIntegrationStatus {
+  SOURCE_INTEGRATION_STATUS_UNKNOWN = 0; // 未知状态
+  SOURCE_INTEGRATION_STATUS_ACTIVE = 1; // 已连接且可用
+  SOURCE_INTEGRATION_STATUS_DISCONNECTED = 2; // 已主动断开
+  SOURCE_INTEGRATION_STATUS_ERROR = 3; // 安装或令牌同步异常
+}
+
+// V5 授权仓库状态。
+enum SourceRepositoryStatus {
+  SOURCE_REPOSITORY_STATUS_UNKNOWN = 0; // 未知状态
+  SOURCE_REPOSITORY_STATUS_AUTHORIZED = 1; // 已授权只读访问
+  SOURCE_REPOSITORY_STATUS_REVOKED = 2; // 已撤销授权
+}
+
+// V5 APK Artifact来源类型。
+enum SourceArtifactType {
+  SOURCE_ARTIFACT_TYPE_UNKNOWN = 0; // 未知来源
+  SOURCE_ARTIFACT_TYPE_RELEASE = 1; // Release附件
+  SOURCE_ARTIFACT_TYPE_CI_JOB = 2; // CI任务Artifact
+}
+
+// V5 源码平台预定义构建触发事件类型。
+enum SourceBuildTriggerEventType {
+  SOURCE_BUILD_TRIGGER_EVENT_TYPE_UNKNOWN = 0; // 未知事件
+  SOURCE_BUILD_TRIGGER_EVENT_TYPE_RELEASE_PUBLISHED = 1; // Release发布事件
+  SOURCE_BUILD_TRIGGER_EVENT_TYPE_CI_SUCCEEDED = 2; // CI流水线成功事件
+}
+
+// V5 源码平台预定义构建触发策略状态。
+enum SourceBuildTriggerStatus {
+  SOURCE_BUILD_TRIGGER_STATUS_UNKNOWN = 0; // 未知状态
+  SOURCE_BUILD_TRIGGER_STATUS_ACTIVE = 1; // 启用并接受签名Webhook
+  SOURCE_BUILD_TRIGGER_STATUS_DISABLED = 2; // 停用且拒绝Webhook
+}
+
+// V5 源码平台入站Webhook处理状态。
+enum SourceWebhookEventStatus {
+  SOURCE_WEBHOOK_EVENT_STATUS_UNKNOWN = 0; // 未知状态
+  SOURCE_WEBHOOK_EVENT_STATUS_PENDING = 1; // 已可靠入队等待处理
+  SOURCE_WEBHOOK_EVENT_STATUS_PROCESSING = 2; // Worker处理中
+  SOURCE_WEBHOOK_EVENT_STATUS_SUCCEEDED = 3; // Artifact导入和构建任务创建成功
+  SOURCE_WEBHOOK_EVENT_STATUS_IGNORED = 4; // 未满足预定义策略并已忽略
+  SOURCE_WEBHOOK_EVENT_STATUS_FAILED = 5; // 达到重试上限后失败
+}
+
+// V6 套餐计费周期。
+enum BillingCycle {
+  BILLING_CYCLE_UNKNOWN = 0; // 未知周期
+  BILLING_CYCLE_MONTHLY = 1; // 按月计费
+  BILLING_CYCLE_YEARLY = 2; // 按年计费
+}
+
+// V6 套餐版本状态。
+enum BillingPlanStatus {
+  BILLING_PLAN_STATUS_UNKNOWN = 0; // 未知状态
+  BILLING_PLAN_STATUS_ACTIVE = 1; // 可售且可订阅
+  BILLING_PLAN_STATUS_RETIRED = 2; // 已退役，不影响历史订阅
+}
+
+// V6 租户订阅状态。
+enum TenantSubscriptionStatus {
+  TENANT_SUBSCRIPTION_STATUS_UNKNOWN = 0; // 未知状态
+  TENANT_SUBSCRIPTION_STATUS_ACTIVE = 1; // 正常生效
+  TENANT_SUBSCRIPTION_STATUS_PAST_DUE = 2; // 支付逾期
+  TENANT_SUBSCRIPTION_STATUS_GRACE = 3; // 宽限期内
+  TENANT_SUBSCRIPTION_STATUS_PAUSED = 4; // 已暂停，不允许新增消耗
+  TENANT_SUBSCRIPTION_STATUS_CANCELED = 5; // 已取消
+  TENANT_SUBSCRIPTION_STATUS_PENDING = 6; // 待支付或待人工确认
+}
+
+// V6 订阅来源。
+enum TenantSubscriptionSource {
+  TENANT_SUBSCRIPTION_SOURCE_UNKNOWN = 0; // 未知来源
+  TENANT_SUBSCRIPTION_SOURCE_STRIPE = 1; // Stripe在线订阅
+  TENANT_SUBSCRIPTION_SOURCE_MANUAL = 2; // 人工合同订阅
+  TENANT_SUBSCRIPTION_SOURCE_GRANT = 3; // 平台赠送订阅
+}
+
+// V6 权益状态。
+enum TenantEntitlementStatus {
+  TENANT_ENTITLEMENT_STATUS_UNKNOWN = 0; // 未知状态
+  TENANT_ENTITLEMENT_STATUS_ACTIVE = 1; // 当前生效
+  TENANT_ENTITLEMENT_STATUS_PAUSED = 2; // 已暂停
+}
+
+// V6 用量指标。
+enum BillingUsageMetric {
+  BILLING_USAGE_METRIC_UNKNOWN = 0; // 未知指标
+  BILLING_USAGE_METRIC_BUILD_STARTED = 1; // 启动构建次数
+  BILLING_USAGE_METRIC_BUILD_SUCCEEDED = 2; // 成功构建次数
+  BILLING_USAGE_METRIC_BUILD_COMPUTE_SECONDS = 3; // 构建计算秒数
+  BILLING_USAGE_METRIC_STORAGE_SOURCE_BYTES = 4; // 原始与配置源文件存储字节
+  BILLING_USAGE_METRIC_STORAGE_ARTIFACT_BYTES = 5; // 构建产物存储字节
+  BILLING_USAGE_METRIC_STORAGE_LOG_BYTES = 6; // 构建日志存储字节
+  BILLING_USAGE_METRIC_API_REQUESTS = 7; // Open API调用次数
+  BILLING_USAGE_METRIC_TEAM_ACTIVE_SEATS = 8; // 团队活跃席位数快照
+}
+
+// V6 可预占额度指标。
+enum QuotaMetric {
+  QUOTA_METRIC_UNKNOWN = 0; // 未知额度
+  QUOTA_METRIC_BUILD_COUNT = 1; // 周期构建次数
+  QUOTA_METRIC_STORAGE_BYTES = 2; // 当前存储字节
+  QUOTA_METRIC_TEAM_SEATS = 3; // 当前活跃席位
+}
+
+// V6 额度预占状态。
+enum QuotaReservationStatus {
+  QUOTA_RESERVATION_STATUS_UNKNOWN = 0; // 未知状态
+  QUOTA_RESERVATION_STATUS_RESERVED = 1; // 已预占待确认
+  QUOTA_RESERVATION_STATUS_CONFIRMED = 2; // 已确认并计量
+  QUOTA_RESERVATION_STATUS_RELEASED = 3; // 已释放
+  QUOTA_RESERVATION_STATUS_EXPIRED = 4; // 已过期释放
+}
+
+// V6 订阅套餐变更生效方式。
+enum SubscriptionChangeMode {
+  SUBSCRIPTION_CHANGE_MODE_UNKNOWN = 0; // 未知方式
+  SUBSCRIPTION_CHANGE_MODE_IMMEDIATE = 1; // 立即生效，通常用于升级或人工恢复
+  SUBSCRIPTION_CHANGE_MODE_PERIOD_END = 2; // 当前周期结束后生效，通常用于降级
+}
+
+// V6 账单状态。
+enum InvoiceStatus {
+  INVOICE_STATUS_UNKNOWN = 0; // 未知状态
+  INVOICE_STATUS_DRAFT = 1; // 草稿
+  INVOICE_STATUS_OPEN = 2; // 待支付
+  INVOICE_STATUS_PAID = 3; // 已支付
+  INVOICE_STATUS_PAYMENT_FAILED = 4; // 支付失败
+  INVOICE_STATUS_VOID = 5; // 已作废
+  INVOICE_STATUS_REFUNDED = 6; // 已退款
+}
+
+// V6 支付交易类型。
+enum PaymentTransactionType {
+  PAYMENT_TRANSACTION_TYPE_UNKNOWN = 0; // 未知类型
+  PAYMENT_TRANSACTION_TYPE_CHARGE = 1; // 扣款
+  PAYMENT_TRANSACTION_TYPE_REFUND = 2; // 退款
+  PAYMENT_TRANSACTION_TYPE_DISPUTE = 3; // 争议
+}
+
+// V6 支付交易状态。
+enum PaymentTransactionStatus {
+  PAYMENT_TRANSACTION_STATUS_UNKNOWN = 0; // 未知状态
+  PAYMENT_TRANSACTION_STATUS_PENDING = 1; // 处理中
+  PAYMENT_TRANSACTION_STATUS_SUCCEEDED = 2; // 成功
+  PAYMENT_TRANSACTION_STATUS_FAILED = 3; // 失败
+  PAYMENT_TRANSACTION_STATUS_REVERSED = 4; // 已撤销
+}
+
+// V7 Local Agent运行状态。
+enum LocalAgentStatus {
+  LOCAL_AGENT_STATUS_UNKNOWN = 0; // 未知状态
+  LOCAL_AGENT_STATUS_PENDING = 1; // 已创建，等待一次性注册
+  LOCAL_AGENT_STATUS_ONLINE = 2; // 证书有效且心跳在线
+  LOCAL_AGENT_STATUS_OFFLINE = 3; // 心跳超时
+  LOCAL_AGENT_STATUS_REVOKED = 4; // 已吊销，证书和注册码均不可用
+  LOCAL_AGENT_STATUS_UPGRADE_REQUIRED = 5; // 协议超出兼容窗口，只允许升级和轮换
+}
+
+// V7 Local Agent排空状态。
+enum LocalAgentDrainStatus {
+  LOCAL_AGENT_DRAIN_STATUS_UNKNOWN = 0; // 未知状态
+  LOCAL_AGENT_DRAIN_STATUS_ACCEPTING = 1; // 接受新任务
+  LOCAL_AGENT_DRAIN_STATUS_DRAINING = 2; // 排空中，不领取新任务
+  LOCAL_AGENT_DRAIN_STATUS_DRAINED = 3; // 已排空
+}
+
+// V7 Hybrid Artifact存储模式。
+enum HybridArtifactMode {
+  HYBRID_ARTIFACT_MODE_UNKNOWN = 0; // 未知模式
+  HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE = 1; // 控制面私有对象存储
+  HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE = 2; // 客户S3、MinIO或OSS
+  HYBRID_ARTIFACT_MODE_AIR_GAPPED = 3; // 受签名离线任务包
+}
+
+// V7 Local Agent客户端证书状态。
+enum LocalAgentCertificateStatus {
+  LOCAL_AGENT_CERTIFICATE_STATUS_UNKNOWN = 0; // 未知状态
+  LOCAL_AGENT_CERTIFICATE_STATUS_ACTIVE = 1; // 当前有效
+  LOCAL_AGENT_CERTIFICATE_STATUS_ROTATED = 2; // 已完成轮换
+  LOCAL_AGENT_CERTIFICATE_STATUS_REVOKED = 3; // 已吊销
+  LOCAL_AGENT_CERTIFICATE_STATUS_EXPIRED = 4; // 已过期
+}
+
+// V7 Hybrid Artifact类型。
+enum HybridArtifactType {
+  HYBRID_ARTIFACT_TYPE_UNKNOWN = 0; // 未知类型
+  HYBRID_ARTIFACT_TYPE_SOURCE_APK = 1; // 源APK
+  HYBRID_ARTIFACT_TYPE_BUILT_APK = 2; // 构建APK
+  HYBRID_ARTIFACT_TYPE_BUILD_LOG = 3; // 构建日志
+  HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE = 4; // 受签名离线任务包
 }
 
 // 存储对象生命周期状态。
@@ -215,6 +534,14 @@ message BuildTask {
   int64 white_label_product_id = 33; // V3白标产品ID
   int32 template_revision = 34; // V3模板修订号
   string template_snapshot_json = 35; // V3模板和产品不可变快照JSON
+  string pool_code = 36; // V4目标构建池编码
+  string cache_key = 37; // V4不可变输入缓存键
+  int64 cache_entry_id = 38; // V4命中的缓存条目ID
+  bool cache_hit = 39; // V4是否命中缓存
+  int64 cancel_requested_at = 40; // V4取消请求时间，Unix毫秒
+  int64 cancelled_at = 41; // V4取消完成时间，Unix毫秒
+  string cancel_reason = 42; // V4取消原因
+  int64 retry_of_task_id = 43; // V4重试来源任务ID
 }
 
 // 私有对象存储元数据。
@@ -330,6 +657,145 @@ message WhiteLabelProduct {
   int64 update_time = 15; // 更新时间，Unix毫秒
 }
 
+// V4 Builder集群节点。
+message BuilderNode {
+  int64 id = 1; // 节点ID
+  string node_code = 2; // 节点唯一编码
+  string pool_code = 3; // 所属构建池编码
+  string endpoint = 4; // 节点管理端点或实例标识
+  BuilderNodeStatus status = 5; // 节点健康状态
+  BuilderDrainStatus drain_status = 6; // 节点排空状态
+  int32 max_concurrency = 7; // 最大并发执行数
+  int32 running_count = 8; // 当前执行数
+  int32 cpu_capacity = 9; // CPU容量，单位毫核
+  int64 memory_capacity = 10; // 内存容量，单位字节
+  int64 disk_capacity = 11; // 构建磁盘总容量，单位字节
+  int64 disk_free = 12; // 构建磁盘剩余容量，单位字节
+  string toolchain_version = 13; // APK构建工具链版本
+  int32 build_protocol_version = 14; // 构建协议版本
+  string capability_json = 15; // 节点能力白名单JSON
+  int32 consecutive_failures = 16; // 连续失败次数
+  string last_error_message = 17; // 最近错误摘要
+  int64 last_heartbeat_at = 18; // 最近心跳时间，Unix毫秒
+  int64 create_time = 19; // 创建时间，Unix毫秒
+  int64 update_time = 20; // 更新时间，Unix毫秒
+}
+
+// V4 构建并发与公平调度策略。
+message BuildConcurrencyPolicy {
+  int64 id = 1; // 策略ID
+  int64 tenant_id = 2; // 租户ID，0表示全局作用域
+  int64 app_id = 3; // 应用ID，0表示非应用作用域
+  string pool_code = 4; // 构建池编码
+  int32 max_concurrency = 5; // 作用域最大并发数
+  int32 fair_weight = 6; // 租户公平调度权重
+  int32 max_priority = 7; // 允许提交的最高普通优先级
+  BuildPolicyStatus status = 8; // 策略状态
+  int64 create_by = 9; // 创建人ID
+  int64 create_time = 10; // 创建时间，Unix毫秒
+  int64 update_time = 11; // 更新时间，Unix毫秒
+}
+
+// V4 构建缓存条目。
+message BuildCacheEntry {
+  int64 id = 1; // 缓存条目ID
+  int64 tenant_id = 2; // 所属租户ID
+  BuildCacheScope cache_scope = 3; // 缓存作用域
+  string cache_key = 4; // 不可变输入缓存键
+  string toolchain_version = 5; // 生成缓存的工具链版本
+  int32 build_protocol_version = 6; // 生成缓存的构建协议版本
+  string input_digest = 7; // 规范化输入摘要
+  int64 artifact_object_id = 8; // 缓存产物对象ID
+  string artifact_sha256 = 9; // 缓存产物SHA-256
+  int64 size_bytes = 10; // 缓存产物大小，单位字节
+  int64 hit_count = 11; // 累计命中次数
+  BuildCacheStatus status = 12; // 缓存状态
+  int64 expires_at = 13; // 过期时间，Unix毫秒
+  int64 last_hit_at = 14; // 最近命中时间，Unix毫秒
+  int64 create_time = 15; // 创建时间，Unix毫秒
+  int64 update_time = 16; // 更新时间，Unix毫秒
+}
+
+// V4 构建调度结构化事件。
+message BuildSchedulerEvent {
+  int64 id = 1; // 调度事件ID
+  int64 tenant_id = 2; // 关联租户ID
+  int64 app_id = 3; // 关联应用ID
+  int64 task_id = 4; // 关联构建任务ID
+  string node_code = 5; // 关联Builder节点编码
+  string pool_code = 6; // 构建池编码
+  BuildSchedulerEventType event_type = 7; // 调度事件类型
+  string reason_code = 8; // 结构化调度原因编码
+  string decision_json = 9; // 调度输入、限制和结果JSON
+  int64 create_time = 10; // 事件时间，Unix毫秒
+}
+
+// V4 构建集群运行指标与告警摘要。
+message BuildClusterMetrics {
+  string pool_code = 1; // 构建池编码
+  int32 period_minutes = 2; // 统计窗口分钟数
+  int64 online_nodes = 3; // 在线节点数
+  int64 offline_nodes = 4; // 离线或隔离节点数
+  int64 draining_nodes = 5; // 排空中节点数
+  int64 total_slots = 6; // 节点总并发槽位数
+  int64 running_slots = 7; // 当前运行槽位数
+  int64 disk_capacity = 8; // 节点磁盘总容量，单位字节
+  int64 disk_free = 9; // 节点磁盘剩余容量，单位字节
+  int64 queued_tasks = 10; // 当前排队任务数
+  int64 running_tasks = 11; // 当前执行任务数
+  int64 completed_tasks = 12; // 窗口内完成任务数
+  int64 success_tasks = 13; // 窗口内成功任务数
+  int64 failed_tasks = 14; // 窗口内失败任务数
+  int64 cancelled_tasks = 15; // 窗口内取消任务数
+  int64 average_queue_ms = 16; // 窗口内平均排队时长，单位毫秒
+  int64 average_build_ms = 17; // 窗口内平均构建时长，单位毫秒
+  double success_rate = 18; // 窗口内成功率，取值0到1
+  int64 cache_hit_tasks = 19; // 窗口内缓存命中任务数
+  double cache_hit_rate = 20; // 窗口内缓存命中率，取值0到1
+  int64 active_cache_entries = 21; // 当前有效缓存条目数
+  int64 active_cache_bytes = 22; // 当前有效缓存占用字节数
+  int64 lease_recovery_count = 23; // 窗口内租约恢复次数
+  int64 cache_validation_failure_count = 24; // 窗口内缓存校验失败次数
+  int64 oldest_queued_ms = 25; // 最老排队任务等待时长，单位毫秒
+  repeated string alerts = 26; // 当前告警代码列表
+}
+
+// V5 Open API凭证；不包含Secret或Secret摘要。
+message OpenApiCredential {
+  int64 id = 1; // 凭证ID
+  int64 tenant_id = 2; // 所属租户ID
+  string credential_name = 3; // 凭证名称
+  string key_id = 4; // 公开Key标识
+  repeated OpenApiScope scopes = 5; // 授权Scope列表
+  repeated int64 app_ids = 6; // 允许访问的应用ID，空列表表示全部应用
+  repeated string ip_allowlist = 7; // 允许访问的IP或CIDR，空列表表示不限制
+  int32 rate_limit_per_minute = 8; // 每分钟请求上限
+  OpenApiCredentialStatus status = 9; // 凭证状态
+  int64 expires_at = 10; // 到期时间，Unix毫秒，0表示长期有效
+  int64 grace_expires_at = 11; // 轮换过渡截止时间，Unix毫秒
+  int64 rotated_from_id = 12; // 轮换来源凭证ID
+  int64 last_used_at = 13; // 最近成功使用时间，Unix毫秒
+  int64 create_by = 14; // 创建人ID
+  int64 create_time = 15; // 创建时间，Unix毫秒
+  int64 update_time = 16; // 更新时间，Unix毫秒
+}
+
+// V5 一次性返回的Open API凭证Secret。
+message OpenApiCredentialSecret {
+  OpenApiCredential credential = 1; // 凭证元数据
+  string api_key = 2; // 完整API Key，仅本次响应返回
+}
+
+// V5 Open API认证上下文。
+message OpenApiAuthContext {
+  int64 credential_id = 1; // 凭证ID
+  int64 tenant_id = 2; // 所属租户ID
+  string key_id = 3; // 公开Key标识
+  repeated OpenApiScope scopes = 4; // 授权Scope
+  repeated int64 app_ids = 5; // 应用范围
+  int32 rate_limit_per_minute = 6; // 每分钟请求上限
+}
+
 message ApplicationIdReq { int64 id = 1; }
 message VersionIdReq { int64 id = 1; }
 message ChannelIdReq { int64 id = 1; }
@@ -386,6 +852,720 @@ message SigningConfigListResp {
 message BuildTaskResp {
   common.RespBase base = 1;
   BuildTask data = 2;
+}
+
+// V4 Builder节点响应。
+message BuilderNodeResp {
+  common.RespBase base = 1; // 通用响应
+  BuilderNode data = 2; // Builder节点
+}
+
+// V4 Builder节点列表请求。
+message BuilderNodeListReq {
+  common.PageReq page = 1; // 分页参数
+  string pool_code = 2; // 构建池编码
+  BuilderNodeStatus status = 3; // 节点健康状态
+  BuilderDrainStatus drain_status = 4; // 节点排空状态
+  string keyword = 5; // 节点编码或端点关键字
+}
+
+// V4 Builder节点列表响应。
+message BuilderNodeListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated BuilderNode data = 2; // Builder节点列表
+}
+
+// V4 构建并发策略响应。
+message BuildConcurrencyPolicyResp {
+  common.RespBase base = 1; // 通用响应
+  BuildConcurrencyPolicy data = 2; // 构建并发策略
+}
+
+// V4 构建并发策略列表请求。
+message BuildConcurrencyPolicyListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 tenant_id = 2; // 租户ID，平台查询允许0
+  int64 app_id = 3; // 应用ID
+  string pool_code = 4; // 构建池编码
+  BuildPolicyStatus status = 5; // 策略状态
+}
+
+// V4 构建并发策略列表响应。
+message BuildConcurrencyPolicyListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated BuildConcurrencyPolicy data = 2; // 构建并发策略列表
+}
+
+// V4 构建缓存条目响应。
+message BuildCacheEntryResp {
+  common.RespBase base = 1; // 通用响应
+  BuildCacheEntry data = 2; // 构建缓存条目
+}
+
+// V4 构建缓存列表请求。
+message BuildCacheEntryListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 tenant_id = 2; // 租户ID，普通租户由上下文强制覆盖
+  BuildCacheScope cache_scope = 3; // 缓存作用域
+  BuildCacheStatus status = 4; // 缓存状态
+  string keyword = 5; // 缓存键、输入摘要或工具链关键字
+}
+
+// V4 构建缓存列表响应。
+message BuildCacheEntryListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated BuildCacheEntry data = 2; // 构建缓存条目列表
+}
+
+// V4 调度事件列表请求。
+message BuildSchedulerEventListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 tenant_id = 2; // 租户ID，普通租户由上下文强制覆盖
+  int64 app_id = 3; // 应用ID
+  int64 task_id = 4; // 构建任务ID
+  string node_code = 5; // Builder节点编码
+  string pool_code = 6; // 构建池编码
+  BuildSchedulerEventType event_type = 7; // 调度事件类型
+}
+
+// V4 调度事件列表响应。
+message BuildSchedulerEventListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated BuildSchedulerEvent data = 2; // 调度事件列表
+}
+
+// V4 构建集群指标查询请求。
+message BuildClusterMetricsReq {
+  string pool_code = 1; // 构建池编码，空值使用default
+  int32 period_minutes = 2; // 统计窗口分钟数，默认60，最大10080
+}
+
+// V4 构建集群指标响应。
+message BuildClusterMetricsResp {
+  common.RespBase base = 1; // 通用响应
+  BuildClusterMetrics data = 2; // 集群运行指标与告警摘要
+}
+
+// V5 Open API凭证列表请求。
+message OpenApiCredentialListReq {
+  common.PageReq page = 1; // 分页参数
+  OpenApiCredentialStatus status = 2; // 凭证状态
+  string keyword = 3; // 名称或Key标识关键字
+}
+
+// V5 Open API凭证列表响应。
+message OpenApiCredentialListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated OpenApiCredential data = 2; // 凭证列表
+}
+
+// V5 Open API凭证响应。
+message OpenApiCredentialResp {
+  common.RespBase base = 1; // 通用响应
+  OpenApiCredential data = 2; // 凭证
+}
+
+// V5 Open API凭证一次性Secret响应。
+message OpenApiCredentialSecretResp {
+  common.RespBase base = 1; // 通用响应
+  OpenApiCredentialSecret data = 2; // 凭证与一次性Secret
+}
+
+// V5 创建Open API凭证请求。
+message CreateOpenApiCredentialReq {
+  string credential_name = 1; // 凭证名称
+  repeated OpenApiScope scopes = 2; // 授权Scope
+  repeated int64 app_ids = 3; // 应用范围
+  repeated string ip_allowlist = 4; // IP或CIDR白名单
+  int32 rate_limit_per_minute = 5; // 每分钟请求上限
+  int64 expires_at = 6; // 到期时间，Unix毫秒，0表示长期有效
+}
+
+// V5 Open API凭证主键请求。
+message OpenApiCredentialIdReq {
+  int64 id = 1; // 凭证ID
+}
+
+// V5 轮换Open API凭证请求。
+message RotateOpenApiCredentialReq {
+  int64 id = 1; // 原凭证ID
+  int64 grace_seconds = 2; // 旧Key过渡秒数，0表示立即吊销
+}
+
+// V5 认证Open API凭证请求；不传输明文Secret。
+message AuthenticateOpenApiCredentialReq {
+  string key_id = 1; // 公开Key标识
+  string secret_hash = 2; // API层计算的Secret SHA-256
+  string client_ip = 3; // 调用方IP
+}
+
+// V5 认证Open API凭证响应。
+message OpenApiAuthContextResp {
+  common.RespBase base = 1; // 通用响应
+  OpenApiAuthContext data = 2; // 认证上下文
+}
+
+// V5 开始Open API幂等请求。
+message BeginOpenApiIdempotencyReq {
+  int64 credential_id = 1; // 调用凭证ID
+  string idempotency_key = 2; // 客户端幂等键
+  string request_method = 3; // HTTP请求方法
+  string request_path = 4; // 规范化请求路径
+  string request_hash = 5; // 请求体SHA-256摘要
+  int64 expires_in_seconds = 6; // 幂等记录有效秒数
+}
+
+// V5 Open API幂等处理结果。
+message OpenApiIdempotencyResult {
+  int64 id = 1; // 幂等记录ID
+  OpenApiIdempotencyDecision decision = 2; // 本次处理决定
+  int32 response_status = 3; // 可重放HTTP状态码
+  string response_body = 4; // 可重放JSON响应体
+}
+
+// V5 Open API幂等处理响应。
+message OpenApiIdempotencyResp {
+  common.RespBase base = 1; // 通用响应
+  OpenApiIdempotencyResult data = 2; // 幂等处理结果
+}
+
+// V5 完成Open API幂等请求。
+message CompleteOpenApiIdempotencyReq {
+  int64 id = 1; // 幂等记录ID
+  int64 credential_id = 2; // 调用凭证ID
+  int32 response_status = 3; // HTTP响应状态码
+  string response_body = 4; // JSON响应体
+  string resource_type = 5; // 创建的资源类型
+  int64 resource_id = 6; // 创建的资源ID
+  bool succeeded = 7; // 请求是否成功完成
+}
+
+// V5 写入Open API调用审计。
+message RecordOpenApiAuditReq {
+  int64 credential_id = 1; // 调用凭证ID
+  string key_id = 2; // Key标识快照
+  string request_id = 3; // 请求唯一标识
+  string request_method = 4; // HTTP请求方法
+  string request_path = 5; // 规范化请求路径
+  string scope_used = 6; // 本次使用的Scope
+  string resource_type = 7; // 资源类型
+  int64 resource_id = 8; // 资源ID
+  string client_ip = 9; // 调用方IP
+  int32 response_status = 10; // HTTP响应状态码
+  int64 duration_ms = 11; // 请求耗时毫秒
+  string error_code = 12; // 结构化错误码
+}
+
+// V5 Webhook端点；不包含签名Secret密文。
+message WebhookEndpoint {
+  int64 id = 1; // 端点ID
+  int64 tenant_id = 2; // 所属租户ID
+  string endpoint_name = 3; // 端点名称
+  string endpoint_url = 4; // HTTPS投递地址
+  repeated string event_types = 5; // 订阅事件类型
+  string secret_hint = 6; // Secret末尾提示
+  int32 max_attempts = 7; // 最大投递次数
+  WebhookEndpointStatus status = 8; // 端点状态
+  int64 last_success_at = 9; // 最近成功时间，Unix毫秒
+  int64 last_failure_at = 10; // 最近失败时间，Unix毫秒
+  int64 create_by = 11; // 创建人ID
+  int64 create_time = 12; // 创建时间，Unix毫秒
+  int64 update_time = 13; // 更新时间，Unix毫秒
+}
+
+// V5 Webhook端点与仅显示一次的签名Secret。
+message WebhookEndpointSecret {
+  WebhookEndpoint endpoint = 1; // 端点元数据
+  string signing_secret = 2; // 签名Secret，仅本次返回
+}
+
+// V5 Webhook投递记录。
+message WebhookDelivery {
+  int64 id = 1; // 投递ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 endpoint_id = 3; // 端点ID
+  string event_id = 4; // 对外事件ID
+  string event_type = 5; // 事件类型
+  int32 attempt = 6; // 已尝试次数
+  WebhookDeliveryStatus status = 7; // 投递状态
+  int32 response_status = 8; // 最近HTTP状态码
+  string response_body_excerpt = 9; // 响应摘要
+  string error_message = 10; // 错误摘要
+  int64 next_retry_at = 11; // 下次重试时间，Unix毫秒
+  int64 delivered_at = 12; // 成功投递时间，Unix毫秒
+  int64 create_time = 13; // 创建时间，Unix毫秒
+  int64 update_time = 14; // 更新时间，Unix毫秒
+}
+
+// V5 创建Webhook端点请求。
+message CreateWebhookEndpointReq {
+  string endpoint_name = 1; // 端点名称
+  string endpoint_url = 2; // HTTPS投递地址
+  repeated string event_types = 3; // 订阅事件类型
+  int32 max_attempts = 4; // 最大投递次数
+}
+
+// V5 更新Webhook端点请求。
+message UpdateWebhookEndpointReq {
+  int64 id = 1; // 端点ID
+  string endpoint_name = 2; // 端点名称
+  string endpoint_url = 3; // HTTPS投递地址
+  repeated string event_types = 4; // 订阅事件类型
+  int32 max_attempts = 5; // 最大投递次数
+  WebhookEndpointStatus status = 6; // 端点状态
+}
+
+// V5 Webhook端点主键请求。
+message WebhookEndpointIdReq {
+  int64 id = 1; // 端点ID
+}
+
+// V5 Webhook端点列表请求。
+message WebhookEndpointListReq {
+  common.PageReq page = 1; // 分页参数
+  WebhookEndpointStatus status = 2; // 端点状态
+  string keyword = 3; // 名称或URL关键字
+}
+
+// V5 Webhook端点响应。
+message WebhookEndpointResp {
+  common.RespBase base = 1; // 通用响应
+  WebhookEndpoint data = 2; // Webhook端点
+}
+
+// V5 Webhook端点列表响应。
+message WebhookEndpointListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated WebhookEndpoint data = 2; // Webhook端点列表
+}
+
+// V5 Webhook端点Secret响应。
+message WebhookEndpointSecretResp {
+  common.RespBase base = 1; // 通用响应
+  WebhookEndpointSecret data = 2; // 端点与一次性Secret
+}
+
+// V5 Webhook投递列表请求。
+message WebhookDeliveryListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 endpoint_id = 2; // Webhook端点ID
+  WebhookDeliveryStatus status = 3; // 投递状态
+  string event_type = 4; // 事件类型
+}
+
+// V5 Webhook投递列表响应。
+message WebhookDeliveryListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated WebhookDelivery data = 2; // 投递记录列表
+}
+
+// V5 Webhook投递响应。
+message WebhookDeliveryResp {
+  common.RespBase base = 1; // 通用响应
+  WebhookDelivery data = 2; // Webhook投递记录
+}
+
+// V5 Webhook投递主键请求。
+message WebhookDeliveryIdReq {
+  int64 id = 1; // 投递ID
+}
+
+// V5 创建测试Webhook事件请求。
+message CreateTestWebhookEventReq {
+  int64 endpoint_id = 1; // 目标端点ID
+}
+
+// V5 代码平台集成；永不返回访问令牌或刷新令牌。
+message SourceIntegration {
+  int64 id = 1; // 集成ID
+  int64 tenant_id = 2; // 所属租户ID
+  SourcePlatform platform = 3; // 代码平台
+  string integration_name = 4; // 集成显示名称
+  string installation_ref = 5; // OAuth或App安装标识
+  int64 token_expires_at = 6; // 访问令牌到期时间，Unix毫秒
+  SourceIntegrationStatus status = 7; // 集成状态
+  int64 last_sync_at = 8; // 最近状态同步时间，Unix毫秒
+  int64 create_by = 9; // 创建人ID
+  int64 create_time = 10; // 创建时间，Unix毫秒
+  int64 update_time = 11; // 更新时间，Unix毫秒
+}
+
+// V5 完成受信任OAuth回调或App安装同步请求，仅接收供应商返回的受控令牌。
+message CompleteSourceIntegrationReq {
+  SourcePlatform platform = 1; // 代码平台
+  string integration_name = 2; // 集成显示名称
+  string installation_ref = 3; // OAuth或App安装标识
+  string access_token = 4; // 最小权限访问令牌，仅用于加密保存
+  string refresh_token = 5; // 刷新令牌，仅用于加密保存
+  int64 token_expires_at = 6; // 访问令牌到期时间，Unix毫秒
+}
+
+// V5 代码平台集成主键请求。
+message SourceIntegrationIdReq {
+  int64 id = 1; // 集成ID
+}
+
+// V5 代码平台集成列表请求。
+message SourceIntegrationListReq {
+  common.PageReq page = 1; // 分页参数
+  SourcePlatform platform = 2; // 代码平台筛选
+  SourceIntegrationStatus status = 3; // 状态筛选
+  string keyword = 4; // 名称或安装标识关键字
+}
+
+// V5 代码平台集成响应。
+message SourceIntegrationResp {
+  common.RespBase base = 1; // 通用响应
+  SourceIntegration data = 2; // 集成信息
+}
+
+// V5 代码平台集成列表响应。
+message SourceIntegrationListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated SourceIntegration data = 2; // 集成列表
+}
+
+// V5 代码平台集成内部凭证，只允许可信服务间RPC使用，禁止映射到HTTP响应。
+message SourceIntegrationCredential {
+  SourceIntegration integration = 1; // 集成元数据
+  string access_token = 2; // 解密后的短时访问令牌
+  string refresh_token = 3; // 解密后的刷新令牌
+}
+
+// V5 代码平台集成内部凭证响应。
+message SourceIntegrationCredentialResp {
+  common.RespBase base = 1; // 通用响应
+  SourceIntegrationCredential data = 2; // 内部凭证
+}
+
+// V5 授权仓库。
+message SourceRepository {
+  int64 id = 1; // 授权仓库ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 integration_id = 3; // 代码平台集成ID
+  string external_repository_id = 4; // 平台仓库ID
+  string repository_full_name = 5; // 仓库完整名称
+  string default_branch = 6; // 默认分支
+  string permission_level = 7; // 固定为read
+  SourceRepositoryStatus status = 8; // 授权状态
+  int64 create_time = 9; // 创建时间，Unix毫秒
+  int64 update_time = 10; // 更新时间，Unix毫秒
+}
+
+// V5 同步OAuth/App明确授权的仓库请求。
+message AuthorizeSourceRepositoryReq {
+  int64 integration_id = 1; // 代码平台集成ID
+  string external_repository_id = 2; // 平台仓库ID
+  string repository_full_name = 3; // 仓库完整名称
+  string default_branch = 4; // 默认分支
+}
+
+// V5 授权仓库主键请求。
+message SourceRepositoryIdReq {
+  int64 id = 1; // 授权仓库ID
+}
+
+// V5 授权仓库列表请求。
+message SourceRepositoryListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 integration_id = 2; // 集成ID筛选
+  SourceRepositoryStatus status = 3; // 授权状态筛选
+  string keyword = 4; // 仓库名称关键字
+}
+
+// V5 授权仓库响应。
+message SourceRepositoryResp {
+  common.RespBase base = 1; // 通用响应
+  SourceRepository data = 2; // 授权仓库
+}
+
+// V5 授权仓库列表响应。
+message SourceRepositoryListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated SourceRepository data = 2; // 授权仓库列表
+}
+
+// V5 已导入APK Artifact来源审计记录。
+message SourceArtifact {
+  int64 id = 1; // 来源记录ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 app_id = 3; // 关联应用ID
+  int64 version_id = 4; // 关联版本ID
+  int64 integration_id = 5; // 集成ID
+  int64 repository_id = 6; // 授权仓库ID
+  SourceArtifactType artifact_source = 7; // Artifact来源
+  string external_artifact_id = 8; // 平台Artifact ID
+  string commit_sha = 9; // 来源Commit SHA
+  string pipeline_ref = 10; // Pipeline或Workflow标识
+  string job_ref = 11; // Job标识
+  string artifact_sha256 = 12; // APK SHA-256
+  int64 storage_object_id = 13; // 导入后的私有存储对象ID
+  int64 create_time = 14; // 创建时间，Unix毫秒
+}
+
+// V5 记录由受控供应商客户端完成的APK Artifact导入。
+message RecordSourceArtifactReq {
+  int64 app_id = 1; // 关联应用ID
+  int64 version_id = 2; // 关联版本ID
+  int64 integration_id = 3; // 集成ID
+  int64 repository_id = 4; // 授权仓库ID
+  SourceArtifactType artifact_source = 5; // Artifact来源
+  string external_artifact_id = 6; // 平台Artifact ID
+  string commit_sha = 7; // 来源Commit SHA
+  string pipeline_ref = 8; // Pipeline或Workflow标识
+  string job_ref = 9; // Job标识
+  string artifact_sha256 = 10; // 下载后校验的APK SHA-256
+  int64 storage_object_id = 11; // 已校验私有存储对象ID
+}
+
+// V5 APK Artifact来源响应。
+message SourceArtifactResp {
+  common.RespBase base = 1; // 通用响应
+  SourceArtifact data = 2; // Artifact来源
+}
+
+// V5 原子创建应用版本并记录已校验的供应商Artifact来源。
+message ImportSourceArtifactReq {
+  int64 app_id = 1; // 关联应用ID
+  int64 version_code = 2; // Android versionCode
+  string version_name = 3; // Android versionName
+  string release_notes = 4; // 发布说明
+  int64 integration_id = 5; // 集成ID
+  int64 repository_id = 6; // 授权仓库ID
+  SourceArtifactType artifact_source = 7; // Artifact来源
+  string external_artifact_id = 8; // 平台Artifact ID
+  string commit_sha = 9; // 来源Commit SHA
+  string pipeline_ref = 10; // Pipeline或Workflow标识
+  string job_ref = 11; // Job标识
+  string artifact_sha256 = 12; // 下载后校验的APK SHA-256
+  int64 storage_object_id = 13; // 已校验私有存储对象ID
+}
+
+// V5 原子Artifact导入结果。
+message SourceArtifactImportResult {
+  Version version = 1; // 创建的应用版本
+  SourceArtifact artifact = 2; // 不可变来源审计记录
+}
+
+// V5 原子Artifact导入响应。
+message SourceArtifactImportResp {
+  common.RespBase base = 1; // 通用响应
+  SourceArtifactImportResult data = 2; // 导入结果
+}
+
+// V5 源码平台预定义构建触发策略。
+message SourceBuildTrigger {
+  int64 id = 1; // 触发策略ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 repository_id = 3; // 已授权仓库ID
+  int64 app_id = 4; // 目标应用ID
+  string trigger_name = 5; // 策略名称
+  SourceBuildTriggerEventType event_type = 6; // 接受的供应商事件类型
+  string ref_pattern = 7; // Tag或分支glob模式
+  string artifact_selector = 8; // Release附件名或CI Job名称精确选择器
+  repeated int64 channel_ids = 9; // 构建目标渠道ID
+  int64 signing_config_id = 10; // 签名配置ID
+  int64 branding_profile_id = 11; // 品牌配置ID，0表示不使用
+  int64 white_label_product_id = 12; // 白标产品ID，0表示不使用
+  int32 priority = 13; // 构建优先级
+  string pool_code = 14; // 构建池编码
+  string version_name_prefix = 15; // 自动版本名称前缀
+  SourceBuildTriggerStatus status = 16; // 策略状态
+  SourcePlatform platform = 17; // 仓库所属代码平台
+  string repository_full_name = 18; // 授权仓库完整名称
+  int64 create_time = 19; // 创建时间，Unix毫秒
+  int64 update_time = 20; // 更新时间，Unix毫秒
+}
+
+// V5 创建源码平台预定义构建触发策略请求。
+message CreateSourceBuildTriggerReq {
+  int64 repository_id = 1; // 已授权仓库ID
+  int64 app_id = 2; // 目标应用ID
+  string trigger_name = 3; // 策略名称
+  SourceBuildTriggerEventType event_type = 4; // 接受的供应商事件类型
+  string ref_pattern = 5; // Tag或分支glob模式
+  string artifact_selector = 6; // Release附件名或CI Job名称精确选择器
+  repeated int64 channel_ids = 7; // 构建目标渠道ID
+  int64 signing_config_id = 8; // 签名配置ID
+  int64 branding_profile_id = 9; // 品牌配置ID，0表示不使用
+  int64 white_label_product_id = 10; // 白标产品ID，0表示不使用
+  int32 priority = 11; // 构建优先级
+  string pool_code = 12; // 构建池编码
+  string version_name_prefix = 13; // 自动版本名称前缀
+}
+
+// V5 更新源码平台预定义构建触发策略请求。
+message UpdateSourceBuildTriggerReq {
+  int64 id = 1; // 触发策略ID
+  string trigger_name = 2; // 策略名称
+  SourceBuildTriggerEventType event_type = 3; // 接受的供应商事件类型
+  string ref_pattern = 4; // Tag或分支glob模式
+  string artifact_selector = 5; // Release附件名或CI Job名称精确选择器
+  repeated int64 channel_ids = 6; // 构建目标渠道ID
+  int64 signing_config_id = 7; // 签名配置ID
+  int64 branding_profile_id = 8; // 品牌配置ID，0表示不使用
+  int64 white_label_product_id = 9; // 白标产品ID，0表示不使用
+  int32 priority = 10; // 构建优先级
+  string pool_code = 11; // 构建池编码
+  string version_name_prefix = 12; // 自动版本名称前缀
+  SourceBuildTriggerStatus status = 13; // 策略状态
+}
+
+// V5 源码平台构建触发策略主键请求。
+message SourceBuildTriggerIdReq {
+  int64 id = 1; // 触发策略ID
+}
+
+// V5 源码平台构建触发策略列表请求。
+message SourceBuildTriggerListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 repository_id = 2; // 授权仓库ID筛选
+  int64 app_id = 3; // 应用ID筛选
+  SourceBuildTriggerStatus status = 4; // 策略状态筛选
+  string keyword = 5; // 策略名称关键字
+}
+
+// V5 源码平台构建触发策略响应。
+message SourceBuildTriggerResp {
+  common.RespBase base = 1; // 通用响应
+  SourceBuildTrigger data = 2; // 触发策略
+}
+
+// V5 源码平台构建触发策略列表响应。
+message SourceBuildTriggerListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated SourceBuildTrigger data = 2; // 触发策略列表
+}
+
+// V5 源码平台构建触发策略一次性密钥。
+message SourceBuildTriggerSecret {
+  SourceBuildTrigger trigger = 1; // 已创建或已轮换的触发策略
+  string webhook_token = 2; // 仅本次返回的公开回调随机令牌
+  string webhook_secret = 3; // 仅本次返回的供应商签名Secret
+}
+
+// V5 源码平台构建触发策略一次性密钥响应。
+message SourceBuildTriggerSecretResp {
+  common.RespBase base = 1; // 通用响应
+  SourceBuildTriggerSecret data = 2; // 一次性回调令牌和签名Secret
+}
+
+// V5 解析公开回调随机令牌请求，仅允许可信API内部调用。
+message ResolveSourceBuildTriggerReq {
+  string webhook_token = 1; // 公开回调路径中的高熵随机令牌
+}
+
+// V5 入站Webhook内部凭证，禁止映射到HTTP响应。
+message SourceBuildTriggerCredential {
+  SourceBuildTrigger trigger = 1; // 启用的预定义触发策略
+  string webhook_secret = 2; // 解密后的供应商Webhook签名Secret
+  string external_repository_id = 3; // 必须匹配的供应商仓库ID
+}
+
+// V5 入站Webhook内部凭证响应。
+message SourceBuildTriggerCredentialResp {
+  common.RespBase base = 1; // 通用响应
+  SourceBuildTriggerCredential data = 2; // 内部签名验证材料
+}
+
+// V5 已标准化的源码平台入站Webhook事件。
+message SourceWebhookEvent {
+  int64 id = 1; // 入站事件ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 trigger_id = 3; // 触发策略ID
+  string provider_event_id = 4; // 供应商投递事件唯一ID
+  string provider_event_type = 5; // 供应商原始事件类型
+  string source_ref = 6; // Tag或分支
+  string commit_sha = 7; // Commit SHA
+  SourceArtifactType artifact_source = 8; // Artifact来源
+  string external_artifact_id = 9; // 供应商Artifact或Job ID
+  string release_ref = 10; // Release Tag
+  string pipeline_ref = 11; // Pipeline或Workflow标识
+  string job_ref = 12; // Job标识
+  string payload_sha256 = 13; // 原始请求体SHA-256
+  int64 version_code = 14; // 原子分配的Android versionCode
+  string version_name = 15; // 自动生成的Android versionName
+  SourceWebhookEventStatus status = 16; // 处理状态
+  int32 attempt = 17; // 已处理次数
+  int64 version_id = 18; // 导入成功后的版本ID
+  repeated int64 build_task_ids = 19; // 创建成功的构建任务ID
+  string error_message = 20; // 最近失败错误摘要
+  int64 create_time = 21; // 创建时间，Unix毫秒
+  int64 update_time = 22; // 更新时间，Unix毫秒
+}
+
+// V5 签名验证后可靠入队源码Webhook事件请求。
+message EnqueueSourceWebhookEventReq {
+  int64 trigger_id = 1; // 已解析且签名验证通过的触发策略ID
+  string provider_event_id = 2; // 供应商投递事件唯一ID
+  string provider_event_type = 3; // 供应商原始事件类型
+  string external_repository_id = 4; // 供应商仓库ID
+  string source_ref = 5; // Tag或分支
+  string commit_sha = 6; // Commit SHA
+  SourceArtifactType artifact_source = 7; // Artifact来源
+  string external_artifact_id = 8; // 供应商Artifact或Job ID
+  string release_ref = 9; // Release Tag
+  string pipeline_ref = 10; // Pipeline或Workflow标识
+  string job_ref = 11; // Job标识
+  string payload_sha256 = 12; // 原始请求体SHA-256
+}
+
+// V5 源码Webhook入队结果。
+message EnqueueSourceWebhookEventResult {
+  SourceWebhookEvent event = 1; // 已存在或新建的可靠事件
+  bool accepted = 2; // true表示本次首次入队，false表示幂等重放
+}
+
+// V5 源码Webhook入队响应。
+message EnqueueSourceWebhookEventResp {
+  common.RespBase base = 1; // 通用响应
+  EnqueueSourceWebhookEventResult data = 2; // 入队结果
+}
+
+// V5 Worker领取源码Webhook事件请求。
+message ClaimSourceWebhookEventReq {
+  string worker_id = 1; // Worker唯一实例标识
+  int32 lease_seconds = 2; // 处理租约秒数
+}
+
+// V5 Worker领取源码Webhook事件结果。
+message ClaimedSourceWebhookEvent {
+  SourceWebhookEvent event = 1; // 已领取事件
+  SourceBuildTrigger trigger = 2; // 固化的预定义构建策略
+}
+
+// V5 Worker领取源码Webhook事件响应；无任务时data为空。
+message ClaimSourceWebhookEventResp {
+  common.RespBase base = 1; // 通用响应
+  ClaimedSourceWebhookEvent data = 2; // 已领取事件和策略
+}
+
+// V5 Worker完成源码Webhook事件请求。
+message CompleteSourceWebhookEventReq {
+  int64 id = 1; // 入站事件ID
+  int64 version_id = 2; // 导入成功的版本ID
+  repeated int64 build_task_ids = 3; // 创建成功的构建任务ID
+  string commit_sha = 4; // Provider API最终确认的Commit SHA
+}
+
+// V5 Worker失败源码Webhook事件请求。
+message FailSourceWebhookEventReq {
+  int64 id = 1; // 入站事件ID
+  string error_message = 2; // 已脱敏错误摘要
+  bool retryable = 3; // 是否允许指数退避重试
+}
+
+// V5 源码Webhook事件列表请求。
+message SourceWebhookEventListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 trigger_id = 2; // 触发策略ID筛选
+  SourceWebhookEventStatus status = 3; // 处理状态筛选
+}
+
+// V5 源码Webhook事件列表响应。
+message SourceWebhookEventListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated SourceWebhookEvent data = 2; // 入站事件审计列表
 }
 
 // 品牌配置响应。
@@ -487,9 +1667,10 @@ message WhiteLabelProductPreflightResp {
 }
 
 message ApplicationListReq {
-  common.PageReq page = 1;
-  string keyword = 2;
-  ApplicationStatus status = 3;
+  common.PageReq page = 1; // 分页参数
+  string keyword = 2; // 应用编码或应用名称关键字
+  ApplicationStatus status = 3; // 应用状态
+  repeated int64 app_ids = 4; // 可访问的应用ID白名单，为空表示不限制
 }
 
 message ApplicationListResp {
@@ -639,6 +1820,149 @@ message CreateBuildTaskReq {
   int32 priority = 5;
   int64 branding_profile_id = 6; // 可选品牌配置ID，0表示沿用V1构建
   int64 white_label_product_id = 7; // 可选V3白标产品ID，提供后由产品覆盖品牌和签名配置
+  string pool_code = 8; // V4目标构建池编码，空值使用default
+  int64 source_webhook_event_id = 9; // V5内部源码Webhook事件ID，普通调用必须为0
+}
+
+// V4 Builder节点主键请求。
+message BuilderNodeIdReq {
+  int64 id = 1; // Builder节点ID
+}
+
+// V4 注册或刷新Builder节点请求。
+message RegisterBuilderNodeReq {
+  string node_code = 1; // 节点唯一编码
+  string pool_code = 2; // 所属构建池编码
+  string endpoint = 3; // 节点管理端点或实例标识
+  int32 max_concurrency = 4; // 节点最大并发执行数
+  int32 cpu_capacity = 5; // CPU容量，单位毫核
+  int64 memory_capacity = 6; // 内存容量，单位字节
+  int64 disk_capacity = 7; // 构建磁盘总容量，单位字节
+  int64 disk_free = 8; // 构建磁盘剩余容量，单位字节
+  string toolchain_version = 9; // APK构建工具链版本
+  int32 build_protocol_version = 10; // 构建协议版本
+  string capability_json = 11; // 节点能力白名单JSON
+}
+
+// V4 Builder节点心跳请求。
+message BuilderNodeHeartbeatReq {
+  string node_code = 1; // 节点唯一编码
+  int32 running_count = 2; // 当前执行任务数
+  int64 disk_free = 3; // 构建磁盘剩余容量，单位字节
+  repeated int64 running_task_ids = 4; // 当前执行任务ID列表
+  string last_error_message = 5; // 最近错误摘要，空值表示本次无错误
+}
+
+// V4 修改Builder节点排空状态请求。
+message DrainBuilderNodeReq {
+  int64 id = 1; // Builder节点ID，管理端调用时使用
+  string node_code = 2; // Builder节点编码，内部协议调用时使用
+  BuilderDrainStatus drain_status = 3; // 目标排空状态
+}
+
+// V4 人工确认恢复已隔离Builder节点请求。
+message RecoverBuilderNodeReq {
+  int64 id = 1; // Builder节点ID
+  string reason = 2; // 人工恢复原因，写入结构化调度事件
+}
+
+// V4 原子领取调度任务请求。
+message ClaimScheduledBuildTaskReq {
+  string node_code = 1; // 已注册Builder节点编码
+  int32 lease_seconds = 2; // 任务和槽位租约秒数
+}
+
+// V4 取消构建任务请求。
+message CancelBuildTaskReq {
+  int64 id = 1; // 构建任务ID
+  string reason = 2; // 取消原因
+}
+
+// V4 重试构建任务请求。
+message RetryBuildTaskReq {
+  int64 id = 1; // 来源构建任务ID
+  int32 priority = 2; // 新任务优先级，0表示沿用
+}
+
+// V4 创建或更新构建并发策略请求。
+message UpsertBuildConcurrencyPolicyReq {
+  int64 id = 1; // 策略ID，0表示按作用域创建
+  int64 tenant_id = 2; // 租户ID，0表示全局作用域
+  int64 app_id = 3; // 应用ID，0表示非应用作用域
+  string pool_code = 4; // 构建池编码
+  int32 max_concurrency = 5; // 作用域最大并发数
+  int32 fair_weight = 6; // 租户公平调度权重
+  int32 max_priority = 7; // 允许提交的最高普通优先级
+  BuildPolicyStatus status = 8; // 策略状态
+}
+
+// V4 构建缓存主键请求。
+message BuildCacheEntryIdReq {
+  int64 id = 1; // 构建缓存条目ID
+}
+
+// V4 解析构建缓存请求。
+message ResolveBuildCacheReq {
+  int64 task_id = 1; // 当前构建任务ID
+  string node_code = 2; // 当前Builder节点编码
+  int32 builder_attempt = 3; // 当前任务领取代次
+  string toolchain_version = 4; // 当前节点工具链版本
+  int32 build_protocol_version = 5; // 当前节点构建协议版本
+  bool confirm_hit = 6; // Worker完成对象字节校验后确认命中；false仅解析候选缓存
+}
+
+// V4 构建缓存解析结果。
+message BuildCacheResolution {
+  bool hit = 1; // 是否命中有效缓存
+  BuildCacheEntry entry = 2; // 命中的缓存条目
+  StorageObject artifact = 3; // 待校验缓存产物对象
+}
+
+// V4 构建缓存解析响应。
+message BuildCacheResolutionResp {
+  common.RespBase base = 1; // 通用响应
+  BuildCacheResolution data = 2; // 缓存解析结果
+}
+
+// V4 发布构建缓存请求。
+message PublishBuildCacheReq {
+  int64 task_id = 1; // 已成功构建任务ID
+  string node_code = 2; // 发布缓存的Builder节点编码
+  int32 builder_attempt = 3; // 构建任务领取代次
+  string toolchain_version = 4; // 构建工具链版本
+  int32 build_protocol_version = 5; // 构建协议版本
+  int64 artifact_object_id = 6; // 独立缓存产物对象ID
+  string artifact_sha256 = 7; // 缓存产物SHA-256
+  int64 size_bytes = 8; // 缓存产物大小，单位字节
+  int64 ttl_seconds = 9; // 缓存TTL秒数
+  string artifact_object_key = 10; // 缓存中间APK私有对象Key，artifact_object_id为0时由Core登记
+}
+
+// V4 失效构建缓存请求。
+message InvalidateBuildCacheReq {
+  int64 id = 1; // 构建缓存条目ID
+  int64 task_id = 2; // 发现损坏的构建任务ID，管理端操作允许为0
+  string node_code = 3; // 发现损坏的Builder节点编码
+  string reason = 4; // 失效原因
+}
+
+// V4 清理构建缓存请求。
+message CleanupBuildCacheReq {
+  int32 limit = 1; // 单次最多清理条目数
+  int64 target_free_bytes = 2; // 目标释放字节数，0表示仅TTL清理
+}
+
+// V4 构建缓存清理结果。
+message CleanupBuildCacheResult {
+  int32 invalidated_count = 1; // 失效条目数
+  int64 reclaimable_bytes = 2; // 可回收对象字节数
+  repeated int64 object_ids = 3; // 可物理删除且未被任务引用的对象ID
+}
+
+// V4 构建缓存清理响应。
+message CleanupBuildCacheResp {
+  common.RespBase base = 1; // 通用响应
+  CleanupBuildCacheResult data = 2; // 清理结果
 }
 
 // 创建V3白标模板请求。
@@ -955,6 +2279,514 @@ message BuildExecutionContextResp {
   BuildExecutionContext data = 2; // 构建执行上下文
 }
 
+// V6 不可变套餐版本。
+message BillingPlan {
+  int64 id = 1; // 套餐版本ID
+  string plan_code = 2; // 套餐稳定编码
+  string plan_name = 3; // 套餐展示名称
+  BillingCycle billing_cycle = 4; // 计费周期
+  int64 price_amount = 5; // 价格，最小货币单位整数
+  string currency = 6; // ISO 4217币种
+  string feature_json = 7; // 功能开关JSON
+  int64 builds_per_cycle = 8; // 周期构建次数，-1不限量
+  int32 max_build_concurrency = 9; // 最大构建并发，-1不限量
+  int64 storage_bytes = 10; // 存储额度字节，-1不限量
+  int64 max_upload_bytes = 11; // 单文件上传上限字节，-1不限量
+  int32 team_seats = 12; // 团队席位，-1不限量
+  int32 api_rate_limit = 13; // Open API每分钟上限，-1不限量
+  bool charge_failed_build = 14; // 失败构建是否计量
+  bool charge_cache_hit = 15; // 缓存命中是否计量
+  bool charge_retry_build = 16; // 重试构建是否计量
+  BillingPlanStatus status = 17; // 套餐版本状态
+  int32 version = 18; // 不可变版本号
+  int64 create_time = 19; // 创建时间Unix毫秒
+  int64 update_time = 20; // 更新时间Unix毫秒
+}
+
+// 创建V6套餐不可变版本请求。
+message CreateBillingPlanReq {
+  string plan_code = 1; // 套餐稳定编码
+  string plan_name = 2; // 套餐展示名称
+  BillingCycle billing_cycle = 3; // 计费周期
+  int64 price_amount = 4; // 服务端价格，最小货币单位整数
+  string currency = 5; // ISO 4217币种
+  string feature_json = 6; // 功能开关JSON
+  int64 builds_per_cycle = 7; // 周期构建次数，-1不限量
+  int32 max_build_concurrency = 8; // 最大构建并发，-1不限量
+  int64 storage_bytes = 9; // 存储额度字节，-1不限量
+  int64 max_upload_bytes = 10; // 单文件上传上限字节，-1不限量
+  int32 team_seats = 11; // 团队席位，-1不限量
+  int32 api_rate_limit = 12; // Open API每分钟上限，-1不限量
+  bool charge_failed_build = 13; // 失败构建是否计量
+  bool charge_cache_hit = 14; // 缓存命中是否计量
+  bool charge_retry_build = 15; // 重试构建是否计量
+}
+
+// V6套餐版本ID请求。
+message BillingPlanIdReq {
+  int64 id = 1; // 套餐版本ID
+}
+
+// 查询V6套餐列表请求。
+message BillingPlanListReq {
+  BillingPlanStatus status = 1; // 状态筛选，未知表示全部
+  int32 page = 2; // 页码，从1开始
+  int32 page_size = 3; // 每页数量
+}
+
+// V6套餐响应。
+message BillingPlanResp {
+  common.RespBase base = 1; // 通用响应
+  BillingPlan data = 2; // 套餐版本
+}
+
+// V6套餐列表响应。
+message BillingPlanListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated BillingPlan data = 2; // 套餐版本列表
+  int64 total = 3; // 总数
+}
+
+// V6租户当前订阅。
+message TenantSubscription {
+  int64 id = 1; // 订阅ID
+  int64 tenant_id = 2; // 租户ID
+  int64 plan_id = 3; // 当前套餐版本ID
+  int32 plan_version = 4; // 固化套餐版本号
+  TenantSubscriptionStatus status = 5; // 订阅状态
+  TenantSubscriptionSource source = 6; // 订阅来源
+  string external_customer_id = 7; // 支付客户ID
+  string external_subscription_id = 8; // 支付订阅ID
+  int64 current_period_start = 9; // 周期开始Unix毫秒
+  int64 current_period_end = 10; // 周期结束Unix毫秒
+  bool cancel_at_period_end = 11; // 是否周期末取消
+  int64 grace_until = 12; // 宽限截止Unix毫秒
+  int64 pending_plan_id = 13; // 周期末待切换套餐ID
+  int32 pending_plan_version = 14; // 周期末待切换套餐版本
+  int64 create_time = 15; // 创建时间Unix毫秒
+  int64 update_time = 16; // 更新时间Unix毫秒
+}
+
+// V6租户当前权益。
+message TenantEntitlement {
+  int64 id = 1; // 权益ID
+  int64 tenant_id = 2; // 租户ID
+  int64 plan_id = 3; // 基础套餐版本ID
+  int32 plan_version = 4; // 基础套餐版本号
+  int64 builds_per_cycle = 5; // 周期构建次数
+  int32 max_build_concurrency = 6; // 最大构建并发
+  int64 storage_bytes = 7; // 存储额度字节
+  int64 max_upload_bytes = 8; // 单文件上传上限字节
+  int32 team_seats = 9; // 团队席位
+  int32 api_rate_limit = 10; // Open API每分钟上限
+  bool charge_failed_build = 11; // 失败构建是否计量
+  bool charge_cache_hit = 12; // 缓存命中是否计量
+  bool charge_retry_build = 13; // 重试构建是否计量
+  string override_json = 14; // 人工覆盖JSON
+  int64 valid_from = 15; // 生效时间Unix毫秒
+  int64 valid_until = 16; // 失效时间Unix毫秒
+  TenantEntitlementStatus status = 17; // 权益状态
+  int64 revision = 18; // 权益修订号
+}
+
+// 查询V6租户账务请求；tenant_id为0时使用调用上下文租户。
+message TenantBillingReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+}
+
+// V6租户订阅和权益响应。
+message TenantBillingResp {
+  common.RespBase base = 1; // 通用响应
+  TenantSubscription subscription = 2; // 当前订阅
+  TenantEntitlement entitlement = 3; // 当前权益
+  BillingPlan plan = 4; // 当前不可变套餐版本
+}
+
+// 管理端创建或更新V6人工合同订阅请求。
+message UpsertManualSubscriptionReq {
+  int64 tenant_id = 1; // 目标租户ID
+  int64 plan_id = 2; // 套餐版本ID
+  int64 period_start = 3; // 周期开始Unix毫秒
+  int64 period_end = 4; // 周期结束Unix毫秒
+  int64 grace_until = 5; // 可选宽限截止Unix毫秒
+  string override_json = 6; // 可选权益覆盖JSON
+  string contract_reference = 7; // 人工合同编号
+}
+
+// V6订阅套餐变更请求。
+message ChangeTenantSubscriptionReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  int64 plan_id = 2; // 新套餐版本ID
+  SubscriptionChangeMode mode = 3; // 生效方式
+}
+
+// V6订阅取消请求。
+message CancelTenantSubscriptionReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  bool immediately = 2; // 是否立即取消，否则周期末取消
+}
+
+// V6额度预占请求。
+message ReserveQuotaReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  QuotaMetric metric = 2; // 额度指标
+  int64 quantity = 3; // 预占数量
+  string resource_type = 4; // 来源资源类型
+  int64 resource_id = 5; // 来源资源ID，创建前可为0
+  string idempotency_key = 6; // 预占幂等键
+  int64 ttl_seconds = 7; // 预占有效秒数
+}
+
+// V6额度预占结果。
+message QuotaReservation {
+  int64 id = 1; // 预占ID
+  int64 tenant_id = 2; // 租户ID
+  QuotaMetric metric = 3; // 额度指标
+  int64 quantity = 4; // 预占数量
+  string resource_type = 5; // 来源资源类型
+  int64 resource_id = 6; // 来源资源ID
+  string idempotency_key = 7; // 幂等键
+  string period_key = 8; // 周期键YYYY-MM
+  QuotaReservationStatus status = 9; // 预占状态
+  int64 expires_at = 10; // 过期时间Unix毫秒
+  int64 used_quantity = 11; // 当前已使用数量
+  int64 reserved_quantity = 12; // 当前生效预占数量
+  int64 limit_quantity = 13; // 当前限额，-1不限量
+}
+
+// V6额度预占响应。
+message QuotaReservationResp {
+  common.RespBase base = 1; // 通用响应
+  QuotaReservation data = 2; // 预占结果
+}
+
+// V6额度确认或释放请求。
+message QuotaReservationActionReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  QuotaMetric metric = 2; // 额度指标
+  string idempotency_key = 3; // 预占幂等键
+  int64 resource_id = 4; // 最终资源ID
+  BillingUsageMetric usage_metric = 5; // 确认时写入的用量指标，释放时忽略
+  string usage_metadata_json = 6; // 确认时用量元数据JSON
+}
+
+// V6幂等用量入账请求。
+message RecordUsageReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  BillingUsageMetric metric = 2; // 用量指标
+  int64 quantity = 3; // 增量，调整账可为负数
+  string resource_type = 4; // 来源资源类型
+  int64 resource_id = 5; // 来源资源ID
+  string idempotency_key = 6; // 指标内幂等键
+  int64 occurred_at = 7; // 发生时间Unix毫秒，0表示当前时间
+  string metadata_json = 8; // 计量规则或调整原因JSON
+}
+
+// V6单项用量汇总。
+message UsageMetricSummary {
+  BillingUsageMetric metric = 1; // 用量指标
+  int64 used_quantity = 2; // 账本汇总用量
+  int64 reserved_quantity = 3; // 生效预占数量
+  int64 limit_quantity = 4; // 当前权益限额，-1不限量
+  int32 usage_percent = 5; // 使用百分比，不限量为0
+}
+
+// 查询V6用量请求。
+message BillingUsageReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  string period_key = 2; // 周期键YYYY-MM，空表示当前订阅周期
+}
+
+// V6用量汇总响应。
+message BillingUsageResp {
+  common.RespBase base = 1; // 通用响应
+  string period_key = 2; // 周期键YYYY-MM
+  repeated UsageMetricSummary data = 3; // 各指标用量
+}
+
+// V6不可变账单项。
+message InvoiceItem {
+  int64 id = 1; // 账单项ID
+  int64 invoice_id = 2; // 账单ID
+  string line_key = 3; // 不可变行键
+  int32 item_type = 4; // 账单项类型枚举值
+  string description = 5; // 说明
+  BillingUsageMetric metric = 6; // 用量指标
+  int64 quantity = 7; // 数量
+  int64 unit_amount = 8; // 单价整数
+  int64 amount = 9; // 行金额整数
+}
+
+// V6不可变账单。
+message Invoice {
+  int64 id = 1; // 账单ID
+  int64 tenant_id = 2; // 租户ID
+  string invoice_no = 3; // 平台账单号
+  string external_invoice_id = 4; // 支付提供商账单ID
+  InvoiceStatus status = 5; // 账单状态
+  string currency = 6; // ISO 4217币种
+  int64 subtotal_amount = 7; // 税前小计整数
+  int64 discount_amount = 8; // 折扣金额整数
+  int64 tax_amount = 9; // 税费整数
+  int64 total_amount = 10; // 应付总额整数
+  int64 paid_amount = 11; // 已支付金额整数
+  int64 refunded_amount = 12; // 已退款金额整数
+  int64 period_start = 13; // 周期开始Unix毫秒
+  int64 period_end = 14; // 周期结束Unix毫秒
+  int64 due_at = 15; // 到期时间Unix毫秒
+  int64 paid_at = 16; // 支付时间Unix毫秒
+  repeated InvoiceItem items = 17; // 不可变账单项
+  int64 create_time = 18; // 创建时间Unix毫秒
+}
+
+// 查询V6账单列表请求。
+message InvoiceListReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  InvoiceStatus status = 2; // 状态筛选，未知表示全部
+  int32 page = 3; // 页码，从1开始
+  int32 page_size = 4; // 每页数量
+}
+
+// V6账单列表响应。
+message InvoiceListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated Invoice data = 2; // 账单列表
+  int64 total = 3; // 总数
+}
+
+// 已完成签名验证并标准化的V6支付回调请求。
+message ApplyBillingWebhookReq {
+  string provider = 1; // 支付提供商：stripe
+  string provider_event_id = 2; // 供应商事件ID
+  string event_type = 3; // 供应商事件类型
+  int64 event_created_at = 4; // 供应商事件创建Unix秒
+  string payload_json = 5; // 原始JSON，仅在Core内加密保存
+  int64 tenant_id = 6; // 事件元数据中的租户ID
+  int64 plan_id = 7; // 事件元数据中的套餐版本ID
+  string external_customer_id = 8; // 供应商客户ID
+  string external_subscription_id = 9; // 供应商订阅ID
+  string external_invoice_id = 10; // 供应商账单ID
+  string external_transaction_id = 11; // 供应商支付、退款或争议ID
+  string currency = 12; // ISO 4217币种
+  int64 amount = 13; // 事件金额，最小货币单位整数
+  int64 period_start = 14; // 订阅或账单周期开始Unix秒
+  int64 period_end = 15; // 订阅或账单周期结束Unix秒
+  bool cancel_at_period_end = 16; // 是否周期末取消
+  string failure_code = 17; // 失败结构化代码
+  string failure_message = 18; // 失败脱敏摘要
+}
+
+// V7 Local Agent预定义能力，能力键不能表示任意命令。
+message LocalAgentCapability {
+  string capability_key = 1; // 能力键，例如android.api、abi或signing.remote
+  string capability_value = 2; // 能力版本或约束值
+}
+
+// V7 Local Agent公开客户端证书信息，不包含私钥。
+message LocalAgentCertificate {
+  int64 id = 1; // 证书记录ID
+  string serial_number = 2; // X.509证书序列号
+  string fingerprint_sha256 = 3; // 证书DER SHA-256指纹
+  string certificate_pem = 4; // 公开客户端证书PEM
+  LocalAgentCertificateStatus status = 5; // 证书状态
+  int64 not_before = 6; // 生效时间Unix毫秒
+  int64 not_after = 7; // 失效时间Unix毫秒
+}
+
+// V7 Local Builder Agent。
+message LocalAgent {
+  int64 id = 1; // Agent ID
+  int64 tenant_id = 2; // 所属租户ID
+  string agent_code = 3; // 租户内稳定编码
+  string agent_name = 4; // 展示名称
+  string pool_code = 5; // 构建池编码
+  LocalAgentStatus status = 6; // 运行状态
+  LocalAgentDrainStatus drain_status = 7; // 排空状态
+  int32 protocol_version = 8; // 协议版本
+  string agent_version = 9; // Agent语义化版本
+  HybridArtifactMode artifact_mode = 10; // Artifact模式
+  string customer_storage_ref = 11; // 客户存储Secret引用
+  repeated int64 allowed_app_ids = 12; // 允许构建的应用ID
+  repeated LocalAgentCapability capabilities = 13; // 预定义能力
+  string certificate_serial = 14; // 当前证书序列号
+  int64 certificate_not_after = 15; // 当前证书到期时间Unix毫秒
+  int64 last_heartbeat_at = 16; // 最近心跳Unix毫秒
+  int64 create_time = 17; // 创建时间Unix毫秒
+  int64 update_time = 18; // 更新时间Unix毫秒
+}
+
+// 创建V7 Local Agent和一次性注册码请求。
+message CreateLocalAgentRegistrationReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  string agent_code = 2; // 租户内稳定编码
+  string agent_name = 3; // 展示名称
+  string pool_code = 4; // 构建池编码
+  HybridArtifactMode artifact_mode = 5; // Artifact模式
+  string customer_storage_ref = 6; // 客户存储Secret引用
+  repeated int64 allowed_app_ids = 7; // 允许构建的应用ID
+  repeated LocalAgentCapability capabilities = 8; // 初始预定义能力
+  int64 expires_seconds = 9; // 一次性注册码有效秒数
+}
+
+// V7 Local Agent一次性注册码响应，注册码只返回一次。
+message LocalAgentRegistrationResp {
+  common.RespBase base = 1; // 通用响应
+  LocalAgent data = 2; // 已创建Agent
+  string registration_token = 3; // 一次性注册码明文
+  int64 expires_at = 4; // 注册码过期时间Unix毫秒
+}
+
+// Agent首次出站注册请求，CSR私钥仅存在Agent本地。
+message RegisterLocalAgentReq {
+  string registration_token = 1; // 一次性注册码
+  string csr_pem = 2; // PKCS#10 CSR PEM
+  string agent_version = 3; // Agent语义化版本
+  int32 protocol_version = 4; // Agent协议版本
+  string nonce = 5; // 单次随机Nonce
+  int64 timestamp = 6; // 请求时间Unix毫秒
+  string source_ip = 7; // API边界解析的来源IP
+}
+
+// Agent首次注册或证书轮换响应，私钥不经过控制面。
+message RegisterLocalAgentResp {
+  common.RespBase base = 1; // 通用响应
+  LocalAgent data = 2; // Agent信息
+  LocalAgentCertificate certificate = 3; // 新签发公开证书
+  string ca_certificate_pem = 4; // Agent mTLS CA公开证书
+}
+
+// V7 Agent管理查询请求。
+message LocalAgentIdReq {
+  int64 id = 1; // Agent ID
+  int64 tenant_id = 2; // 目标租户ID，0表示当前租户
+}
+
+// V7 Agent详情响应。
+message LocalAgentResp {
+  common.RespBase base = 1; // 通用响应
+  LocalAgent data = 2; // Agent信息
+}
+
+// V7 Agent分页查询请求。
+message LocalAgentListReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  LocalAgentStatus status = 2; // 状态筛选，未知表示全部
+  int32 page = 3; // 页码，从1开始
+  int32 page_size = 4; // 每页数量
+}
+
+// V7 Agent分页响应。
+message LocalAgentListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated LocalAgent data = 2; // Agent列表
+  int64 total = 3; // 总数
+}
+
+// V7 mTLS Agent请求认证上下文，由网关根据客户端证书填充。
+message LocalAgentAuth {
+  int64 agent_id = 1; // Agent ID
+  string certificate_serial = 2; // mTLS客户端证书序列号
+  string certificate_fingerprint_sha256 = 3; // mTLS客户端证书指纹
+  string nonce = 4; // 单次随机Nonce
+  int64 timestamp = 5; // 请求时间Unix毫秒
+}
+
+// V7 Agent心跳请求。
+message HeartbeatLocalAgentReq {
+  LocalAgentAuth auth = 1; // mTLS认证上下文
+  string agent_version = 2; // Agent语义化版本
+  int32 protocol_version = 3; // Agent协议版本
+  repeated LocalAgentCapability capabilities = 4; // 当前能力快照
+  repeated int64 running_task_ids = 5; // 当前执行任务ID
+}
+
+// V7 Agent Drain管理请求。
+message DrainLocalAgentReq {
+  int64 id = 1; // Agent ID
+  int64 tenant_id = 2; // 目标租户ID，0表示当前租户
+  LocalAgentDrainStatus drain_status = 3; // 目标排空状态
+}
+
+// V7 Agent吊销请求。
+message RevokeLocalAgentReq {
+  int64 id = 1; // Agent ID
+  int64 tenant_id = 2; // 目标租户ID，0表示当前租户
+  string reason = 3; // 吊销原因
+}
+
+// V7 Agent证书轮换请求。
+message RotateLocalAgentCertificateReq {
+  LocalAgentAuth auth = 1; // 当前有效mTLS认证上下文
+  string csr_pem = 2; // 使用新本地私钥生成的CSR PEM
+}
+
+// V7 Agent领取构建任务请求。
+message ClaimLocalAgentBuildTaskReq {
+  LocalAgentAuth auth = 1; // mTLS认证上下文
+  int32 lease_seconds = 2; // 租约秒数
+}
+
+// V7 Agent任务响应，无任务时task为空。
+message LocalAgentBuildTaskResp {
+  common.RespBase base = 1; // 通用响应
+  BuildTask task = 2; // 已领取且经过租户、应用、能力检查的任务
+  HybridArtifactMode artifact_mode = 3; // 本任务Artifact模式
+}
+
+// V7 Agent任务续租请求。
+message RenewLocalAgentTaskLeaseReq {
+  LocalAgentAuth auth = 1; // mTLS认证上下文
+  int64 task_id = 2; // 构建任务ID
+  int32 builder_attempt = 3; // fencing尝试次数
+  int32 lease_seconds = 4; // 续租秒数
+}
+
+// V7 Agent构建进度请求。
+message ReportLocalAgentBuildProgressReq {
+  LocalAgentAuth auth = 1; // mTLS认证上下文
+  int64 task_id = 2; // 构建任务ID
+  int32 builder_attempt = 3; // fencing尝试次数
+  BuildTaskStatus status = 4; // 预定义构建阶段
+  int32 progress = 5; // 进度百分比
+  string message = 6; // 脱敏进度摘要
+}
+
+// V7 Agent构建成功请求。
+message CompleteLocalAgentBuildTaskReq {
+  LocalAgentAuth auth = 1; // mTLS认证上下文
+  int64 task_id = 2; // 构建任务ID
+  int32 builder_attempt = 3; // fencing尝试次数
+  string apk_reference = 4; // 对象引用，不包含凭证
+  string apk_sha256 = 5; // APK SHA-256
+  int64 apk_size = 6; // APK大小字节数
+  string log_reference = 7; // 日志对象引用，不包含凭证
+  string log_sha256 = 8; // 日志SHA-256
+  int64 log_size = 9; // 日志大小字节数
+}
+
+// V7 Agent构建失败请求。
+message FailLocalAgentBuildTaskReq {
+  LocalAgentAuth auth = 1; // mTLS认证上下文
+  int64 task_id = 2; // 构建任务ID
+  int32 builder_attempt = 3; // fencing尝试次数
+  string error_message = 4; // 脱敏失败摘要
+  string log_reference = 5; // 日志对象引用，不包含凭证
+  string log_sha256 = 6; // 日志SHA-256
+  int64 log_size = 7; // 日志大小字节数
+}
+
+// V7 Hybrid Artifact完整性登记请求。
+message VerifyHybridArtifactReq {
+  LocalAgentAuth auth = 1; // mTLS认证上下文
+  int64 task_id = 2; // 构建任务ID
+  int32 builder_attempt = 3; // fencing尝试次数
+  HybridArtifactType artifact_type = 4; // Artifact类型
+  HybridArtifactMode storage_mode = 5; // 存储模式
+  string object_reference = 6; // 对象引用或离线包ID
+  string sha256 = 7; // 内容SHA-256
+  int64 size_bytes = 8; // 内容大小字节数
+}
+
 service Core {
   rpc CreateApplication(CreateApplicationReq) returns (ApplicationResp);
   rpc GetApplication(ApplicationIdReq) returns (ApplicationResp);
@@ -1050,6 +2882,168 @@ service Core {
   rpc CreateBuildTask(CreateBuildTaskReq) returns (BuildTaskResp);
   rpc GetBuildTask(BuildTaskIdReq) returns (BuildTaskResp);
   rpc ListBuildTasks(BuildTaskListReq) returns (BuildTaskListResp);
+  // 取消待处理或执行中的V4构建任务并立即推进fencing代次。
+  rpc CancelBuildTask(CancelBuildTaskReq) returns (BuildTaskResp);
+  // 根据不可变历史快照创建V4重试任务。
+  rpc RetryBuildTask(RetryBuildTaskReq) returns (BuildTaskResp);
+
+  // 查询V4 Builder节点详情。
+  rpc GetBuilderNode(BuilderNodeIdReq) returns (BuilderNodeResp);
+  // 分页查询V4 Builder集群节点。
+  rpc ListBuilderNodes(BuilderNodeListReq) returns (BuilderNodeListResp);
+  // 修改V4 Builder节点排空状态。
+  rpc DrainBuilderNode(DrainBuilderNodeReq) returns (BuilderNodeResp);
+  // 在心跳、失败次数和磁盘容量均恢复后人工解除V4 Builder节点隔离。
+  rpc RecoverBuilderNode(RecoverBuilderNodeReq) returns (BuilderNodeResp);
+  // 创建或更新V4构建并发与公平调度策略。
+  rpc UpsertBuildConcurrencyPolicy(UpsertBuildConcurrencyPolicyReq) returns (BuildConcurrencyPolicyResp);
+  // 分页查询V4构建并发与公平调度策略。
+  rpc ListBuildConcurrencyPolicies(BuildConcurrencyPolicyListReq) returns (BuildConcurrencyPolicyListResp);
+  // 分页查询V4构建缓存条目。
+  rpc ListBuildCacheEntries(BuildCacheEntryListReq) returns (BuildCacheEntryListResp);
+  // 管理端失效V4构建缓存条目。
+  rpc InvalidateBuildCache(InvalidateBuildCacheReq) returns (BuildCacheEntryResp);
+  // 分页查询V4结构化调度事件。
+  rpc ListBuildSchedulerEvents(BuildSchedulerEventListReq) returns (BuildSchedulerEventListResp);
+  // 查询V4构建集群运行指标与告警摘要。
+  rpc GetBuildClusterMetrics(BuildClusterMetricsReq) returns (BuildClusterMetricsResp);
+
+  // 创建V5 Open API凭证并一次性返回Secret。
+  rpc CreateOpenApiCredential(CreateOpenApiCredentialReq) returns (OpenApiCredentialSecretResp);
+  // 分页查询V5 Open API凭证。
+  rpc ListOpenApiCredentials(OpenApiCredentialListReq) returns (OpenApiCredentialListResp);
+  // 轮换V5 Open API凭证并一次性返回新Secret。
+  rpc RotateOpenApiCredential(RotateOpenApiCredentialReq) returns (OpenApiCredentialSecretResp);
+  // 立即吊销V5 Open API凭证。
+  rpc RevokeOpenApiCredential(OpenApiCredentialIdReq) returns (OpenApiCredentialResp);
+  // 验证V5 Open API凭证、IP、状态和有效期。
+  rpc AuthenticateOpenApiCredential(AuthenticateOpenApiCredentialReq) returns (OpenApiAuthContextResp);
+  // 申请或读取Open API幂等执行记录。
+  rpc BeginOpenApiIdempotency(BeginOpenApiIdempotencyReq) returns (OpenApiIdempotencyResp);
+  // 保存Open API幂等请求的最终响应。
+  rpc CompleteOpenApiIdempotency(CompleteOpenApiIdempotencyReq) returns (RespBase);
+  // 写入Open API调用审计。
+  rpc RecordOpenApiAudit(RecordOpenApiAuditReq) returns (RespBase);
+  // 创建Webhook订阅端点并一次性返回签名Secret。
+  rpc CreateWebhookEndpoint(CreateWebhookEndpointReq) returns (WebhookEndpointSecretResp);
+  // 更新Webhook订阅端点。
+  rpc UpdateWebhookEndpoint(UpdateWebhookEndpointReq) returns (WebhookEndpointResp);
+  // 查询Webhook订阅端点。
+  rpc GetWebhookEndpoint(WebhookEndpointIdReq) returns (WebhookEndpointResp);
+  // 查询Webhook订阅端点列表。
+  rpc ListWebhookEndpoints(WebhookEndpointListReq) returns (WebhookEndpointListResp);
+  // 重置Webhook签名Secret并一次性返回新Secret。
+  rpc RotateWebhookEndpointSecret(WebhookEndpointIdReq) returns (WebhookEndpointSecretResp);
+  // 查询Webhook投递日志。
+  rpc ListWebhookDeliveries(WebhookDeliveryListReq) returns (WebhookDeliveryListResp);
+  // 重放失败或死信的Webhook投递。
+  rpc ReplayWebhookDelivery(WebhookDeliveryIdReq) returns (WebhookDeliveryResp);
+  // 创建只投递到指定端点的测试事件。
+  rpc CreateTestWebhookEvent(CreateTestWebhookEventReq) returns (RespBase);
+  // 完成受信任的GitHub/GitLab OAuth回调或App安装同步，并加密保存令牌。
+  rpc CompleteSourceIntegration(CompleteSourceIntegrationReq) returns (SourceIntegrationResp);
+  // 查询代码平台集成。
+  rpc GetSourceIntegration(SourceIntegrationIdReq) returns (SourceIntegrationResp);
+  // 分页查询代码平台集成。
+  rpc ListSourceIntegrations(SourceIntegrationListReq) returns (SourceIntegrationListResp);
+  // 读取有效集成令牌，仅供受内部认证保护的供应商客户端调用，禁止暴露到HTTP。
+  rpc GetSourceIntegrationCredential(SourceIntegrationIdReq) returns (SourceIntegrationCredentialResp);
+  // 断开集成并使令牌立即不可用。
+  rpc DisconnectSourceIntegration(SourceIntegrationIdReq) returns (SourceIntegrationResp);
+  // 同步OAuth/App明确授权的只读仓库。
+  rpc AuthorizeSourceRepository(AuthorizeSourceRepositoryReq) returns (SourceRepositoryResp);
+  // 查询单个授权仓库。
+  rpc GetSourceRepository(SourceRepositoryIdReq) returns (SourceRepositoryResp);
+  // 分页查询授权仓库。
+  rpc ListSourceRepositories(SourceRepositoryListReq) returns (SourceRepositoryListResp);
+  // 撤销仓库授权。
+  rpc RevokeSourceRepository(SourceRepositoryIdReq) returns (SourceRepositoryResp);
+  // 记录从授权仓库导入并完成校验的APK Artifact来源。
+  rpc RecordSourceArtifact(RecordSourceArtifactReq) returns (SourceArtifactResp);
+  // 在同一数据库事务中创建版本、绑定存储对象并记录供应商Artifact来源。
+  rpc ImportSourceArtifact(ImportSourceArtifactReq) returns (SourceArtifactImportResp);
+  // 创建预定义源码平台构建触发策略并一次性返回回调令牌和签名Secret。
+  rpc CreateSourceBuildTrigger(CreateSourceBuildTriggerReq) returns (SourceBuildTriggerSecretResp);
+  // 更新预定义源码平台构建触发策略，不能修改授权仓库和应用。
+  rpc UpdateSourceBuildTrigger(UpdateSourceBuildTriggerReq) returns (SourceBuildTriggerResp);
+  // 查询预定义源码平台构建触发策略。
+  rpc GetSourceBuildTrigger(SourceBuildTriggerIdReq) returns (SourceBuildTriggerResp);
+  // 分页查询预定义源码平台构建触发策略。
+  rpc ListSourceBuildTriggers(SourceBuildTriggerListReq) returns (SourceBuildTriggerListResp);
+  // 轮换回调随机令牌和供应商签名Secret并一次性返回。
+  rpc RotateSourceBuildTriggerSecret(SourceBuildTriggerIdReq) returns (SourceBuildTriggerSecretResp);
+  // 解析回调随机令牌和内部签名材料，仅供受内部认证保护的公开入口调用。
+  rpc ResolveSourceBuildTrigger(ResolveSourceBuildTriggerReq) returns (SourceBuildTriggerCredentialResp);
+  // 将已完成供应商签名验证的标准化事件可靠且幂等地写入队列。
+  rpc EnqueueSourceWebhookEvent(EnqueueSourceWebhookEventReq) returns (EnqueueSourceWebhookEventResp);
+  // Worker使用租约原子领取待处理或超时事件。
+  rpc ClaimSourceWebhookEvent(ClaimSourceWebhookEventReq) returns (ClaimSourceWebhookEventResp);
+  // Worker记录Artifact导入和构建任务创建成功。
+  rpc CompleteSourceWebhookEvent(CompleteSourceWebhookEventReq) returns (RespBase);
+  // Worker按可重试性记录失败、指数退避或最终失败。
+  rpc FailSourceWebhookEvent(FailSourceWebhookEventReq) returns (RespBase);
+  // 分页查询源码平台入站事件审计记录。
+  rpc ListSourceWebhookEvents(SourceWebhookEventListReq) returns (SourceWebhookEventListResp);
+
+  // 创建V6不可变套餐版本，同编码自动分配下一版本号。
+  rpc CreateBillingPlan(CreateBillingPlanReq) returns (BillingPlanResp);
+  // 查询V6套餐版本。
+  rpc GetBillingPlan(BillingPlanIdReq) returns (BillingPlanResp);
+  // 查询V6套餐版本列表。
+  rpc ListBillingPlans(BillingPlanListReq) returns (BillingPlanListResp);
+  // 退役V6套餐版本，不影响历史订阅。
+  rpc RetireBillingPlan(BillingPlanIdReq) returns (BillingPlanResp);
+  // 查询租户当前订阅、权益和固化套餐版本。
+  rpc GetTenantBilling(TenantBillingReq) returns (TenantBillingResp);
+  // 创建或更新人工合同订阅并原子刷新权益。
+  rpc UpsertManualSubscription(UpsertManualSubscriptionReq) returns (TenantBillingResp);
+  // 立即或周期末变更套餐。
+  rpc ChangeTenantSubscription(ChangeTenantSubscriptionReq) returns (TenantBillingResp);
+  // 立即或周期末取消订阅。
+  rpc CancelTenantSubscription(CancelTenantSubscriptionReq) returns (TenantBillingResp);
+  // 并发安全地预占构建、存储或席位额度。
+  rpc ReserveQuota(ReserveQuotaReq) returns (QuotaReservationResp);
+  // 幂等确认额度预占并写不可变用量账本。
+  rpc ConfirmQuota(QuotaReservationActionReq) returns (QuotaReservationResp);
+  // 幂等释放未使用额度预占。
+  rpc ReleaseQuota(QuotaReservationActionReq) returns (QuotaReservationResp);
+  // 追加一条幂等不可变用量记录。
+  rpc RecordUsage(RecordUsageReq) returns (RespBase);
+  // 查询周期用量、预占和当前限额。
+  rpc GetBillingUsage(BillingUsageReq) returns (BillingUsageResp);
+  // 查询租户不可变账单及账单项。
+  rpc ListInvoices(InvoiceListReq) returns (InvoiceListResp);
+  // 应用已验签支付事件，事件幂等且拒绝乱序覆盖新状态。
+  rpc ApplyBillingWebhook(ApplyBillingWebhookReq) returns (RespBase);
+
+  // 创建V7 Local Agent并一次性返回注册码。
+  rpc CreateLocalAgentRegistration(CreateLocalAgentRegistrationReq) returns (LocalAgentRegistrationResp);
+  // Agent使用一次性注册码和本地CSR完成首次注册。
+  rpc RegisterLocalAgent(RegisterLocalAgentReq) returns (RegisterLocalAgentResp);
+  // 查询V7 Local Agent详情。
+  rpc GetLocalAgent(LocalAgentIdReq) returns (LocalAgentResp);
+  // 分页查询V7 Local Agent。
+  rpc ListLocalAgents(LocalAgentListReq) returns (LocalAgentListResp);
+  // Agent通过mTLS出站连接上报心跳和预定义能力。
+  rpc HeartbeatLocalAgent(HeartbeatLocalAgentReq) returns (LocalAgentResp);
+  // 管理员远程设置Agent Drain状态。
+  rpc DrainLocalAgent(DrainLocalAgentReq) returns (LocalAgentResp);
+  // 管理员吊销Agent及其全部有效证书。
+  rpc RevokeLocalAgent(RevokeLocalAgentReq) returns (LocalAgentResp);
+  // Agent使用当前有效证书和新CSR轮换客户端证书。
+  rpc RotateLocalAgentCertificate(RotateLocalAgentCertificateReq) returns (RegisterLocalAgentResp);
+  // Agent领取经过租户、应用、能力和协议范围校验的构建任务。
+  rpc ClaimLocalAgentBuildTask(ClaimLocalAgentBuildTaskReq) returns (LocalAgentBuildTaskResp);
+  // Agent按任务attempt续租，旧进程不能回写。
+  rpc RenewLocalAgentTaskLease(RenewLocalAgentTaskLeaseReq) returns (RespBase);
+  // Agent回报预定义构建阶段，不支持任意命令。
+  rpc ReportLocalAgentBuildProgress(ReportLocalAgentBuildProgressReq) returns (RespBase);
+  // Agent校验Artifact后完成构建任务。
+  rpc CompleteLocalAgentBuildTask(CompleteLocalAgentBuildTaskReq) returns (RespBase);
+  // Agent记录脱敏失败摘要并结束任务。
+  rpc FailLocalAgentBuildTask(FailLocalAgentBuildTaskReq) returns (RespBase);
+  // 校验并登记三种存储模式下的Artifact引用。
+  rpc VerifyHybridArtifact(VerifyHybridArtifactReq) returns (RespBase);
 
   rpc ReportInstall(InstallReportReq) returns (RespBase);
   rpc ReportChannelEvent(ReportChannelEventReq) returns (RespBase);
@@ -1058,6 +3052,18 @@ service Core {
   rpc ResolveChannelDownload(ResolveChannelDownloadReq) returns (ChannelDownloadArtifactResp);
 
   rpc ClaimBuildTask(ClaimBuildTaskReq) returns (BuildTaskResp);
+  // 注册或刷新V4 Builder节点能力。
+  rpc RegisterBuilderNode(RegisterBuilderNodeReq) returns (BuilderNodeResp);
+  // 上报V4 Builder节点心跳、容量和运行任务。
+  rpc BuilderNodeHeartbeat(BuilderNodeHeartbeatReq) returns (BuilderNodeResp);
+  // 结合节点能力、公平队列和并发槽位原子领取V4构建任务。
+  rpc ClaimScheduledBuildTask(ClaimScheduledBuildTaskReq) returns (BuildTaskResp);
+  // 解析并记录V4输入可寻址构建缓存命中。
+  rpc ResolveBuildCache(ResolveBuildCacheReq) returns (BuildCacheResolutionResp);
+  // 发布独立V4构建缓存产物。
+  rpc PublishBuildCache(PublishBuildCacheReq) returns (BuildCacheEntryResp);
+  // 执行V4构建缓存TTL/LRU清理并返回可物理删除对象。
+  rpc CleanupBuildCache(CleanupBuildCacheReq) returns (CleanupBuildCacheResp);
   // 读取当前Builder已领取任务的内部执行上下文。
   rpc GetBuildExecutionContext(GetBuildExecutionContextReq) returns (BuildExecutionContextResp);
   rpc HeartbeatBuildTask(HeartbeatBuildTaskReq) returns (RespBase);

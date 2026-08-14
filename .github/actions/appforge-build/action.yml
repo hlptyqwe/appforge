@@ -1,0 +1,59 @@
+name: AppForge APK build
+description: Upload an APK, create a channel build, wait, and download the artifact
+inputs:
+  base-url:
+    description: AppForge API origin
+    required: true
+  api-key:
+    description: AppForge API Key; pass a GitHub secret
+    required: true
+  cli-path:
+    description: Preinstalled appforgectl executable
+    required: false
+    default: appforgectl
+  apk:
+    description: Source APK path
+    required: true
+  app-id:
+    description: AppForge application ID
+    required: true
+  version-code:
+    description: Android versionCode
+    required: true
+  version-name:
+    description: Android versionName
+    required: true
+  channel-id:
+    description: AppForge channel ID
+    required: true
+  signing-config-id:
+    description: AppForge signing configuration ID
+    required: true
+  output:
+    description: Result APK path
+    required: false
+    default: channel.apk
+outputs:
+  artifact-path:
+    description: Downloaded APK path
+    value: ${{ steps.build.outputs.artifact-path }}
+runs:
+  using: composite
+  steps:
+    - id: build
+      shell: bash
+      env:
+        APPFORGE_BASE_URL: ${{ inputs.base-url }}
+        APPFORGE_API_KEY: ${{ inputs.api-key }}
+        APPFORGE_CLI: ${{ inputs.cli-path }}
+        APPFORGE_APK: ${{ inputs.apk }}
+        APPFORGE_APP_ID: ${{ inputs.app-id }}
+        APPFORGE_VERSION_CODE: ${{ inputs.version-code }}
+        APPFORGE_VERSION_NAME: ${{ inputs.version-name }}
+        APPFORGE_CHANNEL_ID: ${{ inputs.channel-id }}
+        APPFORGE_SIGNING_CONFIG_ID: ${{ inputs.signing-config-id }}
+        APPFORGE_OUTPUT: ${{ inputs.output }}
+      run: |
+        set +x
+        "${{ github.action_path }}/../../../docs/ci/appforge-build.sh"
+        echo "artifact-path=${APPFORGE_OUTPUT}" >> "${GITHUB_OUTPUT}"

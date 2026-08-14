@@ -6,8 +6,10 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	"appforge/admin-api/internal/config"
+	"appforge/common/offlinelicense"
 	"appforge/common/rpcauth"
 	"appforge/common/secretbox"
 	"appforge/common/utils"
@@ -26,11 +28,24 @@ type ServiceContext struct {
 	CoreCli    core.CoreClient
 	BuilderCli builder.BuilderClient
 	Secrets    *secretbox.Box
+	License    *offlinelicense.VerifiedLicense
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	if err := rpcauth.ValidateToken(c.InternalRpc.Token); err != nil {
 		panic(err)
+	}
+	var verifiedLicense *offlinelicense.VerifiedLicense
+	if c.OfflineLicense.Enabled {
+		var err error
+		verifiedLicense, err = offlinelicense.VerifyFile(offlinelicense.Config{
+			LicenseFile: c.OfflineLicense.LicenseFile, PublicKeyFile: c.OfflineLicense.PublicKeyFile,
+			StateFile: c.OfflineLicense.StateFile, DeploymentID: c.OfflineLicense.DeploymentId,
+			DeploymentMode: c.OfflineLicense.DeploymentMode, ClockRollbackTolerance: c.OfflineLicense.ClockRollbackTolerance,
+		}, time.Now())
+		if err != nil {
+			panic(fmt.Sprintf("verify offline enterprise license: %v", err))
+		}
 	}
 	metadataInterceptor := zrpc.WithUnaryClientInterceptor(func(
 		ctx context.Context,
@@ -75,5 +90,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		CoreCli:    core.NewCoreClient(coreClient.Conn()),
 		BuilderCli: builder.NewBuilderClient(builderClient.Conn()),
 		Secrets:    secrets,
+		License:    verifiedLicense,
 	}
 }

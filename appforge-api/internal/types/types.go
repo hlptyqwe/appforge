@@ -8,9 +8,30 @@ type AssignUserRolesReq struct {
 	RoleIds []int64 `json:"roleIds"`
 }
 
+type AuthorizePlatformSourceRepositoryReq struct {
+	Id           int64  `path:"id"`
+	RepositoryId string `path:"repositoryId"`
+}
+
+type CancelPlatformBuildTaskReq struct {
+	Id     int64  `path:"id"`
+	Reason string `json:"reason,optional"`
+}
+
+type CancelPlatformSubscriptionReq struct {
+	TenantId    int64 `json:"tenantId,optional"`
+	Immediately bool  `json:"immediately"`
+}
+
 type ChangePlatformBrandingProfileStatusReq struct {
 	Id     int64 `path:"id"`
 	Status int32 `json:"status"`
+}
+
+type ChangePlatformSubscriptionReq struct {
+	TenantId int64 `json:"tenantId,optional"`
+	PlanId   int64 `json:"planId"`
+	Mode     int32 `json:"mode"`
 }
 
 type ChangePlatformWhiteLabelProductStatusReq struct {
@@ -26,6 +47,11 @@ type ChangePlatformWhiteLabelTemplateStatusReq struct {
 type ChangeUserStatusReq struct {
 	Id      int64 `json:"id"`
 	Enabled int64 `json:"enabled"` // 0未知 1启用 2禁用
+}
+
+type CleanupPlatformBuildCacheReq struct {
+	Limit           int32 `json:"limit,optional"`
+	TargetFreeBytes int64 `json:"targetFreeBytes,optional"`
 }
 
 type CompletePlatformUploadReq struct {
@@ -53,6 +79,28 @@ type CreatePlatformApplicationReq struct {
 	ApiHost     string `json:"apiHost,optional"`
 }
 
+type CreatePlatformBillingCheckoutReq struct {
+	PlanId int64 `json:"planId"`
+}
+
+type CreatePlatformBillingPlanReq struct {
+	PlanCode            string `json:"planCode"`
+	PlanName            string `json:"planName"`
+	BillingCycle        int32  `json:"billingCycle"`
+	PriceAmount         int64  `json:"priceAmount"`
+	Currency            string `json:"currency"`
+	FeatureJson         string `json:"featureJson"`
+	BuildsPerCycle      int64  `json:"buildsPerCycle"`
+	MaxBuildConcurrency int32  `json:"maxBuildConcurrency"`
+	StorageBytes        int64  `json:"storageBytes"`
+	MaxUploadBytes      int64  `json:"maxUploadBytes"`
+	TeamSeats           int32  `json:"teamSeats"`
+	ApiRateLimit        int32  `json:"apiRateLimit"`
+	ChargeFailedBuild   bool   `json:"chargeFailedBuild"`
+	ChargeCacheHit      bool   `json:"chargeCacheHit"`
+	ChargeRetryBuild    bool   `json:"chargeRetryBuild"`
+}
+
 type CreatePlatformBrandingPreflightReq struct {
 	Id        int64 `path:"id"`
 	VersionId int64 `json:"versionId"`
@@ -72,13 +120,14 @@ type CreatePlatformBrandingProfileReq struct {
 }
 
 type CreatePlatformBuildTaskReq struct {
-	AppId               int64 `json:"appId"`
-	VersionId           int64 `json:"versionId"`
-	ChannelId           int64 `json:"channelId"`
-	SigningConfigId     int64 `json:"signingConfigId,optional"`
-	Priority            int32 `json:"priority,optional"`
-	BrandingProfileId   int64 `json:"brandingProfileId,optional"`
-	WhiteLabelProductId int64 `json:"whiteLabelProductId,optional"`
+	AppId               int64  `json:"appId"`
+	VersionId           int64  `json:"versionId"`
+	ChannelId           int64  `json:"channelId"`
+	SigningConfigId     int64  `json:"signingConfigId,optional"`
+	Priority            int32  `json:"priority,optional"`
+	BrandingProfileId   int64  `json:"brandingProfileId,optional"`
+	WhiteLabelProductId int64  `json:"whiteLabelProductId,optional"`
+	PoolCode            string `json:"poolCode,optional"`
 }
 
 type CreatePlatformChannelReq struct {
@@ -87,6 +136,27 @@ type CreatePlatformChannelReq struct {
 	ChannelName string `json:"channelName"`
 	LandingUrl  string `json:"landingUrl,optional"`
 	DownloadUrl string `json:"downloadUrl,optional"`
+}
+
+type CreatePlatformLocalAgentRegistrationReq struct {
+	TenantId           int64                          `json:"tenantId,optional"`
+	AgentCode          string                         `json:"agentCode"`
+	AgentName          string                         `json:"agentName"`
+	PoolCode           string                         `json:"poolCode"`
+	ArtifactMode       int32                          `json:"artifactMode"`
+	CustomerStorageRef string                         `json:"customerStorageRef,optional"`
+	AllowedAppIds      []int64                        `json:"allowedAppIds"`
+	Capabilities       []PlatformLocalAgentCapability `json:"capabilities"`
+	ExpiresSeconds     int64                          `json:"expiresSeconds,optional"`
+}
+
+type CreatePlatformOpenApiCredentialReq struct {
+	CredentialName     string   `json:"credentialName"`
+	Scopes             []int32  `json:"scopes"`
+	AppIds             []int64  `json:"appIds,optional"`
+	IpAllowlist        []string `json:"ipAllowlist,optional"`
+	RateLimitPerMinute int32    `json:"rateLimitPerMinute"`
+	ExpiresAt          int64    `json:"expiresAt,optional"`
 }
 
 type CreatePlatformSigningConfigReq struct {
@@ -99,6 +169,26 @@ type CreatePlatformSigningConfigReq struct {
 	KeystoreObjectId int64  `json:"keystoreObjectId"`
 }
 
+type CreatePlatformSourceBuildTriggerReq struct {
+	RepositoryId        int64   `json:"repositoryId"`
+	AppId               int64   `json:"appId"`
+	TriggerName         string  `json:"triggerName"`
+	EventType           int32   `json:"eventType"`
+	RefPattern          string  `json:"refPattern,optional"`
+	ArtifactSelector    string  `json:"artifactSelector"`
+	ChannelIds          []int64 `json:"channelIds"`
+	SigningConfigId     int64   `json:"signingConfigId,optional"`
+	BrandingProfileId   int64   `json:"brandingProfileId,optional"`
+	WhiteLabelProductId int64   `json:"whiteLabelProductId,optional"`
+	Priority            int32   `json:"priority,optional"`
+	PoolCode            string  `json:"poolCode,optional"`
+	VersionNamePrefix   string  `json:"versionNamePrefix,optional"`
+}
+
+type CreatePlatformSourceOAuthAuthorizationReq struct {
+	Platform int32 `path:"platform"`
+}
+
 type CreatePlatformVersionReq struct {
 	AppId             int64  `json:"appId"`
 	VersionCode       int64  `json:"versionCode"`
@@ -108,6 +198,13 @@ type CreatePlatformVersionReq struct {
 	ReleaseNotes      string `json:"releaseNotes,optional"`
 	BuildConfigJson   string `json:"buildConfigJson,optional"`
 	SourceApkObjectId int64  `json:"sourceApkObjectId"`
+}
+
+type CreatePlatformWebhookEndpointReq struct {
+	EndpointName string   `json:"endpointName"`
+	EndpointUrl  string   `json:"endpointUrl"`
+	EventTypes   []string `json:"eventTypes"`
+	MaxAttempts  int32    `json:"maxAttempts,optional"`
 }
 
 type CreatePlatformWhiteLabelProductReq struct {
@@ -138,6 +235,22 @@ type CreatePlatformWhiteLabelTemplateRevisionReq struct {
 	ResourcePatchJson     string `json:"resourcePatchJson,optional"`
 	ExtensionFilesJson    string `json:"extensionFilesJson,optional"`
 	ExpectedArtifactsJson string `json:"expectedArtifactsJson,optional"`
+}
+
+type DrainPlatformBuilderNodeReq struct {
+	Id          int64 `path:"id"`
+	DrainStatus int32 `json:"drainStatus"`
+}
+
+type DrainPlatformLocalAgentReq struct {
+	Id          int64 `path:"id"`
+	TenantId    int64 `json:"tenantId,optional"`
+	DrainStatus int32 `json:"drainStatus"`
+}
+
+type GetPlatformBuildClusterMetricsReq struct {
+	PoolCode      string `form:"poolCode,optional"`
+	PeriodMinutes int32  `form:"periodMinutes,optional"`
 }
 
 type GetPlatformChannelStatsReq struct {
@@ -195,6 +308,17 @@ type Google2FAResetReq struct {
 	UserId int64 `json:"userId"`
 }
 
+type ImportPlatformSourceArtifactReq struct {
+	AppId              int64  `json:"appId"`
+	RepositoryId       int64  `json:"repositoryId"`
+	ArtifactSource     int32  `json:"artifactSource"`
+	ExternalArtifactId string `json:"externalArtifactId"`
+	ReleaseRef         string `json:"releaseRef,optional"`
+	VersionCode        int64  `json:"versionCode"`
+	VersionName        string `json:"versionName"`
+	ReleaseNotes       string `json:"releaseNotes,optional"`
+}
+
 type InitiatePlatformUploadReq struct {
 	AppId       int64  `json:"appId,optional"`
 	ObjectType  int32  `json:"objectType"`
@@ -208,10 +332,21 @@ type InitiatePlatformUploadResp struct {
 	Data PlatformUploadTicket `json:"data"`
 }
 
+type InvalidatePlatformBuildCacheReq struct {
+	Id     int64  `path:"id"`
+	Reason string `json:"reason,optional"`
+}
+
 type ListPlatformApplicationsReq struct {
 	PageReq
 	Keyword string `form:"keyword,optional"`
 	Status  int32  `form:"status,optional"`
+}
+
+type ListPlatformBillingPlansReq struct {
+	Page     int32 `form:"page,optional"`
+	PageSize int32 `form:"pageSize,optional"`
+	Status   int32 `form:"status,optional"`
 }
 
 type ListPlatformBrandingPreflightsReq struct {
@@ -229,11 +364,42 @@ type ListPlatformBrandingProfilesReq struct {
 	Status  int32  `form:"status,optional"`
 }
 
+type ListPlatformBuildCacheEntriesReq struct {
+	PageReq
+	CacheScope int32  `form:"cacheScope,optional"`
+	Status     int32  `form:"status,optional"`
+	Keyword    string `form:"keyword,optional"`
+}
+
+type ListPlatformBuildConcurrencyPoliciesReq struct {
+	PageReq
+	AppId    int64  `form:"appId,optional"`
+	PoolCode string `form:"poolCode,optional"`
+	Status   int32  `form:"status,optional"`
+}
+
+type ListPlatformBuildSchedulerEventsReq struct {
+	PageReq
+	AppId     int64  `form:"appId,optional"`
+	TaskId    int64  `form:"taskId,optional"`
+	NodeCode  string `form:"nodeCode,optional"`
+	PoolCode  string `form:"poolCode,optional"`
+	EventType int32  `form:"eventType,optional"`
+}
+
 type ListPlatformBuildTasksReq struct {
 	PageReq
 	AppId     int64 `form:"appId,optional"`
 	ChannelId int64 `form:"channelId,optional"`
 	Status    int32 `form:"status,optional"`
+}
+
+type ListPlatformBuilderNodesReq struct {
+	PageReq
+	PoolCode    string `form:"poolCode,optional"`
+	Status      int32  `form:"status,optional"`
+	DrainStatus int32  `form:"drainStatus,optional"`
+	Keyword     string `form:"keyword,optional"`
 }
 
 type ListPlatformChannelsReq struct {
@@ -243,16 +409,80 @@ type ListPlatformChannelsReq struct {
 	Status  int32  `form:"status,optional"`
 }
 
+type ListPlatformInvoicesReq struct {
+	TenantId int64 `form:"tenantId,optional"`
+	Status   int32 `form:"status,optional"`
+	Page     int32 `form:"page,optional"`
+	PageSize int32 `form:"pageSize,optional"`
+}
+
+type ListPlatformLocalAgentsReq struct {
+	PageReq
+	TenantId int64 `form:"tenantId,optional"`
+	Status   int32 `form:"status,optional"`
+}
+
+type ListPlatformOpenApiCredentialsReq struct {
+	PageReq
+	Status  int32  `form:"status,optional"`
+	Keyword string `form:"keyword,optional"`
+}
+
 type ListPlatformSigningConfigsReq struct {
 	PageReq
 	AppId  int64 `form:"appId,optional"`
 	Status int64 `form:"status,optional"`
 }
 
+type ListPlatformSourceAvailableRepositoriesReq struct {
+	Id int64 `path:"id"`
+}
+
+type ListPlatformSourceBuildTriggersReq struct {
+	PageReq
+	RepositoryId int64  `form:"repositoryId,optional"`
+	AppId        int64  `form:"appId,optional"`
+	Status       int32  `form:"status,optional"`
+	Keyword      string `form:"keyword,optional"`
+}
+
+type ListPlatformSourceIntegrationsReq struct {
+	PageReq
+	Platform int32  `form:"platform,optional"`
+	Status   int32  `form:"status,optional"`
+	Keyword  string `form:"keyword,optional"`
+}
+
+type ListPlatformSourceRepositoriesReq struct {
+	PageReq
+	IntegrationId int64  `form:"integrationId,optional"`
+	Status        int32  `form:"status,optional"`
+	Keyword       string `form:"keyword,optional"`
+}
+
+type ListPlatformSourceWebhookEventsReq struct {
+	PageReq
+	TriggerId int64 `form:"triggerId,optional"`
+	Status    int32 `form:"status,optional"`
+}
+
 type ListPlatformVersionsReq struct {
 	PageReq
 	AppId  int64 `form:"appId,optional"`
 	Status int32 `form:"status,optional"`
+}
+
+type ListPlatformWebhookDeliveriesReq struct {
+	PageReq
+	EndpointId int64  `form:"endpointId,optional"`
+	Status     int32  `form:"status,optional"`
+	EventType  string `form:"eventType,optional"`
+}
+
+type ListPlatformWebhookEndpointsReq struct {
+	PageReq
+	Status  int32  `form:"status,optional"`
+	Keyword string `form:"keyword,optional"`
 }
 
 type ListPlatformWhiteLabelProductsReq struct {
@@ -357,6 +587,12 @@ type OpLogListResp struct {
 	Data []OpLogItem `json:"data"`
 }
 
+type OpenListApplicationsReq struct {
+	PageReq
+	Keyword string `form:"keyword,optional"`
+	Status  int32  `form:"status,optional"`
+}
+
 type OptionsGroup struct {
 	Key     string        `json:"key"`
 	Label   string        `json:"label"`
@@ -397,6 +633,61 @@ type PlatformApplicationListResp struct {
 type PlatformApplicationResp struct {
 	RespBase
 	Data PlatformApplication `json:"data"`
+}
+
+type PlatformBillingCheckoutResp struct {
+	RespBase
+	CheckoutUrl string `json:"checkoutUrl"`
+	SessionId   string `json:"sessionId"`
+}
+
+type PlatformBillingPlan struct {
+	Id                  int64  `json:"id"`
+	PlanCode            string `json:"planCode"`
+	PlanName            string `json:"planName"`
+	BillingCycle        int32  `json:"billingCycle"`
+	PriceAmount         int64  `json:"priceAmount"`
+	Currency            string `json:"currency"`
+	FeatureJson         string `json:"featureJson"`
+	BuildsPerCycle      int64  `json:"buildsPerCycle"`
+	MaxBuildConcurrency int32  `json:"maxBuildConcurrency"`
+	StorageBytes        int64  `json:"storageBytes"`
+	MaxUploadBytes      int64  `json:"maxUploadBytes"`
+	TeamSeats           int32  `json:"teamSeats"`
+	ApiRateLimit        int32  `json:"apiRateLimit"`
+	ChargeFailedBuild   bool   `json:"chargeFailedBuild"`
+	ChargeCacheHit      bool   `json:"chargeCacheHit"`
+	ChargeRetryBuild    bool   `json:"chargeRetryBuild"`
+	Status              int32  `json:"status"`
+	Version             int32  `json:"version"`
+	CreateTime          int64  `json:"createTime"`
+	UpdateTime          int64  `json:"updateTime"`
+}
+
+type PlatformBillingPlanIdReq struct {
+	Id int64 `path:"id"`
+}
+
+type PlatformBillingPlanListResp struct {
+	RespBase
+	Data  []PlatformBillingPlan `json:"data"`
+	Total int64                 `json:"total"`
+}
+
+type PlatformBillingPlanResp struct {
+	RespBase
+	Data PlatformBillingPlan `json:"data"`
+}
+
+type PlatformBillingUsageReq struct {
+	TenantId  int64  `form:"tenantId,optional"`
+	PeriodKey string `form:"periodKey,optional"`
+}
+
+type PlatformBillingUsageResp struct {
+	RespBase
+	PeriodKey string                       `json:"periodKey"`
+	Data      []PlatformUsageMetricSummary `json:"data"`
 }
 
 type PlatformBrandingPreflight struct {
@@ -457,6 +748,122 @@ type PlatformBrandingProfileResp struct {
 	Data PlatformBrandingProfile `json:"data"`
 }
 
+type PlatformBuildCacheCleanupResp struct {
+	RespBase
+	Data PlatformBuildCacheCleanupResult `json:"data"`
+}
+
+type PlatformBuildCacheCleanupResult struct {
+	InvalidatedCount int64   `json:"invalidatedCount"`
+	ReclaimableBytes int64   `json:"reclaimableBytes"`
+	ObjectIds        []int64 `json:"objectIds"`
+}
+
+type PlatformBuildCacheEntry struct {
+	Id                   int64  `json:"id"`
+	TenantId             int64  `json:"tenantId"`
+	CacheScope           int32  `json:"cacheScope"`
+	CacheKey             string `json:"cacheKey"`
+	ToolchainVersion     string `json:"toolchainVersion"`
+	BuildProtocolVersion int32  `json:"buildProtocolVersion"`
+	InputDigest          string `json:"inputDigest"`
+	ArtifactObjectId     int64  `json:"artifactObjectId"`
+	ArtifactSha256       string `json:"artifactSha256"`
+	SizeBytes            int64  `json:"sizeBytes"`
+	HitCount             int64  `json:"hitCount"`
+	Status               int32  `json:"status"`
+	ExpiresAt            int64  `json:"expiresAt"`
+	LastHitAt            int64  `json:"lastHitAt,optional"`
+	CreateTime           int64  `json:"createTime"`
+	UpdateTime           int64  `json:"updateTime"`
+}
+
+type PlatformBuildCacheEntryListResp struct {
+	RespBase
+	Data []PlatformBuildCacheEntry `json:"data"`
+}
+
+type PlatformBuildCacheEntryResp struct {
+	RespBase
+	Data PlatformBuildCacheEntry `json:"data"`
+}
+
+type PlatformBuildClusterMetrics struct {
+	PoolCode                    string   `json:"poolCode"`
+	PeriodMinutes               int32    `json:"periodMinutes"`
+	OnlineNodes                 int64    `json:"onlineNodes"`
+	OfflineNodes                int64    `json:"offlineNodes"`
+	DrainingNodes               int64    `json:"drainingNodes"`
+	TotalSlots                  int64    `json:"totalSlots"`
+	RunningSlots                int64    `json:"runningSlots"`
+	DiskCapacity                int64    `json:"diskCapacity"`
+	DiskFree                    int64    `json:"diskFree"`
+	QueuedTasks                 int64    `json:"queuedTasks"`
+	RunningTasks                int64    `json:"runningTasks"`
+	CompletedTasks              int64    `json:"completedTasks"`
+	SuccessTasks                int64    `json:"successTasks"`
+	FailedTasks                 int64    `json:"failedTasks"`
+	CancelledTasks              int64    `json:"cancelledTasks"`
+	AverageQueueMs              int64    `json:"averageQueueMs"`
+	AverageBuildMs              int64    `json:"averageBuildMs"`
+	SuccessRate                 float64  `json:"successRate"`
+	CacheHitTasks               int64    `json:"cacheHitTasks"`
+	CacheHitRate                float64  `json:"cacheHitRate"`
+	ActiveCacheEntries          int64    `json:"activeCacheEntries"`
+	ActiveCacheBytes            int64    `json:"activeCacheBytes"`
+	LeaseRecoveryCount          int64    `json:"leaseRecoveryCount"`
+	CacheValidationFailureCount int64    `json:"cacheValidationFailureCount"`
+	OldestQueuedMs              int64    `json:"oldestQueuedMs"`
+	Alerts                      []string `json:"alerts"`
+}
+
+type PlatformBuildClusterMetricsResp struct {
+	RespBase
+	Data PlatformBuildClusterMetrics `json:"data"`
+}
+
+type PlatformBuildConcurrencyPolicy struct {
+	Id             int64  `json:"id"`
+	TenantId       int64  `json:"tenantId"`
+	AppId          int64  `json:"appId"`
+	PoolCode       string `json:"poolCode"`
+	MaxConcurrency int32  `json:"maxConcurrency"`
+	FairWeight     int32  `json:"fairWeight"`
+	MaxPriority    int32  `json:"maxPriority"`
+	Status         int32  `json:"status"`
+	CreateBy       int64  `json:"createBy"`
+	CreateTime     int64  `json:"createTime"`
+	UpdateTime     int64  `json:"updateTime"`
+}
+
+type PlatformBuildConcurrencyPolicyListResp struct {
+	RespBase
+	Data []PlatformBuildConcurrencyPolicy `json:"data"`
+}
+
+type PlatformBuildConcurrencyPolicyResp struct {
+	RespBase
+	Data PlatformBuildConcurrencyPolicy `json:"data"`
+}
+
+type PlatformBuildSchedulerEvent struct {
+	Id           int64  `json:"id"`
+	TenantId     int64  `json:"tenantId"`
+	AppId        int64  `json:"appId"`
+	TaskId       int64  `json:"taskId"`
+	NodeCode     string `json:"nodeCode,optional"`
+	PoolCode     string `json:"poolCode"`
+	EventType    int32  `json:"eventType"`
+	ReasonCode   string `json:"reasonCode,optional"`
+	DecisionJson string `json:"decisionJson,optional"`
+	CreateTime   int64  `json:"createTime"`
+}
+
+type PlatformBuildSchedulerEventListResp struct {
+	RespBase
+	Data []PlatformBuildSchedulerEvent `json:"data"`
+}
+
 type PlatformBuildTask struct {
 	Id                   int64  `json:"id"`
 	TenantId             int64  `json:"tenantId"`
@@ -491,6 +898,14 @@ type PlatformBuildTask struct {
 	WhiteLabelProductId  int64  `json:"whiteLabelProductId"`
 	TemplateRevision     int32  `json:"templateRevision"`
 	TemplateSnapshotJson string `json:"templateSnapshotJson,optional"`
+	PoolCode             string `json:"poolCode"`
+	CacheKey             string `json:"cacheKey,optional"`
+	CacheEntryId         int64  `json:"cacheEntryId"`
+	CacheHit             bool   `json:"cacheHit"`
+	CancelRequestedAt    int64  `json:"cancelRequestedAt,optional"`
+	CancelledAt          int64  `json:"cancelledAt,optional"`
+	CancelReason         string `json:"cancelReason,optional"`
+	RetryOfTaskId        int64  `json:"retryOfTaskId"`
 }
 
 type PlatformBuildTaskListResp struct {
@@ -501,6 +916,38 @@ type PlatformBuildTaskListResp struct {
 type PlatformBuildTaskResp struct {
 	RespBase
 	Data PlatformBuildTask `json:"data"`
+}
+
+type PlatformBuilderNode struct {
+	Id                   int64  `json:"id"`
+	NodeCode             string `json:"nodeCode"`
+	PoolCode             string `json:"poolCode"`
+	Endpoint             string `json:"endpoint,optional"`
+	Status               int32  `json:"status"`
+	DrainStatus          int32  `json:"drainStatus"`
+	MaxConcurrency       int32  `json:"maxConcurrency"`
+	RunningCount         int32  `json:"runningCount"`
+	CpuCapacity          int32  `json:"cpuCapacity"`
+	MemoryCapacity       int64  `json:"memoryCapacity"`
+	DiskCapacity         int64  `json:"diskCapacity"`
+	DiskFree             int64  `json:"diskFree"`
+	ToolchainVersion     string `json:"toolchainVersion"`
+	BuildProtocolVersion int32  `json:"buildProtocolVersion"`
+	CapabilityJson       string `json:"capabilityJson"`
+	LastErrorMessage     string `json:"lastErrorMessage,optional"`
+	LastHeartbeatAt      int64  `json:"lastHeartbeatAt"`
+	CreateTime           int64  `json:"createTime"`
+	UpdateTime           int64  `json:"updateTime"`
+}
+
+type PlatformBuilderNodeListResp struct {
+	RespBase
+	Data []PlatformBuilderNode `json:"data"`
+}
+
+type PlatformBuilderNodeResp struct {
+	RespBase
+	Data PlatformBuilderNode `json:"data"`
 }
 
 type PlatformChannel struct {
@@ -575,6 +1022,133 @@ type PlatformInstallReportReq struct {
 	FirstOpenTime int64  `json:"firstOpenTime,optional"`
 }
 
+type PlatformInvoice struct {
+	Id                int64                 `json:"id"`
+	TenantId          int64                 `json:"tenantId"`
+	InvoiceNo         string                `json:"invoiceNo"`
+	ExternalInvoiceId string                `json:"externalInvoiceId,optional"`
+	Status            int32                 `json:"status"`
+	Currency          string                `json:"currency"`
+	SubtotalAmount    int64                 `json:"subtotalAmount"`
+	DiscountAmount    int64                 `json:"discountAmount"`
+	TaxAmount         int64                 `json:"taxAmount"`
+	TotalAmount       int64                 `json:"totalAmount"`
+	PaidAmount        int64                 `json:"paidAmount"`
+	RefundedAmount    int64                 `json:"refundedAmount"`
+	PeriodStart       int64                 `json:"periodStart"`
+	PeriodEnd         int64                 `json:"periodEnd"`
+	DueAt             int64                 `json:"dueAt,optional"`
+	PaidAt            int64                 `json:"paidAt,optional"`
+	Items             []PlatformInvoiceItem `json:"items"`
+	CreateTime        int64                 `json:"createTime"`
+}
+
+type PlatformInvoiceItem struct {
+	Id          int64  `json:"id"`
+	InvoiceId   int64  `json:"invoiceId"`
+	LineKey     string `json:"lineKey"`
+	ItemType    int32  `json:"itemType"`
+	Description string `json:"description"`
+	Metric      int32  `json:"metric"`
+	Quantity    int64  `json:"quantity"`
+	UnitAmount  int64  `json:"unitAmount"`
+	Amount      int64  `json:"amount"`
+}
+
+type PlatformInvoiceListResp struct {
+	RespBase
+	Data  []PlatformInvoice `json:"data"`
+	Total int64             `json:"total"`
+}
+
+type PlatformLocalAgent struct {
+	Id                  int64                          `json:"id"`
+	TenantId            int64                          `json:"tenantId"`
+	AgentCode           string                         `json:"agentCode"`
+	AgentName           string                         `json:"agentName"`
+	PoolCode            string                         `json:"poolCode"`
+	Status              int32                          `json:"status"`
+	DrainStatus         int32                          `json:"drainStatus"`
+	ProtocolVersion     int32                          `json:"protocolVersion"`
+	AgentVersion        string                         `json:"agentVersion"`
+	ArtifactMode        int32                          `json:"artifactMode"`
+	CustomerStorageRef  string                         `json:"customerStorageRef,optional"`
+	AllowedAppIds       []int64                        `json:"allowedAppIds"`
+	Capabilities        []PlatformLocalAgentCapability `json:"capabilities"`
+	CertificateSerial   string                         `json:"certificateSerial,optional"`
+	CertificateNotAfter int64                          `json:"certificateNotAfter,optional"`
+	LastHeartbeatAt     int64                          `json:"lastHeartbeatAt,optional"`
+	CreateTime          int64                          `json:"createTime"`
+	UpdateTime          int64                          `json:"updateTime"`
+}
+
+type PlatformLocalAgentCapability struct {
+	CapabilityKey   string `json:"capabilityKey"`
+	CapabilityValue string `json:"capabilityValue"`
+}
+
+type PlatformLocalAgentIdReq struct {
+	Id       int64 `path:"id"`
+	TenantId int64 `json:"tenantId,optional" form:"tenantId,optional"`
+}
+
+type PlatformLocalAgentListResp struct {
+	RespBase
+	Data  []PlatformLocalAgent `json:"data"`
+	Total int64                `json:"total"`
+}
+
+type PlatformLocalAgentRegistrationResp struct {
+	RespBase
+	Data              PlatformLocalAgent `json:"data"`
+	RegistrationToken string             `json:"registrationToken"`
+	ExpiresAt         int64              `json:"expiresAt"`
+}
+
+type PlatformLocalAgentResp struct {
+	RespBase
+	Data PlatformLocalAgent `json:"data"`
+}
+
+type PlatformOpenApiCredential struct {
+	Id                 int64    `json:"id"`
+	TenantId           int64    `json:"tenantId"`
+	CredentialName     string   `json:"credentialName"`
+	KeyId              string   `json:"keyId"`
+	Scopes             []int32  `json:"scopes"`
+	AppIds             []int64  `json:"appIds"`
+	IpAllowlist        []string `json:"ipAllowlist"`
+	RateLimitPerMinute int32    `json:"rateLimitPerMinute"`
+	Status             int32    `json:"status"`
+	ExpiresAt          int64    `json:"expiresAt,optional"`
+	GraceExpiresAt     int64    `json:"graceExpiresAt,optional"`
+	RotatedFromId      int64    `json:"rotatedFromId"`
+	LastUsedAt         int64    `json:"lastUsedAt,optional"`
+	CreateBy           int64    `json:"createBy"`
+	CreateTime         int64    `json:"createTime"`
+	UpdateTime         int64    `json:"updateTime"`
+}
+
+type PlatformOpenApiCredentialListResp struct {
+	RespBase
+	Data []PlatformOpenApiCredential `json:"data"`
+}
+
+type PlatformOpenApiCredentialResp struct {
+	RespBase
+	Data PlatformOpenApiCredential `json:"data"`
+}
+
+type PlatformOpenApiCredentialSecret struct {
+	Credential PlatformOpenApiCredential `json:"credential"`
+	ApiKey     string                    `json:"apiKey"`
+}
+
+type PlatformOpenApiCredentialSecretResp struct {
+	RespBase
+	Data PlatformOpenApiCredentialSecret `json:"data"`
+}
+
 type PlatformSigningConfig struct {
 	Id                int64  `json:"id"`
 	TenantId          int64  `json:"tenantId"`
@@ -602,6 +1176,172 @@ type PlatformSigningConfigResp struct {
 	Data PlatformSigningConfig `json:"data"`
 }
 
+type PlatformSourceArtifact struct {
+	Id                 int64  `json:"id"`
+	AppId              int64  `json:"appId"`
+	VersionId          int64  `json:"versionId"`
+	IntegrationId      int64  `json:"integrationId"`
+	RepositoryId       int64  `json:"repositoryId"`
+	ArtifactSource     int32  `json:"artifactSource"`
+	ExternalArtifactId string `json:"externalArtifactId"`
+	CommitSha          string `json:"commitSha"`
+	PipelineRef        string `json:"pipelineRef,optional"`
+	JobRef             string `json:"jobRef,optional"`
+	ArtifactSha256     string `json:"artifactSha256"`
+	StorageObjectId    int64  `json:"storageObjectId"`
+	CreateTime         int64  `json:"createTime"`
+}
+
+type PlatformSourceArtifactImportResp struct {
+	RespBase
+	Data PlatformSourceArtifactImportResult `json:"data"`
+}
+
+type PlatformSourceArtifactImportResult struct {
+	Version  PlatformVersion        `json:"version"`
+	Artifact PlatformSourceArtifact `json:"artifact"`
+}
+
+type PlatformSourceAvailableRepository struct {
+	ExternalRepositoryId string `json:"externalRepositoryId"`
+	RepositoryFullName   string `json:"repositoryFullName"`
+	DefaultBranch        string `json:"defaultBranch,optional"`
+}
+
+type PlatformSourceAvailableRepositoryListResp struct {
+	RespBase
+	Data []PlatformSourceAvailableRepository `json:"data"`
+}
+
+type PlatformSourceBuildTrigger struct {
+	Id                  int64   `json:"id"`
+	TenantId            int64   `json:"tenantId"`
+	RepositoryId        int64   `json:"repositoryId"`
+	AppId               int64   `json:"appId"`
+	TriggerName         string  `json:"triggerName"`
+	EventType           int32   `json:"eventType"`
+	RefPattern          string  `json:"refPattern"`
+	ArtifactSelector    string  `json:"artifactSelector"`
+	ChannelIds          []int64 `json:"channelIds"`
+	SigningConfigId     int64   `json:"signingConfigId"`
+	BrandingProfileId   int64   `json:"brandingProfileId,optional"`
+	WhiteLabelProductId int64   `json:"whiteLabelProductId,optional"`
+	Priority            int32   `json:"priority"`
+	PoolCode            string  `json:"poolCode"`
+	VersionNamePrefix   string  `json:"versionNamePrefix,optional"`
+	Status              int32   `json:"status"`
+	Platform            int32   `json:"platform"`
+	RepositoryFullName  string  `json:"repositoryFullName"`
+	CreateTime          int64   `json:"createTime"`
+	UpdateTime          int64   `json:"updateTime"`
+}
+
+type PlatformSourceBuildTriggerListResp struct {
+	RespBase
+	Data []PlatformSourceBuildTrigger `json:"data"`
+}
+
+type PlatformSourceBuildTriggerResp struct {
+	RespBase
+	Data PlatformSourceBuildTrigger `json:"data"`
+}
+
+type PlatformSourceBuildTriggerSecret struct {
+	Trigger       PlatformSourceBuildTrigger `json:"trigger"`
+	WebhookUrl    string                     `json:"webhookUrl"`
+	SigningSecret string                     `json:"signingSecret"`
+}
+
+type PlatformSourceBuildTriggerSecretResp struct {
+	RespBase
+	Data PlatformSourceBuildTriggerSecret `json:"data"`
+}
+
+type PlatformSourceIntegration struct {
+	Id              int64  `json:"id"`
+	TenantId        int64  `json:"tenantId"`
+	Platform        int32  `json:"platform"`
+	IntegrationName string `json:"integrationName"`
+	InstallationRef string `json:"installationRef"`
+	TokenExpiresAt  int64  `json:"tokenExpiresAt,optional"`
+	Status          int32  `json:"status"`
+	LastSyncAt      int64  `json:"lastSyncAt,optional"`
+	CreateBy        int64  `json:"createBy"`
+	CreateTime      int64  `json:"createTime"`
+	UpdateTime      int64  `json:"updateTime"`
+}
+
+type PlatformSourceIntegrationListResp struct {
+	RespBase
+	Data []PlatformSourceIntegration `json:"data"`
+}
+
+type PlatformSourceIntegrationResp struct {
+	RespBase
+	Data PlatformSourceIntegration `json:"data"`
+}
+
+type PlatformSourceOAuthAuthorization struct {
+	AuthorizationUrl string `json:"authorizationUrl"`
+}
+
+type PlatformSourceOAuthAuthorizationResp struct {
+	RespBase
+	Data PlatformSourceOAuthAuthorization `json:"data"`
+}
+
+type PlatformSourceRepository struct {
+	Id                   int64  `json:"id"`
+	TenantId             int64  `json:"tenantId"`
+	IntegrationId        int64  `json:"integrationId"`
+	ExternalRepositoryId string `json:"externalRepositoryId"`
+	RepositoryFullName   string `json:"repositoryFullName"`
+	DefaultBranch        string `json:"defaultBranch,optional"`
+	PermissionLevel      string `json:"permissionLevel"`
+	Status               int32  `json:"status"`
+	CreateTime           int64  `json:"createTime"`
+	UpdateTime           int64  `json:"updateTime"`
+}
+
+type PlatformSourceRepositoryListResp struct {
+	RespBase
+	Data []PlatformSourceRepository `json:"data"`
+}
+
+type PlatformSourceRepositoryResp struct {
+	RespBase
+	Data PlatformSourceRepository `json:"data"`
+}
+
+type PlatformSourceWebhookEvent struct {
+	Id                 int64   `json:"id"`
+	TriggerId          int64   `json:"triggerId"`
+	ProviderEventId    string  `json:"providerEventId"`
+	ProviderEventType  string  `json:"providerEventType"`
+	SourceRef          string  `json:"sourceRef"`
+	CommitSha          string  `json:"commitSha"`
+	ArtifactSource     int32   `json:"artifactSource"`
+	ExternalArtifactId string  `json:"externalArtifactId"`
+	ReleaseRef         string  `json:"releaseRef,optional"`
+	PipelineRef        string  `json:"pipelineRef,optional"`
+	JobRef             string  `json:"jobRef,optional"`
+	PayloadSha256      string  `json:"payloadSha256"`
+	VersionCode        int64   `json:"versionCode"`
+	VersionName        string  `json:"versionName"`
+	Status             int32   `json:"status"`
+	Attempt            int32   `json:"attempt"`
+	VersionId          int64   `json:"versionId,optional"`
+	BuildTaskIds       []int64 `json:"buildTaskIds,optional"`
+	ErrorMessage       string  `json:"errorMessage,optional"`
+	CreateTime         int64   `json:"createTime"`
+	UpdateTime         int64   `json:"updateTime"`
+}
+
+type PlatformSourceWebhookEventListResp struct {
+	RespBase
+	Data []PlatformSourceWebhookEvent `json:"data"`
+}
+
 type PlatformStorageDownload struct {
 	DownloadUrl string `json:"downloadUrl"`
 	ExpiresAt   int64  `json:"expiresAt"`
@@ -626,10 +1366,69 @@ type PlatformStorageObjectIdReq struct {
 	Id int64 `path:"id"`
 }
 
+type PlatformTenantBillingReq struct {
+	TenantId int64 `form:"tenantId,optional"`
+}
+
+type PlatformTenantBillingResp struct {
+	RespBase
+	Subscription PlatformTenantSubscription `json:"subscription"`
+	Entitlement  PlatformTenantEntitlement  `json:"entitlement"`
+	Plan         PlatformBillingPlan        `json:"plan"`
+}
+
+type PlatformTenantEntitlement struct {
+	Id                  int64  `json:"id"`
+	TenantId            int64  `json:"tenantId"`
+	PlanId              int64  `json:"planId"`
+	PlanVersion         int32  `json:"planVersion"`
+	BuildsPerCycle      int64  `json:"buildsPerCycle"`
+	MaxBuildConcurrency int32  `json:"maxBuildConcurrency"`
+	StorageBytes        int64  `json:"storageBytes"`
+	MaxUploadBytes      int64  `json:"maxUploadBytes"`
+	TeamSeats           int32  `json:"teamSeats"`
+	ApiRateLimit        int32  `json:"apiRateLimit"`
+	ChargeFailedBuild   bool   `json:"chargeFailedBuild"`
+	ChargeCacheHit      bool   `json:"chargeCacheHit"`
+	ChargeRetryBuild    bool   `json:"chargeRetryBuild"`
+	OverrideJson        string `json:"overrideJson,optional"`
+	ValidFrom           int64  `json:"validFrom"`
+	ValidUntil          int64  `json:"validUntil"`
+	Status              int32  `json:"status"`
+	Revision            int64  `json:"revision"`
+}
+
+type PlatformTenantSubscription struct {
+	Id                     int64  `json:"id"`
+	TenantId               int64  `json:"tenantId"`
+	PlanId                 int64  `json:"planId"`
+	PlanVersion            int32  `json:"planVersion"`
+	Status                 int32  `json:"status"`
+	Source                 int32  `json:"source"`
+	ExternalCustomerId     string `json:"externalCustomerId,optional"`
+	ExternalSubscriptionId string `json:"externalSubscriptionId,optional"`
+	CurrentPeriodStart     int64  `json:"currentPeriodStart"`
+	CurrentPeriodEnd       int64  `json:"currentPeriodEnd"`
+	CancelAtPeriodEnd      bool   `json:"cancelAtPeriodEnd"`
+	GraceUntil             int64  `json:"graceUntil,optional"`
+	PendingPlanId          int64  `json:"pendingPlanId"`
+	PendingPlanVersion     int32  `json:"pendingPlanVersion"`
+	CreateTime             int64  `json:"createTime"`
+	UpdateTime             int64  `json:"updateTime"`
+}
+
 type PlatformUploadTicket struct {
 	ObjectId  int64  `json:"objectId"`
 	UploadUrl string `json:"uploadUrl"`
 	ExpiresAt int64  `json:"expiresAt"`
+}
+
+type PlatformUsageMetricSummary struct {
+	Metric           int32 `json:"metric"`
+	UsedQuantity     int64 `json:"usedQuantity"`
+	ReservedQuantity int64 `json:"reservedQuantity"`
+	LimitQuantity    int64 `json:"limitQuantity"`
+	UsagePercent     int32 `json:"usagePercent"`
 }
 
 type PlatformVersion struct {
@@ -658,6 +1457,69 @@ type PlatformVersionListResp struct {
 type PlatformVersionResp struct {
 	RespBase
 	Data PlatformVersion `json:"data"`
+}
+
+type PlatformWebhookDelivery struct {
+	Id                  int64  `json:"id"`
+	TenantId            int64  `json:"tenantId"`
+	EndpointId          int64  `json:"endpointId"`
+	EventId             string `json:"eventId"`
+	EventType           string `json:"eventType"`
+	Attempt             int32  `json:"attempt"`
+	Status              int32  `json:"status"`
+	ResponseStatus      int32  `json:"responseStatus"`
+	ResponseBodyExcerpt string `json:"responseBodyExcerpt,optional"`
+	ErrorMessage        string `json:"errorMessage,optional"`
+	NextRetryAt         int64  `json:"nextRetryAt"`
+	DeliveredAt         int64  `json:"deliveredAt,optional"`
+	CreateTime          int64  `json:"createTime"`
+	UpdateTime          int64  `json:"updateTime"`
+}
+
+type PlatformWebhookDeliveryListResp struct {
+	RespBase
+	Data []PlatformWebhookDelivery `json:"data"`
+}
+
+type PlatformWebhookDeliveryResp struct {
+	RespBase
+	Data PlatformWebhookDelivery `json:"data"`
+}
+
+type PlatformWebhookEndpoint struct {
+	Id            int64    `json:"id"`
+	TenantId      int64    `json:"tenantId"`
+	EndpointName  string   `json:"endpointName"`
+	EndpointUrl   string   `json:"endpointUrl"`
+	EventTypes    []string `json:"eventTypes"`
+	SecretHint    string   `json:"secretHint"`
+	MaxAttempts   int32    `json:"maxAttempts"`
+	Status        int32    `json:"status"`
+	LastSuccessAt int64    `json:"lastSuccessAt,optional"`
+	LastFailureAt int64    `json:"lastFailureAt,optional"`
+	CreateBy      int64    `json:"createBy"`
+	CreateTime    int64    `json:"createTime"`
+	UpdateTime    int64    `json:"updateTime"`
+}
+
+type PlatformWebhookEndpointListResp struct {
+	RespBase
+	Data []PlatformWebhookEndpoint `json:"data"`
+}
+
+type PlatformWebhookEndpointResp struct {
+	RespBase
+	Data PlatformWebhookEndpoint `json:"data"`
+}
+
+type PlatformWebhookEndpointSecret struct {
+	Endpoint      PlatformWebhookEndpoint `json:"endpoint"`
+	SigningSecret string                  `json:"signingSecret"`
+}
+
+type PlatformWebhookEndpointSecretResp struct {
+	RespBase
+	Data PlatformWebhookEndpointSecret `json:"data"`
 }
 
 type PlatformWhiteLabelProduct struct {
@@ -775,6 +1637,11 @@ type PublishPlatformWhiteLabelTemplateReq struct {
 	Revision int32 `json:"revision"`
 }
 
+type RecoverPlatformBuilderNodeReq struct {
+	Id     int64  `path:"id"`
+	Reason string `json:"reason"`
+}
+
 type ResetUserPwdReq struct {
 	Id       int64  `json:"id"`
 	Password string `json:"password"`
@@ -788,6 +1655,26 @@ type RespBase struct {
 	HasPrev    bool   `json:"hasPrev,optional"`
 	NextCursor int64  `json:"nextCursor,optional"`
 	PrevCursor int64  `json:"prevCursor,optional"`
+}
+
+type RetryPlatformBuildTaskReq struct {
+	Id       int64 `path:"id"`
+	Priority int32 `json:"priority,optional"`
+}
+
+type RevokePlatformLocalAgentReq struct {
+	Id       int64  `path:"id"`
+	TenantId int64  `json:"tenantId,optional"`
+	Reason   string `json:"reason"`
+}
+
+type RevokePlatformOpenApiCredentialReq struct {
+	Id int64 `path:"id"`
+}
+
+type RotatePlatformOpenApiCredentialReq struct {
+	Id           int64 `path:"id"`
+	GraceSeconds int64 `json:"graceSeconds,optional"`
 }
 
 type SysConfigCreateReq struct {
@@ -1160,6 +2047,31 @@ type UpdatePlatformBrandingProfileReq struct {
 	RuntimeConfigJson    string `json:"runtimeConfigJson,optional"`
 }
 
+type UpdatePlatformSourceBuildTriggerReq struct {
+	Id                  int64   `path:"id"`
+	TriggerName         string  `json:"triggerName"`
+	EventType           int32   `json:"eventType"`
+	RefPattern          string  `json:"refPattern,optional"`
+	ArtifactSelector    string  `json:"artifactSelector"`
+	ChannelIds          []int64 `json:"channelIds"`
+	SigningConfigId     int64   `json:"signingConfigId,optional"`
+	BrandingProfileId   int64   `json:"brandingProfileId,optional"`
+	WhiteLabelProductId int64   `json:"whiteLabelProductId,optional"`
+	Priority            int32   `json:"priority,optional"`
+	PoolCode            string  `json:"poolCode,optional"`
+	VersionNamePrefix   string  `json:"versionNamePrefix,optional"`
+	Status              int32   `json:"status"`
+}
+
+type UpdatePlatformWebhookEndpointReq struct {
+	Id           int64    `path:"id"`
+	EndpointName string   `json:"endpointName"`
+	EndpointUrl  string   `json:"endpointUrl"`
+	EventTypes   []string `json:"eventTypes"`
+	MaxAttempts  int32    `json:"maxAttempts"`
+	Status       int32    `json:"status"`
+}
+
 type UpdatePlatformWhiteLabelProductReq struct {
 	Id                  int64  `path:"id"`
 	ProductName         string `json:"productName"`
@@ -1193,4 +2105,24 @@ type UpdateProfileReq struct {
 	Nickname string `json:"nickname,optional"`
 	Avatar   string `json:"avatar,optional"`
 	Password string `json:"password,optional"`
+}
+
+type UpsertPlatformBuildConcurrencyPolicyReq struct {
+	Id             int64  `json:"id,optional"`
+	AppId          int64  `json:"appId,optional"`
+	PoolCode       string `json:"poolCode,optional"`
+	MaxConcurrency int32  `json:"maxConcurrency"`
+	FairWeight     int32  `json:"fairWeight"`
+	MaxPriority    int32  `json:"maxPriority"`
+	Status         int32  `json:"status"`
+}
+
+type UpsertPlatformManualSubscriptionReq struct {
+	TenantId          int64  `json:"tenantId"`
+	PlanId            int64  `json:"planId"`
+	PeriodStart       int64  `json:"periodStart"`
+	PeriodEnd         int64  `json:"periodEnd"`
+	GraceUntil        int64  `json:"graceUntil,optional"`
+	OverrideJson      string `json:"overrideJson,optional"`
+	ContractReference string `json:"contractReference"`
 }

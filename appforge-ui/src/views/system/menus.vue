@@ -102,12 +102,7 @@
           min-width="180"
           show-overflow-tooltip
         />
-        <el-table-column
-          :label="t('system.sort')"
-          prop="sort"
-          width="80"
-          align="center"
-        />
+        <el-table-column :label="t('system.sort')" prop="sort" width="80" align="center" />
 
         <el-table-column :label="t('common.visible')" width="90" align="center">
           <template #default="{ row }">
@@ -125,12 +120,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column
-          :label="t('common.actions')"
-          width="180"
-          align="center"
-          fixed="right"
-        >
+        <el-table-column :label="t('common.actions')" width="180" align="center" fixed="right">
           <template #default="{ row }">
             <el-button
               v-if="row.menuType !== 3"
@@ -141,20 +131,10 @@
             >
               {{ t('system.addChild') }}
             </el-button>
-            <el-button
-              v-perm="'sys:menu:update'"
-              link
-              type="primary"
-              @click="handleEdit(row)"
-            >
+            <el-button v-perm="'sys:menu:update'" link type="primary" @click="handleEdit(row)">
               {{ t('common.edit') }}
             </el-button>
-            <el-button
-              v-perm="'sys:menu:delete'"
-              link
-              type="danger"
-              @click="handleDelete(row)"
-            >
+            <el-button v-perm="'sys:menu:delete'" link type="danger" @click="handleDelete(row)">
               {{ t('common.delete') }}
             </el-button>
           </template>
@@ -168,12 +148,7 @@
       width="760px"
       destroy-on-close
     >
-      <el-form
-        ref="formRef"
-        :model="formData"
-        :rules="rules"
-        label-width="100px"
-      >
+      <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
         <el-form-item :label="t('system.parentMenu')" prop="parentId">
           <el-tree-select
             v-model="formData.parentId"
@@ -442,7 +417,7 @@ const { form: queryForm } = useForm<QueryFormData>({
     menuType: undefined,
     enabled: undefined,
     visible: undefined,
-		appScope: 1,
+    appScope: 1,
   },
 })
 const { confirm } = useConfirm()
@@ -735,7 +710,7 @@ function resetQuery() {
   queryForm.menuType = undefined
   queryForm.enabled = undefined
   queryForm.visible = undefined
-	queryForm.appScope = 1
+  queryForm.appScope = 1
   queryPage.cursor = undefined
   queryPage.limit = 20
   getList()

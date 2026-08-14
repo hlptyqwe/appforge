@@ -3,6 +3,26 @@ import axios from 'axios'
 import type {
   PlatformApplication,
   PlatformBuildTask,
+  PlatformBuilderNode,
+  PlatformBuildConcurrencyPolicy,
+  PlatformBuildCacheEntry,
+  PlatformBuildCacheCleanupResult,
+  PlatformBuildClusterMetrics,
+  PlatformOpenApiCredential,
+  PlatformOpenApiCredentialSecret,
+  PlatformWebhookEndpoint,
+  PlatformWebhookEndpointSecret,
+  PlatformWebhookDelivery,
+  PlatformSourceIntegration,
+  PlatformSourceAvailableRepository,
+  PlatformSourceArtifactImportResult,
+  PlatformSourceRepository,
+  PlatformSourceBuildTrigger,
+  PlatformSourceBuildTriggerSecret,
+  PlatformSourceWebhookEvent,
+  PlatformBuildSchedulerEvent,
+  PlatformLocalAgent,
+  PlatformLocalAgentRegistration,
   PlatformChannel,
   PlatformChannelStats,
   PlatformListReq,
@@ -14,6 +34,10 @@ import type {
   PlatformWhiteLabelProduct,
   PlatformWhiteLabelPreflight,
   PlatformVersion,
+  PlatformBillingPlan,
+  PlatformTenantBilling,
+  PlatformUsageMetricSummary,
+  PlatformInvoice,
 } from '@/services/platform/PlatformService'
 import type { RespBase } from '@/services/BaseService'
 import { PLATFORM_API_BASE } from '@/config/environment'
@@ -157,6 +181,143 @@ export const listBuildTasks = (params: PlatformListReq) =>
   get<PlatformBuildTask[]>(`${base}/build-tasks`, params)
 export const createBuildTask = (data: Record<string, unknown>) =>
   post<PlatformBuildTask>(`${base}/build-tasks`, data)
+export const cancelBuildTask = (id: number, reason = '') =>
+  post<PlatformBuildTask>(`${base}/build-tasks/${id}/cancel`, { reason })
+export const retryBuildTask = (id: number, priority = 0) =>
+  post<PlatformBuildTask>(`${base}/build-tasks/${id}/retry`, { priority })
+export const getBuildClusterMetrics = (params: { poolCode?: string; periodMinutes?: number }) =>
+  get<PlatformBuildClusterMetrics>(`${base}/build-cluster/metrics`, params)
+export const listOpenApiCredentials = (params: PlatformListReq) =>
+  get<PlatformOpenApiCredential[]>(`${base}/developer/credentials`, params)
+export const createOpenApiCredential = (data: Record<string, unknown>) =>
+  post<PlatformOpenApiCredentialSecret>(`${base}/developer/credentials`, data)
+export const rotateOpenApiCredential = (id: number, graceSeconds: number) =>
+  post<PlatformOpenApiCredentialSecret>(`${base}/developer/credentials/${id}/rotate`, {
+    graceSeconds,
+  })
+export const revokeOpenApiCredential = (id: number) =>
+  post<PlatformOpenApiCredential>(`${base}/developer/credentials/${id}/revoke`)
+export const listWebhookEndpoints = (params: PlatformListReq) =>
+  get<PlatformWebhookEndpoint[]>(`${base}/developer/webhooks`, params)
+export const createWebhookEndpoint = (data: Record<string, unknown>) =>
+  post<PlatformWebhookEndpointSecret>(`${base}/developer/webhooks`, data)
+export const updateWebhookEndpoint = (id: number, data: Record<string, unknown>) =>
+  put<PlatformWebhookEndpoint>(`${base}/developer/webhooks/${id}`, data)
+export const rotateWebhookEndpointSecret = (id: number) =>
+  post<PlatformWebhookEndpointSecret>(`${base}/developer/webhooks/${id}/rotate-secret`)
+export const testWebhookEndpoint = (id: number) =>
+  post<never>(`${base}/developer/webhooks/${id}/test`)
+export const listWebhookDeliveries = (
+  params: Omit<PlatformListReq, 'eventType'> & { endpointId?: number; eventType?: string },
+) => get<PlatformWebhookDelivery[]>(`${base}/developer/webhook-deliveries`, params)
+export const replayWebhookDelivery = (id: number) =>
+  post<PlatformWebhookDelivery>(`${base}/developer/webhook-deliveries/${id}/replay`)
+export const listSourceIntegrations = (params: PlatformListReq & { platform?: number }) =>
+  get<PlatformSourceIntegration[]>(`${base}/developer/source-integrations`, params)
+export const createSourceOAuthAuthorization = (platform: 1 | 2) =>
+  post<{ authorizationUrl: string }>(`${base}/developer/source-integrations/${platform}/authorize`)
+export const getSourceIntegration = (id: number) =>
+  get<PlatformSourceIntegration>(`${base}/developer/source-integrations/${id}`)
+export const disconnectSourceIntegration = (id: number) =>
+  post<PlatformSourceIntegration>(`${base}/developer/source-integrations/${id}/disconnect`)
+export const listSourceRepositories = (params: PlatformListReq & { integrationId?: number }) =>
+  get<PlatformSourceRepository[]>(`${base}/developer/source-repositories`, params)
+export const revokeSourceRepository = (id: number) =>
+  post<PlatformSourceRepository>(`${base}/developer/source-repositories/${id}/revoke`)
+export const listSourceAvailableRepositories = (integrationId: number) =>
+  get<PlatformSourceAvailableRepository[]>(
+    `${base}/developer/source-integrations/${integrationId}/available-repositories`,
+  )
+export const authorizeSourceRepository = (integrationId: number, externalRepositoryId: string) =>
+  post<PlatformSourceRepository>(
+    `${base}/developer/source-integrations/${integrationId}/repositories/${encodeURIComponent(externalRepositoryId)}/authorize`,
+  )
+export const importSourceArtifact = (data: Record<string, unknown>) =>
+  post<PlatformSourceArtifactImportResult>(`${base}/developer/source-artifacts/import`, data)
+export const listSourceBuildTriggers = (
+  params: PlatformListReq & { repositoryId?: number; appId?: number },
+) => get<PlatformSourceBuildTrigger[]>(`${base}/developer/source-build-triggers`, params)
+export const createSourceBuildTrigger = (data: Record<string, unknown>) =>
+  post<PlatformSourceBuildTriggerSecret>(`${base}/developer/source-build-triggers`, data)
+export const getSourceBuildTrigger = (id: number) =>
+  get<PlatformSourceBuildTrigger>(`${base}/developer/source-build-triggers/${id}`)
+export const updateSourceBuildTrigger = (id: number, data: Record<string, unknown>) =>
+  put<PlatformSourceBuildTrigger>(`${base}/developer/source-build-triggers/${id}`, data)
+export const rotateSourceBuildTriggerSecret = (id: number) =>
+  post<PlatformSourceBuildTriggerSecret>(
+    `${base}/developer/source-build-triggers/${id}/rotate-secret`,
+  )
+export const listSourceWebhookEvents = (params: PlatformListReq & { triggerId?: number }) =>
+  get<PlatformSourceWebhookEvent[]>(`${base}/developer/source-webhook-events`, params)
+export const listBuilderNodes = (params: PlatformListReq) =>
+  get<PlatformBuilderNode[]>(`${base}/build-cluster/nodes`, params)
+export const drainBuilderNode = (id: number, drainStatus: number) =>
+  post<PlatformBuilderNode>(`${base}/build-cluster/nodes/${id}/drain`, { drainStatus })
+export const recoverBuilderNode = (id: number, reason: string) =>
+  post<PlatformBuilderNode>(`${base}/build-cluster/nodes/${id}/recover`, { reason })
+export const listBuildConcurrencyPolicies = (params: PlatformListReq) =>
+  get<PlatformBuildConcurrencyPolicy[]>(`${base}/build-cluster/policies`, params)
+export const upsertBuildConcurrencyPolicy = (data: Record<string, unknown>) =>
+  post<PlatformBuildConcurrencyPolicy>(`${base}/build-cluster/policies`, data)
+export const listBuildCacheEntries = (params: PlatformListReq) =>
+  get<PlatformBuildCacheEntry[]>(`${base}/build-cluster/cache`, params)
+export const invalidateBuildCache = (id: number, reason = '') =>
+  post<PlatformBuildCacheEntry>(`${base}/build-cluster/cache/${id}/invalidate`, { reason })
+export const cleanupBuildCache = (limit = 100, targetFreeBytes = 0) =>
+  post<PlatformBuildCacheCleanupResult>(`${base}/build-cluster/cache/cleanup`, {
+    limit,
+    targetFreeBytes,
+  })
+export const listBuildSchedulerEvents = (params: PlatformListReq) =>
+  get<PlatformBuildSchedulerEvent[]>(`${base}/build-cluster/events`, params)
+export const listLocalAgents = (params: PlatformListReq & { tenantId?: number }) =>
+  get<PlatformLocalAgent[]>(`${base}/enterprise/local-agents`, params)
+export const getLocalAgent = (id: number, tenantId = 0) =>
+  get<PlatformLocalAgent>(`${base}/enterprise/local-agents/${id}`, tenantId ? { tenantId } : {})
+export const createLocalAgentRegistration = (data: Record<string, unknown>) =>
+  post<PlatformLocalAgent>(`${base}/enterprise/local-agents`, data) as Promise<
+    RespBase<PlatformLocalAgent> & PlatformLocalAgentRegistration
+  >
+export const drainLocalAgent = (id: number, drainStatus: number, tenantId = 0) =>
+  post<PlatformLocalAgent>(`${base}/enterprise/local-agents/${id}/drain`, {
+    drainStatus,
+    tenantId,
+  })
+export const revokeLocalAgent = (id: number, reason: string, tenantId = 0) =>
+  post<PlatformLocalAgent>(`${base}/enterprise/local-agents/${id}/revoke`, { reason, tenantId })
+
+export const listBillingPlans = (
+  params: { page?: number; pageSize?: number; status?: number } = {},
+) => get<PlatformBillingPlan[]>(`${base}/billing/plans`, params)
+export const createBillingPlan = (data: Record<string, unknown>) =>
+  post<PlatformBillingPlan>(`${base}/billing/plans`, data)
+export const retireBillingPlan = (id: number) =>
+  post<PlatformBillingPlan>(`${base}/billing/plans/${id}/retire`)
+export const getTenantBilling = (tenantId = 0) =>
+  get<never>(`${base}/billing/subscription`, tenantId ? { tenantId } : {}) as Promise<
+    RespBase<never> & PlatformTenantBilling
+  >
+export const upsertManualSubscription = (data: Record<string, unknown>) =>
+  post<never>(`${base}/billing/contracts`, data) as Promise<RespBase<never> & PlatformTenantBilling>
+export const changeSubscription = (planId: number, mode = 1, tenantId = 0) =>
+  post<never>(`${base}/billing/subscription/change`, { tenantId, planId, mode }) as Promise<
+    RespBase<never> & PlatformTenantBilling
+  >
+export const cancelSubscription = (immediately = false, tenantId = 0) =>
+  post<never>(`${base}/billing/subscription/cancel`, { tenantId, immediately }) as Promise<
+    RespBase<never> & PlatformTenantBilling
+  >
+export const getBillingUsage = (params: { tenantId?: number; periodKey?: string } = {}) =>
+  get<PlatformUsageMetricSummary[]>(`${base}/billing/usage`, params) as Promise<
+    RespBase<PlatformUsageMetricSummary[]> & { periodKey?: string }
+  >
+export const listInvoices = (
+  params: { tenantId?: number; status?: number; page?: number; pageSize?: number } = {},
+) => get<PlatformInvoice[]>(`${base}/billing/invoices`, params)
+export const createBillingCheckout = (planId: number) =>
+  post<never>(`${base}/billing/checkout`, { planId }) as Promise<
+    RespBase<never> & { checkoutUrl: string; sessionId: string }
+  >
 
 export function getChannelStats(params: {
   appId: number
