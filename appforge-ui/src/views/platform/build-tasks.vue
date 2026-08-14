@@ -67,11 +67,17 @@ async function retryTask(row: PlatformBuildTask) {
         link
         type="danger"
         @click="cancelTask(row)"
-        >取消</el-button
       >
-      <el-button v-if="[6, 7].includes(row.status)" link type="primary" @click="retryTask(row)"
-        >重试</el-button
+        取消
+      </el-button>
+      <el-button
+        v-if="[6, 7].includes(row.status)"
+        link
+        type="primary"
+        @click="retryTask(row)"
       >
+        重试
+      </el-button>
     </template>
   </ResourcePage>
 </template>

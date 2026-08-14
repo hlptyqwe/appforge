@@ -163,8 +163,12 @@ defineExpose({ loadData })
           <el-input v-else v-model="query[field.prop]" clearable />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="resetAndLoad(loadData)">查询</el-button>
-          <el-button v-perm="`${permissionPrefix}:add`" @click="openCreate">新增</el-button>
+          <el-button type="primary" @click="resetAndLoad(loadData)">
+            查询
+          </el-button>
+          <el-button v-perm="`${permissionPrefix}:add`" @click="openCreate">
+            新增
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -201,8 +205,15 @@ defineExpose({ loadData })
             <span v-else>{{ scope.row[column.prop] ?? '' }}</span>
           </template>
         </el-table-column>
-        <el-table-column v-if="slots.actions" label="操作" min-width="150" fixed="right">
-          <template #default="scope"><slot name="actions" :row="scope.row" /></template>
+        <el-table-column
+          v-if="slots.actions"
+          label="操作"
+          min-width="150"
+          fixed="right"
+        >
+          <template #default="scope">
+            <slot name="actions" :row="scope.row" />
+          </template>
         </el-table-column>
       </el-table>
       <CursorPagination
@@ -242,7 +253,9 @@ defineExpose({ loadData })
           >
             <el-button>选择文件</el-button>
             <template #tip>
-              <div class="el-upload__tip">选择后将在创建时上传并校验</div>
+              <div class="el-upload__tip">
+                选择后将在创建时上传并校验
+              </div>
               <el-progress
                 v-if="uploadProgress[field.prop] > 0"
                 :percentage="uploadProgress[field.prop]"
@@ -266,8 +279,12 @@ defineExpose({ loadData })
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="submit">创建</el-button>
+        <el-button @click="dialogVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" :loading="submitting" @click="submit">
+          创建
+        </el-button>
       </template>
     </el-dialog>
   </div>

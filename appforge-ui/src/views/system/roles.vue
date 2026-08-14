@@ -458,7 +458,12 @@ onMounted(async () => {
 
         <el-table-column prop="remark" :label="t('common.remark')" min-width="200" />
 
-        <el-table-column :label="t('common.actions')" align="center" width="320" fixed="right">
+        <el-table-column
+          :label="t('common.actions')"
+          align="center"
+          width="320"
+          fixed="right"
+        >
           <template #default="{ row }">
             <el-button
               v-if="!isReadonlyRole(row)"
@@ -478,7 +483,12 @@ onMounted(async () => {
               {{ t('system.viewGrant') }}
             </el-button>
 
-            <el-button v-else v-perm="'sys:role:grant'" size="small" @click="openGrant(row)">
+            <el-button
+              v-else
+              v-perm="'sys:role:grant'"
+              size="small"
+              @click="openGrant(row)"
+            >
               {{ t('system.grant') }}
             </el-button>
 

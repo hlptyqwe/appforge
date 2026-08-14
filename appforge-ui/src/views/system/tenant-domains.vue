@@ -99,8 +99,12 @@ onMounted(loadList)
           <TenantSelect v-model="tenantId" @change="loadList" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="loadList">查询</el-button>
-          <el-button v-perm="'sys:tenant-domain:add'" @click="openCreate">新增域名</el-button>
+          <el-button type="primary" @click="loadList">
+            查询
+          </el-button>
+          <el-button v-perm="'sys:tenant-domain:add'" @click="openCreate">
+            新增域名
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -111,7 +115,9 @@ onMounted(loadList)
         <el-table-column prop="status" label="状态" width="100" />
         <el-table-column prop="priority" label="优先级" width="100" />
         <el-table-column label="更新时间" width="180">
-          <template #default="{ row }">{{ formatDate(row.updateTimes) }}</template>
+          <template #default="{ row }">
+            {{ formatDate(row.updateTimes) }}
+          </template>
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
@@ -120,11 +126,17 @@ onMounted(loadList)
               link
               type="primary"
               @click="openEdit(row)"
-              >编辑</el-button
             >
-            <el-button v-perm="'sys:tenant-domain:delete'" link type="danger" @click="remove(row)"
-              >删除</el-button
+              编辑
+            </el-button>
+            <el-button
+              v-perm="'sys:tenant-domain:delete'"
+              link
+              type="danger"
+              @click="remove(row)"
             >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -143,16 +155,27 @@ onMounted(loadList)
         >
           <el-input v-model="form.origin" placeholder="https://example.com" />
         </el-form-item>
-        <el-form-item label="状态"
-          ><el-input-number v-model="form.status" :min="1" :max="3"
-        /></el-form-item>
-        <el-form-item label="优先级"
-          ><el-input-number v-model="form.priority" :min="0"
-        /></el-form-item>
+        <el-form-item label="状态">
+          <el-input-number
+            v-model="form.status"
+            :min="1"
+            :max="3"
+          />
+        </el-form-item>
+        <el-form-item label="优先级">
+          <el-input-number
+            v-model="form.priority"
+            :min="0"
+          />
+        </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="submit">保存</el-button>
+        <el-button @click="dialogVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" :loading="submitting" @click="submit">
+          保存
+        </el-button>
       </template>
     </el-dialog>
   </div>

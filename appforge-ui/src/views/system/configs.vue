@@ -124,7 +124,9 @@ onMounted(loadList)
           <el-input v-model="query.keyword" clearable placeholder="按配置键搜索" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="resetAndLoad(loadList)">查询</el-button>
+          <el-button type="primary" @click="resetAndLoad(loadList)">
+            查询
+          </el-button>
           <el-button v-perm="'sys:config:add'" @click="openCreate">
             <el-icon><Plus /></el-icon>新增
           </el-button>
@@ -145,16 +147,28 @@ onMounted(loadList)
         />
         <el-table-column prop="remark" label="备注" min-width="140" />
         <el-table-column label="更新时间" width="180">
-          <template #default="{ row }">{{ formatDate(row.updateTimes) }}</template>
+          <template #default="{ row }">
+            {{ formatDate(row.updateTimes) }}
+          </template>
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button v-perm="'sys:config:update'" link type="primary" @click="openEdit(row)"
-              >编辑</el-button
+            <el-button
+              v-perm="'sys:config:update'"
+              link
+              type="primary"
+              @click="openEdit(row)"
             >
-            <el-button v-perm="'sys:config:delete'" link type="danger" @click="remove(row)"
-              >删除</el-button
+              编辑
+            </el-button>
+            <el-button
+              v-perm="'sys:config:delete'"
+              link
+              type="danger"
+              @click="remove(row)"
             >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -188,11 +202,17 @@ onMounted(loadList)
         >
           <el-input v-model="form.configValue" type="textarea" :rows="12" />
         </el-form-item>
-        <el-form-item label="备注"><el-input v-model="form.remark" /></el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="form.remark" />
+        </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="submit">保存</el-button>
+        <el-button @click="dialogVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" :loading="submitting" @click="submit">
+          保存
+        </el-button>
       </template>
     </el-dialog>
   </div>

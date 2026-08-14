@@ -356,10 +356,15 @@ onMounted(loadData)
   <div class="module-page">
     <el-card shadow="never" class="query-card">
       <el-form inline>
-        <el-form-item label="应用 ID"
-          ><el-input-number v-model="query.appId" :min="0"
-        /></el-form-item>
-        <el-form-item label="关键词"><el-input v-model="query.keyword" clearable /></el-form-item>
+        <el-form-item label="应用 ID">
+          <el-input-number
+            v-model="query.appId"
+            :min="0"
+          />
+        </el-form-item>
+        <el-form-item label="关键词">
+          <el-input v-model="query.keyword" clearable />
+        </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="query.status" style="width: 130px">
             <el-option label="全部" :value="0" /><el-option label="草稿" :value="1" />
@@ -367,10 +372,15 @@ onMounted(loadData)
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="resetAndLoad(loadData)">查询</el-button>
-          <el-button v-perm="'core:white-label-template:add'" @click="openTemplateForm()"
-            >新增</el-button
+          <el-button type="primary" @click="resetAndLoad(loadData)">
+            查询
+          </el-button>
+          <el-button
+            v-perm="'core:white-label-template:add'"
+            @click="openTemplateForm()"
           >
+            新增
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -383,38 +393,51 @@ onMounted(loadData)
         <el-table-column prop="templateName" label="模板名称" min-width="160" />
         <el-table-column prop="sourceVersionId" label="源版本 ID" width="110" />
         <el-table-column prop="publishedRevision" label="发布修订" width="100" />
-        <el-table-column label="状态" width="100"
-          ><template #default="scope">{{
-            templateStatus(scope.row.status)
-          }}</template></el-table-column
+        <el-table-column
+          label="状态"
+          width="100"
         >
+          <template #default="scope">
+            {{
+              templateStatus(scope.row.status)
+            }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="360" fixed="right">
-          <template #default="scope"
-            ><el-button link type="primary" @click="showRevisions(scope.row)">修订管理</el-button
-            ><el-button
+          <template #default="scope">
+            <el-button link type="primary" @click="showRevisions(scope.row)">
+              修订管理
+            </el-button><el-button
               v-if="scope.row.status === 1 && scope.row.publishedRevision === 0"
               v-perm="'core:white-label-template:update'"
               link
               type="primary"
               @click="openTemplateForm(scope.row)"
-              >编辑</el-button
-            ><el-button v-perm="'core:white-label-template:copy'" link @click="openCopy(scope.row)"
-              >复制</el-button
-            ><el-button
+            >
+              编辑
+            </el-button><el-button
+              v-perm="'core:white-label-template:copy'"
+              link
+              @click="openCopy(scope.row)"
+            >
+              复制
+            </el-button><el-button
               v-if="scope.row.publishedRevision > 0"
               v-perm="'core:white-label-template:status'"
               link
               @click="changeTemplateStatus(scope.row)"
-              >{{ scope.row.status === 3 ? '启用' : '停用' }}</el-button
-            ><el-button
+            >
+              {{ scope.row.status === 3 ? '启用' : '停用' }}
+            </el-button><el-button
               v-if="scope.row.status === 1 && scope.row.publishedRevision === 0"
               v-perm="'core:white-label-template:delete'"
               link
               type="danger"
               @click="deleteTemplate(scope.row)"
-              >删除</el-button
-            ></template
-          >
+            >
+              删除
+            </el-button>
+          </template>
         </el-table-column>
       </el-table>
       <CursorPagination
@@ -434,37 +457,51 @@ onMounted(loadData)
           label="应用 ID"
           prop="appId"
           :rules="[{ required: true, message: '请输入应用 ID' }]"
-          ><el-input-number
+        >
+          <el-input-number
             v-model="form.appId"
             :min="1"
             style="width: 100%"
             :disabled="Boolean(editingTemplateId)"
-        /></el-form-item>
+          />
+        </el-form-item>
         <el-form-item
           label="模板编码"
           prop="templateCode"
           :rules="[{ required: true, message: '请输入模板编码' }]"
-          ><el-input
+        >
+          <el-input
             v-model="form.templateCode"
             placeholder="lowercase-template-code"
             :disabled="Boolean(editingTemplateId)"
-        /></el-form-item>
+          />
+        </el-form-item>
         <el-form-item
           label="模板名称"
           prop="templateName"
           :rules="[{ required: true, message: '请输入模板名称' }]"
-          ><el-input v-model="form.templateName"
-        /></el-form-item>
+        >
+          <el-input v-model="form.templateName" />
+        </el-form-item>
         <el-form-item
           label="源版本 ID"
           prop="sourceVersionId"
           :rules="[{ required: true, message: '请输入源版本 ID' }]"
-          ><el-input-number v-model="form.sourceVersionId" :min="1" style="width: 100%"
-        /></el-form-item>
+        >
+          <el-input-number
+            v-model="form.sourceVersionId"
+            :min="1"
+            style="width: 100%"
+          />
+        </el-form-item>
         <el-form-item label="参数 Schema 设计">
           <el-radio-group v-model="schemaMode">
-            <el-radio-button value="designer">可视化</el-radio-button>
-            <el-radio-button value="json">JSON</el-radio-button>
+            <el-radio-button value="designer">
+              可视化
+            </el-radio-button>
+            <el-radio-button value="json">
+              JSON
+            </el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="schemaMode === 'designer'" label="参数字段">
@@ -479,11 +516,18 @@ onMounted(loadData)
                   :value="type"
                 />
               </el-select>
-              <el-checkbox v-model="field.required">必填</el-checkbox>
-              <el-checkbox v-model="field.sensitive" :disabled="field.type !== 'string'"
-                >敏感</el-checkbox
+              <el-checkbox v-model="field.required">
+                必填
+              </el-checkbox>
+              <el-checkbox
+                v-model="field.sensitive"
+                :disabled="field.type !== 'string'"
               >
-              <el-button link type="danger" @click="schemaFields.splice(index, 1)">删除</el-button>
+                敏感
+              </el-checkbox>
+              <el-button link type="danger" @click="schemaFields.splice(index, 1)">
+                删除
+              </el-button>
             </div>
             <el-button
               link
@@ -491,44 +535,74 @@ onMounted(loadData)
               @click="
                 schemaFields.push({ name: '', type: 'string', required: false, sensitive: false })
               "
-              >+ 添加参数</el-button
             >
+              + 添加参数
+            </el-button>
           </div>
         </el-form-item>
-        <el-form-item v-else label="参数 JSON Schema"
-          ><el-input v-model="form.parameterSchemaJson" type="textarea" :rows="8"
-        /></el-form-item>
-        <el-form-item label="兼容规则 JSON"
-          ><el-input v-model="form.compatibilityRulesJson" type="textarea" :rows="4"
-        /></el-form-item>
+        <el-form-item
+          v-else
+          label="参数 JSON Schema"
+        >
+          <el-input
+            v-model="form.parameterSchemaJson"
+            type="textarea"
+            :rows="8"
+          />
+        </el-form-item>
+        <el-form-item label="兼容规则 JSON">
+          <el-input
+            v-model="form.compatibilityRulesJson"
+            type="textarea"
+            :rows="4"
+          />
+        </el-form-item>
       </el-form>
-      <template #footer
-        ><el-button @click="createVisible = false">取消</el-button
-        ><el-button type="primary" :loading="submitting" @click="saveTemplate"
-          >保存</el-button
-        ></template
-      >
+      <template #footer>
+        <el-button @click="createVisible = false">
+          取消
+        </el-button><el-button
+          type="primary"
+          :loading="submitting"
+          @click="saveTemplate"
+        >
+          保存
+        </el-button>
+      </template>
     </el-dialog>
 
     <el-dialog v-model="copyVisible" title="复制白标模板" width="620px">
       <el-form :model="copyForm" label-width="130px">
-        <el-form-item label="新模板编码"><el-input v-model="copyForm.templateCode" /></el-form-item>
-        <el-form-item label="新模板名称"><el-input v-model="copyForm.templateName" /></el-form-item>
-        <el-form-item label="源版本 ID"
-          ><el-input-number v-model="copyForm.sourceVersionId" :min="1" style="width: 100%"
-        /></el-form-item>
+        <el-form-item label="新模板编码">
+          <el-input v-model="copyForm.templateCode" />
+        </el-form-item>
+        <el-form-item label="新模板名称">
+          <el-input v-model="copyForm.templateName" />
+        </el-form-item>
+        <el-form-item label="源版本 ID">
+          <el-input-number
+            v-model="copyForm.sourceVersionId"
+            :min="1"
+            style="width: 100%"
+          />
+        </el-form-item>
       </el-form>
       <el-alert
         title="复制后的模板和全部修订均为草稿，需要重新发布。"
         type="info"
         :closable="false"
       />
-      <template #footer
-        ><el-button @click="copyVisible = false">取消</el-button
-        ><el-button type="primary" :loading="submitting" @click="copyTemplate"
-          >复制</el-button
-        ></template
-      >
+      <template #footer>
+        <el-button @click="copyVisible = false">
+          取消
+        </el-button><el-button
+          type="primary"
+          :loading="submitting"
+          @click="copyTemplate"
+        >
+          复制
+        </el-button>
+      </template>
     </el-dialog>
 
     <el-dialog
@@ -541,49 +615,66 @@ onMounted(loadData)
           v-perm="'core:white-label-template:revision'"
           type="primary"
           @click="openRevision()"
-          >新增修订</el-button
         >
+          新增修订
+        </el-button>
       </div>
       <el-table :data="revisions" max-height="520">
         <el-table-column prop="revision" label="修订" width="80" />
-        <el-table-column prop="checksum" label="Checksum" min-width="290" show-overflow-tooltip />
+        <el-table-column
+          prop="checksum"
+          label="Checksum"
+          min-width="290"
+          show-overflow-tooltip
+        />
         <el-table-column
           prop="manifestPatchJson"
           label="Manifest 补丁"
           min-width="260"
           show-overflow-tooltip
         />
-        <el-table-column label="状态" width="100"
-          ><template #default="scope">{{
-            revisionStatus(scope.row.status)
-          }}</template></el-table-column
+        <el-table-column
+          label="状态"
+          width="100"
         >
-        <el-table-column label="操作" width="190"
-          ><template #default="scope"
-            ><el-button
+          <template #default="scope">
+            {{
+              revisionStatus(scope.row.status)
+            }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="操作"
+          width="190"
+        >
+          <template #default="scope">
+            <el-button
               v-if="scope.row.status === 1"
               v-perm="'core:white-label-template:revision'"
               link
               type="primary"
               @click="openRevision(scope.row)"
-              >编辑</el-button
-            ><el-button
+            >
+              编辑
+            </el-button><el-button
               v-if="scope.row.status === 1"
               v-perm="'core:white-label-template:publish'"
               link
               type="success"
               @click="publishRevision(scope.row)"
-              >发布</el-button
-            ><el-button
+            >
+              发布
+            </el-button><el-button
               v-if="scope.row.status === 1"
               v-perm="'core:white-label-template:revision'"
               link
               type="danger"
               @click="deleteRevision(scope.row)"
-              >删除</el-button
-            ></template
-          ></el-table-column
-        >
+            >
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-dialog>
 
@@ -593,37 +684,65 @@ onMounted(loadData)
       width="900px"
     >
       <el-form :model="revisionForm" label-width="170px">
-        <el-form-item label="包名规则 JSON"
-          ><el-input v-model="revisionForm.packageNameRuleJson" type="textarea" :rows="2"
-        /></el-form-item>
-        <el-form-item label="Manifest 补丁 JSON"
-          ><el-input v-model="revisionForm.manifestPatchJson" type="textarea" :rows="5"
-        /></el-form-item>
-        <el-form-item label="资源补丁 JSON"
-          ><el-input v-model="revisionForm.resourcePatchJson" type="textarea" :rows="4"
-        /></el-form-item>
-        <el-form-item label="扩展文件 JSON"
-          ><el-input v-model="revisionForm.extensionFilesJson" type="textarea" :rows="4"
-        /></el-form-item>
-        <el-form-item label="产物验收 JSON"
-          ><el-input v-model="revisionForm.expectedArtifactsJson" type="textarea" :rows="3"
-        /></el-form-item>
-        <el-divider content-position="left">受控模板文件</el-divider>
+        <el-form-item label="包名规则 JSON">
+          <el-input
+            v-model="revisionForm.packageNameRuleJson"
+            type="textarea"
+            :rows="2"
+          />
+        </el-form-item>
+        <el-form-item label="Manifest 补丁 JSON">
+          <el-input
+            v-model="revisionForm.manifestPatchJson"
+            type="textarea"
+            :rows="5"
+          />
+        </el-form-item>
+        <el-form-item label="资源补丁 JSON">
+          <el-input
+            v-model="revisionForm.resourcePatchJson"
+            type="textarea"
+            :rows="4"
+          />
+        </el-form-item>
+        <el-form-item label="扩展文件 JSON">
+          <el-input
+            v-model="revisionForm.extensionFilesJson"
+            type="textarea"
+            :rows="4"
+          />
+        </el-form-item>
+        <el-form-item label="产物验收 JSON">
+          <el-input
+            v-model="revisionForm.expectedArtifactsJson"
+            type="textarea"
+            :rows="3"
+          />
+        </el-form-item>
+        <el-divider content-position="left">
+          受控模板文件
+        </el-divider>
         <el-form-item label="操作类型">
           <el-select v-model="templateFileOperation" style="width: 100%">
             <el-option label="替换现有 res/ 文件" value="resource.replaceFile" />
             <el-option label="写入 assets/ 或 res/raw/" value="extension.writeValidatedFile" />
           </el-select>
         </el-form-item>
-        <el-form-item label="APK 内目标路径"
-          ><el-input v-model="templateFileTarget" placeholder="assets/appforge/customer.json"
-        /></el-form-item>
+        <el-form-item label="APK 内目标路径">
+          <el-input
+            v-model="templateFileTarget"
+            placeholder="assets/appforge/customer.json"
+          />
+        </el-form-item>
         <el-form-item label="选择文件">
           <div class="template-file-upload">
-            <input type="file" accept=".json,.xml,.txt,.png,.webp" @change="selectTemplateFile" />
-            <el-button :loading="submitting" @click="uploadTemplateFile"
-              >私有上传并加入补丁</el-button
+            <input type="file" accept=".json,.xml,.txt,.png,.webp" @change="selectTemplateFile">
+            <el-button
+              :loading="submitting"
+              @click="uploadTemplateFile"
             >
+              私有上传并加入补丁
+            </el-button>
             <el-progress v-if="templateFileProgress > 0" :percentage="templateFileProgress" />
           </div>
         </el-form-item>
@@ -633,12 +752,17 @@ onMounted(loadData)
         type="warning"
         :closable="false"
       />
-      <template #footer
-        ><el-button @click="revisionVisible = false">取消</el-button
-        ><el-button type="primary" :loading="submitting" @click="saveRevision"
-          >保存修订</el-button
-        ></template
-      >
+      <template #footer>
+        <el-button @click="revisionVisible = false">
+          取消
+        </el-button><el-button
+          type="primary"
+          :loading="submitting"
+          @click="saveRevision"
+        >
+          保存修订
+        </el-button>
+      </template>
     </el-dialog>
   </div>
 </template>

@@ -254,31 +254,61 @@ onMounted(loadData)
   <div class="module-page cluster-page">
     <el-card shadow="never" class="query-card">
       <el-form inline>
-        <el-form-item label="构建池"><el-input v-model="query.poolCode" clearable /></el-form-item>
-        <el-form-item label="统计窗口"
-          ><el-select v-model="query.periodMinutes" style="width: 120px"
-            ><el-option :value="60" label="最近 1 小时" /><el-option
+        <el-form-item label="构建池">
+          <el-input v-model="query.poolCode" clearable />
+        </el-form-item>
+        <el-form-item label="统计窗口">
+          <el-select
+            v-model="query.periodMinutes"
+            style="width: 120px"
+          >
+            <el-option :value="60" label="最近 1 小时" /><el-option
               :value="360"
-              label="最近 6 小时" /><el-option :value="1440" label="最近 24 小时" /></el-select
-        ></el-form-item>
-        <el-form-item v-if="activeTab === 'nodes' || activeTab === 'cache'" label="关键词"
-          ><el-input v-model="query.keyword" clearable
-        /></el-form-item>
-        <el-form-item v-if="activeTab === 'events'" label="任务 ID"
-          ><el-input-number v-model="query.taskId" :min="0"
-        /></el-form-item>
-        <el-form-item v-if="activeTab === 'events'" label="事件类型"
-          ><el-input-number v-model="query.eventType" :min="0"
-        /></el-form-item>
+              label="最近 6 小时"
+            /><el-option :value="1440" label="最近 24 小时" />
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          v-if="activeTab === 'nodes' || activeTab === 'cache'"
+          label="关键词"
+        >
+          <el-input
+            v-model="query.keyword"
+            clearable
+          />
+        </el-form-item>
+        <el-form-item
+          v-if="activeTab === 'events'"
+          label="任务 ID"
+        >
+          <el-input-number
+            v-model="query.taskId"
+            :min="0"
+          />
+        </el-form-item>
+        <el-form-item
+          v-if="activeTab === 'events'"
+          label="事件类型"
+        >
+          <el-input-number
+            v-model="query.eventType"
+            :min="0"
+          />
+        </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="resetAndLoad">查询</el-button>
-          <el-button v-if="activeTab === 'policies'" @click="openPolicy()">新增策略</el-button>
+          <el-button type="primary" @click="resetAndLoad">
+            查询
+          </el-button>
+          <el-button v-if="activeTab === 'policies'" @click="openPolicy()">
+            新增策略
+          </el-button>
           <el-button
             v-if="activeTab === 'cache'"
             :loading="cacheCleaning"
             @click="cleanupExpiredCache"
-            >清理过期缓存</el-button
           >
+            清理过期缓存
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -292,25 +322,18 @@ onMounted(loadData)
           <span>运行槽位</span><strong>{{ metrics.runningSlots }}/{{ metrics.totalSlots }}</strong>
         </div>
         <div class="metric-item">
-          <span>排队 / 执行</span
-          ><strong>{{ metrics.queuedTasks }}/{{ metrics.runningTasks }}</strong>
+          <span>排队 / 执行</span><strong>{{ metrics.queuedTasks }}/{{ metrics.runningTasks }}</strong>
         </div>
         <div class="metric-item">
           <span>成功率</span><strong>{{ formatRate(metrics.successRate) }}</strong>
         </div>
         <div class="metric-item">
-          <span>平均排队 / 构建</span
-          ><strong
-            >{{ formatDuration(metrics.averageQueueMs) }} /
-            {{ formatDuration(metrics.averageBuildMs) }}</strong
-          >
+          <span>平均排队 / 构建</span><strong>{{ formatDuration(metrics.averageQueueMs) }} /
+            {{ formatDuration(metrics.averageBuildMs) }}</strong>
         </div>
         <div class="metric-item">
-          <span>缓存命中 / 占用</span
-          ><strong
-            >{{ formatRate(metrics.cacheHitRate) }} /
-            {{ formatBytes(metrics.activeCacheBytes) }}</strong
-          >
+          <span>缓存命中 / 占用</span><strong>{{ formatRate(metrics.cacheHitRate) }} /
+            {{ formatBytes(metrics.activeCacheBytes) }}</strong>
         </div>
       </div>
       <div v-if="metrics?.alerts?.length" class="cluster-alerts">
@@ -331,42 +354,81 @@ onMounted(loadData)
         <el-tab-pane label="调度事件" name="events" />
       </el-tabs>
 
-      <el-table v-if="activeTab === 'nodes'" v-loading="loading" :data="nodes" stripe>
+      <el-table
+        v-if="activeTab === 'nodes'"
+        v-loading="loading"
+        :data="nodes"
+        stripe
+      >
         <el-table-column prop="nodeCode" label="节点" min-width="150" />
         <el-table-column prop="poolCode" label="构建池" width="110" />
-        <el-table-column label="健康" width="90"
-          ><template #default="{ row }"
-            ><el-tag :type="row.status === 1 ? 'success' : row.status === 3 ? 'danger' : 'info'">{{
-              row.status === 1 ? '在线' : row.status === 3 ? '隔离' : '离线'
-            }}</el-tag></template
-          ></el-table-column
+        <el-table-column
+          label="健康"
+          width="90"
         >
-        <el-table-column label="槽位" width="110"
-          ><template #default="{ row }"
-            >{{ row.runningCount }}/{{ row.maxConcurrency }}</template
-          ></el-table-column
+          <template #default="{ row }">
+            <el-tag :type="row.status === 1 ? 'success' : row.status === 3 ? 'danger' : 'info'">
+              {{
+                row.status === 1 ? '在线' : row.status === 3 ? '隔离' : '离线'
+              }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="槽位"
+          width="110"
         >
+          <template #default="{ row }">
+            {{ row.runningCount }}/{{ row.maxConcurrency }}
+          </template>
+        </el-table-column>
         <el-table-column prop="toolchainVersion" label="工具链" min-width="150" />
-        <el-table-column label="磁盘可用" width="120"
-          ><template #default="{ row }">{{ formatBytes(row.diskFree) }}</template></el-table-column
+        <el-table-column
+          label="磁盘可用"
+          width="120"
         >
-        <el-table-column label="最近心跳" min-width="180"
-          ><template #default="{ row }">{{
-            formatTime(row.lastHeartbeatAt)
-          }}</template></el-table-column
+          <template #default="{ row }">
+            {{ formatBytes(row.diskFree) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="最近心跳"
+          min-width="180"
         >
-        <el-table-column label="操作" width="180" fixed="right"
-          ><template #default="{ row }"
-            ><el-button v-if="row.status === 3" link type="danger" @click="recoverNode(row)"
-              >恢复节点</el-button
-            ><el-button link type="primary" @click="changeDrain(row)">{{
-              row.drainStatus === 2 ? '恢复接单' : '排空'
-            }}</el-button></template
-          ></el-table-column
+          <template #default="{ row }">
+            {{
+              formatTime(row.lastHeartbeatAt)
+            }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="操作"
+          width="180"
+          fixed="right"
         >
+          <template #default="{ row }">
+            <el-button
+              v-if="row.status === 3"
+              link
+              type="danger"
+              @click="recoverNode(row)"
+            >
+              恢复节点
+            </el-button><el-button link type="primary" @click="changeDrain(row)">
+              {{
+                row.drainStatus === 2 ? '恢复接单' : '排空'
+              }}
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
-      <el-table v-else-if="activeTab === 'policies'" v-loading="loading" :data="policies" stripe>
+      <el-table
+        v-else-if="activeTab === 'policies'"
+        v-loading="loading"
+        :data="policies"
+        stripe
+      >
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="appId" label="应用 ID（0=租户）" min-width="150" />
         <el-table-column prop="poolCode" label="构建池" />
@@ -374,41 +436,78 @@ onMounted(loadData)
         <el-table-column prop="fairWeight" label="公平权重" />
         <el-table-column prop="maxPriority" label="最高优先级" />
         <el-table-column prop="status" label="状态" />
-        <el-table-column label="操作" width="90"
-          ><template #default="{ row }"
-            ><el-button link type="primary" :disabled="row.tenantId === 0" @click="openPolicy(row)"
-              >编辑</el-button
-            ></template
-          ></el-table-column
+        <el-table-column
+          label="操作"
+          width="90"
         >
+          <template #default="{ row }">
+            <el-button
+              link
+              type="primary"
+              :disabled="row.tenantId === 0"
+              @click="openPolicy(row)"
+            >
+              编辑
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
-      <el-table v-else-if="activeTab === 'cache'" v-loading="loading" :data="caches" stripe>
+      <el-table
+        v-else-if="activeTab === 'cache'"
+        v-loading="loading"
+        :data="caches"
+        stripe
+      >
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="cacheKey" label="缓存键" min-width="220" show-overflow-tooltip />
+        <el-table-column
+          prop="cacheKey"
+          label="缓存键"
+          min-width="220"
+          show-overflow-tooltip
+        />
         <el-table-column prop="toolchainVersion" label="工具链" min-width="150" />
         <el-table-column prop="hitCount" label="命中" width="80" />
-        <el-table-column label="大小" width="110"
-          ><template #default="{ row }">{{ formatBytes(row.sizeBytes) }}</template></el-table-column
+        <el-table-column
+          label="大小"
+          width="110"
         >
-        <el-table-column label="到期时间" min-width="180"
-          ><template #default="{ row }">{{ formatTime(row.expiresAt) }}</template></el-table-column
+          <template #default="{ row }">
+            {{ formatBytes(row.sizeBytes) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="到期时间"
+          min-width="180"
         >
+          <template #default="{ row }">
+            {{ formatTime(row.expiresAt) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="status" label="状态" width="80" />
-        <el-table-column label="操作" width="90"
-          ><template #default="{ row }"
-            ><el-button
+        <el-table-column
+          label="操作"
+          width="90"
+        >
+          <template #default="{ row }">
+            <el-button
               link
               type="danger"
               :disabled="row.status !== 1"
               @click="invalidateCache(row)"
-              >失效</el-button
-            ></template
-          ></el-table-column
-        >
+            >
+              失效
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
-      <el-table v-else v-loading="loading" :data="events" stripe>
+      <el-table
+        v-else
+        v-loading="loading"
+        :data="events"
+        stripe
+      >
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="taskId" label="任务 ID" width="100" />
         <el-table-column prop="nodeCode" label="节点" min-width="140" />
@@ -420,9 +519,14 @@ onMounted(loadData)
           min-width="260"
           show-overflow-tooltip
         />
-        <el-table-column label="时间" min-width="180"
-          ><template #default="{ row }">{{ formatTime(row.createTime) }}</template></el-table-column
+        <el-table-column
+          label="时间"
+          min-width="180"
         >
+          <template #default="{ row }">
+            {{ formatTime(row.createTime) }}
+          </template>
+        </el-table-column>
       </el-table>
 
       <CursorPagination
@@ -438,30 +542,57 @@ onMounted(loadData)
 
     <el-dialog v-model="policyVisible" title="构建并发策略" width="520px">
       <el-form :model="policyForm" label-width="130px">
-        <el-form-item label="应用 ID"
-          ><el-input-number v-model="policyForm.appId" :min="0" style="width: 100%"
-        /></el-form-item>
-        <el-form-item label="构建池"><el-input v-model="policyForm.poolCode" /></el-form-item>
-        <el-form-item label="最大并发"
-          ><el-input-number v-model="policyForm.maxConcurrency" :min="1" style="width: 100%"
-        /></el-form-item>
-        <el-form-item label="公平权重"
-          ><el-input-number v-model="policyForm.fairWeight" :min="1" style="width: 100%"
-        /></el-form-item>
-        <el-form-item label="最高优先级"
-          ><el-input-number v-model="policyForm.maxPriority" :min="0" style="width: 100%"
-        /></el-form-item>
-        <el-form-item label="状态"
-          ><el-select v-model="policyForm.status" style="width: 100%"
-            ><el-option :value="1" label="启用" /><el-option :value="2" label="停用" /></el-select
-        ></el-form-item>
+        <el-form-item label="应用 ID">
+          <el-input-number
+            v-model="policyForm.appId"
+            :min="0"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="构建池">
+          <el-input v-model="policyForm.poolCode" />
+        </el-form-item>
+        <el-form-item label="最大并发">
+          <el-input-number
+            v-model="policyForm.maxConcurrency"
+            :min="1"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="公平权重">
+          <el-input-number
+            v-model="policyForm.fairWeight"
+            :min="1"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="最高优先级">
+          <el-input-number
+            v-model="policyForm.maxPriority"
+            :min="0"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select
+            v-model="policyForm.status"
+            style="width: 100%"
+          >
+            <el-option :value="1" label="启用" /><el-option :value="2" label="停用" />
+          </el-select>
+        </el-form-item>
       </el-form>
-      <template #footer
-        ><el-button @click="policyVisible = false">取消</el-button
-        ><el-button type="primary" :loading="policySaving" @click="savePolicy"
-          >保存</el-button
-        ></template
-      >
+      <template #footer>
+        <el-button @click="policyVisible = false">
+          取消
+        </el-button><el-button
+          type="primary"
+          :loading="policySaving"
+          @click="savePolicy"
+        >
+          保存
+        </el-button>
+      </template>
     </el-dialog>
   </div>
 </template>

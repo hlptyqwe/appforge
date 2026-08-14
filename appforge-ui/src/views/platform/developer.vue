@@ -375,7 +375,10 @@ async function importSourceArtifact() {
   }
 }
 
-function openSourceTriggerForm(item?: PlatformSourceBuildTrigger, repository?: PlatformSourceRepository) {
+function openSourceTriggerForm(
+  item?: PlatformSourceBuildTrigger,
+  repository?: PlatformSourceRepository,
+) {
   Object.assign(sourceTriggerForm, {
     id: item?.id || 0,
     repositoryId: item?.repositoryId || repository?.id || 0,
@@ -410,10 +413,7 @@ async function saveSourceTrigger() {
     const payload = sourceTriggerPayload()
     if (!payload.channelIds.length) throw new Error('至少填写一个渠道 ID')
     if (sourceTriggerForm.id) {
-      const response = await platformService.updateSourceBuildTrigger(
-        sourceTriggerForm.id,
-        payload,
-      )
+      const response = await platformService.updateSourceBuildTrigger(sourceTriggerForm.id, payload)
       if (response.code !== 200) throw new Error(response.msg)
       ElMessage.success('源码构建触发策略已更新')
     } else {
@@ -454,9 +454,7 @@ function sourceTriggerEventLabel(value: number) {
 }
 
 function sourceWebhookStatusLabel(value: number) {
-  return (
-    { 1: '待处理', 2: '处理中', 3: '成功', 4: '已忽略', 5: '失败' }[value] || '未知'
-  )
+  return { 1: '待处理', 2: '处理中', 3: '成功', 4: '已忽略', 5: '失败' }[value] || '未知'
 }
 
 function sourcePlatformLabel(platform: number) {
@@ -663,7 +661,9 @@ onMounted(() => {
     <div v-if="activeTab === 'credentials'">
       <el-card shadow="never" class="query-card">
         <el-form inline>
-          <el-form-item label="关键词"><el-input v-model="query.keyword" clearable /></el-form-item>
+          <el-form-item label="关键词">
+            <el-input v-model="query.keyword" clearable />
+          </el-form-item>
           <el-form-item label="状态">
             <el-select v-model="query.status" style="width: 130px">
               <el-option :value="0" label="全部" />
@@ -674,8 +674,12 @@ onMounted(() => {
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="resetAndLoad">查询</el-button>
-            <el-button type="primary" plain @click="openCreate">创建 API Key</el-button>
+            <el-button type="primary" @click="resetAndLoad">
+              查询
+            </el-button>
+            <el-button type="primary" plain @click="openCreate">
+              创建 API Key
+            </el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -685,25 +689,33 @@ onMounted(() => {
           <el-table-column prop="credentialName" label="名称" min-width="150" />
           <el-table-column prop="keyId" label="Key ID" min-width="145" />
           <el-table-column label="Scopes" min-width="260" show-overflow-tooltip>
-            <template #default="{ row }">{{
-              row.scopes.map((item: number) => scopeLabels[item]).join(', ')
-            }}</template>
+            <template #default="{ row }">
+              {{
+                row.scopes.map((item: number) => scopeLabels[item]).join(', ')
+              }}
+            </template>
           </el-table-column>
           <el-table-column label="应用范围" min-width="130">
-            <template #default="{ row }">{{
-              row.appIds.length ? row.appIds.join(', ') : '全部应用'
-            }}</template>
+            <template #default="{ row }">
+              {{
+                row.appIds.length ? row.appIds.join(', ') : '全部应用'
+              }}
+            </template>
           </el-table-column>
           <el-table-column label="状态" width="110">
-            <template #default="{ row }"
-              ><el-tag>{{ statusLabel(row.status) }}</el-tag></template
-            >
+            <template #default="{ row }">
+              <el-tag>{{ statusLabel(row.status) }}</el-tag>
+            </template>
           </el-table-column>
           <el-table-column label="最近使用" min-width="175">
-            <template #default="{ row }">{{ formatTime(row.lastUsedAt) }}</template>
+            <template #default="{ row }">
+              {{ formatTime(row.lastUsedAt) }}
+            </template>
           </el-table-column>
           <el-table-column label="到期时间" min-width="175">
-            <template #default="{ row }">{{ formatTime(row.expiresAt) }}</template>
+            <template #default="{ row }">
+              {{ formatTime(row.expiresAt) }}
+            </template>
           </el-table-column>
           <el-table-column label="操作" width="150" fixed="right">
             <template #default="{ row }">
@@ -712,15 +724,17 @@ onMounted(() => {
                 type="primary"
                 :disabled="row.status !== 1"
                 @click="rotateCredential(row)"
-                >轮换</el-button
               >
+                轮换
+              </el-button>
               <el-button
                 link
                 type="danger"
                 :disabled="row.status === 3"
                 @click="revokeCredential(row)"
-                >吊销</el-button
               >
+                吊销
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -751,10 +765,15 @@ onMounted(() => {
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="webhookPager.resetAndLoad(loadWebhooks)"
-              >查询</el-button
+            <el-button
+              type="primary"
+              @click="webhookPager.resetAndLoad(loadWebhooks)"
             >
-            <el-button type="primary" plain @click="openWebhookForm()">新增 Webhook</el-button>
+              查询
+            </el-button>
+            <el-button type="primary" plain @click="openWebhookForm()">
+              新增 Webhook
+            </el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -769,35 +788,51 @@ onMounted(() => {
             show-overflow-tooltip
           />
           <el-table-column label="事件" min-width="260" show-overflow-tooltip>
-            <template #default="{ row }">{{ row.eventTypes.join(', ') }}</template>
+            <template #default="{ row }">
+              {{ row.eventTypes.join(', ') }}
+            </template>
           </el-table-column>
           <el-table-column label="密钥提示" width="110">
-            <template #default="{ row }">***{{ row.secretHint }}</template>
+            <template #default="{ row }">
+              ***{{ row.secretHint }}
+            </template>
           </el-table-column>
           <el-table-column label="状态" width="90">
-            <template #default="{ row }"
-              ><el-tag>{{ webhookStatusLabel(row.status) }}</el-tag></template
-            >
+            <template #default="{ row }">
+              <el-tag>{{ webhookStatusLabel(row.status) }}</el-tag>
+            </template>
           </el-table-column>
           <el-table-column label="最近成功" min-width="170">
-            <template #default="{ row }">{{ formatTime(row.lastSuccessAt) }}</template>
+            <template #default="{ row }">
+              {{ formatTime(row.lastSuccessAt) }}
+            </template>
           </el-table-column>
           <el-table-column label="最近失败" min-width="170">
-            <template #default="{ row }">{{ formatTime(row.lastFailureAt) }}</template>
+            <template #default="{ row }">
+              {{ formatTime(row.lastFailureAt) }}
+            </template>
           </el-table-column>
           <el-table-column label="操作" width="230" fixed="right">
             <template #default="{ row }">
-              <el-button link type="primary" @click="openWebhookForm(row)">编辑</el-button>
-              <el-button link type="primary" :disabled="row.status !== 1" @click="testWebhook(row)"
-                >测试</el-button
+              <el-button link type="primary" @click="openWebhookForm(row)">
+                编辑
+              </el-button>
+              <el-button
+                link
+                type="primary"
+                :disabled="row.status !== 1"
+                @click="testWebhook(row)"
               >
+                测试
+              </el-button>
               <el-button
                 link
                 type="warning"
                 :disabled="row.status === 3"
                 @click="rotateWebhookSecret(row)"
-                >轮换密钥</el-button
               >
+                轮换密钥
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -838,9 +873,12 @@ onMounted(() => {
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="deliveryPager.resetAndLoad(loadDeliveries)"
-              >查询投递</el-button
+            <el-button
+              type="primary"
+              @click="deliveryPager.resetAndLoad(loadDeliveries)"
             >
+              查询投递
+            </el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -849,22 +887,31 @@ onMounted(() => {
         <el-table v-loading="deliveryLoading" :data="deliveryRows" stripe>
           <el-table-column prop="id" label="ID" width="80" />
           <el-table-column prop="endpointId" label="端点 ID" width="95" />
-          <el-table-column prop="eventId" label="Event ID" min-width="250" show-overflow-tooltip />
+          <el-table-column
+            prop="eventId"
+            label="Event ID"
+            min-width="250"
+            show-overflow-tooltip
+          />
           <el-table-column prop="eventType" label="事件" min-width="150" />
           <el-table-column prop="attempt" label="尝试" width="75" />
           <el-table-column label="状态" width="105">
-            <template #default="{ row }"
-              ><el-tag>{{ deliveryStatusLabel(row.status) }}</el-tag></template
-            >
+            <template #default="{ row }">
+              <el-tag>{{ deliveryStatusLabel(row.status) }}</el-tag>
+            </template>
           </el-table-column>
           <el-table-column prop="responseStatus" label="HTTP" width="80" />
           <el-table-column label="结果" min-width="240" show-overflow-tooltip>
-            <template #default="{ row }">{{
-              row.errorMessage || row.responseBodyExcerpt || '-'
-            }}</template>
+            <template #default="{ row }">
+              {{
+                row.errorMessage || row.responseBodyExcerpt || '-'
+              }}
+            </template>
           </el-table-column>
           <el-table-column label="更新时间" min-width="175">
-            <template #default="{ row }">{{ formatTime(row.updateTime) }}</template>
+            <template #default="{ row }">
+              {{ formatTime(row.updateTime) }}
+            </template>
           </el-table-column>
           <el-table-column label="操作" width="90" fixed="right">
             <template #default="{ row }">
@@ -873,8 +920,9 @@ onMounted(() => {
                 type="primary"
                 :disabled="![3, 4, 5].includes(row.status)"
                 @click="replayDelivery(row)"
-                >重放</el-button
               >
+                重放
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -915,25 +963,40 @@ onMounted(() => {
               <el-option :value="3" label="异常" />
             </el-select>
           </el-form-item>
-          <el-form-item label="关键词"
-            ><el-input v-model="sourceQuery.keyword" clearable
-          /></el-form-item>
+          <el-form-item label="关键词">
+            <el-input
+              v-model="sourceQuery.keyword"
+              clearable
+            />
+          </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="sourcePager.resetAndLoad(loadSourceIntegrations)"
-              >查询</el-button
+            <el-button
+              type="primary"
+              @click="sourcePager.resetAndLoad(loadSourceIntegrations)"
             >
-            <el-button type="primary" plain @click="connectSource(1)">连接 GitHub</el-button>
-            <el-button type="primary" plain @click="connectSource(2)">连接 GitLab</el-button>
+              查询
+            </el-button>
+            <el-button type="primary" plain @click="connectSource(1)">
+              连接 GitHub
+            </el-button>
+            <el-button type="primary" plain @click="connectSource(2)">
+              连接 GitLab
+            </el-button>
           </el-form-item>
         </el-form>
       </el-card>
       <el-card shadow="never" class="table-card">
         <el-table v-loading="sourceLoading" :data="sourceRows" stripe>
-          <el-table-column label="平台" width="100"
-            ><template #default="{ row }">{{
-              sourcePlatformLabel(row.platform)
-            }}</template></el-table-column
+          <el-table-column
+            label="平台"
+            width="100"
           >
+            <template #default="{ row }">
+              {{
+                sourcePlatformLabel(row.platform)
+              }}
+            </template>
+          </el-table-column>
           <el-table-column prop="integrationName" label="名称" min-width="160" />
           <el-table-column
             prop="installationRef"
@@ -941,39 +1004,58 @@ onMounted(() => {
             min-width="220"
             show-overflow-tooltip
           />
-          <el-table-column label="状态" width="110"
-            ><template #default="{ row }"
-              ><el-tag>{{ sourceStatusLabel(row.status) }}</el-tag></template
-            ></el-table-column
+          <el-table-column
+            label="状态"
+            width="110"
           >
-          <el-table-column label="令牌到期" min-width="175"
-            ><template #default="{ row }">{{
-              formatTime(row.tokenExpiresAt)
-            }}</template></el-table-column
+            <template #default="{ row }">
+              <el-tag>{{ sourceStatusLabel(row.status) }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="令牌到期"
+            min-width="175"
           >
-          <el-table-column label="最近同步" min-width="175"
-            ><template #default="{ row }">{{
-              formatTime(row.lastSyncAt)
-            }}</template></el-table-column
+            <template #default="{ row }">
+              {{
+                formatTime(row.tokenExpiresAt)
+              }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="最近同步"
+            min-width="175"
           >
-          <el-table-column label="操作" width="190" fixed="right"
-            ><template #default="{ row }"
-              ><el-button
+            <template #default="{ row }">
+              {{
+                formatTime(row.lastSyncAt)
+              }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="操作"
+            width="190"
+            fixed="right"
+          >
+            <template #default="{ row }">
+              <el-button
                 link
                 type="primary"
                 :disabled="row.status !== 1"
                 @click="openAvailableRepositories(row)"
-                >授权仓库</el-button
               >
+                授权仓库
+              </el-button>
               ><el-button
                 link
                 type="danger"
                 :disabled="row.status !== 1"
                 @click="disconnectSource(row)"
-                >断开</el-button
-              ></template
-            ></el-table-column
-          >
+              >
+                断开
+              </el-button>
+            </template>
+          </el-table-column>
         </el-table>
         <CursorPagination
           v-model:limit="sourcePager.pagination.limit"
@@ -988,25 +1070,44 @@ onMounted(() => {
 
       <el-card shadow="never" class="query-card delivery-query">
         <el-form inline>
-          <el-form-item label="集成 ID"
-            ><el-input-number v-model="repositoryQuery.integrationId" :min="0" :controls="false"
-          /></el-form-item>
-          <el-form-item label="状态"
-            ><el-select v-model="repositoryQuery.status" style="width: 130px"
-              ><el-option :value="0" label="全部" /><el-option
+          <el-form-item label="集成 ID">
+            <el-input-number
+              v-model="repositoryQuery.integrationId"
+              :min="0"
+              :controls="false"
+            />
+          </el-form-item>
+          <el-form-item label="状态">
+            <el-select
+              v-model="repositoryQuery.status"
+              style="width: 130px"
+            >
+              <el-option :value="0" label="全部" /><el-option
                 :value="1"
-                label="已授权" /><el-option :value="2" label="已撤销" /></el-select
-          ></el-form-item>
-          <el-form-item label="仓库"
-            ><el-input v-model="repositoryQuery.keyword" clearable
-          /></el-form-item>
-          <el-form-item
-            ><el-button type="primary" @click="repositoryPager.resetAndLoad(loadSourceRepositories)"
-              >查询仓库</el-button
-            ><el-button type="primary" plain @click="openArtifactImport()"
-              >导入 APK Artifact</el-button
-            ></el-form-item
-          >
+                label="已授权"
+              /><el-option :value="2" label="已撤销" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="仓库">
+            <el-input
+              v-model="repositoryQuery.keyword"
+              clearable
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              @click="repositoryPager.resetAndLoad(loadSourceRepositories)"
+            >
+              查询仓库
+            </el-button><el-button
+              type="primary"
+              plain
+              @click="openArtifactImport()"
+            >
+              导入 APK Artifact
+            </el-button>
+          </el-form-item>
         </el-form>
       </el-card>
       <el-card shadow="never" class="table-card">
@@ -1015,36 +1116,46 @@ onMounted(() => {
           <el-table-column prop="repositoryFullName" label="授权仓库" min-width="260" />
           <el-table-column prop="defaultBranch" label="默认分支" min-width="130" />
           <el-table-column prop="permissionLevel" label="权限" width="90" />
-          <el-table-column label="状态" width="100"
-            ><template #default="{ row }"
-              ><el-tag>{{ row.status === 1 ? '已授权' : '已撤销' }}</el-tag></template
-            ></el-table-column
+          <el-table-column
+            label="状态"
+            width="100"
           >
-          <el-table-column label="操作" width="230" fixed="right"
-            ><template #default="{ row }"
-              ><el-button
+            <template #default="{ row }">
+              <el-tag>{{ row.status === 1 ? '已授权' : '已撤销' }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="操作"
+            width="230"
+            fixed="right"
+          >
+            <template #default="{ row }">
+              <el-button
                 link
                 type="primary"
                 :disabled="row.status !== 1"
                 @click="openArtifactImport(row)"
-                >导入</el-button
               >
+                导入
+              </el-button>
               <el-button
                 link
                 type="primary"
                 :disabled="row.status !== 1"
                 @click="openSourceTriggerForm(undefined, row)"
-                >触发策略</el-button
               >
+                触发策略
+              </el-button>
               ><el-button
                 link
                 type="danger"
                 :disabled="row.status !== 1"
                 @click="revokeRepository(row)"
-                >撤销</el-button
-              ></template
-            ></el-table-column
-          >
+              >
+                撤销
+              </el-button>
+            </template>
+          </el-table-column>
         </el-table>
         <CursorPagination
           v-model:limit="repositoryPager.pagination.limit"
@@ -1059,60 +1170,111 @@ onMounted(() => {
 
       <el-card shadow="never" class="query-card delivery-query">
         <el-form inline>
-          <el-form-item label="仓库 ID"
-            ><el-input-number v-model="sourceTriggerQuery.repositoryId" :min="0" :controls="false"
-          /></el-form-item>
-          <el-form-item label="应用 ID"
-            ><el-input-number v-model="sourceTriggerQuery.appId" :min="0" :controls="false"
-          /></el-form-item>
-          <el-form-item label="状态"
-            ><el-select v-model="sourceTriggerQuery.status" style="width: 120px"
-              ><el-option :value="0" label="全部" /><el-option :value="1" label="启用" /><el-option
+          <el-form-item label="仓库 ID">
+            <el-input-number
+              v-model="sourceTriggerQuery.repositoryId"
+              :min="0"
+              :controls="false"
+            />
+          </el-form-item>
+          <el-form-item label="应用 ID">
+            <el-input-number
+              v-model="sourceTriggerQuery.appId"
+              :min="0"
+              :controls="false"
+            />
+          </el-form-item>
+          <el-form-item label="状态">
+            <el-select
+              v-model="sourceTriggerQuery.status"
+              style="width: 120px"
+            >
+              <el-option :value="0" label="全部" /><el-option :value="1" label="启用" /><el-option
                 :value="2"
-                label="停用" /></el-select
-          ></el-form-item>
-          <el-form-item label="策略"
-            ><el-input v-model="sourceTriggerQuery.keyword" clearable
-          /></el-form-item>
-          <el-form-item
-            ><el-button
+                label="停用"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="策略">
+            <el-input
+              v-model="sourceTriggerQuery.keyword"
+              clearable
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button
               type="primary"
               @click="sourceTriggerPager.resetAndLoad(loadSourceBuildTriggers)"
-              >查询策略</el-button
-            ><el-button type="primary" plain @click="openSourceTriggerForm()"
-              >新增触发策略</el-button
-            ></el-form-item
-          >
+            >
+              查询策略
+            </el-button><el-button
+              type="primary"
+              plain
+              @click="openSourceTriggerForm()"
+            >
+              新增触发策略
+            </el-button>
+          </el-form-item>
         </el-form>
       </el-card>
       <el-card shadow="never" class="table-card">
-        <template #header>预定义源码构建触发策略</template>
+        <template #header>
+          预定义源码构建触发策略
+        </template>
         <el-table v-loading="sourceTriggerLoading" :data="sourceTriggerRows" stripe>
           <el-table-column prop="triggerName" label="策略" min-width="150" />
           <el-table-column prop="repositoryFullName" label="授权仓库" min-width="220" />
-          <el-table-column label="事件" width="120"
-            ><template #default="{ row }">{{ sourceTriggerEventLabel(row.eventType) }}</template></el-table-column
+          <el-table-column
+            label="事件"
+            width="120"
           >
+            <template #default="{ row }">
+              {{
+                sourceTriggerEventLabel(row.eventType)
+              }}
+            </template>
+          </el-table-column>
           <el-table-column prop="refPattern" label="Tag / 分支" min-width="130" />
           <el-table-column prop="artifactSelector" label="Artifact / Job" min-width="170" />
-          <el-table-column label="渠道" min-width="130"
-            ><template #default="{ row }">{{ row.channelIds.join(', ') }}</template></el-table-column
+          <el-table-column
+            label="渠道"
+            min-width="130"
           >
-          <el-table-column label="状态" width="90"
-            ><template #default="{ row }"
-              ><el-tag :type="row.status === 1 ? 'success' : 'info'">{{
-                row.status === 1 ? '启用' : '停用'
-              }}</el-tag></template
-            ></el-table-column
+            <template #default="{ row }">
+              {{
+                row.channelIds.join(', ')
+              }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="状态"
+            width="90"
           >
-          <el-table-column label="操作" width="150" fixed="right"
-            ><template #default="{ row }"
-              ><el-button link type="primary" @click="openSourceTriggerForm(row)">编辑</el-button
-              ><el-button link type="warning" @click="rotateSourceTriggerSecret(row)"
-                >轮换密钥</el-button
-              ></template
-            ></el-table-column
+            <template #default="{ row }">
+              <el-tag :type="row.status === 1 ? 'success' : 'info'">
+                {{
+                  row.status === 1 ? '启用' : '停用'
+                }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="操作"
+            width="150"
+            fixed="right"
           >
+            <template #default="{ row }">
+              <el-button link type="primary" @click="openSourceTriggerForm(row)">
+                编辑
+              </el-button><el-button
+                link
+                type="warning"
+                @click="rotateSourceTriggerSecret(row)"
+              >
+                轮换密钥
+              </el-button>
+            </template>
+          </el-table-column>
         </el-table>
         <CursorPagination
           v-model:limit="sourceTriggerPager.pagination.limit"
@@ -1127,47 +1289,86 @@ onMounted(() => {
 
       <el-card shadow="never" class="query-card delivery-query">
         <el-form inline>
-          <el-form-item label="策略 ID"
-            ><el-input-number v-model="sourceEventQuery.triggerId" :min="0" :controls="false"
-          /></el-form-item>
-          <el-form-item label="处理状态"
-            ><el-select v-model="sourceEventQuery.status" style="width: 130px"
-              ><el-option :value="0" label="全部" /><el-option :value="1" label="待处理" /><el-option
-                :value="2"
-                label="处理中" /><el-option :value="3" label="成功" /><el-option
-                :value="5"
-                label="失败" /></el-select
-          ></el-form-item>
-          <el-form-item
-            ><el-button type="primary" @click="sourceEventPager.resetAndLoad(loadSourceWebhookEvents)"
-              >查询事件</el-button
-            ></el-form-item
-          >
+          <el-form-item label="策略 ID">
+            <el-input-number
+              v-model="sourceEventQuery.triggerId"
+              :min="0"
+              :controls="false"
+            />
+          </el-form-item>
+          <el-form-item label="处理状态">
+            <el-select
+              v-model="sourceEventQuery.status"
+              style="width: 130px"
+            >
+              <el-option :value="0" label="全部" /><el-option
+                :value="1"
+                label="待处理"
+              /><el-option :value="2" label="处理中" /><el-option
+                :value="3"
+                label="成功"
+              /><el-option :value="5" label="失败" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              @click="sourceEventPager.resetAndLoad(loadSourceWebhookEvents)"
+            >
+              查询事件
+            </el-button>
+          </el-form-item>
         </el-form>
       </el-card>
       <el-card shadow="never" class="table-card">
-        <template #header>源码平台入站 Webhook 事件</template>
+        <template #header>
+          源码平台入站 Webhook 事件
+        </template>
         <el-table v-loading="sourceEventLoading" :data="sourceEventRows" stripe>
           <el-table-column prop="id" label="事件 ID" width="100" />
           <el-table-column prop="triggerId" label="策略 ID" width="100" />
           <el-table-column prop="providerEventType" label="供应商事件" min-width="155" />
           <el-table-column prop="sourceRef" label="Tag / 分支" min-width="130" />
           <el-table-column prop="versionName" label="版本" min-width="130" />
-          <el-table-column label="Commit" min-width="130"
-            ><template #default="{ row }">{{ row.commitSha?.slice(0, 12) || '-' }}</template></el-table-column
+          <el-table-column
+            label="Commit"
+            min-width="130"
           >
-          <el-table-column label="状态" width="100"
-            ><template #default="{ row }"
-              ><el-tag :type="row.status === 3 ? 'success' : row.status === 5 ? 'danger' : 'info'">{{
-                sourceWebhookStatusLabel(row.status)
-              }}</el-tag></template
-            ></el-table-column
+            <template #default="{ row }">
+              {{
+                row.commitSha?.slice(0, 12) || '-'
+              }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="状态"
+            width="100"
           >
+            <template #default="{ row }">
+              <el-tag
+                :type="row.status === 3 ? 'success' : row.status === 5 ? 'danger' : 'info'"
+              >
+                {{ sourceWebhookStatusLabel(row.status) }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column prop="attempt" label="尝试" width="80" />
-          <el-table-column prop="errorMessage" label="错误" min-width="220" show-overflow-tooltip />
-          <el-table-column label="创建时间" min-width="175"
-            ><template #default="{ row }">{{ formatTime(row.createTime) }}</template></el-table-column
+          <el-table-column
+            prop="errorMessage"
+            label="错误"
+            min-width="220"
+            show-overflow-tooltip
+          />
+          <el-table-column
+            label="创建时间"
+            min-width="175"
           >
+            <template #default="{ row }">
+              {{
+                formatTime(row.createTime)
+              }}
+            </template>
+          </el-table-column>
         </el-table>
         <CursorPagination
           v-model:limit="sourceEventPager.pagination.limit"
@@ -1182,24 +1383,30 @@ onMounted(() => {
     </div>
 
     <div v-else class="docs-grid">
-      <el-card shadow="never"
-        ><template #header>Open API v1</template>
+      <el-card shadow="never">
+        <template #header>
+          Open API v1
+        </template>
         <p>统一入口：<code>/open/v1</code></p>
         <p>契约文件：<code>docs/openapi-v1.yaml</code></p>
-        <p>写操作必须携带 <code>Idempotency-Key</code>。</p></el-card
-      >
-      <el-card shadow="never"
-        ><template #header>appforgectl</template>
+        <p>写操作必须携带 <code>Idempotency-Key</code>。</p>
+      </el-card>
+      <el-card shadow="never">
+        <template #header>
+          appforgectl
+        </template>
         <p><code>appforgectl auth configure</code></p>
         <p><code>appforgectl version upload</code></p>
-        <p><code>appforgectl build create</code> / <code>build wait</code></p></el-card
-      >
-      <el-card shadow="never"
-        ><template #header>CI/CD 模板</template>
+        <p><code>appforgectl build create</code> / <code>build wait</code></p>
+      </el-card>
+      <el-card shadow="never">
+        <template #header>
+          CI/CD 模板
+        </template>
         <p>GitHub：<code>.github/actions/appforge-build</code></p>
         <p>GitLab：<code>docs/ci/gitlab-appforge-build.yml</code></p>
-        <p>Shell：<code>docs/ci/appforge-build.sh</code></p></el-card
-      >
+        <p>Shell：<code>docs/ci/appforge-build.sh</code></p>
+      </el-card>
     </div>
 
     <el-dialog
@@ -1223,7 +1430,9 @@ onMounted(() => {
         <el-table-column prop="defaultBranch" label="默认分支" min-width="140" />
         <el-table-column label="操作" width="100">
           <template #default="{ row }">
-            <el-button link type="primary" @click="authorizeRepository(row)">授权</el-button>
+            <el-button link type="primary" @click="authorizeRepository(row)">
+              授权
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -1235,49 +1444,78 @@ onMounted(() => {
       width="760px"
     >
       <el-form :model="sourceTriggerForm" label-width="150px">
-        <el-form-item label="授权仓库 ID"
-          ><el-input-number
+        <el-form-item label="授权仓库 ID">
+          <el-input-number
             v-model="sourceTriggerForm.repositoryId"
             :min="1"
             :controls="false"
             :disabled="sourceTriggerForm.id > 0"
-        /></el-form-item>
-        <el-form-item label="应用 ID"
-          ><el-input-number
+          />
+        </el-form-item>
+        <el-form-item label="应用 ID">
+          <el-input-number
             v-model="sourceTriggerForm.appId"
             :min="1"
             :controls="false"
             :disabled="sourceTriggerForm.id > 0"
-        /></el-form-item>
-        <el-form-item label="策略名称"
-          ><el-input v-model="sourceTriggerForm.triggerName" maxlength="128"
-        /></el-form-item>
-        <el-form-item label="供应商事件"
-          ><el-radio-group v-model="sourceTriggerForm.eventType"
-            ><el-radio-button :value="1">Release 发布</el-radio-button
-            ><el-radio-button :value="2">CI 成功</el-radio-button></el-radio-group
-          ></el-form-item
-        >
-        <el-form-item label="Tag / 分支规则"
-          ><el-input v-model="sourceTriggerForm.refPattern" placeholder="glob，例如 v* 或 release/*"
-        /></el-form-item>
-        <el-form-item label="Artifact / Job"
-          ><el-input
+          />
+        </el-form-item>
+        <el-form-item label="策略名称">
+          <el-input
+            v-model="sourceTriggerForm.triggerName"
+            maxlength="128"
+          />
+        </el-form-item>
+        <el-form-item label="供应商事件">
+          <el-radio-group v-model="sourceTriggerForm.eventType">
+            <el-radio-button :value="1">
+              Release 发布
+            </el-radio-button><el-radio-button :value="2">
+              CI 成功
+            </el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="Tag / 分支规则">
+          <el-input
+            v-model="sourceTriggerForm.refPattern"
+            placeholder="glob，例如 v* 或 release/*"
+          />
+        </el-form-item>
+        <el-form-item label="Artifact / Job">
+          <el-input
             v-model="sourceTriggerForm.artifactSelector"
-            :placeholder="sourceTriggerForm.eventType === 1 ? 'Release 附件文件名' : 'Artifact 或 Job 名称'"
-        /></el-form-item>
-        <el-form-item label="目标渠道 ID"
-          ><el-input v-model="sourceTriggerForm.channelIds" placeholder="多个渠道用逗号分隔"
-        /></el-form-item>
-        <el-form-item label="签名配置 ID"
-          ><el-input-number v-model="sourceTriggerForm.signingConfigId" :min="0" :controls="false"
-        /></el-form-item>
-        <el-form-item label="品牌配置 ID"
-          ><el-input-number v-model="sourceTriggerForm.brandingProfileId" :min="0" :controls="false"
-        /></el-form-item>
-        <el-form-item label="白标产品 ID"
-          ><el-input-number v-model="sourceTriggerForm.whiteLabelProductId" :min="0" :controls="false"
-        /></el-form-item>
+            :placeholder="
+              sourceTriggerForm.eventType === 1 ? 'Release 附件文件名' : 'Artifact 或 Job 名称'
+            "
+          />
+        </el-form-item>
+        <el-form-item label="目标渠道 ID">
+          <el-input
+            v-model="sourceTriggerForm.channelIds"
+            placeholder="多个渠道用逗号分隔"
+          />
+        </el-form-item>
+        <el-form-item label="签名配置 ID">
+          <el-input-number
+            v-model="sourceTriggerForm.signingConfigId"
+            :min="0"
+            :controls="false"
+          />
+        </el-form-item>
+        <el-form-item label="品牌配置 ID">
+          <el-input-number
+            v-model="sourceTriggerForm.brandingProfileId"
+            :min="0"
+            :controls="false"
+          />
+        </el-form-item>
+        <el-form-item label="白标产品 ID">
+          <el-input-number
+            v-model="sourceTriggerForm.whiteLabelProductId"
+            :min="0"
+            :controls="false"
+          />
+        </el-form-item>
         <el-form-item label="构建池 / 优先级">
           <el-input v-model="sourceTriggerForm.poolCode" style="width: 220px" />
           <el-input-number
@@ -1287,15 +1525,24 @@ onMounted(() => {
             style="margin-left: 12px"
           />
         </el-form-item>
-        <el-form-item label="版本名称前缀"
-          ><el-input v-model="sourceTriggerForm.versionNamePrefix" maxlength="32"
-        /></el-form-item>
-        <el-form-item v-if="sourceTriggerForm.id" label="状态"
-          ><el-radio-group v-model="sourceTriggerForm.status"
-            ><el-radio-button :value="1">启用</el-radio-button
-            ><el-radio-button :value="2">停用</el-radio-button></el-radio-group
-          ></el-form-item
+        <el-form-item label="版本名称前缀">
+          <el-input
+            v-model="sourceTriggerForm.versionNamePrefix"
+            maxlength="32"
+          />
+        </el-form-item>
+        <el-form-item
+          v-if="sourceTriggerForm.id"
+          label="状态"
         >
+          <el-radio-group v-model="sourceTriggerForm.status">
+            <el-radio-button :value="1">
+              启用
+            </el-radio-button><el-radio-button :value="2">
+              停用
+            </el-radio-button>
+          </el-radio-group>
+        </el-form-item>
       </el-form>
       <el-alert
         title="策略只能访问已授权仓库；回调仅接受签名正确、仓库匹配、Tag/分支匹配且 Artifact 选择器唯一命中的事件。"
@@ -1303,12 +1550,17 @@ onMounted(() => {
         :closable="false"
         show-icon
       />
-      <template #footer
-        ><el-button @click="sourceTriggerFormVisible = false">取消</el-button
-        ><el-button type="primary" :loading="sourceTriggerSaving" @click="saveSourceTrigger"
-          >保存</el-button
-        ></template
-      >
+      <template #footer>
+        <el-button @click="sourceTriggerFormVisible = false">
+          取消
+        </el-button><el-button
+          type="primary"
+          :loading="sourceTriggerSaving"
+          @click="saveSourceTrigger"
+        >
+          保存
+        </el-button>
+      </template>
     </el-dialog>
 
     <el-dialog v-model="sourceTriggerSecretVisible" title="源码 Webhook 一次性配置" width="720px">
@@ -1319,51 +1571,84 @@ onMounted(() => {
         show-icon
       />
       <el-form label-width="120px" class="secret-form">
-        <el-form-item label="Payload URL"
-          ><el-input :model-value="sourceTriggerWebhookUrl" readonly
-        /></el-form-item>
-        <el-form-item label="Signing Secret"
-          ><el-input :model-value="sourceTriggerSigningSecret" readonly type="password" show-password
-        /></el-form-item>
+        <el-form-item label="Payload URL">
+          <el-input
+            :model-value="sourceTriggerWebhookUrl"
+            readonly
+          />
+        </el-form-item>
+        <el-form-item label="Signing Secret">
+          <el-input
+            :model-value="sourceTriggerSigningSecret"
+            readonly
+            type="password"
+            show-password
+          />
+        </el-form-item>
       </el-form>
-      <template #footer
-        ><el-button
-          type="primary"
-          @click="copySourceTriggerSecret"
-          >复制配置</el-button
-        ><el-button @click="sourceTriggerSecretVisible = false">我已保存</el-button></template
-      >
+      <template #footer>
+        <el-button type="primary" @click="copySourceTriggerSecret">
+          复制配置
+        </el-button><el-button @click="sourceTriggerSecretVisible = false">
+          我已保存
+        </el-button>
+      </template>
     </el-dialog>
 
     <el-dialog v-model="artifactImportVisible" title="从授权仓库导入 APK Artifact" width="680px">
       <el-form :model="artifactImportForm" label-width="140px">
-        <el-form-item label="应用 ID"
-          ><el-input-number v-model="artifactImportForm.appId" :min="1" :controls="false"
-        /></el-form-item>
-        <el-form-item label="授权仓库 ID"
-          ><el-input-number v-model="artifactImportForm.repositoryId" :min="1" :controls="false"
-        /></el-form-item>
-        <el-form-item label="Artifact 来源"
-          ><el-radio-group v-model="artifactImportForm.artifactSource"
-            ><el-radio-button :value="1">Release</el-radio-button
-            ><el-radio-button :value="2">CI Job</el-radio-button></el-radio-group
-          ></el-form-item
+        <el-form-item label="应用 ID">
+          <el-input-number
+            v-model="artifactImportForm.appId"
+            :min="1"
+            :controls="false"
+          />
+        </el-form-item>
+        <el-form-item label="授权仓库 ID">
+          <el-input-number
+            v-model="artifactImportForm.repositoryId"
+            :min="1"
+            :controls="false"
+          />
+        </el-form-item>
+        <el-form-item label="Artifact 来源">
+          <el-radio-group v-model="artifactImportForm.artifactSource">
+            <el-radio-button :value="1">
+              Release
+            </el-radio-button><el-radio-button :value="2">
+              CI Job
+            </el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="供应商 Artifact ID">
+          <el-input v-model="artifactImportForm.externalArtifactId" />
+        </el-form-item>
+        <el-form-item
+          v-if="artifactImportForm.artifactSource === 1"
+          label="Release Tag"
         >
-        <el-form-item label="供应商 Artifact ID"
-          ><el-input v-model="artifactImportForm.externalArtifactId"
-        /></el-form-item>
-        <el-form-item v-if="artifactImportForm.artifactSource === 1" label="Release Tag"
-          ><el-input v-model="artifactImportForm.releaseRef" placeholder="例如 v1.2.0"
-        /></el-form-item>
-        <el-form-item label="versionCode"
-          ><el-input-number v-model="artifactImportForm.versionCode" :min="1" :controls="false"
-        /></el-form-item>
-        <el-form-item label="versionName"
-          ><el-input v-model="artifactImportForm.versionName"
-        /></el-form-item>
-        <el-form-item label="发布说明"
-          ><el-input v-model="artifactImportForm.releaseNotes" type="textarea" :rows="3"
-        /></el-form-item>
+          <el-input
+            v-model="artifactImportForm.releaseRef"
+            placeholder="例如 v1.2.0"
+          />
+        </el-form-item>
+        <el-form-item label="versionCode">
+          <el-input-number
+            v-model="artifactImportForm.versionCode"
+            :min="1"
+            :controls="false"
+          />
+        </el-form-item>
+        <el-form-item label="versionName">
+          <el-input v-model="artifactImportForm.versionName" />
+        </el-form-item>
+        <el-form-item label="发布说明">
+          <el-input
+            v-model="artifactImportForm.releaseNotes"
+            type="textarea"
+            :rows="3"
+          />
+        </el-form-item>
       </el-form>
       <el-alert
         title="仅拉取供应商 Release/CI Artifact，不执行仓库脚本；ZIP 必须且只能包含一个 APK。"
@@ -1371,19 +1656,27 @@ onMounted(() => {
         :closable="false"
         show-icon
       />
-      <template #footer
-        ><el-button @click="artifactImportVisible = false">取消</el-button
-        ><el-button type="primary" :loading="artifactImportSaving" @click="importSourceArtifact"
-          >导入并创建版本</el-button
-        ></template
-      >
+      <template #footer>
+        <el-button @click="artifactImportVisible = false">
+          取消
+        </el-button><el-button
+          type="primary"
+          :loading="artifactImportSaving"
+          @click="importSourceArtifact"
+        >
+          导入并创建版本
+        </el-button>
+      </template>
     </el-dialog>
 
     <el-dialog v-model="formVisible" title="创建 API Key" width="620px">
       <el-form :model="form" label-width="130px">
-        <el-form-item label="名称"
-          ><el-input v-model="form.credentialName" maxlength="128"
-        /></el-form-item>
+        <el-form-item label="名称">
+          <el-input
+            v-model="form.credentialName"
+            maxlength="128"
+          />
+        </el-form-item>
         <el-form-item label="Scopes">
           <el-select v-model="form.scopes" multiple style="width: 100%">
             <el-option
@@ -1393,11 +1686,16 @@ onMounted(() => {
               :label="item[1]"
             />
           </el-select>
-          <div class="form-hint">{{ selectedScopeText }}</div>
+          <div class="form-hint">
+            {{ selectedScopeText }}
+          </div>
         </el-form-item>
-        <el-form-item label="应用 ID"
-          ><el-input v-model="form.appIds" placeholder="留空表示全部；多个用逗号分隔"
-        /></el-form-item>
+        <el-form-item label="应用 ID">
+          <el-input
+            v-model="form.appIds"
+            placeholder="留空表示全部；多个用逗号分隔"
+          />
+        </el-form-item>
         <el-form-item label="IP 白名单">
           <el-input
             v-model="form.ipAllowlist"
@@ -1406,19 +1704,26 @@ onMounted(() => {
             placeholder="留空不限制；每行一个 IP 或 CIDR"
           />
         </el-form-item>
-        <el-form-item label="每分钟上限"
-          ><el-input-number v-model="form.rateLimitPerMinute" :min="1" :max="10000"
-        /></el-form-item>
-        <el-form-item label="有效天数"
-          ><el-input-number v-model="form.expiresInDays" :min="0" :max="3650" /><span
+        <el-form-item label="每分钟上限">
+          <el-input-number
+            v-model="form.rateLimitPerMinute"
+            :min="1"
+            :max="10000"
+          />
+        </el-form-item>
+        <el-form-item label="有效天数">
+          <el-input-number v-model="form.expiresInDays" :min="0" :max="3650" /><span
             class="form-hint"
-            >0 表示长期有效</span
-          ></el-form-item
-        >
+          >0 表示长期有效</span>
+        </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="formVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saving" @click="createCredential">创建</el-button>
+        <el-button @click="formVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" :loading="saving" @click="createCredential">
+          创建
+        </el-button>
       </template>
     </el-dialog>
 
@@ -1436,7 +1741,9 @@ onMounted(() => {
             v-model="webhookForm.endpointUrl"
             placeholder="https://example.com/appforge/webhook"
           />
-          <div class="form-hint">禁止内网、环回、云元数据地址和重定向。</div>
+          <div class="form-hint">
+            禁止内网、环回、云元数据地址和重定向。
+          </div>
         </el-form-item>
         <el-form-item label="订阅事件">
           <el-select v-model="webhookForm.eventTypes" multiple style="width: 100%">
@@ -1453,15 +1760,25 @@ onMounted(() => {
         </el-form-item>
         <el-form-item v-if="webhookForm.id" label="状态">
           <el-radio-group v-model="webhookForm.status">
-            <el-radio-button :value="1">启用</el-radio-button>
-            <el-radio-button :value="2">暂停</el-radio-button>
-            <el-radio-button :value="3">吊销</el-radio-button>
+            <el-radio-button :value="1">
+              启用
+            </el-radio-button>
+            <el-radio-button :value="2">
+              暂停
+            </el-radio-button>
+            <el-radio-button :value="3">
+              吊销
+            </el-radio-button>
           </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="webhookFormVisible = false">取消</el-button>
-        <el-button type="primary" :loading="webhookSaving" @click="saveWebhook">保存</el-button>
+        <el-button @click="webhookFormVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" :loading="webhookSaving" @click="saveWebhook">
+          保存
+        </el-button>
       </template>
     </el-dialog>
 
@@ -1478,10 +1795,16 @@ onMounted(() => {
         show-icon
       />
       <el-input v-model="oneTimeWebhookSecret" readonly class="secret-value">
-        <template #append><el-button @click="copyWebhookSecret">复制</el-button></template>
+        <template #append>
+          <el-button @click="copyWebhookSecret">
+            复制
+          </el-button>
+        </template>
       </el-input>
       <template #footer>
-        <el-button type="primary" @click="webhookSecretVisible = false">我已安全保存</el-button>
+        <el-button type="primary" @click="webhookSecretVisible = false">
+          我已安全保存
+        </el-button>
       </template>
     </el-dialog>
 
@@ -1498,11 +1821,17 @@ onMounted(() => {
         show-icon
       />
       <el-input v-model="oneTimeApiKey" readonly class="secret-value">
-        <template #append><el-button @click="copySecret">复制</el-button></template>
+        <template #append>
+          <el-button @click="copySecret">
+            复制
+          </el-button>
+        </template>
       </el-input>
-      <template #footer
-        ><el-button type="primary" @click="secretVisible = false">我已安全保存</el-button></template
-      >
+      <template #footer>
+        <el-button type="primary" @click="secretVisible = false">
+          我已安全保存
+        </el-button>
+      </template>
     </el-dialog>
   </div>
 </template>

@@ -175,22 +175,36 @@ onMounted(loadData)
   <div class="module-page">
     <el-card shadow="never" class="query-card">
       <el-form inline>
-        <el-form-item label="应用 ID"
-          ><el-input-number v-model="query.appId" :min="0"
-        /></el-form-item>
-        <el-form-item label="关键词"><el-input v-model="query.keyword" clearable /></el-form-item>
-        <el-form-item label="状态"
-          ><el-select v-model="query.status" style="width: 130px"
-            ><el-option label="全部" :value="0" /><el-option label="草稿" :value="1" /><el-option
+        <el-form-item label="应用 ID">
+          <el-input-number
+            v-model="query.appId"
+            :min="0"
+          />
+        </el-form-item>
+        <el-form-item label="关键词">
+          <el-input v-model="query.keyword" clearable />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select
+            v-model="query.status"
+            style="width: 130px"
+          >
+            <el-option label="全部" :value="0" /><el-option label="草稿" :value="1" /><el-option
               label="启用"
-              :value="2" /><el-option label="停用" :value="3" /></el-select
-        ></el-form-item>
-        <el-form-item
-          ><el-button type="primary" @click="resetAndLoad(loadData)">查询</el-button
-          ><el-button v-perm="'core:white-label-product:add'" @click="openForm()"
-            >新增</el-button
-          ></el-form-item
-        >
+              :value="2"
+            /><el-option label="停用" :value="3" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="resetAndLoad(loadData)">
+            查询
+          </el-button><el-button
+            v-perm="'core:white-label-product:add'"
+            @click="openForm()"
+          >
+            新增
+          </el-button>
+        </el-form-item>
       </el-form>
     </el-card>
 
@@ -204,9 +218,14 @@ onMounted(loadData)
         <el-table-column prop="templateRevision" label="模板修订" width="100" />
         <el-table-column prop="brandingProfileId" label="品牌 ID" width="100" />
         <el-table-column prop="signingConfigId" label="签名 ID" width="100" />
-        <el-table-column label="状态" width="90"
-          ><template #default="scope">{{ statusText(scope.row.status) }}</template></el-table-column
+        <el-table-column
+          label="状态"
+          width="90"
         >
+          <template #default="scope">
+            {{ statusText(scope.row.status) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="290" fixed="right">
           <template #default="scope">
             <el-button
@@ -215,29 +234,33 @@ onMounted(loadData)
               link
               type="primary"
               @click="openForm(scope.row)"
-              >编辑</el-button
             >
+              编辑
+            </el-button>
             <el-button
               v-perm="'core:white-label-product:preflight'"
               link
               type="success"
               @click="preflight(scope.row)"
-              >预检</el-button
             >
+              预检
+            </el-button>
             <el-button
               v-perm="'core:white-label-product:status'"
               link
               @click="changeStatus(scope.row)"
-              >{{ scope.row.status === 2 ? '停用' : '启用' }}</el-button
             >
+              {{ scope.row.status === 2 ? '停用' : '启用' }}
+            </el-button>
             <el-button
               v-if="scope.row.status !== 2"
               v-perm="'core:white-label-product:delete'"
               link
               type="danger"
               @click="deleteProduct(scope.row)"
-              >删除</el-button
             >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -253,7 +276,12 @@ onMounted(loadData)
     </el-card>
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="780px">
-      <el-steps :active="formStep" finish-status="success" simple class="product-steps">
+      <el-steps
+        :active="formStep"
+        finish-status="success"
+        simple
+        class="product-steps"
+      >
         <el-step title="产品信息" />
         <el-step title="模板与品牌" />
         <el-step title="签名与参数" />
@@ -264,39 +292,49 @@ onMounted(loadData)
             label="应用 ID"
             prop="appId"
             :rules="[{ required: true, message: '请输入应用 ID' }]"
-            ><el-input-number
+          >
+            <el-input-number
               v-model="form.appId"
               :min="1"
               :disabled="Boolean(editingId)"
               style="width: 100%"
-          /></el-form-item>
-          <el-form-item
-            ><el-button link type="primary" @click="loadDependencyOptions"
-              >按应用 ID 加载模板、品牌和签名选项</el-button
-            ></el-form-item
-          >
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              link
+              type="primary"
+              @click="loadDependencyOptions"
+            >
+              按应用 ID 加载模板、品牌和签名选项
+            </el-button>
+          </el-form-item>
           <el-form-item
             label="产品编码"
             prop="productCode"
             :rules="[{ required: true, message: '请输入产品编码' }]"
-            ><el-input
+          >
+            <el-input
               v-model="form.productCode"
               :disabled="Boolean(editingId)"
               placeholder="lowercase-product-code"
-          /></el-form-item>
+            />
+          </el-form-item>
           <el-form-item
             label="产品名称"
             prop="productName"
             :rules="[{ required: true, message: '请输入产品名称' }]"
-            ><el-input v-model="form.productName"
-          /></el-form-item>
+          >
+            <el-input v-model="form.productName" />
+          </el-form-item>
         </template>
         <template v-else-if="formStep === 1">
           <el-form-item
             label="模板 ID"
             prop="templateId"
             :rules="[{ required: true, message: '请输入模板 ID' }]"
-            ><el-select
+          >
+            <el-select
               v-model="form.templateId"
               filterable
               style="width: 100%"
@@ -307,55 +345,73 @@ onMounted(loadData)
                 :key="item.id"
                 :label="`${item.templateName} · r${item.publishedRevision}`"
                 :value="item.id"
-              /> </el-select
-          ></el-form-item>
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item
             label="模板修订"
             prop="templateRevision"
             :rules="[{ required: true, message: '请输入模板修订' }]"
-            ><el-input-number v-model="form.templateRevision" :min="1" style="width: 100%"
-          /></el-form-item>
+          >
+            <el-input-number
+              v-model="form.templateRevision"
+              :min="1"
+              style="width: 100%"
+            />
+          </el-form-item>
           <el-form-item
             label="品牌配置 ID"
             prop="brandingProfileId"
             :rules="[{ required: true, message: '请输入品牌配置 ID' }]"
-            ><el-select v-model="form.brandingProfileId" filterable style="width: 100%">
+          >
+            <el-select v-model="form.brandingProfileId" filterable style="width: 100%">
               <el-option
                 v-for="item in brandingOptions"
                 :key="item.id"
                 :label="`${item.profileName} · r${item.revision}`"
                 :value="item.id"
-              /> </el-select
-          ></el-form-item>
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item
             label="Package Name"
             prop="packageName"
             :rules="[{ required: true, message: '请输入 Android applicationId' }]"
-            ><el-input v-model="form.packageName" placeholder="com.customer.product"
-          /></el-form-item>
+          >
+            <el-input
+              v-model="form.packageName"
+              placeholder="com.customer.product"
+            />
+          </el-form-item>
         </template>
         <template v-else>
           <el-form-item
             label="签名配置 ID"
             prop="signingConfigId"
             :rules="[{ required: true, message: '请输入签名配置 ID' }]"
-            ><el-select v-model="form.signingConfigId" filterable style="width: 100%">
+          >
+            <el-select v-model="form.signingConfigId" filterable style="width: 100%">
               <el-option
                 v-for="item in signingOptions"
                 :key="item.id"
                 :label="`${item.name} · ${item.certificateSha256?.slice(0, 12) || '未验证'}`"
                 :value="item.id"
-              /> </el-select
-          ></el-form-item>
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item label="证书 SHA-256">
             <el-input
               :model-value="selectedSigning?.certificateSha256 || '未验证，不能启用产品'"
               readonly
             />
           </el-form-item>
-          <el-form-item label="参数值 JSON"
-            ><el-input v-model="form.parameterValuesJson" type="textarea" :rows="6"
-          /></el-form-item>
+          <el-form-item label="参数值 JSON">
+            <el-input
+              v-model="form.parameterValuesJson"
+              type="textarea"
+              :rows="6"
+            />
+          </el-form-item>
         </template>
       </el-form>
       <el-alert
@@ -363,14 +419,22 @@ onMounted(loadData)
         type="warning"
         :closable="false"
       />
-      <template #footer
-        ><el-button @click="dialogVisible = false">取消</el-button
-        ><el-button v-if="formStep > 0" @click="formStep--">上一步</el-button
-        ><el-button v-if="formStep < 2" type="primary" @click="formStep++">下一步</el-button
-        ><el-button v-else type="primary" :loading="submitting" @click="submit"
-          >保存</el-button
-        ></template
-      >
+      <template #footer>
+        <el-button @click="dialogVisible = false">
+          取消
+        </el-button><el-button v-if="formStep > 0" @click="formStep--">
+          上一步
+        </el-button><el-button v-if="formStep < 2" type="primary" @click="formStep++">
+          下一步
+        </el-button><el-button
+          v-else
+          type="primary"
+          :loading="submitting"
+          @click="submit"
+        >
+          保存
+        </el-button>
+      </template>
     </el-dialog>
 
     <el-dialog v-model="reportVisible" title="白标产品预检报告" width="760px">

@@ -34,27 +34,45 @@ async function loadStats() {
   <div class="module-page">
     <el-card shadow="never" class="query-card">
       <el-form inline>
-        <el-form-item label="应用 ID"
-          ><el-input-number v-model="query.appId" :min="1"
-        /></el-form-item>
-        <el-form-item label="渠道 ID"
-          ><el-input-number v-model="query.channelId" :min="1"
-        /></el-form-item>
-        <el-form-item label="开始时间戳"
-          ><el-input-number v-model="query.startTime" :min="0"
-        /></el-form-item>
-        <el-form-item label="结束时间戳"
-          ><el-input-number v-model="query.endTime" :min="0"
-        /></el-form-item>
-        <el-form-item
-          ><el-button type="primary" :loading="loading" @click="loadStats"
-            >查询</el-button
-          ></el-form-item
-        >
+        <el-form-item label="应用 ID">
+          <el-input-number
+            v-model="query.appId"
+            :min="1"
+          />
+        </el-form-item>
+        <el-form-item label="渠道 ID">
+          <el-input-number
+            v-model="query.channelId"
+            :min="1"
+          />
+        </el-form-item>
+        <el-form-item label="开始时间戳">
+          <el-input-number
+            v-model="query.startTime"
+            :min="0"
+          />
+        </el-form-item>
+        <el-form-item label="结束时间戳">
+          <el-input-number
+            v-model="query.endTime"
+            :min="0"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            :loading="loading"
+            @click="loadStats"
+          >
+            查询
+          </el-button>
+        </el-form-item>
       </el-form>
     </el-card>
     <el-card v-if="stats" shadow="never">
-      <template #header>渠道转化统计：{{ stats.channelCode }}</template>
+      <template #header>
+        渠道转化统计：{{ stats.channelCode }}
+      </template>
       <el-row :gutter="16">
         <el-col
           v-for="item in [

@@ -513,7 +513,12 @@ onMounted(async () => {
           </template>
         </el-table-column>
 
-        <el-table-column :label="t('common.actions')" align="center" width="90" fixed="right">
+        <el-table-column
+          :label="t('common.actions')"
+          align="center"
+          width="90"
+          fixed="right"
+        >
           <template #default="{ row }">
             <el-dropdown trigger="click">
               <el-button size="small">
@@ -627,7 +632,12 @@ onMounted(async () => {
             :loading="roleLoading"
             :no-data-text="t('common.noData')"
           >
-            <el-option v-for="r in selectableRoles" :key="r.id" :label="r.name" :value="r.id" />
+            <el-option
+              v-for="r in selectableRoles"
+              :key="r.id"
+              :label="r.name"
+              :value="r.id"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -685,7 +695,12 @@ onMounted(async () => {
             style="width: 100%"
             :loading="roleLoading"
           >
-            <el-option v-for="r in roles" :key="r.id" :label="r.name" :value="r.id" />
+            <el-option
+              v-for="r in roles"
+              :key="r.id"
+              :label="r.name"
+              :value="r.id"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -785,7 +800,7 @@ onMounted(async () => {
               min-height: 240px;
             "
           >
-            <img v-if="g2Init.qrCode" :src="g2Init.qrCode" style="width: 100%; height: auto" />
+            <img v-if="g2Init.qrCode" :src="g2Init.qrCode" style="width: 100%; height: auto">
             <div v-else style="color: #999">
               {{ t('common.click2faBindGenerateQrCode') }}
             </div>

@@ -32,7 +32,7 @@ const form = reactive({
 const registerCommand = computed(
   () =>
     `appforge-local-agent register --control-url ${window.location.origin} ` +
-    `--gateway-url https://<control-plane-host>:9443 --gateway-ca /path/to/gateway-ca.crt ` +
+    '--gateway-url https://<control-plane-host>:9443 --gateway-ca /path/to/gateway-ca.crt ' +
     `--token ${registrationToken.value}`,
 )
 
@@ -195,8 +195,12 @@ onMounted(async () => {
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="resetAndLoad(loadAgents)">查询</el-button>
-          <el-button @click="openCreate">新增节点</el-button>
+          <el-button type="primary" @click="resetAndLoad(loadAgents)">
+            查询
+          </el-button>
+          <el-button @click="openCreate">
+            新增节点
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -208,43 +212,65 @@ onMounted(async () => {
         <el-table-column prop="poolCode" label="构建池" width="110" />
         <el-table-column label="状态" width="105">
           <template #default="{ row }">
-            <el-tag :type="statusLabels[row.status]?.type || 'info'">{{
-              statusLabels[row.status]?.label || row.status
-            }}</el-tag>
+            <el-tag :type="statusLabels[row.status]?.type || 'info'">
+              {{
+                statusLabels[row.status]?.label || row.status
+              }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="接单" width="90">
-          <template #default="{ row }">{{
-            drainLabels[row.drainStatus] || row.drainStatus
-          }}</template>
+          <template #default="{ row }">
+            {{
+              drainLabels[row.drainStatus] || row.drainStatus
+            }}
+          </template>
         </el-table-column>
         <el-table-column label="产物模式" min-width="130">
-          <template #default="{ row }">{{
-            artifactLabels[row.artifactMode] || row.artifactMode
-          }}</template>
+          <template #default="{ row }">
+            {{
+              artifactLabels[row.artifactMode] || row.artifactMode
+            }}
+          </template>
         </el-table-column>
         <el-table-column label="授权应用" min-width="150">
-          <template #default="{ row }">{{ row.allowedAppIds.join(', ') || '-' }}</template>
+          <template #default="{ row }">
+            {{ row.allowedAppIds.join(', ') || '-' }}
+          </template>
         </el-table-column>
         <el-table-column label="版本 / 协议" min-width="135">
-          <template #default="{ row }"
-            >{{ row.agentVersion || '-' }} / {{ row.protocolVersion }}</template
-          >
+          <template #default="{ row }">
+            {{ row.agentVersion || '-' }} / {{ row.protocolVersion }}
+          </template>
         </el-table-column>
         <el-table-column label="证书到期" min-width="180">
-          <template #default="{ row }">{{ formatTime(row.certificateNotAfter) }}</template>
+          <template #default="{ row }">
+            {{ formatTime(row.certificateNotAfter) }}
+          </template>
         </el-table-column>
         <el-table-column label="最近心跳" min-width="180">
-          <template #default="{ row }">{{ formatTime(row.lastHeartbeatAt) }}</template>
+          <template #default="{ row }">
+            {{ formatTime(row.lastHeartbeatAt) }}
+          </template>
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button v-if="row.status !== 4" link type="primary" @click="changeDrain(row)">
+            <el-button
+              v-if="row.status !== 4"
+              link
+              type="primary"
+              @click="changeDrain(row)"
+            >
               {{ row.drainStatus === 1 ? '排空' : '恢复' }}
             </el-button>
-            <el-button v-if="row.status !== 4" link type="danger" @click="revoke(row)"
-              >吊销</el-button
+            <el-button
+              v-if="row.status !== 4"
+              link
+              type="danger"
+              @click="revoke(row)"
             >
+              吊销
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -261,18 +287,35 @@ onMounted(async () => {
 
     <el-dialog v-model="createVisible" title="新增本地构建节点" width="620px">
       <el-form :model="form" label-width="130px">
-        <el-form-item v-if="!IS_AGENT" label="租户 ID"
-          ><el-input-number v-model="form.tenantId" :min="0" style="width: 100%"
-        /></el-form-item>
-        <el-form-item label="节点编码"
-          ><el-input v-model="form.agentCode" maxlength="64" placeholder="例如 shenzhen-builder-01"
-        /></el-form-item>
-        <el-form-item label="节点名称"
-          ><el-input v-model="form.agentName" maxlength="128"
-        /></el-form-item>
-        <el-form-item label="构建池"
-          ><el-input v-model="form.poolCode" maxlength="64"
-        /></el-form-item>
+        <el-form-item
+          v-if="!IS_AGENT"
+          label="租户 ID"
+        >
+          <el-input-number
+            v-model="form.tenantId"
+            :min="0"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="节点编码">
+          <el-input
+            v-model="form.agentCode"
+            maxlength="64"
+            placeholder="例如 shenzhen-builder-01"
+          />
+        </el-form-item>
+        <el-form-item label="节点名称">
+          <el-input
+            v-model="form.agentName"
+            maxlength="128"
+          />
+        </el-form-item>
+        <el-form-item label="构建池">
+          <el-input
+            v-model="form.poolCode"
+            maxlength="64"
+          />
+        </el-form-item>
         <el-form-item label="产物模式">
           <el-select v-model="form.artifactMode" style="width: 100%">
             <el-option :value="1" label="控制面私有对象存储" />
@@ -288,7 +331,12 @@ onMounted(async () => {
           />
         </el-form-item>
         <el-form-item label="授权应用">
-          <el-select v-model="form.allowedAppIds" multiple filterable style="width: 100%">
+          <el-select
+            v-model="form.allowedAppIds"
+            multiple
+            filterable
+            style="width: 100%"
+          >
             <el-option
               v-for="app in applications"
               :key="app.id"
@@ -297,23 +345,34 @@ onMounted(async () => {
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="最大并发"
-          ><el-input-number v-model="form.maxConcurrency" :min="1" :max="64" style="width: 100%"
-        /></el-form-item>
-        <el-form-item label="令牌有效期"
-          ><el-input-number
+        <el-form-item label="最大并发">
+          <el-input-number
+            v-model="form.maxConcurrency"
+            :min="1"
+            :max="64"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="令牌有效期">
+          <el-input-number
             v-model="form.expiresSeconds"
             :min="60"
             :max="86400"
             style="width: 100%"
-          /><span class="field-hint">秒，仅可使用一次</span></el-form-item
-        >
+          /><span class="field-hint">秒，仅可使用一次</span>
+        </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="createVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saving" @click="createRegistration"
-          >生成注册令牌</el-button
+        <el-button @click="createVisible = false">
+          取消
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="saving"
+          @click="createRegistration"
         >
+          生成注册令牌
+        </el-button>
       </template>
     </el-dialog>
 
@@ -331,16 +390,26 @@ onMounted(async () => {
       />
       <p>有效期至：{{ formatTime(registrationExpiresAt) }}</p>
       <el-input :model-value="registrationToken" readonly>
-        <template #append
-          ><el-button @click="copyText(registrationToken)">复制令牌</el-button></template
-        >
+        <template #append>
+          <el-button @click="copyText(registrationToken)">
+            复制令牌
+          </el-button>
+        </template>
       </el-input>
       <p>注册命令（请替换网关地址和网关 CA 路径）：</p>
-      <el-input :model-value="registerCommand" type="textarea" :rows="4" readonly />
-      <template #footer
-        ><el-button type="primary" @click="copyText(registerCommand)">复制命令</el-button
-        ><el-button @click="tokenVisible = false">我已保存</el-button></template
-      >
+      <el-input
+        :model-value="registerCommand"
+        type="textarea"
+        :rows="4"
+        readonly
+      />
+      <template #footer>
+        <el-button type="primary" @click="copyText(registerCommand)">
+          复制命令
+        </el-button><el-button @click="tokenVisible = false">
+          我已保存
+        </el-button>
+      </template>
     </el-dialog>
   </div>
 </template>

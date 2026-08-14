@@ -61,6 +61,7 @@
       "goctl",
       "gofmt",
       "healthcheck",
+      "httpx",
       "JCEKS",
       "keytool",
       "logicutil",
