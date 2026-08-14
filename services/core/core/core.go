@@ -14,63 +14,107 @@ import (
 )
 
 type (
-	Application                    = core.Application
-	ApplicationIdReq               = core.ApplicationIdReq
-	ApplicationListReq             = core.ApplicationListReq
-	ApplicationListResp            = core.ApplicationListResp
-	ApplicationResp                = core.ApplicationResp
-	BuildExecutionContext          = core.BuildExecutionContext
-	BuildExecutionContextResp      = core.BuildExecutionContextResp
-	BuildTask                      = core.BuildTask
-	BuildTaskIdReq                 = core.BuildTaskIdReq
-	BuildTaskListReq               = core.BuildTaskListReq
-	BuildTaskListResp              = core.BuildTaskListResp
-	BuildTaskResp                  = core.BuildTaskResp
-	Channel                        = core.Channel
-	ChannelDownloadArtifact        = core.ChannelDownloadArtifact
-	ChannelDownloadArtifactResp    = core.ChannelDownloadArtifactResp
-	ChannelIdReq                   = core.ChannelIdReq
-	ChannelListReq                 = core.ChannelListReq
-	ChannelListResp                = core.ChannelListResp
-	ChannelResp                    = core.ChannelResp
-	ChannelStats                   = core.ChannelStats
-	ChannelStatsReq                = core.ChannelStatsReq
-	ChannelStatsResp               = core.ChannelStatsResp
-	ClaimBuildTaskReq              = core.ClaimBuildTaskReq
-	ClaimExpiredStorageObjectsReq  = core.ClaimExpiredStorageObjectsReq
-	ClaimExpiredStorageObjectsResp = core.ClaimExpiredStorageObjectsResp
-	CompleteBuildTaskReq           = core.CompleteBuildTaskReq
-	CompleteStorageObjectReq       = core.CompleteStorageObjectReq
-	CreateApplicationReq           = core.CreateApplicationReq
-	CreateBuildTaskReq             = core.CreateBuildTaskReq
-	CreateChannelReq               = core.CreateChannelReq
-	CreateSigningConfigReq         = core.CreateSigningConfigReq
-	CreateStorageObjectReq         = core.CreateStorageObjectReq
-	CreateVersionReq               = core.CreateVersionReq
-	ExpiredStorageObject           = core.ExpiredStorageObject
-	FailBuildTaskReq               = core.FailBuildTaskReq
-	FailStorageObjectReq           = core.FailStorageObjectReq
-	GetBuildExecutionContextReq    = core.GetBuildExecutionContextReq
-	HeartbeatBuildTaskReq          = core.HeartbeatBuildTaskReq
-	InstallReportReq               = core.InstallReportReq
-	MarkStorageObjectDeletedReq    = core.MarkStorageObjectDeletedReq
-	ReportBuildProgressReq         = core.ReportBuildProgressReq
-	ReportChannelEventReq          = core.ReportChannelEventReq
-	ResolveChannelDownloadReq      = core.ResolveChannelDownloadReq
-	RespBase                       = core.RespBase
-	SigningConfig                  = core.SigningConfig
-	SigningConfigIdReq             = core.SigningConfigIdReq
-	SigningConfigListReq           = core.SigningConfigListReq
-	SigningConfigListResp          = core.SigningConfigListResp
-	SigningConfigResp              = core.SigningConfigResp
-	StorageObject                  = core.StorageObject
-	StorageObjectIdReq             = core.StorageObjectIdReq
-	StorageObjectResp              = core.StorageObjectResp
-	Version                        = core.Version
-	VersionIdReq                   = core.VersionIdReq
-	VersionListReq                 = core.VersionListReq
-	VersionListResp                = core.VersionListResp
-	VersionResp                    = core.VersionResp
+	Application                           = core.Application
+	ApplicationIdReq                      = core.ApplicationIdReq
+	ApplicationListReq                    = core.ApplicationListReq
+	ApplicationListResp                   = core.ApplicationListResp
+	ApplicationResp                       = core.ApplicationResp
+	BrandingPreflight                     = core.BrandingPreflight
+	BrandingPreflightExecutionContext     = core.BrandingPreflightExecutionContext
+	BrandingPreflightExecutionContextResp = core.BrandingPreflightExecutionContextResp
+	BrandingPreflightIdReq                = core.BrandingPreflightIdReq
+	BrandingPreflightListReq              = core.BrandingPreflightListReq
+	BrandingPreflightListResp             = core.BrandingPreflightListResp
+	BrandingPreflightResp                 = core.BrandingPreflightResp
+	BrandingProfile                       = core.BrandingProfile
+	BrandingProfileIdReq                  = core.BrandingProfileIdReq
+	BrandingProfileListReq                = core.BrandingProfileListReq
+	BrandingProfileListResp               = core.BrandingProfileListResp
+	BrandingProfileResp                   = core.BrandingProfileResp
+	BuildExecutionContext                 = core.BuildExecutionContext
+	BuildExecutionContextResp             = core.BuildExecutionContextResp
+	BuildTask                             = core.BuildTask
+	BuildTaskIdReq                        = core.BuildTaskIdReq
+	BuildTaskListReq                      = core.BuildTaskListReq
+	BuildTaskListResp                     = core.BuildTaskListResp
+	BuildTaskResp                         = core.BuildTaskResp
+	ChangeBrandingProfileStatusReq        = core.ChangeBrandingProfileStatusReq
+	ChangeWhiteLabelProductStatusReq      = core.ChangeWhiteLabelProductStatusReq
+	ChangeWhiteLabelTemplateStatusReq     = core.ChangeWhiteLabelTemplateStatusReq
+	Channel                               = core.Channel
+	ChannelDownloadArtifact               = core.ChannelDownloadArtifact
+	ChannelDownloadArtifactResp           = core.ChannelDownloadArtifactResp
+	ChannelIdReq                          = core.ChannelIdReq
+	ChannelListReq                        = core.ChannelListReq
+	ChannelListResp                       = core.ChannelListResp
+	ChannelResp                           = core.ChannelResp
+	ChannelStats                          = core.ChannelStats
+	ChannelStatsReq                       = core.ChannelStatsReq
+	ChannelStatsResp                      = core.ChannelStatsResp
+	ClaimBrandingPreflightReq             = core.ClaimBrandingPreflightReq
+	ClaimBuildTaskReq                     = core.ClaimBuildTaskReq
+	ClaimExpiredStorageObjectsReq         = core.ClaimExpiredStorageObjectsReq
+	ClaimExpiredStorageObjectsResp        = core.ClaimExpiredStorageObjectsResp
+	CompleteBrandingPreflightReq          = core.CompleteBrandingPreflightReq
+	CompleteBuildTaskReq                  = core.CompleteBuildTaskReq
+	CompleteStorageObjectReq              = core.CompleteStorageObjectReq
+	CopyWhiteLabelTemplateReq             = core.CopyWhiteLabelTemplateReq
+	CreateApplicationReq                  = core.CreateApplicationReq
+	CreateBrandingPreflightReq            = core.CreateBrandingPreflightReq
+	CreateBrandingProfileReq              = core.CreateBrandingProfileReq
+	CreateBuildTaskReq                    = core.CreateBuildTaskReq
+	CreateChannelReq                      = core.CreateChannelReq
+	CreateSigningConfigReq                = core.CreateSigningConfigReq
+	CreateStorageObjectReq                = core.CreateStorageObjectReq
+	CreateVersionReq                      = core.CreateVersionReq
+	CreateWhiteLabelProductReq            = core.CreateWhiteLabelProductReq
+	CreateWhiteLabelTemplateReq           = core.CreateWhiteLabelTemplateReq
+	CreateWhiteLabelTemplateRevisionReq   = core.CreateWhiteLabelTemplateRevisionReq
+	ExpiredStorageObject                  = core.ExpiredStorageObject
+	FailBuildTaskReq                      = core.FailBuildTaskReq
+	FailStorageObjectReq                  = core.FailStorageObjectReq
+	GetBuildExecutionContextReq           = core.GetBuildExecutionContextReq
+	HeartbeatBuildTaskReq                 = core.HeartbeatBuildTaskReq
+	InstallReportReq                      = core.InstallReportReq
+	MarkStorageObjectDeletedReq           = core.MarkStorageObjectDeletedReq
+	PublishWhiteLabelTemplateReq          = core.PublishWhiteLabelTemplateReq
+	ReportBuildProgressReq                = core.ReportBuildProgressReq
+	ReportChannelEventReq                 = core.ReportChannelEventReq
+	ResolveChannelDownloadReq             = core.ResolveChannelDownloadReq
+	RespBase                              = core.RespBase
+	SigningConfig                         = core.SigningConfig
+	SigningConfigIdReq                    = core.SigningConfigIdReq
+	SigningConfigListReq                  = core.SigningConfigListReq
+	SigningConfigListResp                 = core.SigningConfigListResp
+	SigningConfigResp                     = core.SigningConfigResp
+	StorageObject                         = core.StorageObject
+	StorageObjectIdReq                    = core.StorageObjectIdReq
+	StorageObjectResp                     = core.StorageObjectResp
+	UpdateBrandingProfileReq              = core.UpdateBrandingProfileReq
+	UpdateWhiteLabelProductReq            = core.UpdateWhiteLabelProductReq
+	UpdateWhiteLabelTemplateReq           = core.UpdateWhiteLabelTemplateReq
+	UpdateWhiteLabelTemplateRevisionReq   = core.UpdateWhiteLabelTemplateRevisionReq
+	Version                               = core.Version
+	VersionIdReq                          = core.VersionIdReq
+	VersionListReq                        = core.VersionListReq
+	VersionListResp                       = core.VersionListResp
+	VersionResp                           = core.VersionResp
+	WhiteLabelProduct                     = core.WhiteLabelProduct
+	WhiteLabelProductIdReq                = core.WhiteLabelProductIdReq
+	WhiteLabelProductListReq              = core.WhiteLabelProductListReq
+	WhiteLabelProductListResp             = core.WhiteLabelProductListResp
+	WhiteLabelProductPreflightResp        = core.WhiteLabelProductPreflightResp
+	WhiteLabelProductResp                 = core.WhiteLabelProductResp
+	WhiteLabelTemplate                    = core.WhiteLabelTemplate
+	WhiteLabelTemplateIdReq               = core.WhiteLabelTemplateIdReq
+	WhiteLabelTemplateListReq             = core.WhiteLabelTemplateListReq
+	WhiteLabelTemplateListResp            = core.WhiteLabelTemplateListResp
+	WhiteLabelTemplateResp                = core.WhiteLabelTemplateResp
+	WhiteLabelTemplateRevision            = core.WhiteLabelTemplateRevision
+	WhiteLabelTemplateRevisionIdReq       = core.WhiteLabelTemplateRevisionIdReq
+	WhiteLabelTemplateRevisionListReq     = core.WhiteLabelTemplateRevisionListReq
+	WhiteLabelTemplateRevisionListResp    = core.WhiteLabelTemplateRevisionListResp
+	WhiteLabelTemplateRevisionResp        = core.WhiteLabelTemplateRevisionResp
 
 	Core interface {
 		CreateApplication(ctx context.Context, in *CreateApplicationReq, opts ...grpc.CallOption) (*ApplicationResp, error)
@@ -97,6 +141,66 @@ type (
 		CreateSigningConfig(ctx context.Context, in *CreateSigningConfigReq, opts ...grpc.CallOption) (*SigningConfigResp, error)
 		GetSigningConfig(ctx context.Context, in *SigningConfigIdReq, opts ...grpc.CallOption) (*SigningConfigResp, error)
 		ListSigningConfigs(ctx context.Context, in *SigningConfigListReq, opts ...grpc.CallOption) (*SigningConfigListResp, error)
+		// 创建应用品牌配置。
+		CreateBrandingProfile(ctx context.Context, in *CreateBrandingProfileReq, opts ...grpc.CallOption) (*BrandingProfileResp, error)
+		// 更新应用品牌配置并递增修订号。
+		UpdateBrandingProfile(ctx context.Context, in *UpdateBrandingProfileReq, opts ...grpc.CallOption) (*BrandingProfileResp, error)
+		// 查询当前租户的品牌配置。
+		GetBrandingProfile(ctx context.Context, in *BrandingProfileIdReq, opts ...grpc.CallOption) (*BrandingProfileResp, error)
+		// 分页查询当前租户的品牌配置。
+		ListBrandingProfiles(ctx context.Context, in *BrandingProfileListReq, opts ...grpc.CallOption) (*BrandingProfileListResp, error)
+		// 修改品牌配置状态。
+		ChangeBrandingProfileStatus(ctx context.Context, in *ChangeBrandingProfileStatusReq, opts ...grpc.CallOption) (*BrandingProfileResp, error)
+		// 创建或重置品牌兼容性预检记录。
+		CreateBrandingPreflight(ctx context.Context, in *CreateBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error)
+		// 查询品牌兼容性预检记录。
+		GetBrandingPreflight(ctx context.Context, in *BrandingPreflightIdReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error)
+		// 分页查询品牌兼容性预检记录。
+		ListBrandingPreflights(ctx context.Context, in *BrandingPreflightListReq, opts ...grpc.CallOption) (*BrandingPreflightListResp, error)
+		// 原子领取一个待处理或租约过期的品牌兼容性预检。
+		ClaimBrandingPreflight(ctx context.Context, in *ClaimBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightExecutionContextResp, error)
+		// 完成品牌兼容性预检。
+		CompleteBrandingPreflight(ctx context.Context, in *CompleteBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error)
+		// 创建V3白标模板。
+		CreateWhiteLabelTemplate(ctx context.Context, in *CreateWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+		// 更新尚未发布的V3白标模板。
+		UpdateWhiteLabelTemplate(ctx context.Context, in *UpdateWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+		// 复制V3白标模板及其修订为新草稿。
+		CopyWhiteLabelTemplate(ctx context.Context, in *CopyWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+		// 删除从未发布且未被产品引用的V3白标模板。
+		DeleteWhiteLabelTemplate(ctx context.Context, in *WhiteLabelTemplateIdReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 查询V3白标模板。
+		GetWhiteLabelTemplate(ctx context.Context, in *WhiteLabelTemplateIdReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+		// 分页查询V3白标模板。
+		ListWhiteLabelTemplates(ctx context.Context, in *WhiteLabelTemplateListReq, opts ...grpc.CallOption) (*WhiteLabelTemplateListResp, error)
+		// 创建不可变模板修订。
+		CreateWhiteLabelTemplateRevision(ctx context.Context, in *CreateWhiteLabelTemplateRevisionReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error)
+		// 查询单个模板修订。
+		GetWhiteLabelTemplateRevision(ctx context.Context, in *WhiteLabelTemplateRevisionIdReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error)
+		// 更新尚未发布的模板草稿修订。
+		UpdateWhiteLabelTemplateRevision(ctx context.Context, in *UpdateWhiteLabelTemplateRevisionReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error)
+		// 删除尚未发布的模板草稿修订。
+		DeleteWhiteLabelTemplateRevision(ctx context.Context, in *WhiteLabelTemplateRevisionIdReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 查询模板修订。
+		ListWhiteLabelTemplateRevisions(ctx context.Context, in *WhiteLabelTemplateRevisionListReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionListResp, error)
+		// 发布模板修订。
+		PublishWhiteLabelTemplate(ctx context.Context, in *PublishWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+		// 修改V3白标模板状态。
+		ChangeWhiteLabelTemplateStatus(ctx context.Context, in *ChangeWhiteLabelTemplateStatusReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+		// 创建V3白标产品。
+		CreateWhiteLabelProduct(ctx context.Context, in *CreateWhiteLabelProductReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error)
+		// 更新V3白标产品。
+		UpdateWhiteLabelProduct(ctx context.Context, in *UpdateWhiteLabelProductReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error)
+		// 删除未启用且没有历史构建的V3白标产品。
+		DeleteWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 查询V3白标产品。
+		GetWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error)
+		// 分页查询V3白标产品。
+		ListWhiteLabelProducts(ctx context.Context, in *WhiteLabelProductListReq, opts ...grpc.CallOption) (*WhiteLabelProductListResp, error)
+		// 修改V3白标产品状态。
+		ChangeWhiteLabelProductStatus(ctx context.Context, in *ChangeWhiteLabelProductStatusReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error)
+		// 同步预检V3白标产品契约和依赖。
+		PreflightWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*WhiteLabelProductPreflightResp, error)
 		CreateBuildTask(ctx context.Context, in *CreateBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 		GetBuildTask(ctx context.Context, in *BuildTaskIdReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 		ListBuildTasks(ctx context.Context, in *BuildTaskListReq, opts ...grpc.CallOption) (*BuildTaskListResp, error)
@@ -219,6 +323,186 @@ func (m *defaultCore) GetSigningConfig(ctx context.Context, in *SigningConfigIdR
 func (m *defaultCore) ListSigningConfigs(ctx context.Context, in *SigningConfigListReq, opts ...grpc.CallOption) (*SigningConfigListResp, error) {
 	client := core.NewCoreClient(m.cli.Conn())
 	return client.ListSigningConfigs(ctx, in, opts...)
+}
+
+// 创建应用品牌配置。
+func (m *defaultCore) CreateBrandingProfile(ctx context.Context, in *CreateBrandingProfileReq, opts ...grpc.CallOption) (*BrandingProfileResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateBrandingProfile(ctx, in, opts...)
+}
+
+// 更新应用品牌配置并递增修订号。
+func (m *defaultCore) UpdateBrandingProfile(ctx context.Context, in *UpdateBrandingProfileReq, opts ...grpc.CallOption) (*BrandingProfileResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.UpdateBrandingProfile(ctx, in, opts...)
+}
+
+// 查询当前租户的品牌配置。
+func (m *defaultCore) GetBrandingProfile(ctx context.Context, in *BrandingProfileIdReq, opts ...grpc.CallOption) (*BrandingProfileResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetBrandingProfile(ctx, in, opts...)
+}
+
+// 分页查询当前租户的品牌配置。
+func (m *defaultCore) ListBrandingProfiles(ctx context.Context, in *BrandingProfileListReq, opts ...grpc.CallOption) (*BrandingProfileListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListBrandingProfiles(ctx, in, opts...)
+}
+
+// 修改品牌配置状态。
+func (m *defaultCore) ChangeBrandingProfileStatus(ctx context.Context, in *ChangeBrandingProfileStatusReq, opts ...grpc.CallOption) (*BrandingProfileResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ChangeBrandingProfileStatus(ctx, in, opts...)
+}
+
+// 创建或重置品牌兼容性预检记录。
+func (m *defaultCore) CreateBrandingPreflight(ctx context.Context, in *CreateBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateBrandingPreflight(ctx, in, opts...)
+}
+
+// 查询品牌兼容性预检记录。
+func (m *defaultCore) GetBrandingPreflight(ctx context.Context, in *BrandingPreflightIdReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetBrandingPreflight(ctx, in, opts...)
+}
+
+// 分页查询品牌兼容性预检记录。
+func (m *defaultCore) ListBrandingPreflights(ctx context.Context, in *BrandingPreflightListReq, opts ...grpc.CallOption) (*BrandingPreflightListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListBrandingPreflights(ctx, in, opts...)
+}
+
+// 原子领取一个待处理或租约过期的品牌兼容性预检。
+func (m *defaultCore) ClaimBrandingPreflight(ctx context.Context, in *ClaimBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightExecutionContextResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ClaimBrandingPreflight(ctx, in, opts...)
+}
+
+// 完成品牌兼容性预检。
+func (m *defaultCore) CompleteBrandingPreflight(ctx context.Context, in *CompleteBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CompleteBrandingPreflight(ctx, in, opts...)
+}
+
+// 创建V3白标模板。
+func (m *defaultCore) CreateWhiteLabelTemplate(ctx context.Context, in *CreateWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateWhiteLabelTemplate(ctx, in, opts...)
+}
+
+// 更新尚未发布的V3白标模板。
+func (m *defaultCore) UpdateWhiteLabelTemplate(ctx context.Context, in *UpdateWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.UpdateWhiteLabelTemplate(ctx, in, opts...)
+}
+
+// 复制V3白标模板及其修订为新草稿。
+func (m *defaultCore) CopyWhiteLabelTemplate(ctx context.Context, in *CopyWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CopyWhiteLabelTemplate(ctx, in, opts...)
+}
+
+// 删除从未发布且未被产品引用的V3白标模板。
+func (m *defaultCore) DeleteWhiteLabelTemplate(ctx context.Context, in *WhiteLabelTemplateIdReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.DeleteWhiteLabelTemplate(ctx, in, opts...)
+}
+
+// 查询V3白标模板。
+func (m *defaultCore) GetWhiteLabelTemplate(ctx context.Context, in *WhiteLabelTemplateIdReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetWhiteLabelTemplate(ctx, in, opts...)
+}
+
+// 分页查询V3白标模板。
+func (m *defaultCore) ListWhiteLabelTemplates(ctx context.Context, in *WhiteLabelTemplateListReq, opts ...grpc.CallOption) (*WhiteLabelTemplateListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListWhiteLabelTemplates(ctx, in, opts...)
+}
+
+// 创建不可变模板修订。
+func (m *defaultCore) CreateWhiteLabelTemplateRevision(ctx context.Context, in *CreateWhiteLabelTemplateRevisionReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateWhiteLabelTemplateRevision(ctx, in, opts...)
+}
+
+// 查询单个模板修订。
+func (m *defaultCore) GetWhiteLabelTemplateRevision(ctx context.Context, in *WhiteLabelTemplateRevisionIdReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetWhiteLabelTemplateRevision(ctx, in, opts...)
+}
+
+// 更新尚未发布的模板草稿修订。
+func (m *defaultCore) UpdateWhiteLabelTemplateRevision(ctx context.Context, in *UpdateWhiteLabelTemplateRevisionReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.UpdateWhiteLabelTemplateRevision(ctx, in, opts...)
+}
+
+// 删除尚未发布的模板草稿修订。
+func (m *defaultCore) DeleteWhiteLabelTemplateRevision(ctx context.Context, in *WhiteLabelTemplateRevisionIdReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.DeleteWhiteLabelTemplateRevision(ctx, in, opts...)
+}
+
+// 查询模板修订。
+func (m *defaultCore) ListWhiteLabelTemplateRevisions(ctx context.Context, in *WhiteLabelTemplateRevisionListReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListWhiteLabelTemplateRevisions(ctx, in, opts...)
+}
+
+// 发布模板修订。
+func (m *defaultCore) PublishWhiteLabelTemplate(ctx context.Context, in *PublishWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.PublishWhiteLabelTemplate(ctx, in, opts...)
+}
+
+// 修改V3白标模板状态。
+func (m *defaultCore) ChangeWhiteLabelTemplateStatus(ctx context.Context, in *ChangeWhiteLabelTemplateStatusReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ChangeWhiteLabelTemplateStatus(ctx, in, opts...)
+}
+
+// 创建V3白标产品。
+func (m *defaultCore) CreateWhiteLabelProduct(ctx context.Context, in *CreateWhiteLabelProductReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.CreateWhiteLabelProduct(ctx, in, opts...)
+}
+
+// 更新V3白标产品。
+func (m *defaultCore) UpdateWhiteLabelProduct(ctx context.Context, in *UpdateWhiteLabelProductReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.UpdateWhiteLabelProduct(ctx, in, opts...)
+}
+
+// 删除未启用且没有历史构建的V3白标产品。
+func (m *defaultCore) DeleteWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*RespBase, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.DeleteWhiteLabelProduct(ctx, in, opts...)
+}
+
+// 查询V3白标产品。
+func (m *defaultCore) GetWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetWhiteLabelProduct(ctx, in, opts...)
+}
+
+// 分页查询V3白标产品。
+func (m *defaultCore) ListWhiteLabelProducts(ctx context.Context, in *WhiteLabelProductListReq, opts ...grpc.CallOption) (*WhiteLabelProductListResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ListWhiteLabelProducts(ctx, in, opts...)
+}
+
+// 修改V3白标产品状态。
+func (m *defaultCore) ChangeWhiteLabelProductStatus(ctx context.Context, in *ChangeWhiteLabelProductStatusReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ChangeWhiteLabelProductStatus(ctx, in, opts...)
+}
+
+// 同步预检V3白标产品契约和依赖。
+func (m *defaultCore) PreflightWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*WhiteLabelProductPreflightResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.PreflightWhiteLabelProduct(ctx, in, opts...)
 }
 
 func (m *defaultCore) CreateBuildTask(ctx context.Context, in *CreateBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {

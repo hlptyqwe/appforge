@@ -8,6 +8,21 @@ type AssignUserRolesReq struct {
 	RoleIds []int64 `json:"roleIds"`
 }
 
+type ChangePlatformBrandingProfileStatusReq struct {
+	Id     int64 `path:"id"`
+	Status int32 `json:"status"`
+}
+
+type ChangePlatformWhiteLabelProductStatusReq struct {
+	Id     int64 `path:"id"`
+	Status int32 `json:"status"`
+}
+
+type ChangePlatformWhiteLabelTemplateStatusReq struct {
+	Id     int64 `path:"id"`
+	Status int32 `json:"status"`
+}
+
 type ChangeUserStatusReq struct {
 	Id      int64 `json:"id"`
 	Enabled int64 `json:"enabled"` // 0未知 1启用 2禁用
@@ -22,6 +37,13 @@ type CompletePlatformUploadResp struct {
 	Data PlatformStorageObject `json:"data"`
 }
 
+type CopyPlatformWhiteLabelTemplateReq struct {
+	Id              int64  `path:"id"`
+	TemplateCode    string `json:"templateCode"`
+	TemplateName    string `json:"templateName"`
+	SourceVersionId int64  `json:"sourceVersionId,optional"`
+}
+
 type CreatePlatformApplicationReq struct {
 	AppCode     string `json:"appCode"`
 	AppName     string `json:"appName"`
@@ -31,12 +53,32 @@ type CreatePlatformApplicationReq struct {
 	ApiHost     string `json:"apiHost,optional"`
 }
 
+type CreatePlatformBrandingPreflightReq struct {
+	Id        int64 `path:"id"`
+	VersionId int64 `json:"versionId"`
+}
+
+type CreatePlatformBrandingProfileReq struct {
+	AppId                int64  `json:"appId"`
+	ProfileName          string `json:"profileName"`
+	AppName              string `json:"appName"`
+	LogoObjectId         int64  `json:"logoObjectId"`
+	SplashObjectId       int64  `json:"splashObjectId"`
+	ApiHost              string `json:"apiHost"`
+	RewriteMode          int32  `json:"rewriteMode"`
+	LauncherIconTarget   string `json:"launcherIconTarget,optional"`
+	SplashResourceTarget string `json:"splashResourceTarget,optional"`
+	RuntimeConfigJson    string `json:"runtimeConfigJson,optional"`
+}
+
 type CreatePlatformBuildTaskReq struct {
-	AppId           int64 `json:"appId"`
-	VersionId       int64 `json:"versionId"`
-	ChannelId       int64 `json:"channelId"`
-	SigningConfigId int64 `json:"signingConfigId,optional"`
-	Priority        int32 `json:"priority,optional"`
+	AppId               int64 `json:"appId"`
+	VersionId           int64 `json:"versionId"`
+	ChannelId           int64 `json:"channelId"`
+	SigningConfigId     int64 `json:"signingConfigId,optional"`
+	Priority            int32 `json:"priority,optional"`
+	BrandingProfileId   int64 `json:"brandingProfileId,optional"`
+	WhiteLabelProductId int64 `json:"whiteLabelProductId,optional"`
 }
 
 type CreatePlatformChannelReq struct {
@@ -66,6 +108,36 @@ type CreatePlatformVersionReq struct {
 	ReleaseNotes      string `json:"releaseNotes,optional"`
 	BuildConfigJson   string `json:"buildConfigJson,optional"`
 	SourceApkObjectId int64  `json:"sourceApkObjectId"`
+}
+
+type CreatePlatformWhiteLabelProductReq struct {
+	AppId               int64  `json:"appId"`
+	ProductCode         string `json:"productCode"`
+	ProductName         string `json:"productName"`
+	TemplateId          int64  `json:"templateId"`
+	TemplateRevision    int32  `json:"templateRevision"`
+	BrandingProfileId   int64  `json:"brandingProfileId"`
+	PackageName         string `json:"packageName"`
+	SigningConfigId     int64  `json:"signingConfigId"`
+	ParameterValuesJson string `json:"parameterValuesJson,optional"`
+}
+
+type CreatePlatformWhiteLabelTemplateReq struct {
+	AppId                  int64  `json:"appId"`
+	TemplateCode           string `json:"templateCode"`
+	TemplateName           string `json:"templateName"`
+	SourceVersionId        int64  `json:"sourceVersionId"`
+	ParameterSchemaJson    string `json:"parameterSchemaJson,optional"`
+	CompatibilityRulesJson string `json:"compatibilityRulesJson,optional"`
+}
+
+type CreatePlatformWhiteLabelTemplateRevisionReq struct {
+	Id                    int64  `path:"id"`
+	PackageNameRuleJson   string `json:"packageNameRuleJson"`
+	ManifestPatchJson     string `json:"manifestPatchJson,optional"`
+	ResourcePatchJson     string `json:"resourcePatchJson,optional"`
+	ExtensionFilesJson    string `json:"extensionFilesJson,optional"`
+	ExpectedArtifactsJson string `json:"expectedArtifactsJson,optional"`
 }
 
 type GetPlatformChannelStatsReq struct {
@@ -142,6 +214,21 @@ type ListPlatformApplicationsReq struct {
 	Status  int32  `form:"status,optional"`
 }
 
+type ListPlatformBrandingPreflightsReq struct {
+	PageReq
+	AppId             int64 `form:"appId,optional"`
+	BrandingProfileId int64 `form:"brandingProfileId,optional"`
+	VersionId         int64 `form:"versionId,optional"`
+	Status            int32 `form:"status,optional"`
+}
+
+type ListPlatformBrandingProfilesReq struct {
+	PageReq
+	AppId   int64  `form:"appId,optional"`
+	Keyword string `form:"keyword,optional"`
+	Status  int32  `form:"status,optional"`
+}
+
 type ListPlatformBuildTasksReq struct {
 	PageReq
 	AppId     int64 `form:"appId,optional"`
@@ -166,6 +253,26 @@ type ListPlatformVersionsReq struct {
 	PageReq
 	AppId  int64 `form:"appId,optional"`
 	Status int32 `form:"status,optional"`
+}
+
+type ListPlatformWhiteLabelProductsReq struct {
+	PageReq
+	AppId   int64  `form:"appId,optional"`
+	Keyword string `form:"keyword,optional"`
+	Status  int32  `form:"status,optional"`
+}
+
+type ListPlatformWhiteLabelTemplateRevisionsReq struct {
+	PageReq
+	Id     int64 `path:"id"`
+	Status int32 `form:"status,optional"`
+}
+
+type ListPlatformWhiteLabelTemplatesReq struct {
+	PageReq
+	AppId   int64  `form:"appId,optional"`
+	Keyword string `form:"keyword,optional"`
+	Status  int32  `form:"status,optional"`
 }
 
 type LoginData struct {
@@ -292,34 +399,98 @@ type PlatformApplicationResp struct {
 	Data PlatformApplication `json:"data"`
 }
 
-type PlatformBuildTask struct {
+type PlatformBrandingPreflight struct {
 	Id                int64  `json:"id"`
 	TenantId          int64  `json:"tenantId"`
 	AppId             int64  `json:"appId"`
+	BrandingProfileId int64  `json:"brandingProfileId"`
+	BrandingRevision  int32  `json:"brandingRevision"`
 	VersionId         int64  `json:"versionId"`
-	ChannelId         int64  `json:"channelId"`
-	SigningConfigId   int64  `json:"signingConfigId"`
-	ChannelCode       string `json:"channelCode"`
-	VersionCode       int64  `json:"versionCode"`
-	VersionName       string `json:"versionName"`
 	Status            int32  `json:"status"`
-	BuilderId         string `json:"builderId,optional"`
-	BuilderAttempt    int32  `json:"builderAttempt"`
-	Priority          int32  `json:"priority"`
-	ApkUrl            string `json:"apkUrl,optional"`
-	ApkSha256         string `json:"apkSha256,optional"`
-	ApkSize           int64  `json:"apkSize"`
-	LogUrl            string `json:"logUrl,optional"`
-	SourceApkObjectId int64  `json:"sourceApkObjectId"`
-	ApkObjectId       int64  `json:"apkObjectId"`
-	LogObjectId       int64  `json:"logObjectId"`
-	ErrorMessage      string `json:"errorMessage,optional"`
-	QueuedAt          int64  `json:"queuedAt"`
+	ReportJson        string `json:"reportJson,optional"`
+	SourceApkSha256   string `json:"sourceApkSha256,optional"`
+	ToolchainVersion  string `json:"toolchainVersion,optional"`
 	StartTime         int64  `json:"startTime,optional"`
 	FinishTime        int64  `json:"finishTime,optional"`
 	CreateBy          int64  `json:"createBy"`
 	CreateTime        int64  `json:"createTime"`
 	UpdateTime        int64  `json:"updateTime"`
+}
+
+type PlatformBrandingPreflightListResp struct {
+	RespBase
+	Data []PlatformBrandingPreflight `json:"data"`
+}
+
+type PlatformBrandingPreflightResp struct {
+	RespBase
+	Data PlatformBrandingPreflight `json:"data"`
+}
+
+type PlatformBrandingProfile struct {
+	Id                   int64  `json:"id"`
+	TenantId             int64  `json:"tenantId"`
+	AppId                int64  `json:"appId"`
+	ProfileName          string `json:"profileName"`
+	AppName              string `json:"appName"`
+	LogoObjectId         int64  `json:"logoObjectId"`
+	SplashObjectId       int64  `json:"splashObjectId"`
+	ApiHost              string `json:"apiHost"`
+	RewriteMode          int32  `json:"rewriteMode"`
+	LauncherIconTarget   string `json:"launcherIconTarget,optional"`
+	SplashResourceTarget string `json:"splashResourceTarget,optional"`
+	RuntimeConfigJson    string `json:"runtimeConfigJson,optional"`
+	Status               int32  `json:"status"`
+	Revision             int32  `json:"revision"`
+	CreateBy             int64  `json:"createBy"`
+	CreateTime           int64  `json:"createTime"`
+	UpdateTime           int64  `json:"updateTime"`
+}
+
+type PlatformBrandingProfileListResp struct {
+	RespBase
+	Data []PlatformBrandingProfile `json:"data"`
+}
+
+type PlatformBrandingProfileResp struct {
+	RespBase
+	Data PlatformBrandingProfile `json:"data"`
+}
+
+type PlatformBuildTask struct {
+	Id                   int64  `json:"id"`
+	TenantId             int64  `json:"tenantId"`
+	AppId                int64  `json:"appId"`
+	VersionId            int64  `json:"versionId"`
+	ChannelId            int64  `json:"channelId"`
+	SigningConfigId      int64  `json:"signingConfigId"`
+	ChannelCode          string `json:"channelCode"`
+	VersionCode          int64  `json:"versionCode"`
+	VersionName          string `json:"versionName"`
+	Status               int32  `json:"status"`
+	BuilderId            string `json:"builderId,optional"`
+	BuilderAttempt       int32  `json:"builderAttempt"`
+	Priority             int32  `json:"priority"`
+	ApkUrl               string `json:"apkUrl,optional"`
+	ApkSha256            string `json:"apkSha256,optional"`
+	ApkSize              int64  `json:"apkSize"`
+	LogUrl               string `json:"logUrl,optional"`
+	SourceApkObjectId    int64  `json:"sourceApkObjectId"`
+	ApkObjectId          int64  `json:"apkObjectId"`
+	LogObjectId          int64  `json:"logObjectId"`
+	ErrorMessage         string `json:"errorMessage,optional"`
+	QueuedAt             int64  `json:"queuedAt"`
+	StartTime            int64  `json:"startTime,optional"`
+	FinishTime           int64  `json:"finishTime,optional"`
+	CreateBy             int64  `json:"createBy"`
+	CreateTime           int64  `json:"createTime"`
+	UpdateTime           int64  `json:"updateTime"`
+	BrandingProfileId    int64  `json:"brandingProfileId"`
+	BrandingRevision     int32  `json:"brandingRevision"`
+	BrandingSnapshotJson string `json:"brandingSnapshotJson,optional"`
+	WhiteLabelProductId  int64  `json:"whiteLabelProductId"`
+	TemplateRevision     int32  `json:"templateRevision"`
+	TemplateSnapshotJson string `json:"templateSnapshotJson,optional"`
 }
 
 type PlatformBuildTaskListResp struct {
@@ -418,6 +589,7 @@ type PlatformSigningConfig struct {
 	CreateBy          int64  `json:"createBy"`
 	CreateTime        int64  `json:"createTime"`
 	UpdateTime        int64  `json:"updateTime"`
+	CertificateSha256 string `json:"certificateSha256,optional"`
 }
 
 type PlatformSigningConfigListResp struct {
@@ -488,6 +660,94 @@ type PlatformVersionResp struct {
 	Data PlatformVersion `json:"data"`
 }
 
+type PlatformWhiteLabelProduct struct {
+	Id                  int64  `json:"id"`
+	TenantId            int64  `json:"tenantId"`
+	AppId               int64  `json:"appId"`
+	ProductCode         string `json:"productCode"`
+	ProductName         string `json:"productName"`
+	TemplateId          int64  `json:"templateId"`
+	TemplateRevision    int32  `json:"templateRevision"`
+	BrandingProfileId   int64  `json:"brandingProfileId"`
+	PackageName         string `json:"packageName"`
+	SigningConfigId     int64  `json:"signingConfigId"`
+	ParameterValuesJson string `json:"parameterValuesJson,optional"`
+	Status              int32  `json:"status"`
+	CreateTime          int64  `json:"createTime"`
+	UpdateTime          int64  `json:"updateTime"`
+}
+
+type PlatformWhiteLabelProductListResp struct {
+	RespBase
+	Data []PlatformWhiteLabelProduct `json:"data"`
+}
+
+type PlatformWhiteLabelProductPreflightResp struct {
+	RespBase
+	Compatible bool   `json:"compatible"`
+	ReportJson string `json:"reportJson"`
+}
+
+type PlatformWhiteLabelProductResp struct {
+	RespBase
+	Data PlatformWhiteLabelProduct `json:"data"`
+}
+
+type PlatformWhiteLabelTemplate struct {
+	Id                     int64  `json:"id"`
+	TenantId               int64  `json:"tenantId"`
+	AppId                  int64  `json:"appId"`
+	TemplateCode           string `json:"templateCode"`
+	TemplateName           string `json:"templateName"`
+	SourceVersionId        int64  `json:"sourceVersionId"`
+	ParameterSchemaJson    string `json:"parameterSchemaJson,optional"`
+	CompatibilityRulesJson string `json:"compatibilityRulesJson,optional"`
+	Status                 int32  `json:"status"`
+	PublishedRevision      int32  `json:"publishedRevision"`
+	CreateTime             int64  `json:"createTime"`
+	UpdateTime             int64  `json:"updateTime"`
+}
+
+type PlatformWhiteLabelTemplateListResp struct {
+	RespBase
+	Data []PlatformWhiteLabelTemplate `json:"data"`
+}
+
+type PlatformWhiteLabelTemplateResp struct {
+	RespBase
+	Data PlatformWhiteLabelTemplate `json:"data"`
+}
+
+type PlatformWhiteLabelTemplateRevision struct {
+	Id                    int64  `json:"id"`
+	TenantId              int64  `json:"tenantId"`
+	TemplateId            int64  `json:"templateId"`
+	Revision              int32  `json:"revision"`
+	PackageNameRuleJson   string `json:"packageNameRuleJson"`
+	ManifestPatchJson     string `json:"manifestPatchJson,optional"`
+	ResourcePatchJson     string `json:"resourcePatchJson,optional"`
+	ExtensionFilesJson    string `json:"extensionFilesJson,optional"`
+	ExpectedArtifactsJson string `json:"expectedArtifactsJson,optional"`
+	Checksum              string `json:"checksum"`
+	Status                int32  `json:"status"`
+	CreateTime            int64  `json:"createTime"`
+}
+
+type PlatformWhiteLabelTemplateRevisionIdReq struct {
+	Id       int64 `path:"id"`
+	Revision int32 `path:"revision"`
+}
+
+type PlatformWhiteLabelTemplateRevisionListResp struct {
+	RespBase
+	Data []PlatformWhiteLabelTemplateRevision `json:"data"`
+}
+
+type PlatformWhiteLabelTemplateRevisionResp struct {
+	RespBase
+	Data PlatformWhiteLabelTemplateRevision `json:"data"`
+}
+
 type ProfileData struct {
 	User  ProfileUser `json:"user"`
 	Menus []MenuNode  `json:"menus"`
@@ -508,6 +768,11 @@ type ProfileUser struct {
 	UserType         int64  `json:"userType"` // 用户类型：1系统管理员 2租户主账号 3租户管理员
 	IsOwner          int64  `json:"isOwner"`  // 是否租户主账号：1是 2否
 	Google2FaEnabled int64  `json:"google2FaEnabled"`
+}
+
+type PublishPlatformWhiteLabelTemplateReq struct {
+	Id       int64 `path:"id"`
+	Revision int32 `json:"revision"`
 }
 
 type ResetUserPwdReq struct {
@@ -880,6 +1145,48 @@ type SysUserUpdateReq struct {
 type TimeRange struct {
 	StartTime int64 `form:"startTime,optional"`
 	EndTime   int64 `form:"endTime,optional"`
+}
+
+type UpdatePlatformBrandingProfileReq struct {
+	Id                   int64  `path:"id"`
+	ProfileName          string `json:"profileName"`
+	AppName              string `json:"appName"`
+	LogoObjectId         int64  `json:"logoObjectId"`
+	SplashObjectId       int64  `json:"splashObjectId"`
+	ApiHost              string `json:"apiHost"`
+	RewriteMode          int32  `json:"rewriteMode"`
+	LauncherIconTarget   string `json:"launcherIconTarget,optional"`
+	SplashResourceTarget string `json:"splashResourceTarget,optional"`
+	RuntimeConfigJson    string `json:"runtimeConfigJson,optional"`
+}
+
+type UpdatePlatformWhiteLabelProductReq struct {
+	Id                  int64  `path:"id"`
+	ProductName         string `json:"productName"`
+	BrandingProfileId   int64  `json:"brandingProfileId"`
+	PackageName         string `json:"packageName"`
+	SigningConfigId     int64  `json:"signingConfigId"`
+	ParameterValuesJson string `json:"parameterValuesJson,optional"`
+	TemplateId          int64  `json:"templateId"`
+	TemplateRevision    int32  `json:"templateRevision"`
+}
+
+type UpdatePlatformWhiteLabelTemplateReq struct {
+	Id                     int64  `path:"id"`
+	TemplateName           string `json:"templateName"`
+	SourceVersionId        int64  `json:"sourceVersionId"`
+	ParameterSchemaJson    string `json:"parameterSchemaJson,optional"`
+	CompatibilityRulesJson string `json:"compatibilityRulesJson,optional"`
+}
+
+type UpdatePlatformWhiteLabelTemplateRevisionReq struct {
+	Id                    int64  `path:"id"`
+	Revision              int32  `path:"revision"`
+	PackageNameRuleJson   string `json:"packageNameRuleJson"`
+	ManifestPatchJson     string `json:"manifestPatchJson,optional"`
+	ResourcePatchJson     string `json:"resourcePatchJson,optional"`
+	ExtensionFilesJson    string `json:"extensionFilesJson,optional"`
+	ExpectedArtifactsJson string `json:"expectedArtifactsJson,optional"`
 }
 
 type UpdateProfileReq struct {

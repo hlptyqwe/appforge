@@ -14,19 +14,21 @@ import (
 )
 
 type (
-	BuildTask                  = builder.BuildTask
-	BuildTaskResp              = builder.BuildTaskResp
-	ClaimBuildTaskReq          = builder.ClaimBuildTaskReq
-	CompleteBuildTaskReq       = builder.CompleteBuildTaskReq
-	FailBuildTaskReq           = builder.FailBuildTaskReq
-	HeartbeatBuildTaskReq      = builder.HeartbeatBuildTaskReq
-	ReportBuildProgressReq     = builder.ReportBuildProgressReq
-	RespBase                   = builder.RespBase
-	ValidateSigningMaterialReq = builder.ValidateSigningMaterialReq
+	BuildTask                   = builder.BuildTask
+	BuildTaskResp               = builder.BuildTaskResp
+	ClaimBuildTaskReq           = builder.ClaimBuildTaskReq
+	CompleteBuildTaskReq        = builder.CompleteBuildTaskReq
+	FailBuildTaskReq            = builder.FailBuildTaskReq
+	HeartbeatBuildTaskReq       = builder.HeartbeatBuildTaskReq
+	ReportBuildProgressReq      = builder.ReportBuildProgressReq
+	RespBase                    = builder.RespBase
+	SigningMaterialValidation   = builder.SigningMaterialValidation
+	ValidateSigningMaterialReq  = builder.ValidateSigningMaterialReq
+	ValidateSigningMaterialResp = builder.ValidateSigningMaterialResp
 
 	Builder interface {
 		// 使用实际签名工具校验签名材料，成功后方可创建可用签名配置。
-		ValidateSigningMaterial(ctx context.Context, in *ValidateSigningMaterialReq, opts ...grpc.CallOption) (*RespBase, error)
+		ValidateSigningMaterial(ctx context.Context, in *ValidateSigningMaterialReq, opts ...grpc.CallOption) (*ValidateSigningMaterialResp, error)
 		ClaimBuildTask(ctx context.Context, in *ClaimBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 		HeartbeatBuildTask(ctx context.Context, in *HeartbeatBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
 		ReportBuildProgress(ctx context.Context, in *ReportBuildProgressReq, opts ...grpc.CallOption) (*RespBase, error)
@@ -46,7 +48,7 @@ func NewBuilder(cli zrpc.Client) Builder {
 }
 
 // 使用实际签名工具校验签名材料，成功后方可创建可用签名配置。
-func (m *defaultBuilder) ValidateSigningMaterial(ctx context.Context, in *ValidateSigningMaterialReq, opts ...grpc.CallOption) (*RespBase, error) {
+func (m *defaultBuilder) ValidateSigningMaterial(ctx context.Context, in *ValidateSigningMaterialReq, opts ...grpc.CallOption) (*ValidateSigningMaterialResp, error) {
 	client := builder.NewBuilderClient(m.cli.Conn())
 	return client.ValidateSigningMaterial(ctx, in, opts...)
 }

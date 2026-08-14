@@ -17,7 +17,7 @@ export type ResourceField = {
   type?: 'text' | 'number' | 'textarea' | 'password' | 'file'
   required?: boolean
   accept?: string
-  objectType?: 1 | 2
+  objectType?: 1 | 2 | 5 | 6
   maxBytes?: number
   downloadObject?: boolean
   publicDownload?: boolean

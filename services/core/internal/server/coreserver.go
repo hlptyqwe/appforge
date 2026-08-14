@@ -119,6 +119,186 @@ func (s *CoreServer) ListSigningConfigs(ctx context.Context, in *core.SigningCon
 	return l.ListSigningConfigs(in)
 }
 
+// 创建应用品牌配置。
+func (s *CoreServer) CreateBrandingProfile(ctx context.Context, in *core.CreateBrandingProfileReq) (*core.BrandingProfileResp, error) {
+	l := logic.NewCreateBrandingProfileLogic(ctx, s.svcCtx)
+	return l.CreateBrandingProfile(in)
+}
+
+// 更新应用品牌配置并递增修订号。
+func (s *CoreServer) UpdateBrandingProfile(ctx context.Context, in *core.UpdateBrandingProfileReq) (*core.BrandingProfileResp, error) {
+	l := logic.NewUpdateBrandingProfileLogic(ctx, s.svcCtx)
+	return l.UpdateBrandingProfile(in)
+}
+
+// 查询当前租户的品牌配置。
+func (s *CoreServer) GetBrandingProfile(ctx context.Context, in *core.BrandingProfileIdReq) (*core.BrandingProfileResp, error) {
+	l := logic.NewGetBrandingProfileLogic(ctx, s.svcCtx)
+	return l.GetBrandingProfile(in)
+}
+
+// 分页查询当前租户的品牌配置。
+func (s *CoreServer) ListBrandingProfiles(ctx context.Context, in *core.BrandingProfileListReq) (*core.BrandingProfileListResp, error) {
+	l := logic.NewListBrandingProfilesLogic(ctx, s.svcCtx)
+	return l.ListBrandingProfiles(in)
+}
+
+// 修改品牌配置状态。
+func (s *CoreServer) ChangeBrandingProfileStatus(ctx context.Context, in *core.ChangeBrandingProfileStatusReq) (*core.BrandingProfileResp, error) {
+	l := logic.NewChangeBrandingProfileStatusLogic(ctx, s.svcCtx)
+	return l.ChangeBrandingProfileStatus(in)
+}
+
+// 创建或重置品牌兼容性预检记录。
+func (s *CoreServer) CreateBrandingPreflight(ctx context.Context, in *core.CreateBrandingPreflightReq) (*core.BrandingPreflightResp, error) {
+	l := logic.NewCreateBrandingPreflightLogic(ctx, s.svcCtx)
+	return l.CreateBrandingPreflight(in)
+}
+
+// 查询品牌兼容性预检记录。
+func (s *CoreServer) GetBrandingPreflight(ctx context.Context, in *core.BrandingPreflightIdReq) (*core.BrandingPreflightResp, error) {
+	l := logic.NewGetBrandingPreflightLogic(ctx, s.svcCtx)
+	return l.GetBrandingPreflight(in)
+}
+
+// 分页查询品牌兼容性预检记录。
+func (s *CoreServer) ListBrandingPreflights(ctx context.Context, in *core.BrandingPreflightListReq) (*core.BrandingPreflightListResp, error) {
+	l := logic.NewListBrandingPreflightsLogic(ctx, s.svcCtx)
+	return l.ListBrandingPreflights(in)
+}
+
+// 原子领取一个待处理或租约过期的品牌兼容性预检。
+func (s *CoreServer) ClaimBrandingPreflight(ctx context.Context, in *core.ClaimBrandingPreflightReq) (*core.BrandingPreflightExecutionContextResp, error) {
+	l := logic.NewClaimBrandingPreflightLogic(ctx, s.svcCtx)
+	return l.ClaimBrandingPreflight(in)
+}
+
+// 完成品牌兼容性预检。
+func (s *CoreServer) CompleteBrandingPreflight(ctx context.Context, in *core.CompleteBrandingPreflightReq) (*core.BrandingPreflightResp, error) {
+	l := logic.NewCompleteBrandingPreflightLogic(ctx, s.svcCtx)
+	return l.CompleteBrandingPreflight(in)
+}
+
+// 创建V3白标模板。
+func (s *CoreServer) CreateWhiteLabelTemplate(ctx context.Context, in *core.CreateWhiteLabelTemplateReq) (*core.WhiteLabelTemplateResp, error) {
+	l := logic.NewCreateWhiteLabelTemplateLogic(ctx, s.svcCtx)
+	return l.CreateWhiteLabelTemplate(in)
+}
+
+// 更新尚未发布的V3白标模板。
+func (s *CoreServer) UpdateWhiteLabelTemplate(ctx context.Context, in *core.UpdateWhiteLabelTemplateReq) (*core.WhiteLabelTemplateResp, error) {
+	l := logic.NewUpdateWhiteLabelTemplateLogic(ctx, s.svcCtx)
+	return l.UpdateWhiteLabelTemplate(in)
+}
+
+// 复制V3白标模板及其修订为新草稿。
+func (s *CoreServer) CopyWhiteLabelTemplate(ctx context.Context, in *core.CopyWhiteLabelTemplateReq) (*core.WhiteLabelTemplateResp, error) {
+	l := logic.NewCopyWhiteLabelTemplateLogic(ctx, s.svcCtx)
+	return l.CopyWhiteLabelTemplate(in)
+}
+
+// 删除从未发布且未被产品引用的V3白标模板。
+func (s *CoreServer) DeleteWhiteLabelTemplate(ctx context.Context, in *core.WhiteLabelTemplateIdReq) (*core.RespBase, error) {
+	l := logic.NewDeleteWhiteLabelTemplateLogic(ctx, s.svcCtx)
+	return l.DeleteWhiteLabelTemplate(in)
+}
+
+// 查询V3白标模板。
+func (s *CoreServer) GetWhiteLabelTemplate(ctx context.Context, in *core.WhiteLabelTemplateIdReq) (*core.WhiteLabelTemplateResp, error) {
+	l := logic.NewGetWhiteLabelTemplateLogic(ctx, s.svcCtx)
+	return l.GetWhiteLabelTemplate(in)
+}
+
+// 分页查询V3白标模板。
+func (s *CoreServer) ListWhiteLabelTemplates(ctx context.Context, in *core.WhiteLabelTemplateListReq) (*core.WhiteLabelTemplateListResp, error) {
+	l := logic.NewListWhiteLabelTemplatesLogic(ctx, s.svcCtx)
+	return l.ListWhiteLabelTemplates(in)
+}
+
+// 创建不可变模板修订。
+func (s *CoreServer) CreateWhiteLabelTemplateRevision(ctx context.Context, in *core.CreateWhiteLabelTemplateRevisionReq) (*core.WhiteLabelTemplateRevisionResp, error) {
+	l := logic.NewCreateWhiteLabelTemplateRevisionLogic(ctx, s.svcCtx)
+	return l.CreateWhiteLabelTemplateRevision(in)
+}
+
+// 查询单个模板修订。
+func (s *CoreServer) GetWhiteLabelTemplateRevision(ctx context.Context, in *core.WhiteLabelTemplateRevisionIdReq) (*core.WhiteLabelTemplateRevisionResp, error) {
+	l := logic.NewGetWhiteLabelTemplateRevisionLogic(ctx, s.svcCtx)
+	return l.GetWhiteLabelTemplateRevision(in)
+}
+
+// 更新尚未发布的模板草稿修订。
+func (s *CoreServer) UpdateWhiteLabelTemplateRevision(ctx context.Context, in *core.UpdateWhiteLabelTemplateRevisionReq) (*core.WhiteLabelTemplateRevisionResp, error) {
+	l := logic.NewUpdateWhiteLabelTemplateRevisionLogic(ctx, s.svcCtx)
+	return l.UpdateWhiteLabelTemplateRevision(in)
+}
+
+// 删除尚未发布的模板草稿修订。
+func (s *CoreServer) DeleteWhiteLabelTemplateRevision(ctx context.Context, in *core.WhiteLabelTemplateRevisionIdReq) (*core.RespBase, error) {
+	l := logic.NewDeleteWhiteLabelTemplateRevisionLogic(ctx, s.svcCtx)
+	return l.DeleteWhiteLabelTemplateRevision(in)
+}
+
+// 查询模板修订。
+func (s *CoreServer) ListWhiteLabelTemplateRevisions(ctx context.Context, in *core.WhiteLabelTemplateRevisionListReq) (*core.WhiteLabelTemplateRevisionListResp, error) {
+	l := logic.NewListWhiteLabelTemplateRevisionsLogic(ctx, s.svcCtx)
+	return l.ListWhiteLabelTemplateRevisions(in)
+}
+
+// 发布模板修订。
+func (s *CoreServer) PublishWhiteLabelTemplate(ctx context.Context, in *core.PublishWhiteLabelTemplateReq) (*core.WhiteLabelTemplateResp, error) {
+	l := logic.NewPublishWhiteLabelTemplateLogic(ctx, s.svcCtx)
+	return l.PublishWhiteLabelTemplate(in)
+}
+
+// 修改V3白标模板状态。
+func (s *CoreServer) ChangeWhiteLabelTemplateStatus(ctx context.Context, in *core.ChangeWhiteLabelTemplateStatusReq) (*core.WhiteLabelTemplateResp, error) {
+	l := logic.NewChangeWhiteLabelTemplateStatusLogic(ctx, s.svcCtx)
+	return l.ChangeWhiteLabelTemplateStatus(in)
+}
+
+// 创建V3白标产品。
+func (s *CoreServer) CreateWhiteLabelProduct(ctx context.Context, in *core.CreateWhiteLabelProductReq) (*core.WhiteLabelProductResp, error) {
+	l := logic.NewCreateWhiteLabelProductLogic(ctx, s.svcCtx)
+	return l.CreateWhiteLabelProduct(in)
+}
+
+// 更新V3白标产品。
+func (s *CoreServer) UpdateWhiteLabelProduct(ctx context.Context, in *core.UpdateWhiteLabelProductReq) (*core.WhiteLabelProductResp, error) {
+	l := logic.NewUpdateWhiteLabelProductLogic(ctx, s.svcCtx)
+	return l.UpdateWhiteLabelProduct(in)
+}
+
+// 删除未启用且没有历史构建的V3白标产品。
+func (s *CoreServer) DeleteWhiteLabelProduct(ctx context.Context, in *core.WhiteLabelProductIdReq) (*core.RespBase, error) {
+	l := logic.NewDeleteWhiteLabelProductLogic(ctx, s.svcCtx)
+	return l.DeleteWhiteLabelProduct(in)
+}
+
+// 查询V3白标产品。
+func (s *CoreServer) GetWhiteLabelProduct(ctx context.Context, in *core.WhiteLabelProductIdReq) (*core.WhiteLabelProductResp, error) {
+	l := logic.NewGetWhiteLabelProductLogic(ctx, s.svcCtx)
+	return l.GetWhiteLabelProduct(in)
+}
+
+// 分页查询V3白标产品。
+func (s *CoreServer) ListWhiteLabelProducts(ctx context.Context, in *core.WhiteLabelProductListReq) (*core.WhiteLabelProductListResp, error) {
+	l := logic.NewListWhiteLabelProductsLogic(ctx, s.svcCtx)
+	return l.ListWhiteLabelProducts(in)
+}
+
+// 修改V3白标产品状态。
+func (s *CoreServer) ChangeWhiteLabelProductStatus(ctx context.Context, in *core.ChangeWhiteLabelProductStatusReq) (*core.WhiteLabelProductResp, error) {
+	l := logic.NewChangeWhiteLabelProductStatusLogic(ctx, s.svcCtx)
+	return l.ChangeWhiteLabelProductStatus(in)
+}
+
+// 同步预检V3白标产品契约和依赖。
+func (s *CoreServer) PreflightWhiteLabelProduct(ctx context.Context, in *core.WhiteLabelProductIdReq) (*core.WhiteLabelProductPreflightResp, error) {
+	l := logic.NewPreflightWhiteLabelProductLogic(ctx, s.svcCtx)
+	return l.PreflightWhiteLabelProduct(in)
+}
+
 func (s *CoreServer) CreateBuildTask(ctx context.Context, in *core.CreateBuildTaskReq) (*core.BuildTaskResp, error) {
 	l := logic.NewCreateBuildTaskLogic(ctx, s.svcCtx)
 	return l.CreateBuildTask(in)

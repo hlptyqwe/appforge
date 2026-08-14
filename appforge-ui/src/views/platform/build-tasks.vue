@@ -18,6 +18,9 @@ import { platformService } from '@/services'
       { prop: 'appId', label: '应用 ID' },
       { prop: 'versionName', label: '版本' },
       { prop: 'channelCode', label: '渠道' },
+      { prop: 'brandingRevision', label: '品牌修订' },
+      { prop: 'whiteLabelProductId', label: '白标产品 ID' },
+      { prop: 'templateRevision', label: '模板修订' },
       { prop: 'status', label: '状态' },
       { prop: 'builderId', label: '构建器' },
       { prop: 'apkObjectId', label: 'APK 下载', downloadObject: true },
@@ -28,7 +31,9 @@ import { platformService } from '@/services'
       { prop: 'appId', label: '应用 ID', type: 'number', required: true },
       { prop: 'versionId', label: '版本 ID', type: 'number', required: true },
       { prop: 'channelId', label: '渠道 ID', type: 'number', required: true },
-      { prop: 'signingConfigId', label: '签名配置 ID', type: 'number', required: true },
+      { prop: 'signingConfigId', label: '签名配置 ID', type: 'number' },
+      { prop: 'brandingProfileId', label: '品牌配置 ID', type: 'number' },
+      { prop: 'whiteLabelProductId', label: '白标产品 ID', type: 'number' },
       { prop: 'priority', label: '优先级', type: 'number' },
     ]"
   />

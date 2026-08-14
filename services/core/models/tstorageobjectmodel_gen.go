@@ -46,7 +46,7 @@ type (
 		Id           int64          `db:"id"`            // 存储对象ID
 		TenantId     int64          `db:"tenant_id"`     // 所属租户ID
 		AppId        int64          `db:"app_id"`        // 关联应用ID，上传时允许为0
-		ObjectType   int64          `db:"object_type"`   // 对象类型：1原始APK 2签名文件 3构建APK 4构建日志
+		ObjectType   int64          `db:"object_type"`   // 对象类型：1原始APK 2签名文件 3构建APK 4构建日志 5品牌Logo 6品牌启动图
 		ObjectKey    string         `db:"object_key"`    // 私有对象存储Key
 		OriginalName string         `db:"original_name"` // 用户上传时的原始文件名
 		ContentType  string         `db:"content_type"`  // 对象内容类型

@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"encoding/hex"
 	"strings"
 
 	"appforge/common/secretbox"
@@ -78,6 +79,11 @@ func (l *CreateSigningConfigLogic) CreateSigningConfig(in *core.CreateSigningCon
 		(!secretbox.IsSealed(in.KeystorePasswordCiphertext) || !secretbox.IsSealed(in.KeyPasswordCiphertext)) {
 		return nil, status.Error(codes.InvalidArgument, "keystore and key passwords must use the supported encrypted envelope")
 	}
+	certificateSHA := strings.ToLower(strings.TrimSpace(in.CertificateSha256))
+	decodedCertificateSHA, decodeErr := hex.DecodeString(certificateSHA)
+	if decodeErr != nil || len(decodedCertificateSHA) != 32 {
+		return nil, status.Error(codes.InvalidArgument, "certificate_sha256 is invalid")
+	}
 	_, err = l.svcCtx.SigningConfigModel.Insert(l.ctx, &models.TAppSigningConfig{
 		TenantId:                   tenant,
 		AppId:                      in.AppId,
@@ -85,6 +91,7 @@ func (l *CreateSigningConfigLogic) CreateSigningConfig(in *core.CreateSigningCon
 		KeystoreObjectId:           in.KeystoreObjectId,
 		KeystoreObjectKey:          storageObject.ObjectKey,
 		KeyAlias:                   strings.TrimSpace(in.KeyAlias),
+		CertificateSha256:          nullString(certificateSHA),
 		KeystorePasswordCiphertext: nullString(in.KeystorePasswordCiphertext),
 		KeyPasswordCiphertext:      nullString(in.KeyPasswordCiphertext),
 		SecretRef:                  nullString(in.SecretRef),

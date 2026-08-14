@@ -69,6 +69,46 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: platform_private.GetPlatformApplicationHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodGet,
+				Path:    "/branding-preflights",
+				Handler: platform_private.ListPlatformBrandingPreflightsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/branding-preflights/:id",
+				Handler: platform_private.GetPlatformBrandingPreflightHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/branding-profiles",
+				Handler: platform_private.CreatePlatformBrandingProfileHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/branding-profiles",
+				Handler: platform_private.ListPlatformBrandingProfilesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/branding-profiles/:id",
+				Handler: platform_private.UpdatePlatformBrandingProfileHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/branding-profiles/:id",
+				Handler: platform_private.GetPlatformBrandingProfileHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/branding-profiles/:id/preflight",
+				Handler: platform_private.CreatePlatformBrandingPreflightHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/branding-profiles/:id/status",
+				Handler: platform_private.ChangePlatformBrandingProfileStatusHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodPost,
 				Path:    "/build-tasks",
 				Handler: platform_private.CreatePlatformBuildTaskHandler(serverCtx),
@@ -147,6 +187,106 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/versions/:id",
 				Handler: platform_private.GetPlatformVersionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/white-label/products",
+				Handler: platform_private.CreatePlatformWhiteLabelProductHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/white-label/products",
+				Handler: platform_private.ListPlatformWhiteLabelProductsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/white-label/products/:id",
+				Handler: platform_private.UpdatePlatformWhiteLabelProductHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/white-label/products/:id",
+				Handler: platform_private.DeletePlatformWhiteLabelProductHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/white-label/products/:id",
+				Handler: platform_private.GetPlatformWhiteLabelProductHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/white-label/products/:id/preflight",
+				Handler: platform_private.PreflightPlatformWhiteLabelProductHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/white-label/products/:id/status",
+				Handler: platform_private.ChangePlatformWhiteLabelProductStatusHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/white-label/templates",
+				Handler: platform_private.CreatePlatformWhiteLabelTemplateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/white-label/templates",
+				Handler: platform_private.ListPlatformWhiteLabelTemplatesHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/white-label/templates/:id",
+				Handler: platform_private.UpdatePlatformWhiteLabelTemplateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/white-label/templates/:id",
+				Handler: platform_private.DeletePlatformWhiteLabelTemplateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/white-label/templates/:id",
+				Handler: platform_private.GetPlatformWhiteLabelTemplateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/white-label/templates/:id/copy",
+				Handler: platform_private.CopyPlatformWhiteLabelTemplateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/white-label/templates/:id/publish",
+				Handler: platform_private.PublishPlatformWhiteLabelTemplateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/white-label/templates/:id/revisions",
+				Handler: platform_private.CreatePlatformWhiteLabelTemplateRevisionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/white-label/templates/:id/revisions",
+				Handler: platform_private.ListPlatformWhiteLabelTemplateRevisionsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/white-label/templates/:id/revisions/:revision",
+				Handler: platform_private.GetPlatformWhiteLabelTemplateRevisionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/white-label/templates/:id/revisions/:revision",
+				Handler: platform_private.UpdatePlatformWhiteLabelTemplateRevisionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/white-label/templates/:id/revisions/:revision",
+				Handler: platform_private.DeletePlatformWhiteLabelTemplateRevisionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/white-label/templates/:id/status",
+				Handler: platform_private.ChangePlatformWhiteLabelTemplateStatusHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Jwt.AccessSecret),

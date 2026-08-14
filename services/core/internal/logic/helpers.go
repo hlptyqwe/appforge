@@ -228,6 +228,7 @@ func mapSigningConfig(item *models.TAppSigningConfig) *core.SigningConfig {
 		CreateTime:        millis(item.CreateTime),
 		UpdateTime:        millis(item.UpdateTime),
 		KeystoreObjectId:  item.KeystoreObjectId,
+		CertificateSha256: stringValue(item.CertificateSha256),
 	}
 }
 
@@ -236,35 +237,75 @@ func mapBuildTask(item *models.TBuildTask) *core.BuildTask {
 		return nil
 	}
 	return &core.BuildTask{
-		Id:                item.Id,
-		TenantId:          item.TenantId,
-		AppId:             item.AppId,
-		VersionId:         item.VersionId,
-		ChannelId:         item.ChannelId,
-		SigningConfigId:   item.SigningConfigId,
-		ChannelCode:       item.ChannelCode,
-		VersionCode:       item.VersionCode,
-		VersionName:       item.VersionName,
-		Status:            buildStatusToProto(item.Status),
-		BuilderId:         stringValue(item.BuilderId),
-		BuilderAttempt:    int32(item.BuilderAttempt),
-		Priority:          int32(item.Priority),
-		ApkUrl:            stringValue(item.ApkUrl),
-		ApkSha256:         stringValue(item.ApkSha256),
-		ApkSize:           item.ApkSize,
-		LogUrl:            stringValue(item.LogUrl),
-		ErrorMessage:      stringValue(item.ErrorMessage),
-		QueuedAt:          millis(item.QueuedAt),
-		StartTime:         timeValue(item.StartTime),
-		FinishTime:        timeValue(item.FinishTime),
-		CreateBy:          item.CreateBy,
-		CreateTime:        millis(item.CreateTime),
-		UpdateTime:        millis(item.UpdateTime),
-		SourceApkUrl:      stringValue(item.SourceApkUrl),
-		BuildConfigJson:   stringValue(item.BuildConfig),
-		SourceApkObjectId: item.SourceApkObjectId,
-		ApkObjectId:       item.ApkObjectId,
-		LogObjectId:       item.LogObjectId,
+		Id:                   item.Id,
+		TenantId:             item.TenantId,
+		AppId:                item.AppId,
+		VersionId:            item.VersionId,
+		ChannelId:            item.ChannelId,
+		SigningConfigId:      item.SigningConfigId,
+		ChannelCode:          item.ChannelCode,
+		VersionCode:          item.VersionCode,
+		VersionName:          item.VersionName,
+		Status:               buildStatusToProto(item.Status),
+		BuilderId:            stringValue(item.BuilderId),
+		BuilderAttempt:       int32(item.BuilderAttempt),
+		Priority:             int32(item.Priority),
+		ApkUrl:               stringValue(item.ApkUrl),
+		ApkSha256:            stringValue(item.ApkSha256),
+		ApkSize:              item.ApkSize,
+		LogUrl:               stringValue(item.LogUrl),
+		ErrorMessage:         stringValue(item.ErrorMessage),
+		QueuedAt:             millis(item.QueuedAt),
+		StartTime:            timeValue(item.StartTime),
+		FinishTime:           timeValue(item.FinishTime),
+		CreateBy:             item.CreateBy,
+		CreateTime:           millis(item.CreateTime),
+		UpdateTime:           millis(item.UpdateTime),
+		SourceApkUrl:         stringValue(item.SourceApkUrl),
+		BuildConfigJson:      stringValue(item.BuildConfig),
+		SourceApkObjectId:    item.SourceApkObjectId,
+		ApkObjectId:          item.ApkObjectId,
+		LogObjectId:          item.LogObjectId,
+		BrandingProfileId:    item.BrandingProfileId,
+		BrandingRevision:     int32(item.BrandingRevision),
+		BrandingSnapshotJson: stringValue(item.BrandingSnapshot),
+		WhiteLabelProductId:  item.WhiteLabelProductId,
+		TemplateRevision:     int32(item.TemplateRevision),
+		TemplateSnapshotJson: stringValue(item.TemplateSnapshot),
+	}
+}
+
+func mapBrandingProfile(item *models.TAppBrandingProfile) *core.BrandingProfile {
+	if item == nil {
+		return nil
+	}
+	return &core.BrandingProfile{
+		Id: item.Id, TenantId: item.TenantId, AppId: item.AppId,
+		ProfileName: item.ProfileName, AppName: item.AppName,
+		LogoObjectId: item.LogoObjectId, SplashObjectId: item.SplashObjectId,
+		ApiHost: item.ApiHost, RewriteMode: core.BrandingRewriteMode(item.RewriteMode),
+		LauncherIconTarget:   stringValue(item.LauncherIconTarget),
+		SplashResourceTarget: stringValue(item.SplashResourceTarget),
+		RuntimeConfigJson:    stringValue(item.RuntimeConfig),
+		Status:               core.BrandingProfileStatus(item.Status), Revision: int32(item.Revision),
+		CreateBy: item.CreateBy, CreateTime: millis(item.CreateTime), UpdateTime: millis(item.UpdateTime),
+	}
+}
+
+func mapBrandingPreflight(item *models.TBrandingPreflight) *core.BrandingPreflight {
+	if item == nil {
+		return nil
+	}
+	return &core.BrandingPreflight{
+		Id: item.Id, TenantId: item.TenantId, AppId: item.AppId,
+		BrandingProfileId: item.BrandingProfileId, BrandingRevision: int32(item.BrandingRevision),
+		VersionId: item.VersionId, Status: core.BrandingPreflightStatus(item.Status),
+		ReportJson: stringValue(item.ReportJson), SourceApkSha256: stringValue(item.SourceApkSha256),
+		ToolchainVersion: stringValue(item.ToolchainVersion), StartTime: timeValue(item.StartTime),
+		FinishTime: timeValue(item.FinishTime), CreateBy: item.CreateBy,
+		CreateTime: millis(item.CreateTime), UpdateTime: millis(item.UpdateTime),
+		BuilderId: stringValue(item.BuilderId), BuilderAttempt: int32(item.BuilderAttempt),
+		LeaseUntil: timeValue(item.LeaseUntil),
 	}
 }
 

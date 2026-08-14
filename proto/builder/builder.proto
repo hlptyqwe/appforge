@@ -98,9 +98,20 @@ message ValidateSigningMaterialReq {
   string key_password_ciphertext = 4; // Key密码密文
 }
 
+// 签名材料校验结果。
+message SigningMaterialValidation {
+  string certificate_sha256 = 1; // 签名证书SHA-256指纹，小写十六进制
+}
+
+// 签名材料校验响应。
+message ValidateSigningMaterialResp {
+  common.RespBase base = 1; // 通用响应
+  SigningMaterialValidation data = 2; // 校验结果
+}
+
 service Builder {
   // 使用实际签名工具校验签名材料，成功后方可创建可用签名配置。
-  rpc ValidateSigningMaterial(ValidateSigningMaterialReq) returns (RespBase);
+  rpc ValidateSigningMaterial(ValidateSigningMaterialReq) returns (ValidateSigningMaterialResp);
   rpc ClaimBuildTask(ClaimBuildTaskReq) returns (BuildTaskResp);
   rpc HeartbeatBuildTask(HeartbeatBuildTaskReq) returns (RespBase);
   rpc ReportBuildProgress(ReportBuildProgressReq) returns (RespBase);

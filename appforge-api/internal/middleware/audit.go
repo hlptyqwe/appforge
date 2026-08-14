@@ -291,7 +291,7 @@ func isAuditSecretKey(key string) bool {
 	switch normalized {
 	case "pwd", "token", "accesstoken", "refreshtoken",
 		"authorization", "cookie", "secret", "apikey", "accesskey", "secretkey",
-		"sessionkey", "googlecode", "otp", "verificationcode":
+		"sessionkey", "googlecode", "otp", "verificationcode", "parametervaluesjson":
 		return true
 	default:
 		return false

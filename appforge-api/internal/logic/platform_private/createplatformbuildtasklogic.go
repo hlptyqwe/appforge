@@ -29,7 +29,7 @@ func NewCreatePlatformBuildTaskLogic(ctx context.Context, svcCtx *svc.ServiceCon
 }
 
 func (l *CreatePlatformBuildTaskLogic) CreatePlatformBuildTask(req *types.CreatePlatformBuildTaskReq) (resp *types.PlatformBuildTaskResp, err error) {
-	item, err := l.svcCtx.CoreCli.CreateBuildTask(l.ctx, &core.CreateBuildTaskReq{AppId: req.AppId, VersionId: req.VersionId, ChannelId: req.ChannelId, SigningConfigId: req.SigningConfigId, Priority: req.Priority})
+	item, err := l.svcCtx.CoreCli.CreateBuildTask(l.ctx, &core.CreateBuildTaskReq{AppId: req.AppId, VersionId: req.VersionId, ChannelId: req.ChannelId, SigningConfigId: req.SigningConfigId, Priority: req.Priority, BrandingProfileId: req.BrandingProfileId, WhiteLabelProductId: req.WhiteLabelProductId})
 	if err != nil {
 		return nil, err
 	}

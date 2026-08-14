@@ -18,7 +18,9 @@ import (
 )
 
 const buildTaskSelect = `SELECT id, tenant_id, app_id, version_id, channel_id, signing_config_id,
-channel_code, version_code, version_name, source_apk_object_id, source_apk_url, build_config, status, builder_id,
+channel_code, version_code, version_name, source_apk_object_id, source_apk_url, build_config,
+branding_profile_id, branding_revision, branding_snapshot, status, builder_id,
+white_label_product_id, template_revision, template_snapshot,
 builder_attempt, priority, apk_object_id, apk_url, apk_sha256, apk_size, log_object_id, log_url, error_message, queued_at,
 start_time, finish_time, lease_until, create_by, create_time, update_time FROM t_build_task`
 

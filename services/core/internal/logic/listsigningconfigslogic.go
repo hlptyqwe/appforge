@@ -51,7 +51,7 @@ func (l *ListSigningConfigsLogic) ListSigningConfigs(in *core.SigningConfigListR
 	}
 	queryArgs := append(append([]any{}, args...), cursor, limit+1)
 	var items []models.TAppSigningConfig
-	query := fmt.Sprintf("SELECT id, tenant_id, app_id, name, keystore_object_id, keystore_object_key, key_alias, keystore_password_ciphertext, key_password_ciphertext, secret_ref, status, last_verified_at, create_by, create_time, update_time FROM t_app_signing_config WHERE %s AND id > ? ORDER BY id ASC LIMIT ?", whereSQL)
+	query := fmt.Sprintf("SELECT id, tenant_id, app_id, name, keystore_object_id, keystore_object_key, key_alias, certificate_sha256, keystore_password_ciphertext, key_password_ciphertext, secret_ref, status, last_verified_at, create_by, create_time, update_time FROM t_app_signing_config WHERE %s AND id > ? ORDER BY id ASC LIMIT ?", whereSQL)
 	if err := l.svcCtx.DB.QueryRowsCtx(l.ctx, &items, query, queryArgs...); err != nil {
 		return nil, status.Errorf(codes.Internal, "list signing configs failed: %v", err)
 	}

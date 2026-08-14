@@ -75,7 +75,10 @@ func validateStorageObjectInput(in *core.CreateStorageObjectReq, tenant int64) e
 	if in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_SOURCE_APK &&
 		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE &&
 		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK &&
-		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG {
+		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG &&
+		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO &&
+		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH &&
+		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE {
 		return status.Error(codes.InvalidArgument, "invalid storage object type")
 	}
 	if err := requireText(in.ObjectKey, "object_key", 500); err != nil {
@@ -103,6 +106,25 @@ func validateStorageObjectInput(in *core.CreateStorageObjectReq, tenant int64) e
 		}
 		if in.SizeBytes > 10*1024*1024 {
 			return status.Error(codes.InvalidArgument, "keystore must not exceed 10 MiB")
+		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO,
+		core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH:
+		if ext != ".png" && ext != ".webp" {
+			return status.Error(codes.InvalidArgument, "branding image must be a PNG or WebP file")
+		}
+		maxSize := int64(10 * 1024 * 1024)
+		if in.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO {
+			maxSize = 5 * 1024 * 1024
+		}
+		if in.SizeBytes > maxSize {
+			return status.Errorf(codes.InvalidArgument, "branding image must not exceed %d MiB", maxSize/(1024*1024))
+		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE:
+		if ext != ".json" && ext != ".xml" && ext != ".txt" && ext != ".png" && ext != ".webp" {
+			return status.Error(codes.InvalidArgument, "template file must be JSON, XML, TXT, PNG or WebP")
+		}
+		if in.SizeBytes > 2*1024*1024 {
+			return status.Error(codes.InvalidArgument, "template file must not exceed 2 MiB")
 		}
 	}
 	if strings.TrimSpace(in.ContentType) == "" {

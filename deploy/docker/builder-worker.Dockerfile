@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 FROM debian:bookworm-slim
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends aapt apksigner zipalign default-jre-headless ca-certificates \
+    && apt-get install -y --no-install-recommends aapt apksigner apktool zipalign imagemagick default-jre-headless ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system appforge \
     && useradd --system --gid appforge --create-home appforge \

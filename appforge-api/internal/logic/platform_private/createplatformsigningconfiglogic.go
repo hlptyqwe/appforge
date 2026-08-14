@@ -54,19 +54,24 @@ func (l *CreatePlatformSigningConfigLogic) CreatePlatformSigningConfig(req *type
 	if err != nil || storageObject.GetData() == nil {
 		return nil, status.Error(codes.InvalidArgument, "keystore object is unavailable")
 	}
-	if _, err := l.svcCtx.BuilderCli.ValidateSigningMaterial(l.ctx, &builder.ValidateSigningMaterialReq{
+	validation, err := l.svcCtx.BuilderCli.ValidateSigningMaterial(l.ctx, &builder.ValidateSigningMaterialReq{
 		KeystoreObjectKey:          storageObject.Data.ObjectKey,
 		KeyAlias:                   req.KeyAlias,
 		KeystorePasswordCiphertext: keystorePasswordCiphertext,
 		KeyPasswordCiphertext:      keyPasswordCiphertext,
-	}); err != nil {
+	})
+	if err != nil {
 		return nil, err
+	}
+	if validation.GetData() == nil || len(validation.Data.CertificateSha256) != 64 {
+		return nil, status.Error(codes.FailedPrecondition, "signing certificate fingerprint is unavailable")
 	}
 	item, err := l.svcCtx.CoreCli.CreateSigningConfig(l.ctx, &core.CreateSigningConfigReq{
 		AppId: req.AppId, Name: req.Name,
 		KeyAlias: req.KeyAlias, KeystorePasswordCiphertext: keystorePasswordCiphertext,
 		KeyPasswordCiphertext: keyPasswordCiphertext, SecretRef: req.SecretRef,
-		KeystoreObjectId: req.KeystoreObjectId,
+		KeystoreObjectId:  req.KeystoreObjectId,
+		CertificateSha256: validation.Data.CertificateSha256,
 	})
 	if err != nil {
 		return nil, err

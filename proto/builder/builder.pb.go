@@ -833,6 +833,104 @@ func (x *ValidateSigningMaterialReq) GetKeyPasswordCiphertext() string {
 	return ""
 }
 
+// 签名材料校验结果。
+type SigningMaterialValidation struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	CertificateSha256 string                 `protobuf:"bytes,1,opt,name=certificate_sha256,json=certificateSha256,proto3" json:"certificate_sha256,omitempty"` // 签名证书SHA-256指纹，小写十六进制
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *SigningMaterialValidation) Reset() {
+	*x = SigningMaterialValidation{}
+	mi := &file_proto_builder_builder_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SigningMaterialValidation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SigningMaterialValidation) ProtoMessage() {}
+
+func (x *SigningMaterialValidation) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SigningMaterialValidation.ProtoReflect.Descriptor instead.
+func (*SigningMaterialValidation) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SigningMaterialValidation) GetCertificateSha256() string {
+	if x != nil {
+		return x.CertificateSha256
+	}
+	return ""
+}
+
+// 签名材料校验响应。
+type ValidateSigningMaterialResp struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Base          *common.RespBase           `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *SigningMaterialValidation `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 校验结果
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ValidateSigningMaterialResp) Reset() {
+	*x = ValidateSigningMaterialResp{}
+	mi := &file_proto_builder_builder_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ValidateSigningMaterialResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ValidateSigningMaterialResp) ProtoMessage() {}
+
+func (x *ValidateSigningMaterialResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ValidateSigningMaterialResp.ProtoReflect.Descriptor instead.
+func (*ValidateSigningMaterialResp) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ValidateSigningMaterialResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ValidateSigningMaterialResp) GetData() *SigningMaterialValidation {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 var File_proto_builder_builder_proto protoreflect.FileDescriptor
 
 const file_proto_builder_builder_proto_rawDesc = "" +
@@ -911,7 +1009,12 @@ const file_proto_builder_builder_proto_rawDesc = "" +
 	"\x13keystore_object_key\x18\x01 \x01(\tR\x11keystoreObjectKey\x12\x1b\n" +
 	"\tkey_alias\x18\x02 \x01(\tR\bkeyAlias\x12@\n" +
 	"\x1ckeystore_password_ciphertext\x18\x03 \x01(\tR\x1akeystorePasswordCiphertext\x126\n" +
-	"\x17key_password_ciphertext\x18\x04 \x01(\tR\x15keyPasswordCiphertext*\xec\x01\n" +
+	"\x17key_password_ciphertext\x18\x04 \x01(\tR\x15keyPasswordCiphertext\"J\n" +
+	"\x19SigningMaterialValidation\x12-\n" +
+	"\x12certificate_sha256\x18\x01 \x01(\tR\x11certificateSha256\"{\n" +
+	"\x1bValidateSigningMaterialResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x126\n" +
+	"\x04data\x18\x02 \x01(\v2\".builder.SigningMaterialValidationR\x04data*\xec\x01\n" +
 	"\x0fBuildTaskStatus\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_UNKNOWN\x10\x00\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_PENDING\x10\x01\x12\x1e\n" +
@@ -919,9 +1022,9 @@ const file_proto_builder_builder_proto_rawDesc = "" +
 	"\x19BUILD_TASK_STATUS_SIGNING\x10\x03\x12\x1f\n" +
 	"\x1bBUILD_TASK_STATUS_UPLOADING\x10\x04\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_SUCCESS\x10\x05\x12\x1c\n" +
-	"\x18BUILD_TASK_STATUS_FAILED\x10\x062\xbc\x03\n" +
-	"\aBuilder\x12Q\n" +
-	"\x17ValidateSigningMaterial\x12#.builder.ValidateSigningMaterialReq\x1a\x11.builder.RespBase\x12D\n" +
+	"\x18BUILD_TASK_STATUS_FAILED\x10\x062\xcf\x03\n" +
+	"\aBuilder\x12d\n" +
+	"\x17ValidateSigningMaterial\x12#.builder.ValidateSigningMaterialReq\x1a$.builder.ValidateSigningMaterialResp\x12D\n" +
 	"\x0eClaimBuildTask\x12\x1a.builder.ClaimBuildTaskReq\x1a\x16.builder.BuildTaskResp\x12G\n" +
 	"\x12HeartbeatBuildTask\x12\x1e.builder.HeartbeatBuildTaskReq\x1a\x11.builder.RespBase\x12I\n" +
 	"\x13ReportBuildProgress\x12\x1f.builder.ReportBuildProgressReq\x1a\x11.builder.RespBase\x12E\n" +
@@ -941,43 +1044,47 @@ func file_proto_builder_builder_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_builder_builder_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_builder_builder_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_proto_builder_builder_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_proto_builder_builder_proto_goTypes = []any{
-	(BuildTaskStatus)(0),               // 0: builder.BuildTaskStatus
-	(*RespBase)(nil),                   // 1: builder.RespBase
-	(*BuildTask)(nil),                  // 2: builder.BuildTask
-	(*ClaimBuildTaskReq)(nil),          // 3: builder.ClaimBuildTaskReq
-	(*BuildTaskResp)(nil),              // 4: builder.BuildTaskResp
-	(*HeartbeatBuildTaskReq)(nil),      // 5: builder.HeartbeatBuildTaskReq
-	(*ReportBuildProgressReq)(nil),     // 6: builder.ReportBuildProgressReq
-	(*CompleteBuildTaskReq)(nil),       // 7: builder.CompleteBuildTaskReq
-	(*FailBuildTaskReq)(nil),           // 8: builder.FailBuildTaskReq
-	(*ValidateSigningMaterialReq)(nil), // 9: builder.ValidateSigningMaterialReq
-	(*common.RespBase)(nil),            // 10: common.RespBase
+	(BuildTaskStatus)(0),                // 0: builder.BuildTaskStatus
+	(*RespBase)(nil),                    // 1: builder.RespBase
+	(*BuildTask)(nil),                   // 2: builder.BuildTask
+	(*ClaimBuildTaskReq)(nil),           // 3: builder.ClaimBuildTaskReq
+	(*BuildTaskResp)(nil),               // 4: builder.BuildTaskResp
+	(*HeartbeatBuildTaskReq)(nil),       // 5: builder.HeartbeatBuildTaskReq
+	(*ReportBuildProgressReq)(nil),      // 6: builder.ReportBuildProgressReq
+	(*CompleteBuildTaskReq)(nil),        // 7: builder.CompleteBuildTaskReq
+	(*FailBuildTaskReq)(nil),            // 8: builder.FailBuildTaskReq
+	(*ValidateSigningMaterialReq)(nil),  // 9: builder.ValidateSigningMaterialReq
+	(*SigningMaterialValidation)(nil),   // 10: builder.SigningMaterialValidation
+	(*ValidateSigningMaterialResp)(nil), // 11: builder.ValidateSigningMaterialResp
+	(*common.RespBase)(nil),             // 12: common.RespBase
 }
 var file_proto_builder_builder_proto_depIdxs = []int32{
-	10, // 0: builder.RespBase.base:type_name -> common.RespBase
+	12, // 0: builder.RespBase.base:type_name -> common.RespBase
 	0,  // 1: builder.BuildTask.status:type_name -> builder.BuildTaskStatus
-	10, // 2: builder.BuildTaskResp.base:type_name -> common.RespBase
+	12, // 2: builder.BuildTaskResp.base:type_name -> common.RespBase
 	2,  // 3: builder.BuildTaskResp.data:type_name -> builder.BuildTask
 	0,  // 4: builder.ReportBuildProgressReq.status:type_name -> builder.BuildTaskStatus
-	9,  // 5: builder.Builder.ValidateSigningMaterial:input_type -> builder.ValidateSigningMaterialReq
-	3,  // 6: builder.Builder.ClaimBuildTask:input_type -> builder.ClaimBuildTaskReq
-	5,  // 7: builder.Builder.HeartbeatBuildTask:input_type -> builder.HeartbeatBuildTaskReq
-	6,  // 8: builder.Builder.ReportBuildProgress:input_type -> builder.ReportBuildProgressReq
-	7,  // 9: builder.Builder.CompleteBuildTask:input_type -> builder.CompleteBuildTaskReq
-	8,  // 10: builder.Builder.FailBuildTask:input_type -> builder.FailBuildTaskReq
-	1,  // 11: builder.Builder.ValidateSigningMaterial:output_type -> builder.RespBase
-	4,  // 12: builder.Builder.ClaimBuildTask:output_type -> builder.BuildTaskResp
-	1,  // 13: builder.Builder.HeartbeatBuildTask:output_type -> builder.RespBase
-	1,  // 14: builder.Builder.ReportBuildProgress:output_type -> builder.RespBase
-	1,  // 15: builder.Builder.CompleteBuildTask:output_type -> builder.RespBase
-	1,  // 16: builder.Builder.FailBuildTask:output_type -> builder.RespBase
-	11, // [11:17] is the sub-list for method output_type
-	5,  // [5:11] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	12, // 5: builder.ValidateSigningMaterialResp.base:type_name -> common.RespBase
+	10, // 6: builder.ValidateSigningMaterialResp.data:type_name -> builder.SigningMaterialValidation
+	9,  // 7: builder.Builder.ValidateSigningMaterial:input_type -> builder.ValidateSigningMaterialReq
+	3,  // 8: builder.Builder.ClaimBuildTask:input_type -> builder.ClaimBuildTaskReq
+	5,  // 9: builder.Builder.HeartbeatBuildTask:input_type -> builder.HeartbeatBuildTaskReq
+	6,  // 10: builder.Builder.ReportBuildProgress:input_type -> builder.ReportBuildProgressReq
+	7,  // 11: builder.Builder.CompleteBuildTask:input_type -> builder.CompleteBuildTaskReq
+	8,  // 12: builder.Builder.FailBuildTask:input_type -> builder.FailBuildTaskReq
+	11, // 13: builder.Builder.ValidateSigningMaterial:output_type -> builder.ValidateSigningMaterialResp
+	4,  // 14: builder.Builder.ClaimBuildTask:output_type -> builder.BuildTaskResp
+	1,  // 15: builder.Builder.HeartbeatBuildTask:output_type -> builder.RespBase
+	1,  // 16: builder.Builder.ReportBuildProgress:output_type -> builder.RespBase
+	1,  // 17: builder.Builder.CompleteBuildTask:output_type -> builder.RespBase
+	1,  // 18: builder.Builder.FailBuildTask:output_type -> builder.RespBase
+	13, // [13:19] is the sub-list for method output_type
+	7,  // [7:13] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_proto_builder_builder_proto_init() }
@@ -991,7 +1098,7 @@ func file_proto_builder_builder_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_builder_builder_proto_rawDesc), len(file_proto_builder_builder_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

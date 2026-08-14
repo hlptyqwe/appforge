@@ -68,6 +68,7 @@ export type PlatformSigningConfig = {
   lastVerifiedAt?: number
   createTime: number
   updateTime: number
+  certificateSha256?: string
 }
 
 export type PlatformBuildTask = {
@@ -97,6 +98,100 @@ export type PlatformBuildTask = {
   finishTime?: number
   createTime: number
   updateTime: number
+  brandingProfileId: number
+  brandingRevision: number
+  brandingSnapshotJson?: string
+  whiteLabelProductId: number
+  templateRevision: number
+  templateSnapshotJson?: string
+}
+
+export type PlatformBrandingProfile = {
+  id: number
+  tenantId: number
+  appId: number
+  profileName: string
+  appName: string
+  logoObjectId: number
+  splashObjectId: number
+  apiHost: string
+  rewriteMode: number
+  launcherIconTarget?: string
+  splashResourceTarget?: string
+  runtimeConfigJson?: string
+  status: number
+  revision: number
+  createTime: number
+  updateTime: number
+}
+
+export type PlatformBrandingPreflight = {
+  id: number
+  tenantId: number
+  appId: number
+  brandingProfileId: number
+  brandingRevision: number
+  versionId: number
+  status: number
+  reportJson?: string
+  sourceApkSha256?: string
+  toolchainVersion?: string
+  startTime?: number
+  finishTime?: number
+  createTime: number
+  updateTime: number
+}
+
+export type PlatformWhiteLabelTemplate = {
+  id: number
+  tenantId: number
+  appId: number
+  templateCode: string
+  templateName: string
+  sourceVersionId: number
+  parameterSchemaJson?: string
+  compatibilityRulesJson?: string
+  status: number
+  publishedRevision: number
+  createTime: number
+  updateTime: number
+}
+
+export type PlatformWhiteLabelTemplateRevision = {
+  id: number
+  tenantId: number
+  templateId: number
+  revision: number
+  packageNameRuleJson: string
+  manifestPatchJson?: string
+  resourcePatchJson?: string
+  extensionFilesJson?: string
+  expectedArtifactsJson?: string
+  checksum: string
+  status: number
+  createTime: number
+}
+
+export type PlatformWhiteLabelProduct = {
+  id: number
+  tenantId: number
+  appId: number
+  productCode: string
+  productName: string
+  templateId: number
+  templateRevision: number
+  brandingProfileId: number
+  packageName: string
+  signingConfigId: number
+  parameterValuesJson?: string
+  status: number
+  createTime: number
+  updateTime: number
+}
+
+export type PlatformWhiteLabelPreflight = {
+  compatible: boolean
+  reportJson: string
 }
 
 export type PlatformChannelStats = {
@@ -120,6 +215,30 @@ export class PlatformService {
   createChannel = api.createChannel
   listSigningConfigs = api.listSigningConfigs
   createSigningConfig = api.createSigningConfig
+  listBrandingProfiles = api.listBrandingProfiles
+  createBrandingProfile = api.createBrandingProfile
+  updateBrandingProfile = api.updateBrandingProfile
+  changeBrandingProfileStatus = api.changeBrandingProfileStatus
+  createBrandingPreflight = api.createBrandingPreflight
+  listBrandingPreflights = api.listBrandingPreflights
+  listWhiteLabelTemplates = api.listWhiteLabelTemplates
+  createWhiteLabelTemplate = api.createWhiteLabelTemplate
+  updateWhiteLabelTemplate = api.updateWhiteLabelTemplate
+  copyWhiteLabelTemplate = api.copyWhiteLabelTemplate
+  deleteWhiteLabelTemplate = api.deleteWhiteLabelTemplate
+  createWhiteLabelTemplateRevision = api.createWhiteLabelTemplateRevision
+  getWhiteLabelTemplateRevision = api.getWhiteLabelTemplateRevision
+  updateWhiteLabelTemplateRevision = api.updateWhiteLabelTemplateRevision
+  deleteWhiteLabelTemplateRevision = api.deleteWhiteLabelTemplateRevision
+  listWhiteLabelTemplateRevisions = api.listWhiteLabelTemplateRevisions
+  publishWhiteLabelTemplate = api.publishWhiteLabelTemplate
+  changeWhiteLabelTemplateStatus = api.changeWhiteLabelTemplateStatus
+  listWhiteLabelProducts = api.listWhiteLabelProducts
+  createWhiteLabelProduct = api.createWhiteLabelProduct
+  updateWhiteLabelProduct = api.updateWhiteLabelProduct
+  deleteWhiteLabelProduct = api.deleteWhiteLabelProduct
+  changeWhiteLabelProductStatus = api.changeWhiteLabelProductStatus
+  preflightWhiteLabelProduct = api.preflightWhiteLabelProduct
   listBuildTasks = api.listBuildTasks
   createBuildTask = api.createBuildTask
   getChannelStats = api.getChannelStats
@@ -127,8 +246,6 @@ export class PlatformService {
 }
 
 export type PlatformListCall = (params: PlatformListReq) => Promise<RespBase<any[]>>
-export type PlatformCreateCall = (
-  data: Record<string, unknown>,
-) => Promise<RespBase<any>>
+export type PlatformCreateCall = (data: Record<string, unknown>) => Promise<RespBase<any>>
 
 export const platformService = new PlatformService()

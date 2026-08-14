@@ -24,7 +24,7 @@ func NewBuilderServer(svcCtx *svc.ServiceContext) *BuilderServer {
 }
 
 // 使用实际签名工具校验签名材料，成功后方可创建可用签名配置。
-func (s *BuilderServer) ValidateSigningMaterial(ctx context.Context, in *builder.ValidateSigningMaterialReq) (*builder.RespBase, error) {
+func (s *BuilderServer) ValidateSigningMaterial(ctx context.Context, in *builder.ValidateSigningMaterialReq) (*builder.ValidateSigningMaterialResp, error) {
 	l := logic.NewValidateSigningMaterialLogic(ctx, s.svcCtx)
 	return l.ValidateSigningMaterial(in)
 }

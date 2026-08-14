@@ -32,7 +32,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BuilderClient interface {
 	// 使用实际签名工具校验签名材料，成功后方可创建可用签名配置。
-	ValidateSigningMaterial(ctx context.Context, in *ValidateSigningMaterialReq, opts ...grpc.CallOption) (*RespBase, error)
+	ValidateSigningMaterial(ctx context.Context, in *ValidateSigningMaterialReq, opts ...grpc.CallOption) (*ValidateSigningMaterialResp, error)
 	ClaimBuildTask(ctx context.Context, in *ClaimBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 	HeartbeatBuildTask(ctx context.Context, in *HeartbeatBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
 	ReportBuildProgress(ctx context.Context, in *ReportBuildProgressReq, opts ...grpc.CallOption) (*RespBase, error)
@@ -48,9 +48,9 @@ func NewBuilderClient(cc grpc.ClientConnInterface) BuilderClient {
 	return &builderClient{cc}
 }
 
-func (c *builderClient) ValidateSigningMaterial(ctx context.Context, in *ValidateSigningMaterialReq, opts ...grpc.CallOption) (*RespBase, error) {
+func (c *builderClient) ValidateSigningMaterial(ctx context.Context, in *ValidateSigningMaterialReq, opts ...grpc.CallOption) (*ValidateSigningMaterialResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RespBase)
+	out := new(ValidateSigningMaterialResp)
 	err := c.cc.Invoke(ctx, Builder_ValidateSigningMaterial_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -113,7 +113,7 @@ func (c *builderClient) FailBuildTask(ctx context.Context, in *FailBuildTaskReq,
 // for forward compatibility.
 type BuilderServer interface {
 	// 使用实际签名工具校验签名材料，成功后方可创建可用签名配置。
-	ValidateSigningMaterial(context.Context, *ValidateSigningMaterialReq) (*RespBase, error)
+	ValidateSigningMaterial(context.Context, *ValidateSigningMaterialReq) (*ValidateSigningMaterialResp, error)
 	ClaimBuildTask(context.Context, *ClaimBuildTaskReq) (*BuildTaskResp, error)
 	HeartbeatBuildTask(context.Context, *HeartbeatBuildTaskReq) (*RespBase, error)
 	ReportBuildProgress(context.Context, *ReportBuildProgressReq) (*RespBase, error)
@@ -129,7 +129,7 @@ type BuilderServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBuilderServer struct{}
 
-func (UnimplementedBuilderServer) ValidateSigningMaterial(context.Context, *ValidateSigningMaterialReq) (*RespBase, error) {
+func (UnimplementedBuilderServer) ValidateSigningMaterial(context.Context, *ValidateSigningMaterialReq) (*ValidateSigningMaterialResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ValidateSigningMaterial not implemented")
 }
 func (UnimplementedBuilderServer) ClaimBuildTask(context.Context, *ClaimBuildTaskReq) (*BuildTaskResp, error) {

@@ -3,7 +3,9 @@ package logic
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -36,7 +38,7 @@ func NewValidateSigningMaterialLogic(ctx context.Context, svcCtx *svc.ServiceCon
 }
 
 // 使用实际签名工具校验签名材料，成功后方可创建可用签名配置。
-func (l *ValidateSigningMaterialLogic) ValidateSigningMaterial(in *builder.ValidateSigningMaterialReq) (*builder.RespBase, error) {
+func (l *ValidateSigningMaterialLogic) ValidateSigningMaterial(in *builder.ValidateSigningMaterialReq) (*builder.ValidateSigningMaterialResp, error) {
 	if in == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is required")
 	}
@@ -104,9 +106,6 @@ func (l *ValidateSigningMaterialLogic) ValidateSigningMaterial(in *builder.Valid
 		"APPFORGE_DESTINATION_PASSWORD="+destinationPassword,
 	)
 	output, err := command.CombinedOutput()
-	keystorePassword = ""
-	keyPassword = ""
-	destinationPassword = ""
 	if err != nil {
 		l.Errorf("keystore validation failed: %v (%s)", err, safeToolOutput(output))
 		return nil, status.Error(codes.InvalidArgument, "keystore password, key password or alias is invalid")
@@ -114,8 +113,22 @@ func (l *ValidateSigningMaterialLogic) ValidateSigningMaterial(in *builder.Valid
 	if info, err := os.Stat(destinationPath); err != nil || info.Size() <= 0 {
 		return nil, status.Error(codes.InvalidArgument, "keystore alias does not contain a private key")
 	}
+	certificateCommand := exec.CommandContext(l.ctx, "keytool", "-exportcert", "-keystore", keystorePath,
+		"-storepass:env", "APPFORGE_KEYSTORE_PASSWORD", "-alias", in.KeyAlias)
+	certificateCommand.Env = append(os.Environ(), "APPFORGE_KEYSTORE_PASSWORD="+keystorePassword)
+	certificate, err := certificateCommand.Output()
+	keystorePassword = ""
+	keyPassword = ""
+	destinationPassword = ""
+	if err != nil || len(certificate) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "signing certificate cannot be exported")
+	}
+	fingerprint := sha256.Sum256(certificate)
 
-	return &builder.RespBase{Base: &common.RespBase{Code: 200, Msg: "OK"}}, nil
+	return &builder.ValidateSigningMaterialResp{
+		Base: &common.RespBase{Code: 200, Msg: "OK"},
+		Data: &builder.SigningMaterialValidation{CertificateSha256: hex.EncodeToString(fingerprint[:])},
+	}, nil
 }
 
 func safeToolOutput(output []byte) string {

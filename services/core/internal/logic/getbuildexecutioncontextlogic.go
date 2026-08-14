@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"strings"
 
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
@@ -67,13 +68,60 @@ func (l *GetBuildExecutionContextLogic) GetBuildExecutionContext(in *core.GetBui
 	if err != nil || keystore.TenantId != task.TenantId || keystore.ObjectType != int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE) || keystore.Status != storageStatusBound {
 		return nil, status.Error(codes.FailedPrecondition, "keystore object is unavailable")
 	}
+	branding, err := parseBrandingSnapshot(stringValue(task.BrandingSnapshot))
+	if err != nil {
+		return nil, err
+	}
+	whiteLabel, err := parseWhiteLabelBuildSnapshot(stringValue(task.TemplateSnapshot))
+	if err != nil {
+		return nil, err
+	}
+	var brandLogo, brandSplash *models.TStorageObject
+	templateFiles := make([]*core.StorageObject, 0)
+	apiHost := stringValue(app.ApiHost)
+	packageName := app.PackageName
+	certificateSHA256 := stringValue(signing.CertificateSha256)
+	if whiteLabel != nil {
+		if task.WhiteLabelProductId != whiteLabel.ProductID || task.TemplateRevision != whiteLabel.TemplateRevision {
+			return nil, status.Error(codes.FailedPrecondition, "white-label task snapshot is inconsistent")
+		}
+		if !strings.EqualFold(whiteLabel.CertificateSHA256, certificateSHA256) {
+			return nil, status.Error(codes.FailedPrecondition, "signing certificate no longer matches task snapshot")
+		}
+		packageName = whiteLabel.TargetPackageName
+		objectIDs, bindingErr := templateFileObjectIDs(whiteLabel)
+		if bindingErr != nil {
+			return nil, bindingErr
+		}
+		for _, objectID := range objectIDs {
+			item, findErr := l.svcCtx.StorageObjectModel.FindOne(l.ctx, objectID)
+			if findErr != nil || item.TenantId != task.TenantId || item.AppId != task.AppId ||
+				item.ObjectType != int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE) || item.Status != storageStatusBound {
+				return nil, status.Errorf(codes.FailedPrecondition, "template file object %d is unavailable", objectID)
+			}
+			templateFiles = append(templateFiles, mapStorageObject(item))
+		}
+	}
+	if branding != nil {
+		brandLogo, err = l.svcCtx.StorageObjectModel.FindOne(l.ctx, branding.LogoObjectID)
+		if err != nil || brandLogo.TenantId != task.TenantId || brandLogo.AppId != task.AppId ||
+			brandLogo.ObjectType != int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO) || brandLogo.Status != storageStatusBound {
+			return nil, status.Error(codes.FailedPrecondition, "brand logo object is unavailable")
+		}
+		brandSplash, err = l.svcCtx.StorageObjectModel.FindOne(l.ctx, branding.SplashObjectID)
+		if err != nil || brandSplash.TenantId != task.TenantId || brandSplash.AppId != task.AppId ||
+			brandSplash.ObjectType != int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH) || brandSplash.Status != storageStatusBound {
+			return nil, status.Error(codes.FailedPrecondition, "brand splash object is unavailable")
+		}
+		apiHost = branding.APIHost
+	}
 
 	return &core.BuildExecutionContextResp{
 		Base: okBase(),
 		Data: &core.BuildExecutionContext{
 			Task:                       mapBuildTask(&task),
-			PackageName:                app.PackageName,
-			ApiHost:                    stringValue(app.ApiHost),
+			PackageName:                packageName,
+			ApiHost:                    apiHost,
 			ChannelName:                channel.ChannelName,
 			LandingUrl:                 stringValue(channel.LandingUrl),
 			SourceApk:                  mapStorageObject(source),
@@ -82,6 +130,12 @@ func (l *GetBuildExecutionContextLogic) GetBuildExecutionContext(in *core.GetBui
 			KeystorePasswordCiphertext: stringValue(signing.KeystorePasswordCiphertext),
 			KeyPasswordCiphertext:      stringValue(signing.KeyPasswordCiphertext),
 			SecretRef:                  stringValue(signing.SecretRef),
+			BrandingSnapshotJson:       stringValue(task.BrandingSnapshot),
+			BrandLogo:                  mapStorageObject(brandLogo),
+			BrandSplash:                mapStorageObject(brandSplash),
+			TemplateSnapshotJson:       stringValue(task.TemplateSnapshot),
+			SignerCertificateSha256:    certificateSHA256,
+			TemplateFiles:              templateFiles,
 		},
 	}, nil
 }

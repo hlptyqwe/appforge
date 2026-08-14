@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"archive/zip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -10,6 +11,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -79,6 +81,13 @@ func (w *Worker) Run(ctx context.Context) error {
 	for {
 		if err := ctx.Err(); err != nil {
 			return nil
+		}
+		handledPreflight, preflightErr := w.claimAndExecutePreflight(ctx)
+		if preflightErr != nil {
+			log.Printf("execute branding preflight failed: %v", preflightErr)
+		}
+		if handledPreflight {
+			continue
 		}
 		claimCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
 		response, err := w.builder.ClaimBuildTask(claimCtx, &builder.ClaimBuildTaskReq{
@@ -224,12 +233,64 @@ func (w *Worker) execute(parent context.Context, task *builder.BuildTask) error 
 		closeLog()
 		return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("download keystore: %w", err))
 	}
+	branding, err := decodeBuildBrandingSnapshot(data.BrandingSnapshotJson)
+	if err != nil {
+		closeLog()
+		return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+	}
+	whiteLabel, err := decodeWhiteLabelBuildSnapshot(data.TemplateSnapshotJson)
+	if err != nil {
+		closeLog()
+		return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+	}
+	if whiteLabel != nil {
+		if err := whiteLabel.decryptSensitiveParameters(w.secrets.Open); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("decrypt white-label parameters: %w", err))
+		}
+	}
+	if whiteLabel != nil && branding == nil {
+		closeLog()
+		return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("white-label build requires a branding snapshot"))
+	}
+	templateFiles := make(map[int64]string, len(data.TemplateFiles))
+	for _, object := range data.TemplateFiles {
+		if object.GetId() <= 0 || object.GetObjectType() != core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("template file metadata is invalid"))
+		}
+		if _, exists := templateFiles[object.Id]; exists {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("duplicate template file metadata"))
+		}
+		objectPath := filepath.Join(workDir, "template-files", fmt.Sprint(object.Id))
+		if err := os.MkdirAll(filepath.Dir(objectPath), 0o700); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+		}
+		if err := w.downloadVerified(ctx, object, objectPath); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("download template file %d: %w", object.Id, err))
+		}
+		templateFiles[object.Id] = objectPath
+	}
+	logoPath := filepath.Join(workDir, "brand-logo")
+	splashPath := filepath.Join(workDir, "brand-splash")
+	if branding != nil {
+		if err := w.downloadVerified(ctx, data.BrandLogo, logoPath); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("download brand logo: %w", err))
+		}
+		if err := w.downloadVerified(ctx, data.BrandSplash, splashPath); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("download brand splash: %w", err))
+		}
+	}
 	if err := runAndLog(ctx, logFile, nil, "aapt", "dump", "badging", sourcePath); err != nil {
 		closeLog()
 		return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("validate source APK: %w", err))
 	}
 
-	unsignedPath := filepath.Join(workDir, "unsigned.apk")
 	payload := channelPayload{
 		SchemaVersion: 1, TenantID: data.Task.TenantId, AppID: data.Task.AppId,
 		VersionID: data.Task.VersionId, BuildTaskID: data.Task.Id,
@@ -238,11 +299,21 @@ func (w *Worker) execute(parent context.Context, task *builder.BuildTask) error 
 		VersionCode: data.Task.VersionCode, VersionName: data.Task.VersionName,
 		BuildTime: time.Now().UTC().Format(time.RFC3339),
 	}
-	if err := injectChannelAsset(sourcePath, unsignedPath, payload); err != nil {
-		closeLog()
-		return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+	unsignedPath := filepath.Join(workDir, "unsigned.apk")
+	if branding == nil {
+		if err := injectChannelAsset(sourcePath, unsignedPath, payload); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+		}
+	} else {
+		unsignedPath, err = buildBrandedAPK(ctx, logFile, sourcePath, logoPath, splashPath, workDir,
+			branding, whiteLabel, templateFiles, data.BrandLogo, data.BrandSplash, payload)
+		if err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+		}
 	}
-	w.writeLog(logFile, "channel asset injected: %s", data.Task.ChannelCode)
+	w.writeLog(logFile, "channel and branding assets injected: channel=%s branding_revision=%d", data.Task.ChannelCode, data.Task.BrandingRevision)
 	if err := w.report(ctx, task.Id, task.BuilderAttempt, builder.BuildTaskStatus_BUILD_TASK_STATUS_SIGNING, "signing APK", 55); err != nil {
 		closeLog()
 		return w.fail(ctx, task, logPath, data.Task.TenantId, err)
@@ -273,6 +344,10 @@ func (w *Worker) execute(parent context.Context, task *builder.BuildTask) error 
 		closeLog()
 		return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("validate keystore alias or password: %w", err))
 	}
+	if err := verifyKeystoreCertificate(ctx, keystorePath, data.KeyAlias, keystorePassword, data.SignerCertificateSha256); err != nil {
+		closeLog()
+		return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+	}
 	if err := runAndLog(ctx, logFile, secretEnv, "apksigner", "sign", "--ks", keystorePath,
 		"--ks-key-alias", data.KeyAlias, "--ks-pass", "env:APPFORGE_KEYSTORE_PASSWORD",
 		"--key-pass", "env:APPFORGE_KEY_PASSWORD", "--out", signedPath, alignedPath); err != nil {
@@ -289,6 +364,22 @@ func (w *Worker) execute(parent context.Context, task *builder.BuildTask) error 
 	if err := verifyPackageName(ctx, logFile, signedPath, data.PackageName); err != nil {
 		closeLog()
 		return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+	}
+	if branding != nil {
+		if err := verifyApplicationLabel(ctx, logFile, signedPath, branding.AppName); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+		}
+		if err := verifyAPKAsset(signedPath, brandingAssetPath, `"revision":`+fmt.Sprint(branding.Revision)); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+		}
+	}
+	if whiteLabel != nil {
+		if err := verifyAPKAsset(signedPath, whiteLabelAssetPath, `"templateChecksum":"`+whiteLabel.TemplateChecksum+`"`); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+		}
 	}
 	if err := w.report(ctx, task.Id, task.BuilderAttempt, builder.BuildTaskStatus_BUILD_TASK_STATUS_UPLOADING, "uploading build artifacts", 85); err != nil {
 		closeLog()
@@ -460,6 +551,47 @@ func verifyPackageName(ctx context.Context, output io.Writer, apkPath, expected 
 		return fmt.Errorf("APK package name does not match application package %q", expected)
 	}
 	return nil
+}
+
+func verifyApplicationLabel(ctx context.Context, output io.Writer, apkPath, expected string) error {
+	command := exec.CommandContext(ctx, "aapt", "dump", "badging", apkPath)
+	result, err := command.CombinedOutput()
+	_, _ = output.Write(result)
+	if err != nil {
+		return fmt.Errorf("read APK application label: %w", err)
+	}
+	if !strings.Contains(string(result), "application-label:'"+expected+"'") &&
+		!strings.Contains(string(result), ":'"+expected+"'") {
+		return fmt.Errorf("APK application label does not match branding name %q", expected)
+	}
+	return nil
+}
+
+func verifyAPKAsset(apkPath, assetPath, expected string) error {
+	archive, err := zip.OpenReader(apkPath)
+	if err != nil {
+		return fmt.Errorf("open built APK for asset verification: %w", err)
+	}
+	defer archive.Close()
+	for _, item := range archive.File {
+		if path.Clean(item.Name) != assetPath {
+			continue
+		}
+		reader, err := item.Open()
+		if err != nil {
+			return err
+		}
+		content, readErr := io.ReadAll(io.LimitReader(reader, 1024*1024))
+		_ = reader.Close()
+		if readErr != nil {
+			return readErr
+		}
+		if !strings.Contains(string(content), expected) {
+			return fmt.Errorf("APK asset %s does not contain expected snapshot", assetPath)
+		}
+		return nil
+	}
+	return fmt.Errorf("APK asset %s is missing", assetPath)
 }
 
 func fileDigest(filePath string) (int64, string, error) {

@@ -2,13 +2,19 @@ package logic
 
 import (
 	"archive/zip"
+	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
+	"encoding/xml"
+	"image/png"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
+	"unicode/utf8"
 
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
@@ -23,8 +29,11 @@ import (
 )
 
 const (
-	maxSourceAPKBytes = int64(2 * 1024 * 1024 * 1024)
-	maxKeystoreBytes  = int64(10 * 1024 * 1024)
+	maxSourceAPKBytes    = int64(2 * 1024 * 1024 * 1024)
+	maxKeystoreBytes     = int64(10 * 1024 * 1024)
+	maxBrandLogoBytes    = int64(5 * 1024 * 1024)
+	maxBrandSplashBytes  = int64(10 * 1024 * 1024)
+	maxTemplateFileBytes = int64(2 * 1024 * 1024)
 )
 
 // LoadObjectStore loads system-level storage credentials for internal use only.
@@ -73,6 +82,12 @@ func GenerateStorageObjectKey(ctx context.Context, objectType core.StorageObject
 		prefix = "source-apk"
 	case core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE:
 		prefix = "keystore"
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO:
+		prefix = "brand-logo"
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH:
+		prefix = "brand-splash"
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE:
+		prefix = "template-file"
 	default:
 		return "", status.Error(codes.InvalidArgument, "upload object type is not supported")
 	}
@@ -101,6 +116,15 @@ func VerifyStorageObject(ctx context.Context, store storage.ObjectStore, item *c
 	}
 	if item.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE && info.Size > maxKeystoreBytes {
 		return 0, "", status.Error(codes.InvalidArgument, "keystore exceeds 10 MiB")
+	}
+	if item.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO && info.Size > maxBrandLogoBytes {
+		return 0, "", status.Error(codes.InvalidArgument, "brand logo exceeds 5 MiB")
+	}
+	if item.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH && info.Size > maxBrandSplashBytes {
+		return 0, "", status.Error(codes.InvalidArgument, "brand splash exceeds 10 MiB")
+	}
+	if item.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE && info.Size > maxTemplateFileBytes {
+		return 0, "", status.Error(codes.InvalidArgument, "template file exceeds 2 MiB")
 	}
 
 	reader, err := store.OpenObject(ctx, item.ObjectKey)
@@ -138,10 +162,180 @@ func VerifyStorageObject(ctx context.Context, store storage.ObjectStore, item *c
 		if err := verifyKeystoreHeader(tempPath); err != nil {
 			return 0, "", err
 		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO,
+		core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH:
+		if err := verifyBrandingImage(tempPath, item.ObjectType); err != nil {
+			return 0, "", err
+		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE:
+		if err := verifyTemplateFile(tempPath, item.OriginalName); err != nil {
+			return 0, "", err
+		}
 	default:
 		return 0, "", status.Error(codes.InvalidArgument, "upload object type is not supported")
 	}
 	return written, hex.EncodeToString(hasher.Sum(nil)), nil
+}
+
+func verifyTemplateFile(filename, originalName string) error {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return status.Errorf(codes.Internal, "read template file failed: %v", err)
+	}
+	switch strings.ToLower(filepath.Ext(strings.TrimSpace(originalName))) {
+	case ".json":
+		if !json.Valid(data) {
+			return status.Error(codes.InvalidArgument, "template JSON file is invalid")
+		}
+		var value any
+		if err := json.Unmarshal(data, &value); err != nil || containsTemplateSecret(value) {
+			return status.Error(codes.InvalidArgument, "template files cannot contain plaintext secrets; use a sensitive template parameter")
+		}
+	case ".xml":
+		decoder := xml.NewDecoder(bytes.NewReader(data))
+		for {
+			token, decodeErr := decoder.Token()
+			if decodeErr == io.EOF {
+				break
+			}
+			if decodeErr != nil {
+				return status.Error(codes.InvalidArgument, "template XML file is invalid")
+			}
+			if _, forbidden := token.(xml.Directive); forbidden {
+				return status.Error(codes.InvalidArgument, "template XML directives are not allowed")
+			}
+		}
+	case ".txt":
+		if !utf8.Valid(data) {
+			return status.Error(codes.InvalidArgument, "template TXT file must be UTF-8")
+		}
+	case ".png":
+		if _, err := png.DecodeConfig(bytes.NewReader(data)); err != nil {
+			return status.Error(codes.InvalidArgument, "template PNG file is invalid")
+		}
+	case ".webp":
+		if _, _, err := webPDimensions(data); err != nil {
+			return err
+		}
+	default:
+		return status.Error(codes.InvalidArgument, "template file type is not supported")
+	}
+	if containsSecretText(string(data)) {
+		return status.Error(codes.InvalidArgument, "template files cannot contain plaintext secrets; use a sensitive template parameter")
+	}
+	return nil
+}
+
+func containsTemplateSecret(value any) bool {
+	switch typed := value.(type) {
+	case map[string]any:
+		for key, child := range typed {
+			normalized := strings.NewReplacer("_", "", "-", "").Replace(strings.ToLower(key))
+			if normalized == "clientsecret" || normalized == "privatekey" || normalized == "password" ||
+				normalized == "accesstoken" || normalized == "refreshtoken" {
+				return true
+			}
+			if containsTemplateSecret(child) {
+				return true
+			}
+		}
+	case []any:
+		for _, child := range typed {
+			if containsTemplateSecret(child) {
+				return true
+			}
+		}
+	case string:
+		return containsSecretText(typed)
+	}
+	return false
+}
+
+func containsSecretText(value string) bool {
+	lower := strings.ToLower(value)
+	for _, marker := range []string{"-----begin private key", "-----begin rsa private key", "client_secret", "<clientsecret", "<password", "access_token", "refresh_token"} {
+		if strings.Contains(lower, marker) {
+			return true
+		}
+	}
+	return false
+}
+
+func verifyBrandingImage(filename string, objectType core.StorageObjectType) error {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return status.Errorf(codes.Internal, "read branding image failed: %v", err)
+	}
+	var width, height int
+	switch {
+	case len(data) >= 8 && bytes.Equal(data[:8], []byte("\x89PNG\r\n\x1a\n")):
+		config, decodeErr := png.DecodeConfig(bytes.NewReader(data))
+		if decodeErr != nil {
+			return status.Error(codes.InvalidArgument, "branding PNG is invalid")
+		}
+		width, height = config.Width, config.Height
+	case len(data) >= 12 && string(data[:4]) == "RIFF" && string(data[8:12]) == "WEBP":
+		width, height, err = webPDimensions(data)
+		if err != nil {
+			return err
+		}
+	default:
+		return status.Error(codes.InvalidArgument, "branding image must be a real PNG or WebP file")
+	}
+	if objectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO {
+		if width != height || width < 512 || width > 2048 {
+			return status.Error(codes.InvalidArgument, "brand logo must be square and between 512x512 and 2048x2048")
+		}
+		return nil
+	}
+	if width < 720 || height < 720 {
+		return status.Error(codes.InvalidArgument, "brand splash shortest side must be at least 720 pixels")
+	}
+	return nil
+}
+
+func webPDimensions(data []byte) (int, int, error) {
+	width, height := 0, 0
+	for offset := 12; offset+8 <= len(data); {
+		chunkType := string(data[offset : offset+4])
+		size := int(binary.LittleEndian.Uint32(data[offset+4 : offset+8]))
+		start := offset + 8
+		end := start + size
+		if size < 0 || end < start || end > len(data) {
+			return 0, 0, status.Error(codes.InvalidArgument, "branding WebP has an invalid chunk")
+		}
+		chunk := data[start:end]
+		switch chunkType {
+		case "ANIM", "ANMF":
+			return 0, 0, status.Error(codes.InvalidArgument, "animated WebP is not supported")
+		case "VP8X":
+			if len(chunk) < 10 {
+				return 0, 0, status.Error(codes.InvalidArgument, "branding WebP VP8X header is invalid")
+			}
+			if chunk[0]&0x02 != 0 {
+				return 0, 0, status.Error(codes.InvalidArgument, "animated WebP is not supported")
+			}
+			width = 1 + int(chunk[4]) + int(chunk[5])<<8 + int(chunk[6])<<16
+			height = 1 + int(chunk[7]) + int(chunk[8])<<8 + int(chunk[9])<<16
+		case "VP8 ":
+			if len(chunk) < 10 || !bytes.Equal(chunk[3:6], []byte{0x9d, 0x01, 0x2a}) {
+				return 0, 0, status.Error(codes.InvalidArgument, "branding WebP VP8 header is invalid")
+			}
+			width = int(binary.LittleEndian.Uint16(chunk[6:8]) & 0x3fff)
+			height = int(binary.LittleEndian.Uint16(chunk[8:10]) & 0x3fff)
+		case "VP8L":
+			if len(chunk) < 5 || chunk[0] != 0x2f {
+				return 0, 0, status.Error(codes.InvalidArgument, "branding WebP VP8L header is invalid")
+			}
+			width = 1 + int(chunk[1]) + (int(chunk[2]&0x3f) << 8)
+			height = 1 + int(chunk[2]>>6) + (int(chunk[3]) << 2) + (int(chunk[4]&0x0f) << 10)
+		}
+		offset = end + size%2
+	}
+	if width <= 0 || height <= 0 {
+		return 0, 0, status.Error(codes.InvalidArgument, "branding WebP dimensions are unavailable")
+	}
+	return width, height, nil
 }
 
 func verifyAPK(filename string) error {

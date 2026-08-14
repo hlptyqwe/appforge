@@ -41,7 +41,7 @@ func TestAuditMiddlewareRedactsSecretsAndForcesTenantScope(t *testing.T) {
 	req := httptest.NewRequest(
 		http.MethodPut,
 		"/admin/system/users/10?accessToken=query-secret",
-		strings.NewReader(`{"tenantId":99,"password":"request-secret","keystorePassword":"keystore-secret","profile":{"otp":"123456","keyPasswordCiphertext":"cipher-secret"}}`),
+		strings.NewReader(`{"tenantId":99,"password":"request-secret","keystorePassword":"keystore-secret","parameterValuesJson":"{\"clientSecret\":\"oauth-plaintext\"}","profile":{"otp":"123456","keyPasswordCiphertext":"cipher-secret"}}`),
 	)
 	req.RemoteAddr = "192.0.2.1:1234"
 	resp := httptest.NewRecorder()
@@ -60,7 +60,7 @@ func TestAuditMiddlewareRedactsSecretsAndForcesTenantScope(t *testing.T) {
 	if log.Module != "system:user" || log.Action != "update" {
 		t.Fatalf("unexpected module/action: %q/%q", log.Module, log.Action)
 	}
-	for _, secret := range []string{"request-secret", "keystore-secret", "cipher-secret", "query-secret", "123456", "response-secret"} {
+	for _, secret := range []string{"request-secret", "keystore-secret", "cipher-secret", "query-secret", "123456", "response-secret", "oauth-plaintext"} {
 		if strings.Contains(log.Req, secret) || strings.Contains(log.Resp, secret) {
 			t.Fatalf("secret %q was not redacted: req=%s resp=%s", secret, log.Req, log.Resp)
 		}

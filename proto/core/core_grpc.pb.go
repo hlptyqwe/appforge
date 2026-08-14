@@ -19,37 +19,67 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Core_CreateApplication_FullMethodName          = "/core.Core/CreateApplication"
-	Core_GetApplication_FullMethodName             = "/core.Core/GetApplication"
-	Core_ListApplications_FullMethodName           = "/core.Core/ListApplications"
-	Core_CreateStorageObject_FullMethodName        = "/core.Core/CreateStorageObject"
-	Core_GetStorageObject_FullMethodName           = "/core.Core/GetStorageObject"
-	Core_CompleteStorageObject_FullMethodName      = "/core.Core/CompleteStorageObject"
-	Core_FailStorageObject_FullMethodName          = "/core.Core/FailStorageObject"
-	Core_ClaimExpiredStorageObjects_FullMethodName = "/core.Core/ClaimExpiredStorageObjects"
-	Core_MarkStorageObjectDeleted_FullMethodName   = "/core.Core/MarkStorageObjectDeleted"
-	Core_CreateVersion_FullMethodName              = "/core.Core/CreateVersion"
-	Core_GetVersion_FullMethodName                 = "/core.Core/GetVersion"
-	Core_ListVersions_FullMethodName               = "/core.Core/ListVersions"
-	Core_CreateChannel_FullMethodName              = "/core.Core/CreateChannel"
-	Core_GetChannel_FullMethodName                 = "/core.Core/GetChannel"
-	Core_ListChannels_FullMethodName               = "/core.Core/ListChannels"
-	Core_CreateSigningConfig_FullMethodName        = "/core.Core/CreateSigningConfig"
-	Core_GetSigningConfig_FullMethodName           = "/core.Core/GetSigningConfig"
-	Core_ListSigningConfigs_FullMethodName         = "/core.Core/ListSigningConfigs"
-	Core_CreateBuildTask_FullMethodName            = "/core.Core/CreateBuildTask"
-	Core_GetBuildTask_FullMethodName               = "/core.Core/GetBuildTask"
-	Core_ListBuildTasks_FullMethodName             = "/core.Core/ListBuildTasks"
-	Core_ReportInstall_FullMethodName              = "/core.Core/ReportInstall"
-	Core_ReportChannelEvent_FullMethodName         = "/core.Core/ReportChannelEvent"
-	Core_GetChannelStats_FullMethodName            = "/core.Core/GetChannelStats"
-	Core_ResolveChannelDownload_FullMethodName     = "/core.Core/ResolveChannelDownload"
-	Core_ClaimBuildTask_FullMethodName             = "/core.Core/ClaimBuildTask"
-	Core_GetBuildExecutionContext_FullMethodName   = "/core.Core/GetBuildExecutionContext"
-	Core_HeartbeatBuildTask_FullMethodName         = "/core.Core/HeartbeatBuildTask"
-	Core_ReportBuildProgress_FullMethodName        = "/core.Core/ReportBuildProgress"
-	Core_CompleteBuildTask_FullMethodName          = "/core.Core/CompleteBuildTask"
-	Core_FailBuildTask_FullMethodName              = "/core.Core/FailBuildTask"
+	Core_CreateApplication_FullMethodName                = "/core.Core/CreateApplication"
+	Core_GetApplication_FullMethodName                   = "/core.Core/GetApplication"
+	Core_ListApplications_FullMethodName                 = "/core.Core/ListApplications"
+	Core_CreateStorageObject_FullMethodName              = "/core.Core/CreateStorageObject"
+	Core_GetStorageObject_FullMethodName                 = "/core.Core/GetStorageObject"
+	Core_CompleteStorageObject_FullMethodName            = "/core.Core/CompleteStorageObject"
+	Core_FailStorageObject_FullMethodName                = "/core.Core/FailStorageObject"
+	Core_ClaimExpiredStorageObjects_FullMethodName       = "/core.Core/ClaimExpiredStorageObjects"
+	Core_MarkStorageObjectDeleted_FullMethodName         = "/core.Core/MarkStorageObjectDeleted"
+	Core_CreateVersion_FullMethodName                    = "/core.Core/CreateVersion"
+	Core_GetVersion_FullMethodName                       = "/core.Core/GetVersion"
+	Core_ListVersions_FullMethodName                     = "/core.Core/ListVersions"
+	Core_CreateChannel_FullMethodName                    = "/core.Core/CreateChannel"
+	Core_GetChannel_FullMethodName                       = "/core.Core/GetChannel"
+	Core_ListChannels_FullMethodName                     = "/core.Core/ListChannels"
+	Core_CreateSigningConfig_FullMethodName              = "/core.Core/CreateSigningConfig"
+	Core_GetSigningConfig_FullMethodName                 = "/core.Core/GetSigningConfig"
+	Core_ListSigningConfigs_FullMethodName               = "/core.Core/ListSigningConfigs"
+	Core_CreateBrandingProfile_FullMethodName            = "/core.Core/CreateBrandingProfile"
+	Core_UpdateBrandingProfile_FullMethodName            = "/core.Core/UpdateBrandingProfile"
+	Core_GetBrandingProfile_FullMethodName               = "/core.Core/GetBrandingProfile"
+	Core_ListBrandingProfiles_FullMethodName             = "/core.Core/ListBrandingProfiles"
+	Core_ChangeBrandingProfileStatus_FullMethodName      = "/core.Core/ChangeBrandingProfileStatus"
+	Core_CreateBrandingPreflight_FullMethodName          = "/core.Core/CreateBrandingPreflight"
+	Core_GetBrandingPreflight_FullMethodName             = "/core.Core/GetBrandingPreflight"
+	Core_ListBrandingPreflights_FullMethodName           = "/core.Core/ListBrandingPreflights"
+	Core_ClaimBrandingPreflight_FullMethodName           = "/core.Core/ClaimBrandingPreflight"
+	Core_CompleteBrandingPreflight_FullMethodName        = "/core.Core/CompleteBrandingPreflight"
+	Core_CreateWhiteLabelTemplate_FullMethodName         = "/core.Core/CreateWhiteLabelTemplate"
+	Core_UpdateWhiteLabelTemplate_FullMethodName         = "/core.Core/UpdateWhiteLabelTemplate"
+	Core_CopyWhiteLabelTemplate_FullMethodName           = "/core.Core/CopyWhiteLabelTemplate"
+	Core_DeleteWhiteLabelTemplate_FullMethodName         = "/core.Core/DeleteWhiteLabelTemplate"
+	Core_GetWhiteLabelTemplate_FullMethodName            = "/core.Core/GetWhiteLabelTemplate"
+	Core_ListWhiteLabelTemplates_FullMethodName          = "/core.Core/ListWhiteLabelTemplates"
+	Core_CreateWhiteLabelTemplateRevision_FullMethodName = "/core.Core/CreateWhiteLabelTemplateRevision"
+	Core_GetWhiteLabelTemplateRevision_FullMethodName    = "/core.Core/GetWhiteLabelTemplateRevision"
+	Core_UpdateWhiteLabelTemplateRevision_FullMethodName = "/core.Core/UpdateWhiteLabelTemplateRevision"
+	Core_DeleteWhiteLabelTemplateRevision_FullMethodName = "/core.Core/DeleteWhiteLabelTemplateRevision"
+	Core_ListWhiteLabelTemplateRevisions_FullMethodName  = "/core.Core/ListWhiteLabelTemplateRevisions"
+	Core_PublishWhiteLabelTemplate_FullMethodName        = "/core.Core/PublishWhiteLabelTemplate"
+	Core_ChangeWhiteLabelTemplateStatus_FullMethodName   = "/core.Core/ChangeWhiteLabelTemplateStatus"
+	Core_CreateWhiteLabelProduct_FullMethodName          = "/core.Core/CreateWhiteLabelProduct"
+	Core_UpdateWhiteLabelProduct_FullMethodName          = "/core.Core/UpdateWhiteLabelProduct"
+	Core_DeleteWhiteLabelProduct_FullMethodName          = "/core.Core/DeleteWhiteLabelProduct"
+	Core_GetWhiteLabelProduct_FullMethodName             = "/core.Core/GetWhiteLabelProduct"
+	Core_ListWhiteLabelProducts_FullMethodName           = "/core.Core/ListWhiteLabelProducts"
+	Core_ChangeWhiteLabelProductStatus_FullMethodName    = "/core.Core/ChangeWhiteLabelProductStatus"
+	Core_PreflightWhiteLabelProduct_FullMethodName       = "/core.Core/PreflightWhiteLabelProduct"
+	Core_CreateBuildTask_FullMethodName                  = "/core.Core/CreateBuildTask"
+	Core_GetBuildTask_FullMethodName                     = "/core.Core/GetBuildTask"
+	Core_ListBuildTasks_FullMethodName                   = "/core.Core/ListBuildTasks"
+	Core_ReportInstall_FullMethodName                    = "/core.Core/ReportInstall"
+	Core_ReportChannelEvent_FullMethodName               = "/core.Core/ReportChannelEvent"
+	Core_GetChannelStats_FullMethodName                  = "/core.Core/GetChannelStats"
+	Core_ResolveChannelDownload_FullMethodName           = "/core.Core/ResolveChannelDownload"
+	Core_ClaimBuildTask_FullMethodName                   = "/core.Core/ClaimBuildTask"
+	Core_GetBuildExecutionContext_FullMethodName         = "/core.Core/GetBuildExecutionContext"
+	Core_HeartbeatBuildTask_FullMethodName               = "/core.Core/HeartbeatBuildTask"
+	Core_ReportBuildProgress_FullMethodName              = "/core.Core/ReportBuildProgress"
+	Core_CompleteBuildTask_FullMethodName                = "/core.Core/CompleteBuildTask"
+	Core_FailBuildTask_FullMethodName                    = "/core.Core/FailBuildTask"
 )
 
 // CoreClient is the client API for Core service.
@@ -80,6 +110,66 @@ type CoreClient interface {
 	CreateSigningConfig(ctx context.Context, in *CreateSigningConfigReq, opts ...grpc.CallOption) (*SigningConfigResp, error)
 	GetSigningConfig(ctx context.Context, in *SigningConfigIdReq, opts ...grpc.CallOption) (*SigningConfigResp, error)
 	ListSigningConfigs(ctx context.Context, in *SigningConfigListReq, opts ...grpc.CallOption) (*SigningConfigListResp, error)
+	// 创建应用品牌配置。
+	CreateBrandingProfile(ctx context.Context, in *CreateBrandingProfileReq, opts ...grpc.CallOption) (*BrandingProfileResp, error)
+	// 更新应用品牌配置并递增修订号。
+	UpdateBrandingProfile(ctx context.Context, in *UpdateBrandingProfileReq, opts ...grpc.CallOption) (*BrandingProfileResp, error)
+	// 查询当前租户的品牌配置。
+	GetBrandingProfile(ctx context.Context, in *BrandingProfileIdReq, opts ...grpc.CallOption) (*BrandingProfileResp, error)
+	// 分页查询当前租户的品牌配置。
+	ListBrandingProfiles(ctx context.Context, in *BrandingProfileListReq, opts ...grpc.CallOption) (*BrandingProfileListResp, error)
+	// 修改品牌配置状态。
+	ChangeBrandingProfileStatus(ctx context.Context, in *ChangeBrandingProfileStatusReq, opts ...grpc.CallOption) (*BrandingProfileResp, error)
+	// 创建或重置品牌兼容性预检记录。
+	CreateBrandingPreflight(ctx context.Context, in *CreateBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error)
+	// 查询品牌兼容性预检记录。
+	GetBrandingPreflight(ctx context.Context, in *BrandingPreflightIdReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error)
+	// 分页查询品牌兼容性预检记录。
+	ListBrandingPreflights(ctx context.Context, in *BrandingPreflightListReq, opts ...grpc.CallOption) (*BrandingPreflightListResp, error)
+	// 原子领取一个待处理或租约过期的品牌兼容性预检。
+	ClaimBrandingPreflight(ctx context.Context, in *ClaimBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightExecutionContextResp, error)
+	// 完成品牌兼容性预检。
+	CompleteBrandingPreflight(ctx context.Context, in *CompleteBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error)
+	// 创建V3白标模板。
+	CreateWhiteLabelTemplate(ctx context.Context, in *CreateWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+	// 更新尚未发布的V3白标模板。
+	UpdateWhiteLabelTemplate(ctx context.Context, in *UpdateWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+	// 复制V3白标模板及其修订为新草稿。
+	CopyWhiteLabelTemplate(ctx context.Context, in *CopyWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+	// 删除从未发布且未被产品引用的V3白标模板。
+	DeleteWhiteLabelTemplate(ctx context.Context, in *WhiteLabelTemplateIdReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 查询V3白标模板。
+	GetWhiteLabelTemplate(ctx context.Context, in *WhiteLabelTemplateIdReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+	// 分页查询V3白标模板。
+	ListWhiteLabelTemplates(ctx context.Context, in *WhiteLabelTemplateListReq, opts ...grpc.CallOption) (*WhiteLabelTemplateListResp, error)
+	// 创建不可变模板修订。
+	CreateWhiteLabelTemplateRevision(ctx context.Context, in *CreateWhiteLabelTemplateRevisionReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error)
+	// 查询单个模板修订。
+	GetWhiteLabelTemplateRevision(ctx context.Context, in *WhiteLabelTemplateRevisionIdReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error)
+	// 更新尚未发布的模板草稿修订。
+	UpdateWhiteLabelTemplateRevision(ctx context.Context, in *UpdateWhiteLabelTemplateRevisionReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error)
+	// 删除尚未发布的模板草稿修订。
+	DeleteWhiteLabelTemplateRevision(ctx context.Context, in *WhiteLabelTemplateRevisionIdReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 查询模板修订。
+	ListWhiteLabelTemplateRevisions(ctx context.Context, in *WhiteLabelTemplateRevisionListReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionListResp, error)
+	// 发布模板修订。
+	PublishWhiteLabelTemplate(ctx context.Context, in *PublishWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+	// 修改V3白标模板状态。
+	ChangeWhiteLabelTemplateStatus(ctx context.Context, in *ChangeWhiteLabelTemplateStatusReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error)
+	// 创建V3白标产品。
+	CreateWhiteLabelProduct(ctx context.Context, in *CreateWhiteLabelProductReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error)
+	// 更新V3白标产品。
+	UpdateWhiteLabelProduct(ctx context.Context, in *UpdateWhiteLabelProductReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error)
+	// 删除未启用且没有历史构建的V3白标产品。
+	DeleteWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 查询V3白标产品。
+	GetWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error)
+	// 分页查询V3白标产品。
+	ListWhiteLabelProducts(ctx context.Context, in *WhiteLabelProductListReq, opts ...grpc.CallOption) (*WhiteLabelProductListResp, error)
+	// 修改V3白标产品状态。
+	ChangeWhiteLabelProductStatus(ctx context.Context, in *ChangeWhiteLabelProductStatusReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error)
+	// 同步预检V3白标产品契约和依赖。
+	PreflightWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*WhiteLabelProductPreflightResp, error)
 	CreateBuildTask(ctx context.Context, in *CreateBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 	GetBuildTask(ctx context.Context, in *BuildTaskIdReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 	ListBuildTasks(ctx context.Context, in *BuildTaskListReq, opts ...grpc.CallOption) (*BuildTaskListResp, error)
@@ -285,6 +375,306 @@ func (c *coreClient) ListSigningConfigs(ctx context.Context, in *SigningConfigLi
 	return out, nil
 }
 
+func (c *coreClient) CreateBrandingProfile(ctx context.Context, in *CreateBrandingProfileReq, opts ...grpc.CallOption) (*BrandingProfileResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandingProfileResp)
+	err := c.cc.Invoke(ctx, Core_CreateBrandingProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) UpdateBrandingProfile(ctx context.Context, in *UpdateBrandingProfileReq, opts ...grpc.CallOption) (*BrandingProfileResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandingProfileResp)
+	err := c.cc.Invoke(ctx, Core_UpdateBrandingProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetBrandingProfile(ctx context.Context, in *BrandingProfileIdReq, opts ...grpc.CallOption) (*BrandingProfileResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandingProfileResp)
+	err := c.cc.Invoke(ctx, Core_GetBrandingProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListBrandingProfiles(ctx context.Context, in *BrandingProfileListReq, opts ...grpc.CallOption) (*BrandingProfileListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandingProfileListResp)
+	err := c.cc.Invoke(ctx, Core_ListBrandingProfiles_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ChangeBrandingProfileStatus(ctx context.Context, in *ChangeBrandingProfileStatusReq, opts ...grpc.CallOption) (*BrandingProfileResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandingProfileResp)
+	err := c.cc.Invoke(ctx, Core_ChangeBrandingProfileStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateBrandingPreflight(ctx context.Context, in *CreateBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandingPreflightResp)
+	err := c.cc.Invoke(ctx, Core_CreateBrandingPreflight_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetBrandingPreflight(ctx context.Context, in *BrandingPreflightIdReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandingPreflightResp)
+	err := c.cc.Invoke(ctx, Core_GetBrandingPreflight_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListBrandingPreflights(ctx context.Context, in *BrandingPreflightListReq, opts ...grpc.CallOption) (*BrandingPreflightListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandingPreflightListResp)
+	err := c.cc.Invoke(ctx, Core_ListBrandingPreflights_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ClaimBrandingPreflight(ctx context.Context, in *ClaimBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightExecutionContextResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandingPreflightExecutionContextResp)
+	err := c.cc.Invoke(ctx, Core_ClaimBrandingPreflight_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CompleteBrandingPreflight(ctx context.Context, in *CompleteBrandingPreflightReq, opts ...grpc.CallOption) (*BrandingPreflightResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BrandingPreflightResp)
+	err := c.cc.Invoke(ctx, Core_CompleteBrandingPreflight_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateWhiteLabelTemplate(ctx context.Context, in *CreateWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateResp)
+	err := c.cc.Invoke(ctx, Core_CreateWhiteLabelTemplate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) UpdateWhiteLabelTemplate(ctx context.Context, in *UpdateWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateResp)
+	err := c.cc.Invoke(ctx, Core_UpdateWhiteLabelTemplate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CopyWhiteLabelTemplate(ctx context.Context, in *CopyWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateResp)
+	err := c.cc.Invoke(ctx, Core_CopyWhiteLabelTemplate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) DeleteWhiteLabelTemplate(ctx context.Context, in *WhiteLabelTemplateIdReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_DeleteWhiteLabelTemplate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetWhiteLabelTemplate(ctx context.Context, in *WhiteLabelTemplateIdReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateResp)
+	err := c.cc.Invoke(ctx, Core_GetWhiteLabelTemplate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListWhiteLabelTemplates(ctx context.Context, in *WhiteLabelTemplateListReq, opts ...grpc.CallOption) (*WhiteLabelTemplateListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateListResp)
+	err := c.cc.Invoke(ctx, Core_ListWhiteLabelTemplates_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateWhiteLabelTemplateRevision(ctx context.Context, in *CreateWhiteLabelTemplateRevisionReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateRevisionResp)
+	err := c.cc.Invoke(ctx, Core_CreateWhiteLabelTemplateRevision_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetWhiteLabelTemplateRevision(ctx context.Context, in *WhiteLabelTemplateRevisionIdReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateRevisionResp)
+	err := c.cc.Invoke(ctx, Core_GetWhiteLabelTemplateRevision_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) UpdateWhiteLabelTemplateRevision(ctx context.Context, in *UpdateWhiteLabelTemplateRevisionReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateRevisionResp)
+	err := c.cc.Invoke(ctx, Core_UpdateWhiteLabelTemplateRevision_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) DeleteWhiteLabelTemplateRevision(ctx context.Context, in *WhiteLabelTemplateRevisionIdReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_DeleteWhiteLabelTemplateRevision_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListWhiteLabelTemplateRevisions(ctx context.Context, in *WhiteLabelTemplateRevisionListReq, opts ...grpc.CallOption) (*WhiteLabelTemplateRevisionListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateRevisionListResp)
+	err := c.cc.Invoke(ctx, Core_ListWhiteLabelTemplateRevisions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) PublishWhiteLabelTemplate(ctx context.Context, in *PublishWhiteLabelTemplateReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateResp)
+	err := c.cc.Invoke(ctx, Core_PublishWhiteLabelTemplate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ChangeWhiteLabelTemplateStatus(ctx context.Context, in *ChangeWhiteLabelTemplateStatusReq, opts ...grpc.CallOption) (*WhiteLabelTemplateResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelTemplateResp)
+	err := c.cc.Invoke(ctx, Core_ChangeWhiteLabelTemplateStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateWhiteLabelProduct(ctx context.Context, in *CreateWhiteLabelProductReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelProductResp)
+	err := c.cc.Invoke(ctx, Core_CreateWhiteLabelProduct_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) UpdateWhiteLabelProduct(ctx context.Context, in *UpdateWhiteLabelProductReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelProductResp)
+	err := c.cc.Invoke(ctx, Core_UpdateWhiteLabelProduct_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) DeleteWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_DeleteWhiteLabelProduct_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelProductResp)
+	err := c.cc.Invoke(ctx, Core_GetWhiteLabelProduct_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ListWhiteLabelProducts(ctx context.Context, in *WhiteLabelProductListReq, opts ...grpc.CallOption) (*WhiteLabelProductListResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelProductListResp)
+	err := c.cc.Invoke(ctx, Core_ListWhiteLabelProducts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ChangeWhiteLabelProductStatus(ctx context.Context, in *ChangeWhiteLabelProductStatusReq, opts ...grpc.CallOption) (*WhiteLabelProductResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelProductResp)
+	err := c.cc.Invoke(ctx, Core_ChangeWhiteLabelProductStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) PreflightWhiteLabelProduct(ctx context.Context, in *WhiteLabelProductIdReq, opts ...grpc.CallOption) (*WhiteLabelProductPreflightResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WhiteLabelProductPreflightResp)
+	err := c.cc.Invoke(ctx, Core_PreflightWhiteLabelProduct_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *coreClient) CreateBuildTask(ctx context.Context, in *CreateBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BuildTaskResp)
@@ -443,6 +833,66 @@ type CoreServer interface {
 	CreateSigningConfig(context.Context, *CreateSigningConfigReq) (*SigningConfigResp, error)
 	GetSigningConfig(context.Context, *SigningConfigIdReq) (*SigningConfigResp, error)
 	ListSigningConfigs(context.Context, *SigningConfigListReq) (*SigningConfigListResp, error)
+	// 创建应用品牌配置。
+	CreateBrandingProfile(context.Context, *CreateBrandingProfileReq) (*BrandingProfileResp, error)
+	// 更新应用品牌配置并递增修订号。
+	UpdateBrandingProfile(context.Context, *UpdateBrandingProfileReq) (*BrandingProfileResp, error)
+	// 查询当前租户的品牌配置。
+	GetBrandingProfile(context.Context, *BrandingProfileIdReq) (*BrandingProfileResp, error)
+	// 分页查询当前租户的品牌配置。
+	ListBrandingProfiles(context.Context, *BrandingProfileListReq) (*BrandingProfileListResp, error)
+	// 修改品牌配置状态。
+	ChangeBrandingProfileStatus(context.Context, *ChangeBrandingProfileStatusReq) (*BrandingProfileResp, error)
+	// 创建或重置品牌兼容性预检记录。
+	CreateBrandingPreflight(context.Context, *CreateBrandingPreflightReq) (*BrandingPreflightResp, error)
+	// 查询品牌兼容性预检记录。
+	GetBrandingPreflight(context.Context, *BrandingPreflightIdReq) (*BrandingPreflightResp, error)
+	// 分页查询品牌兼容性预检记录。
+	ListBrandingPreflights(context.Context, *BrandingPreflightListReq) (*BrandingPreflightListResp, error)
+	// 原子领取一个待处理或租约过期的品牌兼容性预检。
+	ClaimBrandingPreflight(context.Context, *ClaimBrandingPreflightReq) (*BrandingPreflightExecutionContextResp, error)
+	// 完成品牌兼容性预检。
+	CompleteBrandingPreflight(context.Context, *CompleteBrandingPreflightReq) (*BrandingPreflightResp, error)
+	// 创建V3白标模板。
+	CreateWhiteLabelTemplate(context.Context, *CreateWhiteLabelTemplateReq) (*WhiteLabelTemplateResp, error)
+	// 更新尚未发布的V3白标模板。
+	UpdateWhiteLabelTemplate(context.Context, *UpdateWhiteLabelTemplateReq) (*WhiteLabelTemplateResp, error)
+	// 复制V3白标模板及其修订为新草稿。
+	CopyWhiteLabelTemplate(context.Context, *CopyWhiteLabelTemplateReq) (*WhiteLabelTemplateResp, error)
+	// 删除从未发布且未被产品引用的V3白标模板。
+	DeleteWhiteLabelTemplate(context.Context, *WhiteLabelTemplateIdReq) (*RespBase, error)
+	// 查询V3白标模板。
+	GetWhiteLabelTemplate(context.Context, *WhiteLabelTemplateIdReq) (*WhiteLabelTemplateResp, error)
+	// 分页查询V3白标模板。
+	ListWhiteLabelTemplates(context.Context, *WhiteLabelTemplateListReq) (*WhiteLabelTemplateListResp, error)
+	// 创建不可变模板修订。
+	CreateWhiteLabelTemplateRevision(context.Context, *CreateWhiteLabelTemplateRevisionReq) (*WhiteLabelTemplateRevisionResp, error)
+	// 查询单个模板修订。
+	GetWhiteLabelTemplateRevision(context.Context, *WhiteLabelTemplateRevisionIdReq) (*WhiteLabelTemplateRevisionResp, error)
+	// 更新尚未发布的模板草稿修订。
+	UpdateWhiteLabelTemplateRevision(context.Context, *UpdateWhiteLabelTemplateRevisionReq) (*WhiteLabelTemplateRevisionResp, error)
+	// 删除尚未发布的模板草稿修订。
+	DeleteWhiteLabelTemplateRevision(context.Context, *WhiteLabelTemplateRevisionIdReq) (*RespBase, error)
+	// 查询模板修订。
+	ListWhiteLabelTemplateRevisions(context.Context, *WhiteLabelTemplateRevisionListReq) (*WhiteLabelTemplateRevisionListResp, error)
+	// 发布模板修订。
+	PublishWhiteLabelTemplate(context.Context, *PublishWhiteLabelTemplateReq) (*WhiteLabelTemplateResp, error)
+	// 修改V3白标模板状态。
+	ChangeWhiteLabelTemplateStatus(context.Context, *ChangeWhiteLabelTemplateStatusReq) (*WhiteLabelTemplateResp, error)
+	// 创建V3白标产品。
+	CreateWhiteLabelProduct(context.Context, *CreateWhiteLabelProductReq) (*WhiteLabelProductResp, error)
+	// 更新V3白标产品。
+	UpdateWhiteLabelProduct(context.Context, *UpdateWhiteLabelProductReq) (*WhiteLabelProductResp, error)
+	// 删除未启用且没有历史构建的V3白标产品。
+	DeleteWhiteLabelProduct(context.Context, *WhiteLabelProductIdReq) (*RespBase, error)
+	// 查询V3白标产品。
+	GetWhiteLabelProduct(context.Context, *WhiteLabelProductIdReq) (*WhiteLabelProductResp, error)
+	// 分页查询V3白标产品。
+	ListWhiteLabelProducts(context.Context, *WhiteLabelProductListReq) (*WhiteLabelProductListResp, error)
+	// 修改V3白标产品状态。
+	ChangeWhiteLabelProductStatus(context.Context, *ChangeWhiteLabelProductStatusReq) (*WhiteLabelProductResp, error)
+	// 同步预检V3白标产品契约和依赖。
+	PreflightWhiteLabelProduct(context.Context, *WhiteLabelProductIdReq) (*WhiteLabelProductPreflightResp, error)
 	CreateBuildTask(context.Context, *CreateBuildTaskReq) (*BuildTaskResp, error)
 	GetBuildTask(context.Context, *BuildTaskIdReq) (*BuildTaskResp, error)
 	ListBuildTasks(context.Context, *BuildTaskListReq) (*BuildTaskListResp, error)
@@ -521,6 +971,96 @@ func (UnimplementedCoreServer) GetSigningConfig(context.Context, *SigningConfigI
 }
 func (UnimplementedCoreServer) ListSigningConfigs(context.Context, *SigningConfigListReq) (*SigningConfigListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListSigningConfigs not implemented")
+}
+func (UnimplementedCoreServer) CreateBrandingProfile(context.Context, *CreateBrandingProfileReq) (*BrandingProfileResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateBrandingProfile not implemented")
+}
+func (UnimplementedCoreServer) UpdateBrandingProfile(context.Context, *UpdateBrandingProfileReq) (*BrandingProfileResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateBrandingProfile not implemented")
+}
+func (UnimplementedCoreServer) GetBrandingProfile(context.Context, *BrandingProfileIdReq) (*BrandingProfileResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBrandingProfile not implemented")
+}
+func (UnimplementedCoreServer) ListBrandingProfiles(context.Context, *BrandingProfileListReq) (*BrandingProfileListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListBrandingProfiles not implemented")
+}
+func (UnimplementedCoreServer) ChangeBrandingProfileStatus(context.Context, *ChangeBrandingProfileStatusReq) (*BrandingProfileResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ChangeBrandingProfileStatus not implemented")
+}
+func (UnimplementedCoreServer) CreateBrandingPreflight(context.Context, *CreateBrandingPreflightReq) (*BrandingPreflightResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateBrandingPreflight not implemented")
+}
+func (UnimplementedCoreServer) GetBrandingPreflight(context.Context, *BrandingPreflightIdReq) (*BrandingPreflightResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBrandingPreflight not implemented")
+}
+func (UnimplementedCoreServer) ListBrandingPreflights(context.Context, *BrandingPreflightListReq) (*BrandingPreflightListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListBrandingPreflights not implemented")
+}
+func (UnimplementedCoreServer) ClaimBrandingPreflight(context.Context, *ClaimBrandingPreflightReq) (*BrandingPreflightExecutionContextResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ClaimBrandingPreflight not implemented")
+}
+func (UnimplementedCoreServer) CompleteBrandingPreflight(context.Context, *CompleteBrandingPreflightReq) (*BrandingPreflightResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CompleteBrandingPreflight not implemented")
+}
+func (UnimplementedCoreServer) CreateWhiteLabelTemplate(context.Context, *CreateWhiteLabelTemplateReq) (*WhiteLabelTemplateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateWhiteLabelTemplate not implemented")
+}
+func (UnimplementedCoreServer) UpdateWhiteLabelTemplate(context.Context, *UpdateWhiteLabelTemplateReq) (*WhiteLabelTemplateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateWhiteLabelTemplate not implemented")
+}
+func (UnimplementedCoreServer) CopyWhiteLabelTemplate(context.Context, *CopyWhiteLabelTemplateReq) (*WhiteLabelTemplateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CopyWhiteLabelTemplate not implemented")
+}
+func (UnimplementedCoreServer) DeleteWhiteLabelTemplate(context.Context, *WhiteLabelTemplateIdReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteWhiteLabelTemplate not implemented")
+}
+func (UnimplementedCoreServer) GetWhiteLabelTemplate(context.Context, *WhiteLabelTemplateIdReq) (*WhiteLabelTemplateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWhiteLabelTemplate not implemented")
+}
+func (UnimplementedCoreServer) ListWhiteLabelTemplates(context.Context, *WhiteLabelTemplateListReq) (*WhiteLabelTemplateListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListWhiteLabelTemplates not implemented")
+}
+func (UnimplementedCoreServer) CreateWhiteLabelTemplateRevision(context.Context, *CreateWhiteLabelTemplateRevisionReq) (*WhiteLabelTemplateRevisionResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateWhiteLabelTemplateRevision not implemented")
+}
+func (UnimplementedCoreServer) GetWhiteLabelTemplateRevision(context.Context, *WhiteLabelTemplateRevisionIdReq) (*WhiteLabelTemplateRevisionResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWhiteLabelTemplateRevision not implemented")
+}
+func (UnimplementedCoreServer) UpdateWhiteLabelTemplateRevision(context.Context, *UpdateWhiteLabelTemplateRevisionReq) (*WhiteLabelTemplateRevisionResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateWhiteLabelTemplateRevision not implemented")
+}
+func (UnimplementedCoreServer) DeleteWhiteLabelTemplateRevision(context.Context, *WhiteLabelTemplateRevisionIdReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteWhiteLabelTemplateRevision not implemented")
+}
+func (UnimplementedCoreServer) ListWhiteLabelTemplateRevisions(context.Context, *WhiteLabelTemplateRevisionListReq) (*WhiteLabelTemplateRevisionListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListWhiteLabelTemplateRevisions not implemented")
+}
+func (UnimplementedCoreServer) PublishWhiteLabelTemplate(context.Context, *PublishWhiteLabelTemplateReq) (*WhiteLabelTemplateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method PublishWhiteLabelTemplate not implemented")
+}
+func (UnimplementedCoreServer) ChangeWhiteLabelTemplateStatus(context.Context, *ChangeWhiteLabelTemplateStatusReq) (*WhiteLabelTemplateResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ChangeWhiteLabelTemplateStatus not implemented")
+}
+func (UnimplementedCoreServer) CreateWhiteLabelProduct(context.Context, *CreateWhiteLabelProductReq) (*WhiteLabelProductResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateWhiteLabelProduct not implemented")
+}
+func (UnimplementedCoreServer) UpdateWhiteLabelProduct(context.Context, *UpdateWhiteLabelProductReq) (*WhiteLabelProductResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateWhiteLabelProduct not implemented")
+}
+func (UnimplementedCoreServer) DeleteWhiteLabelProduct(context.Context, *WhiteLabelProductIdReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteWhiteLabelProduct not implemented")
+}
+func (UnimplementedCoreServer) GetWhiteLabelProduct(context.Context, *WhiteLabelProductIdReq) (*WhiteLabelProductResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetWhiteLabelProduct not implemented")
+}
+func (UnimplementedCoreServer) ListWhiteLabelProducts(context.Context, *WhiteLabelProductListReq) (*WhiteLabelProductListResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListWhiteLabelProducts not implemented")
+}
+func (UnimplementedCoreServer) ChangeWhiteLabelProductStatus(context.Context, *ChangeWhiteLabelProductStatusReq) (*WhiteLabelProductResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ChangeWhiteLabelProductStatus not implemented")
+}
+func (UnimplementedCoreServer) PreflightWhiteLabelProduct(context.Context, *WhiteLabelProductIdReq) (*WhiteLabelProductPreflightResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method PreflightWhiteLabelProduct not implemented")
 }
 func (UnimplementedCoreServer) CreateBuildTask(context.Context, *CreateBuildTaskReq) (*BuildTaskResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateBuildTask not implemented")
@@ -906,6 +1446,546 @@ func _Core_ListSigningConfigs_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Core_CreateBrandingProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateBrandingProfileReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateBrandingProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateBrandingProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateBrandingProfile(ctx, req.(*CreateBrandingProfileReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_UpdateBrandingProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateBrandingProfileReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).UpdateBrandingProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_UpdateBrandingProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).UpdateBrandingProfile(ctx, req.(*UpdateBrandingProfileReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetBrandingProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BrandingProfileIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetBrandingProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetBrandingProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetBrandingProfile(ctx, req.(*BrandingProfileIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListBrandingProfiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BrandingProfileListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListBrandingProfiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListBrandingProfiles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListBrandingProfiles(ctx, req.(*BrandingProfileListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ChangeBrandingProfileStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangeBrandingProfileStatusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ChangeBrandingProfileStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ChangeBrandingProfileStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ChangeBrandingProfileStatus(ctx, req.(*ChangeBrandingProfileStatusReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateBrandingPreflight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateBrandingPreflightReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateBrandingPreflight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateBrandingPreflight_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateBrandingPreflight(ctx, req.(*CreateBrandingPreflightReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetBrandingPreflight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BrandingPreflightIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetBrandingPreflight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetBrandingPreflight_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetBrandingPreflight(ctx, req.(*BrandingPreflightIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListBrandingPreflights_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BrandingPreflightListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListBrandingPreflights(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListBrandingPreflights_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListBrandingPreflights(ctx, req.(*BrandingPreflightListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ClaimBrandingPreflight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClaimBrandingPreflightReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ClaimBrandingPreflight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ClaimBrandingPreflight_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ClaimBrandingPreflight(ctx, req.(*ClaimBrandingPreflightReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CompleteBrandingPreflight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompleteBrandingPreflightReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CompleteBrandingPreflight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CompleteBrandingPreflight_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CompleteBrandingPreflight(ctx, req.(*CompleteBrandingPreflightReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateWhiteLabelTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateWhiteLabelTemplateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateWhiteLabelTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateWhiteLabelTemplate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateWhiteLabelTemplate(ctx, req.(*CreateWhiteLabelTemplateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_UpdateWhiteLabelTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateWhiteLabelTemplateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).UpdateWhiteLabelTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_UpdateWhiteLabelTemplate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).UpdateWhiteLabelTemplate(ctx, req.(*UpdateWhiteLabelTemplateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CopyWhiteLabelTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CopyWhiteLabelTemplateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CopyWhiteLabelTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CopyWhiteLabelTemplate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CopyWhiteLabelTemplate(ctx, req.(*CopyWhiteLabelTemplateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_DeleteWhiteLabelTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteLabelTemplateIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).DeleteWhiteLabelTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_DeleteWhiteLabelTemplate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).DeleteWhiteLabelTemplate(ctx, req.(*WhiteLabelTemplateIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetWhiteLabelTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteLabelTemplateIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetWhiteLabelTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetWhiteLabelTemplate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetWhiteLabelTemplate(ctx, req.(*WhiteLabelTemplateIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListWhiteLabelTemplates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteLabelTemplateListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListWhiteLabelTemplates(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListWhiteLabelTemplates_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListWhiteLabelTemplates(ctx, req.(*WhiteLabelTemplateListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateWhiteLabelTemplateRevision_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateWhiteLabelTemplateRevisionReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateWhiteLabelTemplateRevision(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateWhiteLabelTemplateRevision_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateWhiteLabelTemplateRevision(ctx, req.(*CreateWhiteLabelTemplateRevisionReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetWhiteLabelTemplateRevision_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteLabelTemplateRevisionIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetWhiteLabelTemplateRevision(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetWhiteLabelTemplateRevision_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetWhiteLabelTemplateRevision(ctx, req.(*WhiteLabelTemplateRevisionIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_UpdateWhiteLabelTemplateRevision_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateWhiteLabelTemplateRevisionReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).UpdateWhiteLabelTemplateRevision(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_UpdateWhiteLabelTemplateRevision_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).UpdateWhiteLabelTemplateRevision(ctx, req.(*UpdateWhiteLabelTemplateRevisionReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_DeleteWhiteLabelTemplateRevision_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteLabelTemplateRevisionIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).DeleteWhiteLabelTemplateRevision(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_DeleteWhiteLabelTemplateRevision_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).DeleteWhiteLabelTemplateRevision(ctx, req.(*WhiteLabelTemplateRevisionIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListWhiteLabelTemplateRevisions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteLabelTemplateRevisionListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListWhiteLabelTemplateRevisions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListWhiteLabelTemplateRevisions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListWhiteLabelTemplateRevisions(ctx, req.(*WhiteLabelTemplateRevisionListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_PublishWhiteLabelTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PublishWhiteLabelTemplateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).PublishWhiteLabelTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_PublishWhiteLabelTemplate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).PublishWhiteLabelTemplate(ctx, req.(*PublishWhiteLabelTemplateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ChangeWhiteLabelTemplateStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangeWhiteLabelTemplateStatusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ChangeWhiteLabelTemplateStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ChangeWhiteLabelTemplateStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ChangeWhiteLabelTemplateStatus(ctx, req.(*ChangeWhiteLabelTemplateStatusReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateWhiteLabelProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateWhiteLabelProductReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateWhiteLabelProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateWhiteLabelProduct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateWhiteLabelProduct(ctx, req.(*CreateWhiteLabelProductReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_UpdateWhiteLabelProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateWhiteLabelProductReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).UpdateWhiteLabelProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_UpdateWhiteLabelProduct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).UpdateWhiteLabelProduct(ctx, req.(*UpdateWhiteLabelProductReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_DeleteWhiteLabelProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteLabelProductIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).DeleteWhiteLabelProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_DeleteWhiteLabelProduct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).DeleteWhiteLabelProduct(ctx, req.(*WhiteLabelProductIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetWhiteLabelProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteLabelProductIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetWhiteLabelProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetWhiteLabelProduct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetWhiteLabelProduct(ctx, req.(*WhiteLabelProductIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ListWhiteLabelProducts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteLabelProductListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ListWhiteLabelProducts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ListWhiteLabelProducts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ListWhiteLabelProducts(ctx, req.(*WhiteLabelProductListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ChangeWhiteLabelProductStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangeWhiteLabelProductStatusReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ChangeWhiteLabelProductStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ChangeWhiteLabelProductStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ChangeWhiteLabelProductStatus(ctx, req.(*ChangeWhiteLabelProductStatusReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_PreflightWhiteLabelProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WhiteLabelProductIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).PreflightWhiteLabelProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_PreflightWhiteLabelProduct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).PreflightWhiteLabelProduct(ctx, req.(*WhiteLabelProductIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Core_CreateBuildTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateBuildTaskReq)
 	if err := dec(in); err != nil {
@@ -1218,6 +2298,126 @@ var Core_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListSigningConfigs",
 			Handler:    _Core_ListSigningConfigs_Handler,
+		},
+		{
+			MethodName: "CreateBrandingProfile",
+			Handler:    _Core_CreateBrandingProfile_Handler,
+		},
+		{
+			MethodName: "UpdateBrandingProfile",
+			Handler:    _Core_UpdateBrandingProfile_Handler,
+		},
+		{
+			MethodName: "GetBrandingProfile",
+			Handler:    _Core_GetBrandingProfile_Handler,
+		},
+		{
+			MethodName: "ListBrandingProfiles",
+			Handler:    _Core_ListBrandingProfiles_Handler,
+		},
+		{
+			MethodName: "ChangeBrandingProfileStatus",
+			Handler:    _Core_ChangeBrandingProfileStatus_Handler,
+		},
+		{
+			MethodName: "CreateBrandingPreflight",
+			Handler:    _Core_CreateBrandingPreflight_Handler,
+		},
+		{
+			MethodName: "GetBrandingPreflight",
+			Handler:    _Core_GetBrandingPreflight_Handler,
+		},
+		{
+			MethodName: "ListBrandingPreflights",
+			Handler:    _Core_ListBrandingPreflights_Handler,
+		},
+		{
+			MethodName: "ClaimBrandingPreflight",
+			Handler:    _Core_ClaimBrandingPreflight_Handler,
+		},
+		{
+			MethodName: "CompleteBrandingPreflight",
+			Handler:    _Core_CompleteBrandingPreflight_Handler,
+		},
+		{
+			MethodName: "CreateWhiteLabelTemplate",
+			Handler:    _Core_CreateWhiteLabelTemplate_Handler,
+		},
+		{
+			MethodName: "UpdateWhiteLabelTemplate",
+			Handler:    _Core_UpdateWhiteLabelTemplate_Handler,
+		},
+		{
+			MethodName: "CopyWhiteLabelTemplate",
+			Handler:    _Core_CopyWhiteLabelTemplate_Handler,
+		},
+		{
+			MethodName: "DeleteWhiteLabelTemplate",
+			Handler:    _Core_DeleteWhiteLabelTemplate_Handler,
+		},
+		{
+			MethodName: "GetWhiteLabelTemplate",
+			Handler:    _Core_GetWhiteLabelTemplate_Handler,
+		},
+		{
+			MethodName: "ListWhiteLabelTemplates",
+			Handler:    _Core_ListWhiteLabelTemplates_Handler,
+		},
+		{
+			MethodName: "CreateWhiteLabelTemplateRevision",
+			Handler:    _Core_CreateWhiteLabelTemplateRevision_Handler,
+		},
+		{
+			MethodName: "GetWhiteLabelTemplateRevision",
+			Handler:    _Core_GetWhiteLabelTemplateRevision_Handler,
+		},
+		{
+			MethodName: "UpdateWhiteLabelTemplateRevision",
+			Handler:    _Core_UpdateWhiteLabelTemplateRevision_Handler,
+		},
+		{
+			MethodName: "DeleteWhiteLabelTemplateRevision",
+			Handler:    _Core_DeleteWhiteLabelTemplateRevision_Handler,
+		},
+		{
+			MethodName: "ListWhiteLabelTemplateRevisions",
+			Handler:    _Core_ListWhiteLabelTemplateRevisions_Handler,
+		},
+		{
+			MethodName: "PublishWhiteLabelTemplate",
+			Handler:    _Core_PublishWhiteLabelTemplate_Handler,
+		},
+		{
+			MethodName: "ChangeWhiteLabelTemplateStatus",
+			Handler:    _Core_ChangeWhiteLabelTemplateStatus_Handler,
+		},
+		{
+			MethodName: "CreateWhiteLabelProduct",
+			Handler:    _Core_CreateWhiteLabelProduct_Handler,
+		},
+		{
+			MethodName: "UpdateWhiteLabelProduct",
+			Handler:    _Core_UpdateWhiteLabelProduct_Handler,
+		},
+		{
+			MethodName: "DeleteWhiteLabelProduct",
+			Handler:    _Core_DeleteWhiteLabelProduct_Handler,
+		},
+		{
+			MethodName: "GetWhiteLabelProduct",
+			Handler:    _Core_GetWhiteLabelProduct_Handler,
+		},
+		{
+			MethodName: "ListWhiteLabelProducts",
+			Handler:    _Core_ListWhiteLabelProducts_Handler,
+		},
+		{
+			MethodName: "ChangeWhiteLabelProductStatus",
+			Handler:    _Core_ChangeWhiteLabelProductStatus_Handler,
+		},
+		{
+			MethodName: "PreflightWhiteLabelProduct",
+			Handler:    _Core_PreflightWhiteLabelProduct_Handler,
 		},
 		{
 			MethodName: "CreateBuildTask",

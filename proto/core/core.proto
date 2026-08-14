@@ -50,6 +50,9 @@ enum StorageObjectType {
   STORAGE_OBJECT_TYPE_KEYSTORE = 2; // APK签名文件
   STORAGE_OBJECT_TYPE_BUILT_APK = 3; // Builder生成的渠道APK
   STORAGE_OBJECT_TYPE_BUILD_LOG = 4; // Builder构建日志
+  STORAGE_OBJECT_TYPE_BRAND_LOGO = 5; // 品牌Logo图片
+  STORAGE_OBJECT_TYPE_BRAND_SPLASH = 6; // 品牌启动图图片
+  STORAGE_OBJECT_TYPE_TEMPLATE_FILE = 7; // V3模板声明式补丁引用的受控文件
 }
 
 // 存储对象生命周期状态。
@@ -60,6 +63,54 @@ enum StorageObjectStatus {
   STORAGE_OBJECT_STATUS_BOUND = 3; // 已绑定到版本、签名配置或构建任务
   STORAGE_OBJECT_STATUS_DELETED = 4; // 已删除
   STORAGE_OBJECT_STATUS_FAILED = 5; // 上传或校验失败
+}
+
+// 品牌资源改写模式。
+enum BrandingRewriteMode {
+  BRANDING_REWRITE_MODE_UNKNOWN = 0; // 未知模式
+  BRANDING_REWRITE_MODE_RESOURCE_REBUILD = 1; // 解包并替换Android资源后重建
+  BRANDING_REWRITE_MODE_RUNTIME_CONTRACT = 2; // 写入AppForge运行时契约配置
+}
+
+// 品牌配置状态。
+enum BrandingProfileStatus {
+  BRANDING_PROFILE_STATUS_UNKNOWN = 0; // 未知状态
+  BRANDING_PROFILE_STATUS_DRAFT = 1; // 草稿
+  BRANDING_PROFILE_STATUS_ENABLED = 2; // 启用
+  BRANDING_PROFILE_STATUS_DISABLED = 3; // 停用
+}
+
+// 品牌兼容性预检状态。
+enum BrandingPreflightStatus {
+  BRANDING_PREFLIGHT_STATUS_UNKNOWN = 0; // 未知状态
+  BRANDING_PREFLIGHT_STATUS_PENDING = 1; // 待处理
+  BRANDING_PREFLIGHT_STATUS_COMPATIBLE = 2; // 兼容
+  BRANDING_PREFLIGHT_STATUS_INCOMPATIBLE = 3; // 不兼容
+  BRANDING_PREFLIGHT_STATUS_FAILED = 4; // 预检执行失败
+}
+
+// V3白标模板状态。
+enum WhiteLabelTemplateStatus {
+  WHITE_LABEL_TEMPLATE_STATUS_UNKNOWN = 0; // 未知状态
+  WHITE_LABEL_TEMPLATE_STATUS_DRAFT = 1; // 草稿
+  WHITE_LABEL_TEMPLATE_STATUS_PUBLISHED = 2; // 已发布
+  WHITE_LABEL_TEMPLATE_STATUS_DISABLED = 3; // 停用
+}
+
+// V3白标模板修订状态。
+enum WhiteLabelRevisionStatus {
+  WHITE_LABEL_REVISION_STATUS_UNKNOWN = 0; // 未知状态
+  WHITE_LABEL_REVISION_STATUS_DRAFT = 1; // 草稿
+  WHITE_LABEL_REVISION_STATUS_PUBLISHED = 2; // 已发布且不可变
+  WHITE_LABEL_REVISION_STATUS_SUPERSEDED = 3; // 已被新修订取代
+}
+
+// V3白标产品状态。
+enum WhiteLabelProductStatus {
+  WHITE_LABEL_PRODUCT_STATUS_UNKNOWN = 0; // 未知状态
+  WHITE_LABEL_PRODUCT_STATUS_DRAFT = 1; // 草稿
+  WHITE_LABEL_PRODUCT_STATUS_ENABLED = 2; // 启用
+  WHITE_LABEL_PRODUCT_STATUS_DISABLED = 3; // 停用
 }
 
 message Application {
@@ -125,6 +176,7 @@ message SigningConfig {
   int64 create_time = 11;
   int64 update_time = 12;
   int64 keystore_object_id = 13; // 签名文件存储对象ID
+  string certificate_sha256 = 14; // 签名证书SHA-256指纹
 }
 
 message BuildTask {
@@ -157,6 +209,12 @@ message BuildTask {
   int64 source_apk_object_id = 27; // 原始APK对象ID快照
   int64 apk_object_id = 28; // 构建产物APK对象ID
   int64 log_object_id = 29; // 构建日志对象ID
+  int64 branding_profile_id = 30; // 构建时使用的品牌配置ID
+  int32 branding_revision = 31; // 构建时使用的品牌修订号
+  string branding_snapshot_json = 32; // 构建时固化的品牌配置快照JSON
+  int64 white_label_product_id = 33; // V3白标产品ID
+  int32 template_revision = 34; // V3模板修订号
+  string template_snapshot_json = 35; // V3模板和产品不可变快照JSON
 }
 
 // 私有对象存储元数据。
@@ -176,10 +234,123 @@ message StorageObject {
   int64 update_time = 13; // 更新时间，Unix毫秒
 }
 
+// 应用品牌白标配置。
+message BrandingProfile {
+  int64 id = 1; // 品牌配置ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 app_id = 3; // 应用ID
+  string profile_name = 4; // 品牌配置名称
+  string app_name = 5; // 构建后的应用展示名称
+  int64 logo_object_id = 6; // 品牌Logo存储对象ID
+  int64 splash_object_id = 7; // 品牌启动图存储对象ID
+  string api_host = 8; // 构建后的业务API地址
+  BrandingRewriteMode rewrite_mode = 9; // 品牌资源改写模式
+  string launcher_icon_target = 10; // Launcher图标资源目标
+  string splash_resource_target = 11; // 启动图资源目标
+  string runtime_config_json = 12; // 运行时契约扩展配置JSON
+  BrandingProfileStatus status = 13; // 品牌配置状态
+  int32 revision = 14; // 品牌配置修订号
+  int64 create_by = 15; // 创建人ID
+  int64 create_time = 16; // 创建时间，Unix毫秒
+  int64 update_time = 17; // 更新时间，Unix毫秒
+}
+
+// 品牌兼容性预检记录。
+message BrandingPreflight {
+  int64 id = 1; // 预检记录ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 app_id = 3; // 应用ID
+  int64 branding_profile_id = 4; // 品牌配置ID
+  int32 branding_revision = 5; // 预检时的品牌修订号
+  int64 version_id = 6; // 被检查的应用版本ID
+  BrandingPreflightStatus status = 7; // 预检状态
+  string report_json = 8; // 结构化预检报告JSON
+  string source_apk_sha256 = 9; // 源APK SHA-256快照
+  string toolchain_version = 10; // 预检工具链版本
+  int64 start_time = 11; // 预检开始时间，Unix毫秒
+  int64 finish_time = 12; // 预检完成时间，Unix毫秒
+  int64 create_by = 13; // 创建人ID
+  int64 create_time = 14; // 创建时间，Unix毫秒
+  int64 update_time = 15; // 更新时间，Unix毫秒
+  string builder_id = 16; // 当前预检Builder节点ID
+  int32 builder_attempt = 17; // 预检领取代次
+  int64 lease_until = 18; // Builder租约到期时间，Unix毫秒
+}
+
+// V3白标模板。
+message WhiteLabelTemplate {
+  int64 id = 1; // 模板ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 app_id = 3; // 应用ID
+  string template_code = 4; // 模板编码
+  string template_name = 5; // 模板名称
+  int64 source_version_id = 6; // 源应用版本ID
+  string parameter_schema_json = 7; // 参数JSON Schema
+  string compatibility_rules_json = 8; // 兼容规则JSON
+  WhiteLabelTemplateStatus status = 9; // 模板状态
+  int32 published_revision = 10; // 当前发布修订号
+  int64 create_by = 11; // 创建人ID
+  int64 create_time = 12; // 创建时间，Unix毫秒
+  int64 update_time = 13; // 更新时间，Unix毫秒
+}
+
+// V3白标模板不可变修订。
+message WhiteLabelTemplateRevision {
+  int64 id = 1; // 修订ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 template_id = 3; // 模板ID
+  int32 revision = 4; // 修订号
+  string package_name_rule_json = 5; // 动态包名规则JSON
+  string manifest_patch_json = 6; // Manifest声明式补丁JSON
+  string resource_patch_json = 7; // 资源声明式补丁JSON
+  string extension_files_json = 8; // 受控扩展文件JSON
+  string expected_artifacts_json = 9; // 产物验收规则JSON
+  string checksum = 10; // 规范化修订内容SHA-256
+  WhiteLabelRevisionStatus status = 11; // 修订状态
+  int64 create_by = 12; // 创建人ID
+  int64 create_time = 13; // 创建时间，Unix毫秒
+}
+
+// V3白标产品。
+message WhiteLabelProduct {
+  int64 id = 1; // 产品ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 app_id = 3; // 应用ID
+  string product_code = 4; // 产品编码
+  string product_name = 5; // 产品名称
+  int64 template_id = 6; // 模板ID
+  int32 template_revision = 7; // 模板修订号
+  int64 branding_profile_id = 8; // 品牌配置ID
+  string package_name = 9; // Android applicationId
+  int64 signing_config_id = 10; // 独立签名配置ID
+  string parameter_values_json = 11; // 模板参数值JSON
+  WhiteLabelProductStatus status = 12; // 产品状态
+  int64 create_by = 13; // 创建人ID
+  int64 create_time = 14; // 创建时间，Unix毫秒
+  int64 update_time = 15; // 更新时间，Unix毫秒
+}
+
 message ApplicationIdReq { int64 id = 1; }
 message VersionIdReq { int64 id = 1; }
 message ChannelIdReq { int64 id = 1; }
 message BuildTaskIdReq { int64 id = 1; }
+// 品牌配置主键请求。
+message BrandingProfileIdReq { int64 id = 1; }
+// 品牌预检记录主键请求。
+message BrandingPreflightIdReq { int64 id = 1; }
+// 白标模板主键请求。
+message WhiteLabelTemplateIdReq {
+  int64 id = 1; // 白标模板ID
+}
+// 白标模板修订主键请求。
+message WhiteLabelTemplateRevisionIdReq {
+  int64 template_id = 1; // 白标模板ID
+  int32 revision = 2; // 模板修订号
+}
+// 白标产品主键请求。
+message WhiteLabelProductIdReq {
+  int64 id = 1; // 白标产品ID
+}
 
 message ApplicationResp {
   common.RespBase base = 1;
@@ -215,6 +386,104 @@ message SigningConfigListResp {
 message BuildTaskResp {
   common.RespBase base = 1;
   BuildTask data = 2;
+}
+
+// 品牌配置响应。
+message BrandingProfileResp {
+  common.RespBase base = 1; // 通用响应
+  BrandingProfile data = 2; // 品牌配置
+}
+
+// 品牌配置列表请求。
+message BrandingProfileListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 app_id = 2; // 应用ID
+  string keyword = 3; // 配置名称或应用名称关键字
+  BrandingProfileStatus status = 4; // 品牌配置状态
+}
+
+// 品牌配置列表响应。
+message BrandingProfileListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated BrandingProfile data = 2; // 品牌配置列表
+}
+
+// 品牌预检记录响应。
+message BrandingPreflightResp {
+  common.RespBase base = 1; // 通用响应
+  BrandingPreflight data = 2; // 品牌预检记录
+}
+
+// 品牌预检记录列表请求。
+message BrandingPreflightListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 app_id = 2; // 应用ID
+  int64 branding_profile_id = 3; // 品牌配置ID
+  int64 version_id = 4; // 应用版本ID
+  BrandingPreflightStatus status = 5; // 预检状态
+}
+
+// 品牌预检记录列表响应。
+message BrandingPreflightListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated BrandingPreflight data = 2; // 品牌预检记录列表
+}
+
+// 白标模板响应。
+message WhiteLabelTemplateResp {
+  common.RespBase base = 1; // 通用响应
+  WhiteLabelTemplate data = 2; // 白标模板
+}
+// 白标模板列表请求。
+message WhiteLabelTemplateListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 app_id = 2; // 应用ID
+  string keyword = 3; // 模板编码或名称关键字
+  WhiteLabelTemplateStatus status = 4; // 模板状态
+}
+// 白标模板列表响应。
+message WhiteLabelTemplateListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated WhiteLabelTemplate data = 2; // 白标模板列表
+}
+// 白标模板修订响应。
+message WhiteLabelTemplateRevisionResp {
+  common.RespBase base = 1; // 通用响应
+  WhiteLabelTemplateRevision data = 2; // 白标模板修订
+}
+// 白标模板修订列表请求。
+message WhiteLabelTemplateRevisionListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 template_id = 2; // 白标模板ID
+  WhiteLabelRevisionStatus status = 3; // 修订状态
+}
+// 白标模板修订列表响应。
+message WhiteLabelTemplateRevisionListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated WhiteLabelTemplateRevision data = 2; // 白标模板修订列表
+}
+// 白标产品响应。
+message WhiteLabelProductResp {
+  common.RespBase base = 1; // 通用响应
+  WhiteLabelProduct data = 2; // 白标产品
+}
+// 白标产品列表请求。
+message WhiteLabelProductListReq {
+  common.PageReq page = 1; // 分页参数
+  int64 app_id = 2; // 应用ID
+  string keyword = 3; // 产品编码、名称或包名关键字
+  WhiteLabelProductStatus status = 4; // 产品状态
+}
+// 白标产品列表响应。
+message WhiteLabelProductListResp {
+  common.RespBase base = 1; // 通用响应
+  repeated WhiteLabelProduct data = 2; // 白标产品列表
+}
+// 白标产品预检响应。
+message WhiteLabelProductPreflightResp {
+  common.RespBase base = 1; // 通用响应
+  bool compatible = 2; // 是否通过同步预检
+  string report_json = 3; // 结构化预检报告JSON
 }
 
 message ApplicationListReq {
@@ -302,6 +571,7 @@ message CreateSigningConfigReq {
   string key_password_ciphertext = 6;
   string secret_ref = 7;
   int64 keystore_object_id = 8; // 已校验的签名文件对象ID
+  string certificate_sha256 = 9; // Builder校验得到的签名证书SHA-256指纹
 }
 
 // 创建待上传对象元数据请求。
@@ -367,6 +637,162 @@ message CreateBuildTaskReq {
   int64 channel_id = 3;
   int64 signing_config_id = 4;
   int32 priority = 5;
+  int64 branding_profile_id = 6; // 可选品牌配置ID，0表示沿用V1构建
+  int64 white_label_product_id = 7; // 可选V3白标产品ID，提供后由产品覆盖品牌和签名配置
+}
+
+// 创建V3白标模板请求。
+message CreateWhiteLabelTemplateReq {
+  int64 app_id = 1; // 应用ID
+  string template_code = 2; // 租户内唯一模板编码
+  string template_name = 3; // 模板名称
+  int64 source_version_id = 4; // 源应用版本ID
+  string parameter_schema_json = 5; // 参数JSON Schema
+  string compatibility_rules_json = 6; // 兼容规则JSON
+}
+// 更新尚未发布的V3白标模板请求。
+message UpdateWhiteLabelTemplateReq {
+  int64 id = 1; // 白标模板ID
+  string template_name = 2; // 模板名称
+  int64 source_version_id = 3; // 源应用版本ID
+  string parameter_schema_json = 4; // 参数JSON Schema
+  string compatibility_rules_json = 5; // 兼容规则JSON
+}
+// 复制V3白标模板请求，复制后的修订均为草稿。
+message CopyWhiteLabelTemplateReq {
+  int64 id = 1; // 来源白标模板ID
+  string template_code = 2; // 新模板编码
+  string template_name = 3; // 新模板名称
+  int64 source_version_id = 4; // 可选新源版本ID，0表示沿用来源模板
+}
+// 创建V3白标模板修订请求，修订号由服务端递增。
+message CreateWhiteLabelTemplateRevisionReq {
+  int64 template_id = 1; // 白标模板ID
+  string package_name_rule_json = 2; // 动态包名规则JSON
+  string manifest_patch_json = 3; // Manifest声明式补丁JSON
+  string resource_patch_json = 4; // 资源声明式补丁JSON
+  string extension_files_json = 5; // 受控扩展文件JSON
+  string expected_artifacts_json = 6; // 产物验收规则JSON
+}
+// 更新V3白标模板草稿修订请求，已发布修订不可修改。
+message UpdateWhiteLabelTemplateRevisionReq {
+  int64 template_id = 1; // 白标模板ID
+  int32 revision = 2; // 草稿修订号
+  string package_name_rule_json = 3; // 动态包名规则JSON
+  string manifest_patch_json = 4; // Manifest声明式补丁JSON
+  string resource_patch_json = 5; // 资源声明式补丁JSON
+  string extension_files_json = 6; // 受控扩展文件JSON
+  string expected_artifacts_json = 7; // 产物验收规则JSON
+}
+// 发布V3白标模板修订请求。
+message PublishWhiteLabelTemplateReq {
+  int64 id = 1; // 白标模板ID
+  int32 revision = 2; // 待发布修订号
+}
+// 创建V3白标产品请求。
+message CreateWhiteLabelProductReq {
+  int64 app_id = 1; // 应用ID
+  string product_code = 2; // 租户内唯一产品编码
+  string product_name = 3; // 产品名称
+  int64 template_id = 4; // 白标模板ID
+  int32 template_revision = 5; // 已发布模板修订号
+  int64 branding_profile_id = 6; // 品牌配置ID
+  string package_name = 7; // 目标Android applicationId
+  int64 signing_config_id = 8; // 独立签名配置ID
+  string parameter_values_json = 9; // 模板参数值JSON
+}
+// 更新V3白标产品请求。
+message UpdateWhiteLabelProductReq {
+  int64 id = 1; // 白标产品ID
+  string product_name = 2; // 产品名称
+  int64 branding_profile_id = 3; // 品牌配置ID
+  string package_name = 4; // 目标Android applicationId
+  int64 signing_config_id = 5; // 独立签名配置ID
+  string parameter_values_json = 6; // 模板参数值JSON
+	int64 template_id = 7; // 新的白标模板ID，停用产品后允许切换
+	int32 template_revision = 8; // 新的已发布模板修订号
+}
+// 修改V3白标模板状态请求。
+message ChangeWhiteLabelTemplateStatusReq {
+	int64 id = 1; // 白标模板ID
+	WhiteLabelTemplateStatus status = 2; // 目标模板状态
+}
+// 修改V3白标产品状态请求。
+message ChangeWhiteLabelProductStatusReq {
+  int64 id = 1; // 白标产品ID
+  WhiteLabelProductStatus status = 2; // 目标产品状态
+}
+
+// 创建品牌配置请求。
+message CreateBrandingProfileReq {
+  int64 app_id = 1; // 应用ID
+  string profile_name = 2; // 品牌配置名称
+  string app_name = 3; // 构建后的应用展示名称
+  int64 logo_object_id = 4; // 已校验的品牌Logo对象ID
+  int64 splash_object_id = 5; // 已校验的品牌启动图对象ID
+  string api_host = 6; // 构建后的业务API地址
+  BrandingRewriteMode rewrite_mode = 7; // 品牌资源改写模式
+  string launcher_icon_target = 8; // Launcher图标资源目标
+  string splash_resource_target = 9; // 启动图资源目标
+  string runtime_config_json = 10; // 运行时契约扩展配置JSON
+}
+
+// 更新品牌配置请求，成功后修订号自动递增。
+message UpdateBrandingProfileReq {
+  int64 id = 1; // 品牌配置ID
+  string profile_name = 2; // 品牌配置名称
+  string app_name = 3; // 构建后的应用展示名称
+  int64 logo_object_id = 4; // 已校验的品牌Logo对象ID
+  int64 splash_object_id = 5; // 已校验的品牌启动图对象ID
+  string api_host = 6; // 构建后的业务API地址
+  BrandingRewriteMode rewrite_mode = 7; // 品牌资源改写模式
+  string launcher_icon_target = 8; // Launcher图标资源目标
+  string splash_resource_target = 9; // 启动图资源目标
+  string runtime_config_json = 10; // 运行时契约扩展配置JSON
+}
+
+// 修改品牌配置状态请求。
+message ChangeBrandingProfileStatusReq {
+  int64 id = 1; // 品牌配置ID
+  BrandingProfileStatus status = 2; // 目标状态
+}
+
+// 创建品牌兼容性预检请求。
+message CreateBrandingPreflightReq {
+  int64 branding_profile_id = 1; // 品牌配置ID
+  int64 version_id = 2; // 待检查的应用版本ID
+}
+
+// 完成品牌兼容性预检请求，仅供可信Builder调用。
+message CompleteBrandingPreflightReq {
+  int64 id = 1; // 预检记录ID
+  BrandingPreflightStatus status = 2; // 兼容、不兼容或执行失败
+  string report_json = 3; // 结构化预检报告JSON
+  string toolchain_version = 4; // 预检工具链版本
+  string builder_id = 5; // 当前预检Builder节点ID
+  int32 builder_attempt = 6; // 预检领取代次，用于阻止过期Worker回写
+}
+
+// Builder领取品牌预检请求。
+message ClaimBrandingPreflightReq {
+  string builder_id = 1; // Builder工作节点ID
+  int32 lease_seconds = 2; // 预检租约秒数
+}
+
+// Builder品牌预检执行上下文。
+message BrandingPreflightExecutionContext {
+  BrandingPreflight preflight = 1; // 已领取的预检记录
+  BrandingProfile profile = 2; // 对应品牌配置修订
+  Version version = 3; // 待检查应用版本
+  StorageObject source_apk = 4; // 原始APK私有对象
+  StorageObject brand_logo = 5; // 品牌Logo私有对象
+  StorageObject brand_splash = 6; // 品牌启动图私有对象
+}
+
+// Builder品牌预检执行上下文响应，无待处理任务时data为空。
+message BrandingPreflightExecutionContextResp {
+  common.RespBase base = 1; // 通用响应
+  BrandingPreflightExecutionContext data = 2; // 品牌预检执行上下文
 }
 
 message InstallReportReq {
@@ -515,6 +941,12 @@ message BuildExecutionContext {
   string keystore_password_ciphertext = 9; // Keystore密码密文
   string key_password_ciphertext = 10; // Key密码密文
   string secret_ref = 11; // 外部密钥服务引用
+  string branding_snapshot_json = 12; // 构建时固化的品牌配置快照JSON
+  StorageObject brand_logo = 13; // 品牌Logo私有对象
+  StorageObject brand_splash = 14; // 品牌启动图私有对象
+  string template_snapshot_json = 15; // V3模板和产品不可变构建快照JSON
+  string signer_certificate_sha256 = 16; // 构建应使用的签名证书SHA-256指纹
+  repeated StorageObject template_files = 17; // V3模板修订绑定的受控私有文件
 }
 
 // Builder内部执行上下文响应。
@@ -552,6 +984,68 @@ service Core {
   rpc CreateSigningConfig(CreateSigningConfigReq) returns (SigningConfigResp);
   rpc GetSigningConfig(SigningConfigIdReq) returns (SigningConfigResp);
   rpc ListSigningConfigs(SigningConfigListReq) returns (SigningConfigListResp);
+
+  // 创建应用品牌配置。
+  rpc CreateBrandingProfile(CreateBrandingProfileReq) returns (BrandingProfileResp);
+  // 更新应用品牌配置并递增修订号。
+  rpc UpdateBrandingProfile(UpdateBrandingProfileReq) returns (BrandingProfileResp);
+  // 查询当前租户的品牌配置。
+  rpc GetBrandingProfile(BrandingProfileIdReq) returns (BrandingProfileResp);
+  // 分页查询当前租户的品牌配置。
+  rpc ListBrandingProfiles(BrandingProfileListReq) returns (BrandingProfileListResp);
+  // 修改品牌配置状态。
+  rpc ChangeBrandingProfileStatus(ChangeBrandingProfileStatusReq) returns (BrandingProfileResp);
+  // 创建或重置品牌兼容性预检记录。
+  rpc CreateBrandingPreflight(CreateBrandingPreflightReq) returns (BrandingPreflightResp);
+  // 查询品牌兼容性预检记录。
+  rpc GetBrandingPreflight(BrandingPreflightIdReq) returns (BrandingPreflightResp);
+  // 分页查询品牌兼容性预检记录。
+  rpc ListBrandingPreflights(BrandingPreflightListReq) returns (BrandingPreflightListResp);
+  // 原子领取一个待处理或租约过期的品牌兼容性预检。
+  rpc ClaimBrandingPreflight(ClaimBrandingPreflightReq) returns (BrandingPreflightExecutionContextResp);
+  // 完成品牌兼容性预检。
+  rpc CompleteBrandingPreflight(CompleteBrandingPreflightReq) returns (BrandingPreflightResp);
+
+  // 创建V3白标模板。
+  rpc CreateWhiteLabelTemplate(CreateWhiteLabelTemplateReq) returns (WhiteLabelTemplateResp);
+  // 更新尚未发布的V3白标模板。
+  rpc UpdateWhiteLabelTemplate(UpdateWhiteLabelTemplateReq) returns (WhiteLabelTemplateResp);
+  // 复制V3白标模板及其修订为新草稿。
+  rpc CopyWhiteLabelTemplate(CopyWhiteLabelTemplateReq) returns (WhiteLabelTemplateResp);
+  // 删除从未发布且未被产品引用的V3白标模板。
+  rpc DeleteWhiteLabelTemplate(WhiteLabelTemplateIdReq) returns (RespBase);
+  // 查询V3白标模板。
+  rpc GetWhiteLabelTemplate(WhiteLabelTemplateIdReq) returns (WhiteLabelTemplateResp);
+  // 分页查询V3白标模板。
+  rpc ListWhiteLabelTemplates(WhiteLabelTemplateListReq) returns (WhiteLabelTemplateListResp);
+  // 创建不可变模板修订。
+  rpc CreateWhiteLabelTemplateRevision(CreateWhiteLabelTemplateRevisionReq) returns (WhiteLabelTemplateRevisionResp);
+  // 查询单个模板修订。
+  rpc GetWhiteLabelTemplateRevision(WhiteLabelTemplateRevisionIdReq) returns (WhiteLabelTemplateRevisionResp);
+  // 更新尚未发布的模板草稿修订。
+  rpc UpdateWhiteLabelTemplateRevision(UpdateWhiteLabelTemplateRevisionReq) returns (WhiteLabelTemplateRevisionResp);
+  // 删除尚未发布的模板草稿修订。
+  rpc DeleteWhiteLabelTemplateRevision(WhiteLabelTemplateRevisionIdReq) returns (RespBase);
+  // 查询模板修订。
+  rpc ListWhiteLabelTemplateRevisions(WhiteLabelTemplateRevisionListReq) returns (WhiteLabelTemplateRevisionListResp);
+  // 发布模板修订。
+  rpc PublishWhiteLabelTemplate(PublishWhiteLabelTemplateReq) returns (WhiteLabelTemplateResp);
+	// 修改V3白标模板状态。
+	rpc ChangeWhiteLabelTemplateStatus(ChangeWhiteLabelTemplateStatusReq) returns (WhiteLabelTemplateResp);
+  // 创建V3白标产品。
+  rpc CreateWhiteLabelProduct(CreateWhiteLabelProductReq) returns (WhiteLabelProductResp);
+  // 更新V3白标产品。
+  rpc UpdateWhiteLabelProduct(UpdateWhiteLabelProductReq) returns (WhiteLabelProductResp);
+  // 删除未启用且没有历史构建的V3白标产品。
+  rpc DeleteWhiteLabelProduct(WhiteLabelProductIdReq) returns (RespBase);
+  // 查询V3白标产品。
+  rpc GetWhiteLabelProduct(WhiteLabelProductIdReq) returns (WhiteLabelProductResp);
+  // 分页查询V3白标产品。
+  rpc ListWhiteLabelProducts(WhiteLabelProductListReq) returns (WhiteLabelProductListResp);
+  // 修改V3白标产品状态。
+  rpc ChangeWhiteLabelProductStatus(ChangeWhiteLabelProductStatusReq) returns (WhiteLabelProductResp);
+  // 同步预检V3白标产品契约和依赖。
+  rpc PreflightWhiteLabelProduct(WhiteLabelProductIdReq) returns (WhiteLabelProductPreflightResp);
 
   rpc CreateBuildTask(CreateBuildTaskReq) returns (BuildTaskResp);
   rpc GetBuildTask(BuildTaskIdReq) returns (BuildTaskResp);

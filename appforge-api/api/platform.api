@@ -61,36 +61,133 @@ type PlatformSigningConfig {
 	createBy          int64  `json:"createBy"`
 	createTime        int64  `json:"createTime"`
 	updateTime        int64  `json:"updateTime"`
+	certificateSha256 string `json:"certificateSha256,optional"`
 }
 
 type PlatformBuildTask {
+	id                   int64  `json:"id"`
+	tenantId             int64  `json:"tenantId"`
+	appId                int64  `json:"appId"`
+	versionId            int64  `json:"versionId"`
+	channelId            int64  `json:"channelId"`
+	signingConfigId      int64  `json:"signingConfigId"`
+	channelCode          string `json:"channelCode"`
+	versionCode          int64  `json:"versionCode"`
+	versionName          string `json:"versionName"`
+	status               int32  `json:"status"`
+	builderId            string `json:"builderId,optional"`
+	builderAttempt       int32  `json:"builderAttempt"`
+	priority             int32  `json:"priority"`
+	apkUrl               string `json:"apkUrl,optional"`
+	apkSha256            string `json:"apkSha256,optional"`
+	apkSize              int64  `json:"apkSize"`
+	logUrl               string `json:"logUrl,optional"`
+	sourceApkObjectId    int64  `json:"sourceApkObjectId"`
+	apkObjectId          int64  `json:"apkObjectId"`
+	logObjectId          int64  `json:"logObjectId"`
+	errorMessage         string `json:"errorMessage,optional"`
+	queuedAt             int64  `json:"queuedAt"`
+	startTime            int64  `json:"startTime,optional"`
+	finishTime           int64  `json:"finishTime,optional"`
+	createBy             int64  `json:"createBy"`
+	createTime           int64  `json:"createTime"`
+	updateTime           int64  `json:"updateTime"`
+	brandingProfileId    int64  `json:"brandingProfileId"`
+	brandingRevision     int32  `json:"brandingRevision"`
+	brandingSnapshotJson string `json:"brandingSnapshotJson,optional"`
+	whiteLabelProductId  int64  `json:"whiteLabelProductId"`
+	templateRevision     int32  `json:"templateRevision"`
+	templateSnapshotJson string `json:"templateSnapshotJson,optional"`
+}
+
+// 应用品牌白标配置。
+type PlatformBrandingProfile {
+	id                   int64  `json:"id"`
+	tenantId             int64  `json:"tenantId"`
+	appId                int64  `json:"appId"`
+	profileName          string `json:"profileName"`
+	appName              string `json:"appName"`
+	logoObjectId         int64  `json:"logoObjectId"`
+	splashObjectId       int64  `json:"splashObjectId"`
+	apiHost              string `json:"apiHost"`
+	rewriteMode          int32  `json:"rewriteMode"`
+	launcherIconTarget   string `json:"launcherIconTarget,optional"`
+	splashResourceTarget string `json:"splashResourceTarget,optional"`
+	runtimeConfigJson    string `json:"runtimeConfigJson,optional"`
+	status               int32  `json:"status"`
+	revision             int32  `json:"revision"`
+	createBy             int64  `json:"createBy"`
+	createTime           int64  `json:"createTime"`
+	updateTime           int64  `json:"updateTime"`
+}
+
+// 品牌兼容性预检记录。
+type PlatformBrandingPreflight {
 	id                int64  `json:"id"`
 	tenantId          int64  `json:"tenantId"`
 	appId             int64  `json:"appId"`
+	brandingProfileId int64  `json:"brandingProfileId"`
+	brandingRevision  int32  `json:"brandingRevision"`
 	versionId         int64  `json:"versionId"`
-	channelId         int64  `json:"channelId"`
-	signingConfigId   int64  `json:"signingConfigId"`
-	channelCode       string `json:"channelCode"`
-	versionCode       int64  `json:"versionCode"`
-	versionName       string `json:"versionName"`
 	status            int32  `json:"status"`
-	builderId         string `json:"builderId,optional"`
-	builderAttempt    int32  `json:"builderAttempt"`
-	priority          int32  `json:"priority"`
-	apkUrl            string `json:"apkUrl,optional"`
-	apkSha256         string `json:"apkSha256,optional"`
-	apkSize           int64  `json:"apkSize"`
-	logUrl            string `json:"logUrl,optional"`
-	sourceApkObjectId int64  `json:"sourceApkObjectId"`
-	apkObjectId       int64  `json:"apkObjectId"`
-	logObjectId       int64  `json:"logObjectId"`
-	errorMessage      string `json:"errorMessage,optional"`
-	queuedAt          int64  `json:"queuedAt"`
+	reportJson        string `json:"reportJson,optional"`
+	sourceApkSha256   string `json:"sourceApkSha256,optional"`
+	toolchainVersion  string `json:"toolchainVersion,optional"`
 	startTime         int64  `json:"startTime,optional"`
 	finishTime        int64  `json:"finishTime,optional"`
 	createBy          int64  `json:"createBy"`
 	createTime        int64  `json:"createTime"`
 	updateTime        int64  `json:"updateTime"`
+}
+
+// V3白标模板。
+type PlatformWhiteLabelTemplate {
+	id                     int64  `json:"id"`
+	tenantId               int64  `json:"tenantId"`
+	appId                  int64  `json:"appId"`
+	templateCode           string `json:"templateCode"`
+	templateName           string `json:"templateName"`
+	sourceVersionId        int64  `json:"sourceVersionId"`
+	parameterSchemaJson    string `json:"parameterSchemaJson,optional"`
+	compatibilityRulesJson string `json:"compatibilityRulesJson,optional"`
+	status                 int32  `json:"status"`
+	publishedRevision      int32  `json:"publishedRevision"`
+	createTime             int64  `json:"createTime"`
+	updateTime             int64  `json:"updateTime"`
+}
+
+// V3白标模板不可变修订。
+type PlatformWhiteLabelTemplateRevision {
+	id                    int64  `json:"id"`
+	tenantId              int64  `json:"tenantId"`
+	templateId            int64  `json:"templateId"`
+	revision              int32  `json:"revision"`
+	packageNameRuleJson   string `json:"packageNameRuleJson"`
+	manifestPatchJson     string `json:"manifestPatchJson,optional"`
+	resourcePatchJson     string `json:"resourcePatchJson,optional"`
+	extensionFilesJson    string `json:"extensionFilesJson,optional"`
+	expectedArtifactsJson string `json:"expectedArtifactsJson,optional"`
+	checksum              string `json:"checksum"`
+	status                int32  `json:"status"`
+	createTime            int64  `json:"createTime"`
+}
+
+// V3白标产品。
+type PlatformWhiteLabelProduct {
+	id                  int64  `json:"id"`
+	tenantId            int64  `json:"tenantId"`
+	appId               int64  `json:"appId"`
+	productCode         string `json:"productCode"`
+	productName         string `json:"productName"`
+	templateId          int64  `json:"templateId"`
+	templateRevision    int32  `json:"templateRevision"`
+	brandingProfileId   int64  `json:"brandingProfileId"`
+	packageName         string `json:"packageName"`
+	signingConfigId     int64  `json:"signingConfigId"`
+	parameterValuesJson string `json:"parameterValuesJson,optional"`
+	status              int32  `json:"status"`
+	createTime          int64  `json:"createTime"`
+	updateTime          int64  `json:"updateTime"`
 }
 
 type PlatformApplicationResp {
@@ -118,6 +215,37 @@ type PlatformBuildTaskResp {
 	data PlatformBuildTask `json:"data"`
 }
 
+type PlatformBrandingProfileResp {
+	RespBase
+	data PlatformBrandingProfile `json:"data"`
+}
+
+type PlatformBrandingPreflightResp {
+	RespBase
+	data PlatformBrandingPreflight `json:"data"`
+}
+
+type PlatformWhiteLabelTemplateResp {
+	RespBase
+	data PlatformWhiteLabelTemplate `json:"data"`
+}
+
+type PlatformWhiteLabelTemplateRevisionResp {
+	RespBase
+	data PlatformWhiteLabelTemplateRevision `json:"data"`
+}
+
+type PlatformWhiteLabelProductResp {
+	RespBase
+	data PlatformWhiteLabelProduct `json:"data"`
+}
+
+type PlatformWhiteLabelProductPreflightResp {
+	RespBase
+	compatible bool   `json:"compatible"`
+	reportJson string `json:"reportJson"`
+}
+
 type PlatformApplicationListResp {
 	RespBase
 	data []PlatformApplication `json:"data"`
@@ -141,6 +269,31 @@ type PlatformSigningConfigListResp {
 type PlatformBuildTaskListResp {
 	RespBase
 	data []PlatformBuildTask `json:"data"`
+}
+
+type PlatformBrandingProfileListResp {
+	RespBase
+	data []PlatformBrandingProfile `json:"data"`
+}
+
+type PlatformBrandingPreflightListResp {
+	RespBase
+	data []PlatformBrandingPreflight `json:"data"`
+}
+
+type PlatformWhiteLabelTemplateListResp {
+	RespBase
+	data []PlatformWhiteLabelTemplate `json:"data"`
+}
+
+type PlatformWhiteLabelTemplateRevisionListResp {
+	RespBase
+	data []PlatformWhiteLabelTemplateRevision `json:"data"`
+}
+
+type PlatformWhiteLabelProductListResp {
+	RespBase
+	data []PlatformWhiteLabelProduct `json:"data"`
 }
 
 type CreatePlatformApplicationReq {
@@ -181,7 +334,7 @@ type CreatePlatformSigningConfigReq {
 	keystoreObjectId int64  `json:"keystoreObjectId"`
 }
 
-// 私有对象上传类型：1原始APK，2签名文件。
+// 私有对象上传类型：1原始APK，2签名文件，5品牌Logo，6品牌启动图，7模板受控文件。
 type InitiatePlatformUploadReq {
 	appId       int64  `json:"appId,optional"`
 	objectType  int32  `json:"objectType"`
@@ -235,11 +388,135 @@ type PlatformStorageDownloadResp {
 }
 
 type CreatePlatformBuildTaskReq {
-	appId           int64 `json:"appId"`
-	versionId       int64 `json:"versionId"`
-	channelId       int64 `json:"channelId"`
-	signingConfigId int64 `json:"signingConfigId,optional"`
-	priority        int32 `json:"priority,optional"`
+	appId               int64 `json:"appId"`
+	versionId           int64 `json:"versionId"`
+	channelId           int64 `json:"channelId"`
+	signingConfigId     int64 `json:"signingConfigId,optional"`
+	priority            int32 `json:"priority,optional"`
+	brandingProfileId   int64 `json:"brandingProfileId,optional"`
+	whiteLabelProductId int64 `json:"whiteLabelProductId,optional"`
+}
+
+type CreatePlatformWhiteLabelTemplateReq {
+	appId                  int64  `json:"appId"`
+	templateCode           string `json:"templateCode"`
+	templateName           string `json:"templateName"`
+	sourceVersionId        int64  `json:"sourceVersionId"`
+	parameterSchemaJson    string `json:"parameterSchemaJson,optional"`
+	compatibilityRulesJson string `json:"compatibilityRulesJson,optional"`
+}
+
+type UpdatePlatformWhiteLabelTemplateReq {
+	id                     int64  `path:"id"`
+	templateName           string `json:"templateName"`
+	sourceVersionId        int64  `json:"sourceVersionId"`
+	parameterSchemaJson    string `json:"parameterSchemaJson,optional"`
+	compatibilityRulesJson string `json:"compatibilityRulesJson,optional"`
+}
+
+type CopyPlatformWhiteLabelTemplateReq {
+	id              int64  `path:"id"`
+	templateCode    string `json:"templateCode"`
+	templateName    string `json:"templateName"`
+	sourceVersionId int64  `json:"sourceVersionId,optional"`
+}
+
+type PlatformWhiteLabelTemplateRevisionIdReq {
+	id       int64 `path:"id"`
+	revision int32 `path:"revision"`
+}
+
+type CreatePlatformWhiteLabelTemplateRevisionReq {
+	id                    int64  `path:"id"`
+	packageNameRuleJson   string `json:"packageNameRuleJson"`
+	manifestPatchJson     string `json:"manifestPatchJson,optional"`
+	resourcePatchJson     string `json:"resourcePatchJson,optional"`
+	extensionFilesJson    string `json:"extensionFilesJson,optional"`
+	expectedArtifactsJson string `json:"expectedArtifactsJson,optional"`
+}
+
+type UpdatePlatformWhiteLabelTemplateRevisionReq {
+	id                    int64  `path:"id"`
+	revision              int32  `path:"revision"`
+	packageNameRuleJson   string `json:"packageNameRuleJson"`
+	manifestPatchJson     string `json:"manifestPatchJson,optional"`
+	resourcePatchJson     string `json:"resourcePatchJson,optional"`
+	extensionFilesJson    string `json:"extensionFilesJson,optional"`
+	expectedArtifactsJson string `json:"expectedArtifactsJson,optional"`
+}
+
+type PublishPlatformWhiteLabelTemplateReq {
+	id       int64 `path:"id"`
+	revision int32 `json:"revision"`
+}
+
+type ChangePlatformWhiteLabelTemplateStatusReq {
+	id     int64 `path:"id"`
+	status int32 `json:"status"`
+}
+
+type CreatePlatformWhiteLabelProductReq {
+	appId               int64  `json:"appId"`
+	productCode         string `json:"productCode"`
+	productName         string `json:"productName"`
+	templateId          int64  `json:"templateId"`
+	templateRevision    int32  `json:"templateRevision"`
+	brandingProfileId   int64  `json:"brandingProfileId"`
+	packageName         string `json:"packageName"`
+	signingConfigId     int64  `json:"signingConfigId"`
+	parameterValuesJson string `json:"parameterValuesJson,optional"`
+}
+
+type UpdatePlatformWhiteLabelProductReq {
+	id                  int64  `path:"id"`
+	productName         string `json:"productName"`
+	brandingProfileId   int64  `json:"brandingProfileId"`
+	packageName         string `json:"packageName"`
+	signingConfigId     int64  `json:"signingConfigId"`
+	parameterValuesJson string `json:"parameterValuesJson,optional"`
+	templateId          int64  `json:"templateId"`
+	templateRevision    int32  `json:"templateRevision"`
+}
+
+type ChangePlatformWhiteLabelProductStatusReq {
+	id     int64 `path:"id"`
+	status int32 `json:"status"`
+}
+
+type CreatePlatformBrandingProfileReq {
+	appId                int64  `json:"appId"`
+	profileName          string `json:"profileName"`
+	appName              string `json:"appName"`
+	logoObjectId         int64  `json:"logoObjectId"`
+	splashObjectId       int64  `json:"splashObjectId"`
+	apiHost              string `json:"apiHost"`
+	rewriteMode          int32  `json:"rewriteMode"`
+	launcherIconTarget   string `json:"launcherIconTarget,optional"`
+	splashResourceTarget string `json:"splashResourceTarget,optional"`
+	runtimeConfigJson    string `json:"runtimeConfigJson,optional"`
+}
+
+type UpdatePlatformBrandingProfileReq {
+	id                   int64  `path:"id"`
+	profileName          string `json:"profileName"`
+	appName              string `json:"appName"`
+	logoObjectId         int64  `json:"logoObjectId"`
+	splashObjectId       int64  `json:"splashObjectId"`
+	apiHost              string `json:"apiHost"`
+	rewriteMode          int32  `json:"rewriteMode"`
+	launcherIconTarget   string `json:"launcherIconTarget,optional"`
+	splashResourceTarget string `json:"splashResourceTarget,optional"`
+	runtimeConfigJson    string `json:"runtimeConfigJson,optional"`
+}
+
+type ChangePlatformBrandingProfileStatusReq {
+	id     int64 `path:"id"`
+	status int32 `json:"status"`
+}
+
+type CreatePlatformBrandingPreflightReq {
+	id        int64 `path:"id"`
+	versionId int64 `json:"versionId"`
 }
 
 type PlatformIdReq {
@@ -276,6 +553,41 @@ type ListPlatformBuildTasksReq {
 	appId     int64 `form:"appId,optional"`
 	channelId int64 `form:"channelId,optional"`
 	status    int32 `form:"status,optional"`
+}
+
+type ListPlatformBrandingProfilesReq {
+	PageReq
+	appId   int64  `form:"appId,optional"`
+	keyword string `form:"keyword,optional"`
+	status  int32  `form:"status,optional"`
+}
+
+type ListPlatformBrandingPreflightsReq {
+	PageReq
+	appId             int64 `form:"appId,optional"`
+	brandingProfileId int64 `form:"brandingProfileId,optional"`
+	versionId         int64 `form:"versionId,optional"`
+	status            int32 `form:"status,optional"`
+}
+
+type ListPlatformWhiteLabelTemplatesReq {
+	PageReq
+	appId   int64  `form:"appId,optional"`
+	keyword string `form:"keyword,optional"`
+	status  int32  `form:"status,optional"`
+}
+
+type ListPlatformWhiteLabelTemplateRevisionsReq {
+	PageReq
+	id     int64 `path:"id"`
+	status int32 `form:"status,optional"`
+}
+
+type ListPlatformWhiteLabelProductsReq {
+	PageReq
+	appId   int64  `form:"appId,optional"`
+	keyword string `form:"keyword,optional"`
+	status  int32  `form:"status,optional"`
 }
 
 type PlatformChannelStats {
@@ -400,6 +712,90 @@ service admin {
 
 	@handler ListPlatformSigningConfigs
 	get /signing-configs (ListPlatformSigningConfigsReq) returns (PlatformSigningConfigListResp)
+
+	@handler CreatePlatformBrandingProfile
+	post /branding-profiles (CreatePlatformBrandingProfileReq) returns (PlatformBrandingProfileResp)
+
+	@handler UpdatePlatformBrandingProfile
+	put /branding-profiles/:id (UpdatePlatformBrandingProfileReq) returns (PlatformBrandingProfileResp)
+
+	@handler GetPlatformBrandingProfile
+	get /branding-profiles/:id (PlatformIdReq) returns (PlatformBrandingProfileResp)
+
+	@handler ListPlatformBrandingProfiles
+	get /branding-profiles (ListPlatformBrandingProfilesReq) returns (PlatformBrandingProfileListResp)
+
+	@handler ChangePlatformBrandingProfileStatus
+	post /branding-profiles/:id/status (ChangePlatformBrandingProfileStatusReq) returns (PlatformBrandingProfileResp)
+
+	@handler CreatePlatformBrandingPreflight
+	post /branding-profiles/:id/preflight (CreatePlatformBrandingPreflightReq) returns (PlatformBrandingPreflightResp)
+
+	@handler GetPlatformBrandingPreflight
+	get /branding-preflights/:id (PlatformIdReq) returns (PlatformBrandingPreflightResp)
+
+	@handler ListPlatformBrandingPreflights
+	get /branding-preflights (ListPlatformBrandingPreflightsReq) returns (PlatformBrandingPreflightListResp)
+
+	@handler CreatePlatformWhiteLabelTemplate
+	post /white-label/templates (CreatePlatformWhiteLabelTemplateReq) returns (PlatformWhiteLabelTemplateResp)
+
+	@handler UpdatePlatformWhiteLabelTemplate
+	put /white-label/templates/:id (UpdatePlatformWhiteLabelTemplateReq) returns (PlatformWhiteLabelTemplateResp)
+
+	@handler CopyPlatformWhiteLabelTemplate
+	post /white-label/templates/:id/copy (CopyPlatformWhiteLabelTemplateReq) returns (PlatformWhiteLabelTemplateResp)
+
+	@handler DeletePlatformWhiteLabelTemplate
+	delete /white-label/templates/:id (PlatformIdReq) returns (RespBase)
+
+	@handler GetPlatformWhiteLabelTemplate
+	get /white-label/templates/:id (PlatformIdReq) returns (PlatformWhiteLabelTemplateResp)
+
+	@handler ListPlatformWhiteLabelTemplates
+	get /white-label/templates (ListPlatformWhiteLabelTemplatesReq) returns (PlatformWhiteLabelTemplateListResp)
+
+	@handler CreatePlatformWhiteLabelTemplateRevision
+	post /white-label/templates/:id/revisions (CreatePlatformWhiteLabelTemplateRevisionReq) returns (PlatformWhiteLabelTemplateRevisionResp)
+
+	@handler GetPlatformWhiteLabelTemplateRevision
+	get /white-label/templates/:id/revisions/:revision (PlatformWhiteLabelTemplateRevisionIdReq) returns (PlatformWhiteLabelTemplateRevisionResp)
+
+	@handler UpdatePlatformWhiteLabelTemplateRevision
+	put /white-label/templates/:id/revisions/:revision (UpdatePlatformWhiteLabelTemplateRevisionReq) returns (PlatformWhiteLabelTemplateRevisionResp)
+
+	@handler DeletePlatformWhiteLabelTemplateRevision
+	delete /white-label/templates/:id/revisions/:revision (PlatformWhiteLabelTemplateRevisionIdReq) returns (RespBase)
+
+	@handler ListPlatformWhiteLabelTemplateRevisions
+	get /white-label/templates/:id/revisions (ListPlatformWhiteLabelTemplateRevisionsReq) returns (PlatformWhiteLabelTemplateRevisionListResp)
+
+	@handler PublishPlatformWhiteLabelTemplate
+	post /white-label/templates/:id/publish (PublishPlatformWhiteLabelTemplateReq) returns (PlatformWhiteLabelTemplateResp)
+
+	@handler ChangePlatformWhiteLabelTemplateStatus
+	post /white-label/templates/:id/status (ChangePlatformWhiteLabelTemplateStatusReq) returns (PlatformWhiteLabelTemplateResp)
+
+	@handler CreatePlatformWhiteLabelProduct
+	post /white-label/products (CreatePlatformWhiteLabelProductReq) returns (PlatformWhiteLabelProductResp)
+
+	@handler UpdatePlatformWhiteLabelProduct
+	put /white-label/products/:id (UpdatePlatformWhiteLabelProductReq) returns (PlatformWhiteLabelProductResp)
+
+	@handler DeletePlatformWhiteLabelProduct
+	delete /white-label/products/:id (PlatformIdReq) returns (RespBase)
+
+	@handler GetPlatformWhiteLabelProduct
+	get /white-label/products/:id (PlatformIdReq) returns (PlatformWhiteLabelProductResp)
+
+	@handler ListPlatformWhiteLabelProducts
+	get /white-label/products (ListPlatformWhiteLabelProductsReq) returns (PlatformWhiteLabelProductListResp)
+
+	@handler ChangePlatformWhiteLabelProductStatus
+	post /white-label/products/:id/status (ChangePlatformWhiteLabelProductStatusReq) returns (PlatformWhiteLabelProductResp)
+
+	@handler PreflightPlatformWhiteLabelProduct
+	post /white-label/products/:id/preflight (PlatformIdReq) returns (PlatformWhiteLabelProductPreflightResp)
 
 	@handler CreatePlatformBuildTask
 	post /build-tasks (CreatePlatformBuildTaskReq) returns (PlatformBuildTaskResp)

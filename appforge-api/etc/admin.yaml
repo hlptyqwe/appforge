@@ -83,3 +83,75 @@ Audit:
       Path: /admin/core/signing-configs
     - Method: POST
       Path: /admin/core/build-tasks
+    - Method: POST
+      Path: /admin/core/branding-profiles
+    - Method: PUT
+      Path: /admin/core/branding-profiles/:id
+    - Method: POST
+      Path: /admin/core/branding-profiles/:id/status
+    - Method: POST
+      Path: /admin/core/branding-profiles/:id/preflight
+    - Method: POST
+      Path: /admin/core/white-label/templates
+    - Method: PUT
+      Path: /admin/core/white-label/templates/:id
+    - Method: POST
+      Path: /admin/core/white-label/templates/:id/copy
+    - Method: DELETE
+      Path: /admin/core/white-label/templates/:id
+    - Method: POST
+      Path: /admin/core/white-label/templates/:id/revisions
+    - Method: PUT
+      Path: /admin/core/white-label/templates/:id/revisions/:revision
+    - Method: DELETE
+      Path: /admin/core/white-label/templates/:id/revisions/:revision
+    - Method: POST
+      Path: /admin/core/white-label/templates/:id/publish
+    - Method: POST
+      Path: /admin/core/white-label/templates/:id/status
+    - Method: POST
+      Path: /admin/core/white-label/products
+    - Method: PUT
+      Path: /admin/core/white-label/products/:id
+    - Method: DELETE
+      Path: /admin/core/white-label/products/:id
+    - Method: POST
+      Path: /admin/core/white-label/products/:id/status
+    - Method: POST
+      Path: /admin/core/white-label/products/:id/preflight
+    - Method: POST
+      Path: /agent/core/branding-profiles
+    - Method: PUT
+      Path: /agent/core/branding-profiles/:id
+    - Method: POST
+      Path: /agent/core/branding-profiles/:id/status
+    - Method: POST
+      Path: /agent/core/branding-profiles/:id/preflight
+    - Method: POST
+      Path: /agent/core/white-label/templates
+    - Method: PUT
+      Path: /agent/core/white-label/templates/:id
+    - Method: POST
+      Path: /agent/core/white-label/templates/:id/copy
+    - Method: DELETE
+      Path: /agent/core/white-label/templates/:id
+    - Method: POST
+      Path: /agent/core/white-label/templates/:id/revisions
+    - Method: PUT
+      Path: /agent/core/white-label/templates/:id/revisions/:revision
+    - Method: DELETE
+      Path: /agent/core/white-label/templates/:id/revisions/:revision
+    - Method: POST
+      Path: /agent/core/white-label/templates/:id/publish
+    - Method: POST
+      Path: /agent/core/white-label/templates/:id/status
+    - Method: POST
+      Path: /agent/core/white-label/products
+    - Method: PUT
+      Path: /agent/core/white-label/products/:id
+    - Method: DELETE
+      Path: /agent/core/white-label/products/:id
+    - Method: POST
+      Path: /agent/core/white-label/products/:id/status
+    - Method: POST
+      Path: /agent/core/white-label/products/:id/preflight
