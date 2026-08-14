@@ -81,7 +81,7 @@ const zhCN = {
   options: {
     ENABLE_ENABLED: '启用', ENABLE_DISABLED: '停用', SWITCH_ON: '显示', SWITCH_OFF: '隐藏',
     MENU_TYPE_DIR: '目录', MENU_TYPE_MENU: '菜单', MENU_TYPE_BUTTON: '按钮',
-    APPLICATION_SCOPE_ADMIN: '管理后台',
+    APPLICATION_SCOPE_ADMIN: '管理后台', APPLICATION_SCOPE_AGENT: '代理端',
   },
 }
 

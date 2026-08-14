@@ -42,7 +42,7 @@ enum UserType {
 enum ApplicationScope {
   APPLICATION_SCOPE_UNKNOWN = 0;
   APPLICATION_SCOPE_ADMIN = 1; // 综合管理后台 admin-ui
-  APPLICATION_SCOPE_LIQUIDITY = 2; // 做市管理后台 liquidity-admin-ui
+  APPLICATION_SCOPE_AGENT = 2; // APK渠道代理端 agent-ui
 }
 
 enum TenantDomainStatus {

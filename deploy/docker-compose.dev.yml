@@ -31,6 +31,24 @@ services:
     networks:
       - appforge
 
+  mysql-migrate:
+    image: mysql:8.4
+    container_name: appforge-mysql-migrate
+    environment:
+      MYSQL_PWD: appforge_dev_password
+    command:
+      - sh
+      - -c
+      - for file in /migrations/*.sql; do mysql -h mysql -uappforge appforge < "$$file" || exit 1; done
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./mysql/migrations:/migrations:ro
+    restart: "no"
+    networks:
+      - appforge
+
   redis:
     image: redis:7.4-alpine
     container_name: appforge-redis
@@ -116,7 +134,7 @@ services:
       - |
         until mc alias set local http://minio:9000 appforge appforge_dev_minio; do sleep 1; done
         mc mb --ignore-existing local/appforge
-        mc anonymous set download local/appforge
+        mc anonymous set none local/appforge
     restart: "no"
     networks:
       - appforge
@@ -133,6 +151,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      mysql-migrate:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
       etcd-init:
@@ -159,6 +179,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      mysql-migrate:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
       etcd-init:
@@ -176,15 +198,15 @@ services:
   builder-rpc:
     build:
       context: ..
-      dockerfile: deploy/docker/go.Dockerfile
-      args:
-        MODULE_DIR: services/builder
+      dockerfile: deploy/docker/builder-rpc.Dockerfile
     container_name: appforge-builder-rpc
     restart: unless-stopped
     command: ["-etcd", "etcd:2379"]
     depends_on:
       core-rpc:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
       etcd-init:
         condition: service_completed_successfully
     ports:
@@ -194,6 +216,25 @@ services:
       interval: 5s
       timeout: 3s
       retries: 30
+    networks:
+      - appforge
+
+  builder-worker:
+    build:
+      context: ..
+      dockerfile: deploy/docker/builder-worker.Dockerfile
+    container_name: appforge-builder-worker
+    restart: unless-stopped
+    command: ["-etcd", "etcd:2379"]
+    depends_on:
+      builder-rpc:
+        condition: service_healthy
+      core-rpc:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      etcd-init:
+        condition: service_completed_successfully
     networks:
       - appforge
 
@@ -236,6 +277,28 @@ services:
       - "${APPFORGE_UI_PORT:-5173}:80"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - appforge
+
+  agent-ui:
+    build:
+      context: ..
+      dockerfile: deploy/docker/ui.Dockerfile
+      args:
+        VITE_APP_MODE: agent
+        VITE_APP_NAME: AppForge 代理端
+    container_name: appforge-agent-ui
+    restart: unless-stopped
+    depends_on:
+      admin-api:
+        condition: service_healthy
+    ports:
+      - "${APPFORGE_AGENT_UI_PORT:-5174}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/agent/core"]
       interval: 10s
       timeout: 5s
       retries: 10

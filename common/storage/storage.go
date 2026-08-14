@@ -2,13 +2,48 @@ package storage
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"mime/multipart"
+	"path"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"appforge/common/i18n"
 	"appforge/common/storage/impl"
+	"appforge/common/storage/internal"
 )
+
+// ObjectInfo describes an object stored by a provider.
+type ObjectInfo = internal.ObjectInfo
+
+// GenerateTenantObjectKey returns an opaque key inside one tenant namespace.
+func GenerateTenantObjectKey(tenantID int64, objectType, filename string) (string, error) {
+	if tenantID <= 0 {
+		return "", errors.New("tenant id is required")
+	}
+	objectType = strings.Trim(strings.ToLower(objectType), "/")
+	if objectType == "" || strings.Contains(objectType, "..") {
+		return "", errors.New("object type is required")
+	}
+	ext := strings.ToLower(filepath.Ext(strings.TrimSpace(filename)))
+	if ext == "" || len(ext) > 16 {
+		ext = ".bin"
+	}
+	random := make([]byte, 16)
+	if _, err := rand.Read(random); err != nil {
+		return "", fmt.Errorf("generate object key: %w", err)
+	}
+	now := time.Now().UTC()
+	return path.Join(
+		"tenants", fmt.Sprintf("%d", tenantID), objectType,
+		now.Format("2006"), now.Format("01"), hex.EncodeToString(random)+ext,
+	), nil
+}
 
 // OssType indicates which implementation will be used for uploads.
 //
@@ -41,6 +76,31 @@ func UploadFile(ctx context.Context, file multipart.File, header *multipart.File
 // The caller can choose how to combine the returned value with an optional domain.
 type Uploader interface {
 	Upload(ctx context.Context, file multipart.File, header *multipart.FileHeader) (string, error)
+}
+
+// ObjectStore provides the private-object operations used by upload APIs and Builder workers.
+// Implementations must not make buckets or objects publicly readable.
+type ObjectStore interface {
+	PutObject(ctx context.Context, key string, reader io.Reader, size int64, contentType string) error
+	OpenObject(ctx context.Context, key string) (io.ReadCloser, error)
+	StatObject(ctx context.Context, key string) (ObjectInfo, error)
+	DeleteObject(ctx context.Context, key string) error
+	PresignPut(ctx context.Context, key string, expires time.Duration) (string, error)
+	PresignGet(ctx context.Context, key string, expires time.Duration) (string, error)
+}
+
+// NewObjectStore creates a private object store. V1 direct-upload operations currently require MinIO/S3 compatibility.
+func NewObjectStore(cfg Config) (ObjectStore, error) {
+	if cfg.OssType != OssTypeMinio || cfg.Minio == nil {
+		return nil, fmt.Errorf("private object operations require MinIO configuration: %w", ErrUnsupportedOssType)
+	}
+	return impl.NewMinioObjectStore(
+		cfg.Minio.Endpoint,
+		cfg.Minio.BucketUrl,
+		cfg.Minio.AccessKeyId,
+		cfg.Minio.AccessKeySecret,
+		cfg.Minio.BucketName,
+	)
 }
 
 // NewUploader creates an uploader for the configured provider.

@@ -34,7 +34,12 @@ func (l *CompleteBuildTaskLogic) CompleteBuildTask(in *builder.CompleteBuildTask
 	if err != nil {
 		return nil, err
 	}
-	resp, err := client.CompleteBuildTask(toCoreContext(l.ctx), &core.CompleteBuildTaskReq{TaskId: in.TaskId, BuilderId: in.BuilderId, ApkUrl: in.ApkUrl, ApkSha256: in.ApkSha256, ApkSize: in.ApkSize, LogUrl: in.LogUrl})
+	resp, err := client.CompleteBuildTask(toCoreContext(l.ctx), &core.CompleteBuildTaskReq{
+		TaskId: in.TaskId, BuilderId: in.BuilderId, ApkUrl: in.ApkUrl,
+		ApkSha256: in.ApkSha256, ApkSize: in.ApkSize, LogUrl: in.LogUrl,
+		ApkObjectKey: in.ApkObjectKey, LogObjectKey: in.LogObjectKey,
+		LogSha256: in.LogSha256, LogSize: in.LogSize, BuilderAttempt: in.BuilderAttempt,
+	})
 	if err != nil {
 		return nil, err
 	}

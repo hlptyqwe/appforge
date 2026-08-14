@@ -27,20 +27,21 @@ func mapBuildTask(item *core.BuildTask) *builderpb.BuildTask {
 		return nil
 	}
 	return &builderpb.BuildTask{
-		Id:              item.Id,
-		TenantId:        item.TenantId,
-		AppId:           item.AppId,
-		VersionId:       item.VersionId,
-		ChannelId:       item.ChannelId,
-		SigningConfigId: item.SigningConfigId,
-		ChannelCode:     item.ChannelCode,
-		VersionCode:     item.VersionCode,
-		VersionName:     item.VersionName,
-		Status:          builderpb.BuildTaskStatus(item.Status),
-		BuilderAttempt:  item.BuilderAttempt,
-		Priority:        item.Priority,
-		SourceApkUrl:    item.SourceApkUrl,
-		BuildConfigJson: item.BuildConfigJson,
+		Id:                item.Id,
+		TenantId:          item.TenantId,
+		AppId:             item.AppId,
+		VersionId:         item.VersionId,
+		ChannelId:         item.ChannelId,
+		SigningConfigId:   item.SigningConfigId,
+		ChannelCode:       item.ChannelCode,
+		VersionCode:       item.VersionCode,
+		VersionName:       item.VersionName,
+		Status:            builderpb.BuildTaskStatus(item.Status),
+		BuilderAttempt:    item.BuilderAttempt,
+		Priority:          item.Priority,
+		SourceApkUrl:      item.SourceApkUrl,
+		BuildConfigJson:   item.BuildConfigJson,
+		SourceApkObjectId: item.SourceApkObjectId,
 	}
 }
 

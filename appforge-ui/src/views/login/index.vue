@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { resolvePostLoginPath } from '@/router'
 import { useI18n } from 'vue-i18n'
 import { useForm, useLoading } from '@/composables'
+import { ENV } from '@/config/environment'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -44,10 +45,11 @@ async function submit() {
   <div class="wrap">
     <el-card class="card">
       <template #header>
-        {{ t('route.login') }}
+		<div class="login-title">{{ ENV.APP_NAME }}</div>
+		<div class="login-subtitle">{{ t('route.login') }}</div>
       </template>
 
-      <el-form label-position="top">
+		<el-form label-position="top">
         <el-form-item :label="t('auth.username')">
           <el-input v-model="form.username" autocomplete="username" />
         </el-form-item>
@@ -88,5 +90,14 @@ async function submit() {
 }
 .card {
   width: 380px;
+}
+.login-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+.login-subtitle {
+  margin-top: 4px;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
 }
 </style>

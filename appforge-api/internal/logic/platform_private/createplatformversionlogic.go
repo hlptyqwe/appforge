@@ -29,7 +29,7 @@ func NewCreatePlatformVersionLogic(ctx context.Context, svcCtx *svc.ServiceConte
 }
 
 func (l *CreatePlatformVersionLogic) CreatePlatformVersion(req *types.CreatePlatformVersionReq) (resp *types.PlatformVersionResp, err error) {
-	item, err := l.svcCtx.CoreCli.CreateVersion(l.ctx, &core.CreateVersionReq{AppId: req.AppId, VersionCode: req.VersionCode, VersionName: req.VersionName, SourceApkUrl: req.SourceApkUrl, SourceApkSha256: req.SourceApkSha256, ReleaseNotes: req.ReleaseNotes, BuildConfigJson: req.BuildConfigJson})
+	item, err := l.svcCtx.CoreCli.CreateVersion(l.ctx, &core.CreateVersionReq{AppId: req.AppId, VersionCode: req.VersionCode, VersionName: req.VersionName, SourceApkUrl: req.SourceApkUrl, SourceApkSha256: req.SourceApkSha256, ReleaseNotes: req.ReleaseNotes, BuildConfigJson: req.BuildConfigJson, SourceApkObjectId: req.SourceApkObjectId})
 	if err != nil {
 		return nil, err
 	}

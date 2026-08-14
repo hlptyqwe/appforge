@@ -56,6 +56,9 @@ func (l *CreateBuildTaskLogic) CreateBuildTask(in *core.CreateBuildTaskReq) (*co
 	if version.TenantId != tenant || version.AppId != in.AppId {
 		return nil, status.Error(codes.NotFound, "version not found")
 	}
+	if version.SourceApkObjectId <= 0 {
+		return nil, status.Error(codes.FailedPrecondition, "version has no validated source APK")
+	}
 	channel, err := l.svcCtx.ChannelModel.FindOne(l.ctx, in.ChannelId)
 	if err != nil {
 		return nil, notFoundOrInternal(err, "channel")
@@ -75,21 +78,22 @@ func (l *CreateBuildTaskLogic) CreateBuildTask(in *core.CreateBuildTaskReq) (*co
 		priority = 0
 	}
 	result, err := l.svcCtx.BuildTaskModel.Insert(l.ctx, &models.TBuildTask{
-		TenantId:        tenant,
-		AppId:           in.AppId,
-		VersionId:       in.VersionId,
-		ChannelId:       in.ChannelId,
-		SigningConfigId: in.SigningConfigId,
-		ChannelCode:     channel.ChannelCode,
-		VersionCode:     version.VersionCode,
-		VersionName:     version.VersionName,
-		SourceApkUrl:    version.SourceApkUrl,
-		BuildConfig:     version.BuildConfig,
-		Status:          buildStatusPending,
-		BuilderAttempt:  0,
-		Priority:        priority,
-		QueuedAt:        timeFromMillis(0),
-		CreateBy:        actorID(l.ctx),
+		TenantId:          tenant,
+		AppId:             in.AppId,
+		VersionId:         in.VersionId,
+		ChannelId:         in.ChannelId,
+		SigningConfigId:   in.SigningConfigId,
+		ChannelCode:       channel.ChannelCode,
+		VersionCode:       version.VersionCode,
+		VersionName:       version.VersionName,
+		SourceApkObjectId: version.SourceApkObjectId,
+		SourceApkUrl:      version.SourceApkUrl,
+		BuildConfig:       version.BuildConfig,
+		Status:            buildStatusPending,
+		BuilderAttempt:    0,
+		Priority:          priority,
+		QueuedAt:          timeFromMillis(0),
+		CreateBy:          actorID(l.ctx),
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "create build task failed: %v", err)
@@ -99,7 +103,7 @@ func (l *CreateBuildTaskLogic) CreateBuildTask(in *core.CreateBuildTaskReq) (*co
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "read build task id failed: %v", err)
 	}
-	if err := l.svcCtx.DB.QueryRowCtx(l.ctx, &item, `SELECT id, tenant_id, app_id, version_id, channel_id, signing_config_id, channel_code, version_code, version_name, source_apk_url, build_config, status, builder_id, builder_attempt, priority, apk_url, apk_sha256, apk_size, log_url, error_message, queued_at, start_time, finish_time, lease_until, create_by, create_time, update_time FROM t_build_task WHERE id = ? AND tenant_id = ?`, id, tenant); err != nil {
+	if err := l.svcCtx.DB.QueryRowCtx(l.ctx, &item, buildTaskSelect+` WHERE id = ? AND tenant_id = ?`, id, tenant); err != nil {
 		return nil, status.Errorf(codes.Internal, "load created build task failed: %v", err)
 	}
 

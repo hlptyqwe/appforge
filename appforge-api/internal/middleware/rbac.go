@@ -18,6 +18,7 @@ import (
 )
 
 type PermissionRule struct {
+	AppScope   system.ApplicationScope
 	Method     string
 	Path       string
 	PermKey    string
@@ -64,9 +65,6 @@ func loadPermissionRules(ctx context.Context, svcCtx *svc.ServiceContext) ([]Per
 	if result != nil {
 		rules = make([]PermissionRule, 0, len(result.Data))
 		for _, item := range result.Data {
-			if item.AppScope != system.ApplicationScope_APPLICATION_SCOPE_ADMIN {
-				continue
-			}
 			pattern, staticSegs, err := compilePathPattern(item.Path)
 			if err != nil {
 				logx.Errorf("compile path pattern failed: method=%s path=%s err=%v", item.Method, item.Path, err)
@@ -79,6 +77,7 @@ func loadPermissionRules(ctx context.Context, svcCtx *svc.ServiceContext) ([]Per
 			}
 
 			rules = append(rules, PermissionRule{
+				AppScope:   item.AppScope,
 				Method:     strings.ToUpper(strings.TrimSpace(method)),
 				Path:       normalizePath(item.Path),
 				PermKey:    item.PermKey,
@@ -91,9 +90,9 @@ func loadPermissionRules(ctx context.Context, svcCtx *svc.ServiceContext) ([]Per
 	return rules, nil
 }
 
-func (m *RbacMiddleware) requiredPermission(ctx context.Context, path, method string) string {
+func (m *RbacMiddleware) requiredPermission(ctx context.Context, appScope system.ApplicationScope, path, method string) string {
 	m.mu.RLock()
-	requiredPerm := getRequiredPermission(m.rules, path, method)
+	requiredPerm := getRequiredPermission(m.rules, appScope, path, method)
 	m.mu.RUnlock()
 	if requiredPerm != "" {
 		return requiredPerm
@@ -102,7 +101,7 @@ func (m *RbacMiddleware) requiredPermission(ctx context.Context, path, method st
 	m.refreshRules(ctx)
 
 	m.mu.RLock()
-	requiredPerm = getRequiredPermission(m.rules, path, method)
+	requiredPerm = getRequiredPermission(m.rules, appScope, path, method)
 	m.mu.RUnlock()
 
 	return requiredPerm
@@ -113,8 +112,13 @@ func (m *RbacMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		path := r.URL.Path
 		method := r.Method
 
-		if isWhitePath(path) {
+		if isPublicPath(path) {
 			next(w, r)
+			return
+		}
+		routeScope := applicationScopeForPath(path)
+		if routeScope == system.ApplicationScope_APPLICATION_SCOPE_UNKNOWN {
+			http.Error(w, "Not Found", http.StatusNotFound)
 			return
 		}
 
@@ -142,8 +146,26 @@ func (m *RbacMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		setAuditActor(r.Context(), userResp.Data.Id, userResp.Data.Username, userResp.Data.TenantId)
+		if userResp.Data.AppScope != routeScope {
+			logx.Errorf("application scope mismatch, userId=%d userScope=%s routeScope=%s path=%s",
+				userId, userResp.Data.AppScope, routeScope, path)
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
 
-		requiredPerm := m.requiredPermission(r.Context(), path, method)
+		ctx := context.WithValue(r.Context(), utils.CtxKeyUid, userResp.Data.Id)
+		ctx = context.WithValue(ctx, utils.CtxKeyUsername, userResp.Data.Username)
+		ctx = context.WithValue(ctx, utils.CtxKeyTenantId, userResp.Data.TenantId)
+		ctx = context.WithValue(ctx, utils.CtxKeyUserType, int64(userResp.Data.UserType))
+		ctx = context.WithValue(ctx, utils.CtxKeyAppScope, int64(userResp.Data.AppScope))
+		r = r.WithContext(ctx)
+
+		if isProfilePath(path) {
+			next(w, r)
+			return
+		}
+
+		requiredPerm := m.requiredPermission(r.Context(), routeScope, path, method)
 		if requiredPerm == "" {
 			logx.Errorf("permission route not found, method=%s path=%s", method, path)
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
@@ -178,13 +200,6 @@ func (m *RbacMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
-
-		// 登录身份只取 JWT 与数据库，覆盖所有同名请求头，避免伪造操作人或跨租户。
-		ctx := context.WithValue(r.Context(), utils.CtxKeyUid, userResp.Data.Id)
-		ctx = context.WithValue(ctx, utils.CtxKeyUsername, userResp.Data.Username)
-		ctx = context.WithValue(ctx, utils.CtxKeyTenantId, userResp.Data.TenantId)
-		ctx = context.WithValue(ctx, utils.CtxKeyUserType, int64(userResp.Data.UserType))
-		r = r.WithContext(ctx)
 
 		next(w, r)
 	}
@@ -253,26 +268,49 @@ func parsePerm(perm string) (obj string, act string, ok bool) {
 	return obj, act, true
 }
 
-func isWhitePath(path string) bool {
+func isPublicPath(path string) bool {
+	if strings.HasPrefix(path, "/d/") {
+		return true
+	}
 	whiteList := map[string]struct{}{
-		"/admin/system/core":         {},
-		"/admin/system/auth/login":   {},
-		"/admin/system/auth/profile": {},
-		"/api/install/report":        {},
-		"/api/channel/event":         {},
-		"/health":                    {},
+		"/admin/system/core":       {},
+		"/admin/system/auth/login": {},
+		"/agent/core":              {},
+		"/agent/auth/login":        {},
+		"/api/install/report":      {},
+		"/api/channel/event":       {},
+		"/health":                  {},
 	}
 
 	_, ok := whiteList[path]
 	return ok
 }
 
-func getRequiredPermission(rules []PermissionRule, path, method string) string {
+func isProfilePath(path string) bool {
+	return path == "/admin/system/auth/profile" || path == "/agent/auth/profile"
+}
+
+func applicationScopeForPath(path string) system.ApplicationScope {
+	switch {
+	case path == "/admin" || strings.HasPrefix(path, "/admin/"):
+		return system.ApplicationScope_APPLICATION_SCOPE_ADMIN
+	case path == "/agent" || strings.HasPrefix(path, "/agent/"):
+		return system.ApplicationScope_APPLICATION_SCOPE_AGENT
+	default:
+		return system.ApplicationScope_APPLICATION_SCOPE_UNKNOWN
+	}
+}
+
+func getRequiredPermission(rules []PermissionRule, appScope system.ApplicationScope, path, method string) string {
 	path = strings.TrimSpace(path)
 
 	if strings.HasPrefix(path, "/admin/") {
 		path = strings.TrimPrefix(path, "/admin")
 	} else if path == "/admin" {
+		path = "/"
+	} else if strings.HasPrefix(path, "/agent/") {
+		path = strings.TrimPrefix(path, "/agent")
+	} else if path == "/agent" {
 		path = "/"
 	}
 
@@ -283,6 +321,9 @@ func getRequiredPermission(rules []PermissionRule, path, method string) string {
 
 	for i := range rules {
 		rule := &rules[i]
+		if rule.AppScope != appScope {
+			continue
+		}
 		if rule.Method != method {
 			continue
 		}

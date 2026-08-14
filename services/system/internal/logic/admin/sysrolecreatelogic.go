@@ -36,7 +36,7 @@ func (l *SysRoleCreateLogic) SysRoleCreate(in *system.SysRoleCreateReq) (*system
 	if err != nil {
 		return nil, err
 	}
-	appScope := effectiveAppScope(in.GetAppScope())
+	appScope := effectiveAppScope(l.ctx, in.GetAppScope())
 	if existing, err := l.svcCtx.RoleModel.FindOneByTenantIdAppScopeCode(l.ctx, tenant, appScope, strings.TrimSpace(in.GetCode())); err == nil && existing != nil {
 		return nil, status.Error(codes.AlreadyExists, "role code already exists")
 	}

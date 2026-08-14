@@ -43,6 +43,25 @@ enum BuildTaskStatus {
   BUILD_TASK_STATUS_FAILED = 6; // 失败
 }
 
+// 私有对象存储中的业务对象类型。
+enum StorageObjectType {
+  STORAGE_OBJECT_TYPE_UNKNOWN = 0; // 未知类型
+  STORAGE_OBJECT_TYPE_SOURCE_APK = 1; // 客户上传的原始APK
+  STORAGE_OBJECT_TYPE_KEYSTORE = 2; // APK签名文件
+  STORAGE_OBJECT_TYPE_BUILT_APK = 3; // Builder生成的渠道APK
+  STORAGE_OBJECT_TYPE_BUILD_LOG = 4; // Builder构建日志
+}
+
+// 存储对象生命周期状态。
+enum StorageObjectStatus {
+  STORAGE_OBJECT_STATUS_UNKNOWN = 0; // 未知状态
+  STORAGE_OBJECT_STATUS_UPLOADING = 1; // 等待或正在上传
+  STORAGE_OBJECT_STATUS_READY = 2; // 上传校验完成，可被业务绑定
+  STORAGE_OBJECT_STATUS_BOUND = 3; // 已绑定到版本、签名配置或构建任务
+  STORAGE_OBJECT_STATUS_DELETED = 4; // 已删除
+  STORAGE_OBJECT_STATUS_FAILED = 5; // 上传或校验失败
+}
+
 message Application {
   int64 id = 1;
   int64 tenant_id = 2;
@@ -73,6 +92,7 @@ message Version {
   int64 create_by = 12;
   int64 create_time = 13;
   int64 update_time = 14;
+  int64 source_apk_object_id = 15; // 原始APK存储对象ID
 }
 
 message Channel {
@@ -104,6 +124,7 @@ message SigningConfig {
   int64 create_by = 10;
   int64 create_time = 11;
   int64 update_time = 12;
+  int64 keystore_object_id = 13; // 签名文件存储对象ID
 }
 
 message BuildTask {
@@ -133,6 +154,26 @@ message BuildTask {
   int64 update_time = 24;
   string source_apk_url = 25; // 构建时使用的原始APK地址快照
   string build_config_json = 26; // 构建时使用的构建配置快照
+  int64 source_apk_object_id = 27; // 原始APK对象ID快照
+  int64 apk_object_id = 28; // 构建产物APK对象ID
+  int64 log_object_id = 29; // 构建日志对象ID
+}
+
+// 私有对象存储元数据。
+message StorageObject {
+  int64 id = 1; // 存储对象ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 app_id = 3; // 关联应用ID，上传时允许为0
+  StorageObjectType object_type = 4; // 对象类型
+  string object_key = 5; // 私有对象存储Key
+  string original_name = 6; // 用户上传时的原始文件名
+  string content_type = 7; // 对象内容类型
+  int64 size_bytes = 8; // 对象大小，单位字节
+  string sha256 = 9; // 对象SHA-256
+  StorageObjectStatus status = 10; // 生命周期状态
+  int64 create_by = 11; // 创建人ID
+  int64 create_time = 12; // 创建时间，Unix毫秒
+  int64 update_time = 13; // 更新时间，Unix毫秒
 }
 
 message ApplicationIdReq { int64 id = 1; }
@@ -239,6 +280,7 @@ message CreateVersionReq {
   string source_apk_sha256 = 5;
   string release_notes = 6;
   string build_config_json = 7;
+  int64 source_apk_object_id = 8; // 已校验的原始APK对象ID
 }
 
 message CreateChannelReq {
@@ -259,6 +301,64 @@ message CreateSigningConfigReq {
   string keystore_password_ciphertext = 5;
   string key_password_ciphertext = 6;
   string secret_ref = 7;
+  int64 keystore_object_id = 8; // 已校验的签名文件对象ID
+}
+
+// 创建待上传对象元数据请求。
+message CreateStorageObjectReq {
+  int64 app_id = 1; // 关联应用ID，允许为0
+  StorageObjectType object_type = 2; // 对象类型
+  string object_key = 3; // 服务端生成的对象Key
+  string original_name = 4; // 原始文件名
+  string content_type = 5; // 内容类型
+  int64 size_bytes = 6; // 客户端声明的对象大小
+}
+
+// 完成对象上传及校验请求。
+message CompleteStorageObjectReq {
+  int64 id = 1; // 存储对象ID
+  int64 size_bytes = 2; // 服务端验证后的对象大小
+  string sha256 = 3; // 服务端流式计算的SHA-256
+}
+
+// 标记对象上传失败请求。
+message FailStorageObjectReq {
+  int64 id = 1; // 存储对象ID
+}
+
+// 待回收的过期上传对象。
+message ExpiredStorageObject {
+  int64 id = 1; // 存储对象ID
+  string object_key = 2; // 待删除的私有对象Key
+}
+
+// Builder领取过期上传对象清理批次请求。
+message ClaimExpiredStorageObjectsReq {
+  int64 stale_seconds = 1; // 判定上传过期的秒数
+  int32 limit = 2; // 单次最多领取数量
+}
+
+// Builder领取过期上传对象清理批次响应。
+message ClaimExpiredStorageObjectsResp {
+  common.RespBase base = 1; // 通用响应
+  repeated ExpiredStorageObject data = 2; // 待删除对象列表
+}
+
+// Builder确认物理对象已删除请求。
+message MarkStorageObjectDeletedReq {
+  int64 id = 1; // 存储对象ID
+  string object_key = 2; // 已删除的私有对象Key
+}
+
+// 查询存储对象请求。
+message StorageObjectIdReq {
+  int64 id = 1; // 存储对象ID
+}
+
+// 存储对象响应。
+message StorageObjectResp {
+  common.RespBase base = 1; // 通用响应
+  StorageObject data = 2; // 存储对象
 }
 
 message CreateBuildTaskReq {
@@ -317,6 +417,33 @@ message ReportChannelEventReq {
   string metadata = 11;
 }
 
+// 公开渠道下载解析请求。event_key 由可信 API 根据客户端匿名标识生成。
+message ResolveChannelDownloadReq {
+  string channel_code = 1; // 全局唯一渠道编码
+  string event_key = 2; // 下载访问幂等键
+  string ip = 3; // 客户端IP
+  string user_agent = 4; // 客户端User-Agent
+}
+
+// 公开渠道下载解析结果，不包含对象存储访问凭据。
+message ChannelDownloadArtifact {
+  int64 tenant_id = 1; // 所属租户ID
+  int64 app_id = 2; // 应用ID
+  int64 channel_id = 3; // 渠道ID
+  string channel_code = 4; // 渠道编码
+  int64 build_task_id = 5; // 最新成功构建任务ID
+  int64 object_id = 6; // 构建产物对象ID
+  string object_key = 7; // 私有对象Key
+  string original_name = 8; // 下载文件名
+  string content_type = 9; // MIME类型
+}
+
+// 公开渠道下载解析响应。
+message ChannelDownloadArtifactResp {
+  common.RespBase base = 1; // 通用响应
+  ChannelDownloadArtifact data = 2; // 可下载构建产物
+}
+
 // Builder领取构建任务请求。
 message ClaimBuildTaskReq {
   string builder_id = 1; // Builder工作节点ID
@@ -328,6 +455,7 @@ message HeartbeatBuildTaskReq {
   int64 task_id = 1; // 构建任务ID
   string builder_id = 2; // Builder工作节点ID
   int32 lease_seconds = 3; // 租约秒数
+  int32 builder_attempt = 4; // 本次领取代次，用于阻止过期Worker回写
 }
 
 // Builder回报构建进度请求。
@@ -337,6 +465,7 @@ message ReportBuildProgressReq {
   BuildTaskStatus status = 3; // 当前构建任务状态
   string message = 4; // 进度说明
   int32 progress = 5; // 进度百分比
+  int32 builder_attempt = 6; // 本次领取代次，用于阻止过期Worker回写
 }
 
 // Builder回报构建成功请求。
@@ -347,6 +476,11 @@ message CompleteBuildTaskReq {
   string apk_sha256 = 4; // APK SHA-256
   int64 apk_size = 5; // APK大小（字节）
   string log_url = 6; // 构建日志地址
+  string apk_object_key = 7; // 构建产物私有对象Key
+  string log_object_key = 8; // 构建日志私有对象Key
+  string log_sha256 = 9; // 构建日志SHA-256
+  int64 log_size = 10; // 构建日志大小，单位字节
+  int32 builder_attempt = 11; // 本次领取代次，用于阻止过期Worker回写
 }
 
 // Builder回报构建失败请求。
@@ -355,12 +489,57 @@ message FailBuildTaskReq {
   string builder_id = 2; // Builder工作节点ID
   string error_message = 3; // 失败原因
   string log_url = 4; // 构建日志地址
+  string log_object_key = 5; // 构建日志私有对象Key
+  string log_sha256 = 6; // 构建日志SHA-256
+  int64 log_size = 7; // 构建日志大小，单位字节
+  int32 builder_attempt = 8; // 本次领取代次，用于阻止过期Worker回写
+}
+
+// Builder读取已领取任务的完整执行上下文请求。
+message GetBuildExecutionContextReq {
+  int64 task_id = 1; // 构建任务ID
+  string builder_id = 2; // 当前租约持有者ID
+  int32 builder_attempt = 3; // 本次领取代次，用于阻止过期Worker读取敏感上下文
+}
+
+// Builder内部执行上下文，包含敏感信息，不允许通过HTTP接口暴露。
+message BuildExecutionContext {
+  BuildTask task = 1; // 构建任务快照
+  string package_name = 2; // 期望的Android包名
+  string api_host = 3; // 注入APK的业务API地址
+  string channel_name = 4; // 渠道名称
+  string landing_url = 5; // 渠道落地页
+  StorageObject source_apk = 6; // 原始APK私有对象
+  StorageObject keystore = 7; // 签名文件私有对象
+  string key_alias = 8; // 签名别名
+  string keystore_password_ciphertext = 9; // Keystore密码密文
+  string key_password_ciphertext = 10; // Key密码密文
+  string secret_ref = 11; // 外部密钥服务引用
+}
+
+// Builder内部执行上下文响应。
+message BuildExecutionContextResp {
+  common.RespBase base = 1; // 通用响应
+  BuildExecutionContext data = 2; // 构建执行上下文
 }
 
 service Core {
   rpc CreateApplication(CreateApplicationReq) returns (ApplicationResp);
   rpc GetApplication(ApplicationIdReq) returns (ApplicationResp);
   rpc ListApplications(ApplicationListReq) returns (ApplicationListResp);
+
+  // 创建待上传的私有存储对象元数据。
+  rpc CreateStorageObject(CreateStorageObjectReq) returns (StorageObjectResp);
+  // 查询当前租户的私有存储对象。
+  rpc GetStorageObject(StorageObjectIdReq) returns (StorageObjectResp);
+  // 完成上传校验并把对象置为可用。
+  rpc CompleteStorageObject(CompleteStorageObjectReq) returns (StorageObjectResp);
+  // 标记上传或校验失败。
+  rpc FailStorageObject(FailStorageObjectReq) returns (RespBase);
+  // 领取超时未完成或失败的上传对象，供后台清理物理文件。
+  rpc ClaimExpiredStorageObjects(ClaimExpiredStorageObjectsReq) returns (ClaimExpiredStorageObjectsResp);
+  // 确认物理对象已删除并把元数据置为已删除。
+  rpc MarkStorageObjectDeleted(MarkStorageObjectDeletedReq) returns (RespBase);
 
   rpc CreateVersion(CreateVersionReq) returns (VersionResp);
   rpc GetVersion(VersionIdReq) returns (VersionResp);
@@ -381,8 +560,12 @@ service Core {
   rpc ReportInstall(InstallReportReq) returns (RespBase);
   rpc ReportChannelEvent(ReportChannelEventReq) returns (RespBase);
   rpc GetChannelStats(ChannelStatsReq) returns (ChannelStatsResp);
+  // 解析渠道最新成功产物并幂等记录点击、下载事件。
+  rpc ResolveChannelDownload(ResolveChannelDownloadReq) returns (ChannelDownloadArtifactResp);
 
   rpc ClaimBuildTask(ClaimBuildTaskReq) returns (BuildTaskResp);
+  // 读取当前Builder已领取任务的内部执行上下文。
+  rpc GetBuildExecutionContext(GetBuildExecutionContextReq) returns (BuildExecutionContextResp);
   rpc HeartbeatBuildTask(HeartbeatBuildTaskReq) returns (RespBase);
   rpc ReportBuildProgress(ReportBuildProgressReq) returns (RespBase);
   rpc CompleteBuildTask(CompleteBuildTaskReq) returns (RespBase);

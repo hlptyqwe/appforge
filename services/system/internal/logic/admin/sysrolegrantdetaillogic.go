@@ -29,6 +29,13 @@ func (l *SysRoleGrantDetailLogic) SysRoleGrantDetail(in *system.SysRoleGrantDeta
 	if in == nil || in.Id <= 0 {
 		return nil, status.Error(codes.InvalidArgument, "role_id is required")
 	}
+	role, err := l.svcCtx.RoleModel.FindOne(l.ctx, in.Id)
+	if err != nil {
+		return nil, notFound(err, "role")
+	}
+	if err := requireItemAppScope(l.ctx, role.AppScope); err != nil {
+		return nil, err
+	}
 	items, err := l.svcCtx.RoleMenuModel.ListByRoleId(l.ctx, in.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "query role permissions failed: %v", err)

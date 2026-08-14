@@ -59,7 +59,7 @@ func (l *ListBuildTasksLogic) ListBuildTasks(in *core.BuildTaskListReq) (*core.B
 	}
 	queryArgs := append(append([]any{}, args...), cursor, limit+1)
 	var items []models.TBuildTask
-	query := fmt.Sprintf("SELECT id, tenant_id, app_id, version_id, channel_id, signing_config_id, channel_code, version_code, version_name, source_apk_url, build_config, status, builder_id, builder_attempt, priority, apk_url, apk_sha256, apk_size, log_url, error_message, queued_at, start_time, finish_time, lease_until, create_by, create_time, update_time FROM t_build_task WHERE %s AND id > ? ORDER BY priority DESC, id ASC LIMIT ?", whereSQL)
+	query := fmt.Sprintf(buildTaskSelect+" WHERE %s AND id > ? ORDER BY priority DESC, id ASC LIMIT ?", whereSQL)
 	if err := l.svcCtx.DB.QueryRowsCtx(l.ctx, &items, query, queryArgs...); err != nil {
 		return nil, status.Errorf(codes.Internal, "list build tasks failed: %v", err)
 	}

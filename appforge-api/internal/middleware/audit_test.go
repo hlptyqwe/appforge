@@ -41,7 +41,7 @@ func TestAuditMiddlewareRedactsSecretsAndForcesTenantScope(t *testing.T) {
 	req := httptest.NewRequest(
 		http.MethodPut,
 		"/admin/system/users/10?accessToken=query-secret",
-		strings.NewReader(`{"tenantId":99,"password":"request-secret","profile":{"otp":"123456"}}`),
+		strings.NewReader(`{"tenantId":99,"password":"request-secret","keystorePassword":"keystore-secret","profile":{"otp":"123456","keyPasswordCiphertext":"cipher-secret"}}`),
 	)
 	req.RemoteAddr = "192.0.2.1:1234"
 	resp := httptest.NewRecorder()
@@ -60,12 +60,12 @@ func TestAuditMiddlewareRedactsSecretsAndForcesTenantScope(t *testing.T) {
 	if log.Module != "system:user" || log.Action != "update" {
 		t.Fatalf("unexpected module/action: %q/%q", log.Module, log.Action)
 	}
-	for _, secret := range []string{"request-secret", "query-secret", "123456", "response-secret"} {
+	for _, secret := range []string{"request-secret", "keystore-secret", "cipher-secret", "query-secret", "123456", "response-secret"} {
 		if strings.Contains(log.Req, secret) || strings.Contains(log.Resp, secret) {
 			t.Fatalf("secret %q was not redacted: req=%s resp=%s", secret, log.Req, log.Resp)
 		}
 	}
-	if !strings.Contains(log.Req, `"password":"***"`) || !strings.Contains(log.Resp, `"token":"***"`) {
+	if !strings.Contains(log.Req, `"password":"***"`) || !strings.Contains(log.Req, `"keystorePassword":"***"`) || !strings.Contains(log.Req, `"keyPasswordCiphertext":"***"`) || !strings.Contains(log.Resp, `"token":"***"`) {
 		t.Fatalf("redaction marker missing: req=%s resp=%s", log.Req, log.Resp)
 	}
 	if log.Ip != "192.0.2.1" || log.Method != system.RequestMethod_REQUEST_METHOD_PUT {

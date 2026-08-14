@@ -5,13 +5,17 @@ package platform_private
 
 import (
 	"context"
+	"strings"
 
 	platformlogic "appforge/admin-api/internal/logic"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
+	"appforge/proto/builder"
 	"appforge/proto/core"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type CreatePlatformSigningConfigLogic struct {
@@ -29,10 +33,40 @@ func NewCreatePlatformSigningConfigLogic(ctx context.Context, svcCtx *svc.Servic
 }
 
 func (l *CreatePlatformSigningConfigLogic) CreatePlatformSigningConfig(req *types.CreatePlatformSigningConfigReq) (resp *types.PlatformSigningConfigResp, err error) {
+	var keystorePasswordCiphertext, keyPasswordCiphertext string
+	if strings.TrimSpace(req.SecretRef) != "" {
+		return nil, status.Error(codes.InvalidArgument, "external secret references are not configured")
+	}
+	if strings.TrimSpace(req.SecretRef) == "" {
+		if strings.TrimSpace(req.KeystorePassword) == "" || strings.TrimSpace(req.KeyPassword) == "" {
+			return nil, status.Error(codes.InvalidArgument, "keystorePassword and keyPassword are required")
+		}
+		keystorePasswordCiphertext, err = l.svcCtx.Secrets.Seal(req.KeystorePassword)
+		if err != nil {
+			return nil, err
+		}
+		keyPasswordCiphertext, err = l.svcCtx.Secrets.Seal(req.KeyPassword)
+		if err != nil {
+			return nil, err
+		}
+	}
+	storageObject, err := l.svcCtx.CoreCli.GetStorageObject(l.ctx, &core.StorageObjectIdReq{Id: req.KeystoreObjectId})
+	if err != nil || storageObject.GetData() == nil {
+		return nil, status.Error(codes.InvalidArgument, "keystore object is unavailable")
+	}
+	if _, err := l.svcCtx.BuilderCli.ValidateSigningMaterial(l.ctx, &builder.ValidateSigningMaterialReq{
+		KeystoreObjectKey:          storageObject.Data.ObjectKey,
+		KeyAlias:                   req.KeyAlias,
+		KeystorePasswordCiphertext: keystorePasswordCiphertext,
+		KeyPasswordCiphertext:      keyPasswordCiphertext,
+	}); err != nil {
+		return nil, err
+	}
 	item, err := l.svcCtx.CoreCli.CreateSigningConfig(l.ctx, &core.CreateSigningConfigReq{
-		AppId: req.AppId, Name: req.Name, KeystoreObjectKey: req.KeystoreObjectKey,
-		KeyAlias: req.KeyAlias, KeystorePasswordCiphertext: req.KeystorePasswordCiphertext,
-		KeyPasswordCiphertext: req.KeyPasswordCiphertext, SecretRef: req.SecretRef,
+		AppId: req.AppId, Name: req.Name,
+		KeyAlias: req.KeyAlias, KeystorePasswordCiphertext: keystorePasswordCiphertext,
+		KeyPasswordCiphertext: keyPasswordCiphertext, SecretRef: req.SecretRef,
+		KeystoreObjectId: req.KeystoreObjectId,
 	})
 	if err != nil {
 		return nil, err

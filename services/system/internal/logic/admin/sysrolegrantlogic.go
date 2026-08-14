@@ -34,6 +34,9 @@ func (l *SysRoleGrantLogic) SysRoleGrant(in *system.SysRoleGrantReq) (*system.Re
 	if err != nil {
 		return nil, notFound(err, "role")
 	}
+	if err := requireItemAppScope(l.ctx, role.AppScope); err != nil {
+		return nil, err
+	}
 	if err := l.svcCtx.RoleMenuModel.DeleteByRoleId(l.ctx, in.RoleId); err != nil {
 		return nil, status.Errorf(codes.Internal, "clear role permissions failed: %v", err)
 	}
@@ -41,6 +44,10 @@ func (l *SysRoleGrantLogic) SysRoleGrant(in *system.SysRoleGrantReq) (*system.Re
 	for _, menuID := range in.MenuIds {
 		if menuID <= 0 {
 			continue
+		}
+		var count int64
+		if err := l.svcCtx.DB.QueryRowCtx(l.ctx, &count, "SELECT COUNT(*) FROM sys_menu WHERE id = ? AND app_scope = ?", menuID, role.AppScope); err != nil || count != 1 {
+			return nil, status.Error(codes.InvalidArgument, "menu does not belong to role application scope")
 		}
 		items = append(items, &models.SysRoleMenu{TenantId: role.TenantId, RoleId: in.RoleId, MenuId: menuID})
 	}

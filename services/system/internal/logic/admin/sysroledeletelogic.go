@@ -29,8 +29,12 @@ func (l *SysRoleDeleteLogic) SysRoleDelete(in *system.SysRoleDeleteReq) (*system
 	if in == nil || in.GetId() <= 0 {
 		return nil, status.Error(codes.InvalidArgument, "id is required")
 	}
-	if _, err := l.svcCtx.RoleModel.FindOne(l.ctx, in.GetId()); err != nil {
+	item, err := l.svcCtx.RoleModel.FindOne(l.ctx, in.GetId())
+	if err != nil {
 		return nil, notFound(err, "role")
+	}
+	if err := requireItemAppScope(l.ctx, item.AppScope); err != nil {
+		return nil, err
 	}
 	if _, err := l.svcCtx.DB.ExecCtx(l.ctx, "DELETE FROM sys_user_role WHERE role_id = ?", in.GetId()); err != nil {
 		return nil, status.Errorf(codes.Internal, "delete role users failed: %v", err)

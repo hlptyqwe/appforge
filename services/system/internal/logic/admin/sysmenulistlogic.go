@@ -37,7 +37,7 @@ func (l *SysMenuListLogic) SysMenuList(in *system.SysMenuListReq) (*system.SysMe
 		return nil, err
 	}
 	_ = tenant
-	appScope := effectiveAppScope(in.GetAppScope())
+	appScope := effectiveAppScope(l.ctx, in.GetAppScope())
 	cursor, limit := pageValues(in.GetPage())
 	where := []string{"app_scope = ?"}
 	args := []any{appScope}

@@ -7,6 +7,27 @@ Etcd:
   Key: builder.rpc
 CoreRpc:
   Target: 127.0.0.1:8081
+BuilderRpc:
+  Target: 127.0.0.1:8082
 Builder:
   Id: builder-local
   LeaseSeconds: 120
+  PollInterval: 2s
+  TempDir: /tmp/appforge-builder
+
+ObjectCleanup:
+  Interval: 5m
+  StaleAfter: 30m
+  BatchSize: 100
+
+ObjectStorage:
+  OssType: 3
+  Minio:
+    Endpoint: http://127.0.0.1:9000
+    BucketUrl: http://127.0.0.1:9000/appforge
+    AccessKeyId: appforge
+    AccessKeySecret: appforge_dev_minio
+    BucketName: appforge
+
+SigningSecrets:
+  MasterKeyBase64: YXBwZm9yZ2UtZGV2LXNpZ25pbmcta2V5LTAwMDAwMSE=

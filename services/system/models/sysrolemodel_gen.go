@@ -46,7 +46,7 @@ type (
 	SysRole struct {
 		Id          int64  `db:"id"`           // 角色ID
 		TenantId    int64  `db:"tenant_id"`    // 所属租户ID：0=系统角色，>0=租户角色
-		AppScope    int64  `db:"app_scope"`    // 应用范围：1 APK渠道分发管理平台
+		AppScope    int64  `db:"app_scope"`    // 应用范围：1平台管理端 2代理端
 		Name        string `db:"name"`         // 角色名称
 		Code        string `db:"code"`         // 角色标识(如admin)
 		Enabled     int64  `db:"enabled"`      // 启用开关：1启用 2禁用

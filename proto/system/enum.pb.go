@@ -251,9 +251,9 @@ func (UserType) EnumDescriptor() ([]byte, []int) {
 type ApplicationScope int32
 
 const (
-	ApplicationScope_APPLICATION_SCOPE_UNKNOWN   ApplicationScope = 0
-	ApplicationScope_APPLICATION_SCOPE_ADMIN     ApplicationScope = 1 // 综合管理后台 admin-ui
-	ApplicationScope_APPLICATION_SCOPE_LIQUIDITY ApplicationScope = 2 // 做市管理后台 liquidity-admin-ui
+	ApplicationScope_APPLICATION_SCOPE_UNKNOWN ApplicationScope = 0
+	ApplicationScope_APPLICATION_SCOPE_ADMIN   ApplicationScope = 1 // 综合管理后台 admin-ui
+	ApplicationScope_APPLICATION_SCOPE_AGENT   ApplicationScope = 2 // APK渠道代理端 agent-ui
 )
 
 // Enum value maps for ApplicationScope.
@@ -261,12 +261,12 @@ var (
 	ApplicationScope_name = map[int32]string{
 		0: "APPLICATION_SCOPE_UNKNOWN",
 		1: "APPLICATION_SCOPE_ADMIN",
-		2: "APPLICATION_SCOPE_LIQUIDITY",
+		2: "APPLICATION_SCOPE_AGENT",
 	}
 	ApplicationScope_value = map[string]int32{
-		"APPLICATION_SCOPE_UNKNOWN":   0,
-		"APPLICATION_SCOPE_ADMIN":     1,
-		"APPLICATION_SCOPE_LIQUIDITY": 2,
+		"APPLICATION_SCOPE_UNKNOWN": 0,
+		"APPLICATION_SCOPE_ADMIN":   1,
+		"APPLICATION_SCOPE_AGENT":   2,
 	}
 )
 
@@ -379,11 +379,11 @@ const file_proto_system_enum_proto_rawDesc = "" +
 	"\x11USER_TYPE_UNKNOWN\x10\x00\x12\x1a\n" +
 	"\x16USER_TYPE_SYSTEM_ADMIN\x10\x01\x12\x1a\n" +
 	"\x16USER_TYPE_TENANT_OWNER\x10\x02\x12\x1a\n" +
-	"\x16USER_TYPE_TENANT_ADMIN\x10\x03*o\n" +
+	"\x16USER_TYPE_TENANT_ADMIN\x10\x03*k\n" +
 	"\x10ApplicationScope\x12\x1d\n" +
 	"\x19APPLICATION_SCOPE_UNKNOWN\x10\x00\x12\x1b\n" +
-	"\x17APPLICATION_SCOPE_ADMIN\x10\x01\x12\x1f\n" +
-	"\x1bAPPLICATION_SCOPE_LIQUIDITY\x10\x02*\x9c\x01\n" +
+	"\x17APPLICATION_SCOPE_ADMIN\x10\x01\x12\x1b\n" +
+	"\x17APPLICATION_SCOPE_AGENT\x10\x02*\x9c\x01\n" +
 	"\x12TenantDomainStatus\x12 \n" +
 	"\x1cTENANT_DOMAIN_STATUS_UNKNOWN\x10\x00\x12\x1f\n" +
 	"\x1bTENANT_DOMAIN_STATUS_ACTIVE\x10\x01\x12 \n" +

@@ -8,7 +8,10 @@ import (
 	"strconv"
 
 	"appforge/admin-api/internal/config"
+	"appforge/common/rpcauth"
+	"appforge/common/secretbox"
 	"appforge/common/utils"
+	"appforge/proto/builder"
 	"appforge/proto/core"
 	"appforge/proto/system"
 
@@ -18,12 +21,17 @@ import (
 )
 
 type ServiceContext struct {
-	Config    config.Config
-	SystemCli system.AdminClient
-	CoreCli   core.CoreClient
+	Config     config.Config
+	SystemCli  system.AdminClient
+	CoreCli    core.CoreClient
+	BuilderCli builder.BuilderClient
+	Secrets    *secretbox.Box
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
+	if err := rpcauth.ValidateToken(c.InternalRpc.Token); err != nil {
+		panic(err)
+	}
 	metadataInterceptor := zrpc.WithUnaryClientInterceptor(func(
 		ctx context.Context,
 		method string,
@@ -32,7 +40,10 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		invoker grpc.UnaryInvoker,
 		opts ...grpc.CallOption,
 	) error {
-		pairs := []string{utils.CtxKeySubjectDomain, utils.SubjectDomainSystem}
+		pairs := []string{
+			utils.CtxKeySubjectDomain, utils.SubjectDomainSystem,
+			rpcauth.MetadataKey, c.InternalRpc.Token,
+		}
 		if userID, err := utils.GetUserIdFromCtx(ctx); err == nil {
 			pairs = append(pairs, utils.CtxKeyUid, strconv.FormatInt(userID, 10))
 		}
@@ -45,14 +56,24 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		if userType, err := utils.GetUserTypeFromCtx(ctx); err == nil {
 			pairs = append(pairs, utils.CtxKeyUserType, strconv.FormatInt(userType, 10))
 		}
+		if appScope, err := utils.GetAppScopeFromCtx(ctx); err == nil {
+			pairs = append(pairs, utils.CtxKeyAppScope, strconv.FormatInt(appScope, 10))
+		}
 		return invoker(metadata.AppendToOutgoingContext(ctx, pairs...), method, req, reply, cc, opts...)
 	})
 
 	systemClient := zrpc.MustNewClient(c.SystemRpc, metadataInterceptor)
 	coreClient := zrpc.MustNewClient(c.CoreRpc, metadataInterceptor)
+	builderClient := zrpc.MustNewClient(c.BuilderRpc, metadataInterceptor)
+	secrets, err := secretbox.New(c.SigningSecrets.MasterKeyBase64)
+	if err != nil {
+		panic(fmt.Sprintf("initialize signing secret encryption: %v", err))
+	}
 	return &ServiceContext{
-		Config:    c,
-		SystemCli: system.NewAdminClient(systemClient.Conn()),
-		CoreCli:   core.NewCoreClient(coreClient.Conn()),
+		Config:     c,
+		SystemCli:  system.NewAdminClient(systemClient.Conn()),
+		CoreCli:    core.NewCoreClient(coreClient.Conn()),
+		BuilderCli: builder.NewBuilderClient(builderClient.Conn()),
+		Secrets:    secrets,
 	}
 }

@@ -34,6 +34,9 @@ func (l *ChangeUserStatusLogic) ChangeUserStatus(in *system.ChangeUserStatusReq)
 	if err != nil {
 		return nil, notFound(err, "user")
 	}
+	if err := requireItemAppScope(l.ctx, item.AppScope); err != nil {
+		return nil, err
+	}
 	if _, err := effectiveTenant(l.ctx, item.TenantId); err != nil {
 		return nil, err
 	}

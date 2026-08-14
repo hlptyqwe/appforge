@@ -4,3 +4,6 @@ Log:
   Encoding: plain
   Level: info
 
+# 仅用于本地开发；生产环境必须由 Secret Manager 注入独立随机值。
+InternalRpc:
+  Token: appforge-dev-internal-rpc-token-change-before-production

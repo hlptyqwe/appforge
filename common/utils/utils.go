@@ -165,6 +165,24 @@ func GetUserTypeFromMd(ctx context.Context) (int64, error) {
 	return userType, nil
 }
 
+// GetAppScopeFromMd 返回经过 API 认证后透传的应用范围。
+func GetAppScopeFromMd(ctx context.Context) (int64, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return 0, fmt.Errorf("no metadata in context")
+	}
+
+	if vals := md.Get(CtxKeyAppScope); len(vals) > 0 && vals[0] != "" {
+		appScope, err := strconv.ParseInt(vals[0], 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("invalid x-app-scope: %w", err)
+		}
+		return appScope, nil
+	}
+
+	return 0, fmt.Errorf("%s not found in metadata", CtxKeyAppScope)
+}
+
 func GetTenantCodeFromMd(ctx context.Context) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {

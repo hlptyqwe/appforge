@@ -6,7 +6,7 @@ CREATE TABLE sys_user (
   id BIGINT AUTO_INCREMENT COMMENT '用户ID',
 
   tenant_id BIGINT NOT NULL DEFAULT 0 COMMENT '所属租户ID：0=系统侧，>0=租户ID',
-  app_scope TINYINT NOT NULL DEFAULT 1 COMMENT '应用范围：1 APK渠道分发管理平台',
+  app_scope TINYINT NOT NULL DEFAULT 1 COMMENT '应用范围：1平台管理端 2代理端',
   user_type TINYINT NOT NULL DEFAULT 1 COMMENT '账号类型：1系统管理员 2租户所有者 3租户成员',
   is_owner TINYINT NOT NULL DEFAULT 2 COMMENT '是否租户所有者：1是 2否',
 
@@ -33,6 +33,7 @@ CREATE TABLE sys_user (
 
   PRIMARY KEY (id),
   UNIQUE KEY uk_tenant_scope_username (tenant_id, app_scope, username),
+  UNIQUE KEY uk_scope_username (app_scope, username) COMMENT '同一应用端登录账号全局唯一，避免跨租户登录歧义',
   INDEX idx_tenant_id(tenant_id),
   INDEX idx_app_scope(app_scope),
   INDEX idx_user_type(user_type),
@@ -51,7 +52,7 @@ CREATE TABLE sys_role (
   id BIGINT AUTO_INCREMENT COMMENT '角色ID',
 
   tenant_id BIGINT NOT NULL DEFAULT 0 COMMENT '所属租户ID：0=系统角色，>0=租户角色',
-  app_scope TINYINT NOT NULL DEFAULT 1 COMMENT '应用范围：1 APK渠道分发管理平台',
+  app_scope TINYINT NOT NULL DEFAULT 1 COMMENT '应用范围：1平台管理端 2代理端',
 
   name VARCHAR(64) NOT NULL DEFAULT '' COMMENT '角色名称',
   code VARCHAR(64) NOT NULL DEFAULT '' COMMENT '角色标识(如admin)',
@@ -94,15 +95,16 @@ CREATE TABLE sys_user_role (
 -- =============================
 -- 菜单/按钮（核心RBAC）
 -- 说明：
--- 1. app_scope = 1 -> APK渠道分发平台菜单
--- 2. 系统端与租户端通过tenant_id和角色权限进行隔离
+-- 1. app_scope = 1 -> 平台管理端菜单
+-- 2. app_scope = 2 -> 代理端菜单
+-- 3. 系统端与租户端通过tenant_id和角色权限进行隔离
 -- =============================
 DROP TABLE IF EXISTS sys_menu;
 CREATE TABLE sys_menu (
   id BIGINT AUTO_INCREMENT COMMENT '菜单ID',
 
   parent_id BIGINT DEFAULT 0 COMMENT '父级ID',
-  app_scope TINYINT NOT NULL DEFAULT 1 COMMENT '应用范围：1 APK渠道分发管理平台',
+  app_scope TINYINT NOT NULL DEFAULT 1 COMMENT '应用范围：1平台管理端 2代理端',
 
   name VARCHAR(64) NOT NULL DEFAULT '' COMMENT '名称',
 

@@ -8,6 +8,13 @@ import (
 	"time"
 )
 
+// ObjectInfo describes one object without exposing a storage-provider type.
+type ObjectInfo struct {
+	Key         string
+	Size        int64
+	ContentType string
+}
+
 // GenerateObjectKey creates a date-based object key suitable for storage.
 // This helper is intentionally in an internal package so both the public
 // storage package and provider implementations can use the same logic without

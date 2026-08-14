@@ -14,13 +14,12 @@ import (
 	"appforge/admin-api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/rest/httpx"
 
 	"appforge/common/etcd"
 	um "appforge/common/middleware"
 	"appforge/common/utils"
 	"appforge/common/validation"
-
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 var (
@@ -34,7 +33,6 @@ func main() {
 	httpx.SetValidator(validation.New())
 
 	var c config.Config
-	// 用 etcd 配置中心
 	if err := etcd.LoadFromEtcdAndMerge(strings.Split(*endpoints, ","), []string{*commonKey, *configKey}, &c); err != nil {
 		panic(err)
 	}
@@ -48,17 +46,16 @@ func main() {
 	defer server.Stop()
 
 	ctx := svc.NewServiceContext(c)
-	requestLogMiddleware := um.NewRequestLogMiddleware("ADMIN-API")
-	server.Use(requestLogMiddleware.Handle)
+	server.Use(um.NewRequestLogMiddleware("ADMIN-API").Handle)
+	server.Use(middleware.NewPublicRateLimitMiddleware().Handle)
 	auditMiddleware, err := middleware.NewAuditMiddleware(ctx.SystemCli, c.Audit.Routes)
 	if err != nil {
 		panic(fmt.Sprintf("invalid audit routes: %v", err))
 	}
 	server.Use(auditMiddleware.Handle)
-	rbacMiddleware := middleware.NewRbacMiddleware(ctx)
-	server.Use(rbacMiddleware.Handle)
-
+	server.Use(middleware.NewRbacMiddleware(ctx).Handle)
 	handler.RegisterHandlers(server, ctx)
+	handler.RegisterAgentHandlers(server, ctx)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()

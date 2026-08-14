@@ -18,6 +18,7 @@ gen-rpc:
 		--go_out=. --go-grpc_out=. --zrpc_out=. --style=gozero
 	@$(MAKE) fix-imports
 	@$(MAKE) fmt
+	@$(MAKE) clean-gen
 	@$(MAKE) tidy
 
 fix-imports:

@@ -32,6 +32,12 @@ const (
 	eventTypeRegister = 4
 	eventTypeFirstPay = 5
 	eventTypePay      = 6
+
+	storageStatusUploading = int64(core.StorageObjectStatus_STORAGE_OBJECT_STATUS_UPLOADING)
+	storageStatusReady     = int64(core.StorageObjectStatus_STORAGE_OBJECT_STATUS_READY)
+	storageStatusBound     = int64(core.StorageObjectStatus_STORAGE_OBJECT_STATUS_BOUND)
+	storageStatusDeleted   = int64(core.StorageObjectStatus_STORAGE_OBJECT_STATUS_DELETED)
+	storageStatusFailed    = int64(core.StorageObjectStatus_STORAGE_OBJECT_STATUS_FAILED)
 )
 
 func tenantID(ctx context.Context) (int64, error) {
@@ -60,6 +66,13 @@ func requireText(value, field string, max int) error {
 		return status.Errorf(codes.InvalidArgument, "%s is required", field)
 	}
 	if len(value) > max {
+		return status.Errorf(codes.InvalidArgument, "%s is too long", field)
+	}
+	return nil
+}
+
+func requireOptionalText(value, field string, max int) error {
+	if len(strings.TrimSpace(value)) > max {
 		return status.Errorf(codes.InvalidArgument, "%s is too long", field)
 	}
 	return nil
@@ -160,20 +173,21 @@ func mapVersion(item *models.TAppVersion) *core.Version {
 		return nil
 	}
 	return &core.Version{
-		Id:              item.Id,
-		TenantId:        item.TenantId,
-		AppId:           item.AppId,
-		VersionCode:     item.VersionCode,
-		VersionName:     item.VersionName,
-		SourceApkUrl:    stringValue(item.SourceApkUrl),
-		SourceApkSha256: stringValue(item.SourceApkSha256),
-		ReleaseNotes:    stringValue(item.ReleaseNotes),
-		BuildConfigJson: stringValue(item.BuildConfig),
-		Status:          core.VersionStatus(item.Status),
-		PublishedAt:     timeValue(item.PublishedAt),
-		CreateBy:        item.CreateBy,
-		CreateTime:      millis(item.CreateTime),
-		UpdateTime:      millis(item.UpdateTime),
+		Id:                item.Id,
+		TenantId:          item.TenantId,
+		AppId:             item.AppId,
+		VersionCode:       item.VersionCode,
+		VersionName:       item.VersionName,
+		SourceApkUrl:      stringValue(item.SourceApkUrl),
+		SourceApkSha256:   stringValue(item.SourceApkSha256),
+		ReleaseNotes:      stringValue(item.ReleaseNotes),
+		BuildConfigJson:   stringValue(item.BuildConfig),
+		Status:            core.VersionStatus(item.Status),
+		PublishedAt:       timeValue(item.PublishedAt),
+		CreateBy:          item.CreateBy,
+		CreateTime:        millis(item.CreateTime),
+		UpdateTime:        millis(item.UpdateTime),
+		SourceApkObjectId: item.SourceApkObjectId,
 	}
 }
 
@@ -213,6 +227,7 @@ func mapSigningConfig(item *models.TAppSigningConfig) *core.SigningConfig {
 		CreateBy:          item.CreateBy,
 		CreateTime:        millis(item.CreateTime),
 		UpdateTime:        millis(item.UpdateTime),
+		KeystoreObjectId:  item.KeystoreObjectId,
 	}
 }
 
@@ -221,32 +236,56 @@ func mapBuildTask(item *models.TBuildTask) *core.BuildTask {
 		return nil
 	}
 	return &core.BuildTask{
-		Id:              item.Id,
-		TenantId:        item.TenantId,
-		AppId:           item.AppId,
-		VersionId:       item.VersionId,
-		ChannelId:       item.ChannelId,
-		SigningConfigId: item.SigningConfigId,
-		ChannelCode:     item.ChannelCode,
-		VersionCode:     item.VersionCode,
-		VersionName:     item.VersionName,
-		Status:          buildStatusToProto(item.Status),
-		BuilderId:       stringValue(item.BuilderId),
-		BuilderAttempt:  int32(item.BuilderAttempt),
-		Priority:        int32(item.Priority),
-		ApkUrl:          stringValue(item.ApkUrl),
-		ApkSha256:       stringValue(item.ApkSha256),
-		ApkSize:         item.ApkSize,
-		LogUrl:          stringValue(item.LogUrl),
-		ErrorMessage:    stringValue(item.ErrorMessage),
-		QueuedAt:        millis(item.QueuedAt),
-		StartTime:       timeValue(item.StartTime),
-		FinishTime:      timeValue(item.FinishTime),
-		CreateBy:        item.CreateBy,
-		CreateTime:      millis(item.CreateTime),
-		UpdateTime:      millis(item.UpdateTime),
-		SourceApkUrl:    stringValue(item.SourceApkUrl),
-		BuildConfigJson: stringValue(item.BuildConfig),
+		Id:                item.Id,
+		TenantId:          item.TenantId,
+		AppId:             item.AppId,
+		VersionId:         item.VersionId,
+		ChannelId:         item.ChannelId,
+		SigningConfigId:   item.SigningConfigId,
+		ChannelCode:       item.ChannelCode,
+		VersionCode:       item.VersionCode,
+		VersionName:       item.VersionName,
+		Status:            buildStatusToProto(item.Status),
+		BuilderId:         stringValue(item.BuilderId),
+		BuilderAttempt:    int32(item.BuilderAttempt),
+		Priority:          int32(item.Priority),
+		ApkUrl:            stringValue(item.ApkUrl),
+		ApkSha256:         stringValue(item.ApkSha256),
+		ApkSize:           item.ApkSize,
+		LogUrl:            stringValue(item.LogUrl),
+		ErrorMessage:      stringValue(item.ErrorMessage),
+		QueuedAt:          millis(item.QueuedAt),
+		StartTime:         timeValue(item.StartTime),
+		FinishTime:        timeValue(item.FinishTime),
+		CreateBy:          item.CreateBy,
+		CreateTime:        millis(item.CreateTime),
+		UpdateTime:        millis(item.UpdateTime),
+		SourceApkUrl:      stringValue(item.SourceApkUrl),
+		BuildConfigJson:   stringValue(item.BuildConfig),
+		SourceApkObjectId: item.SourceApkObjectId,
+		ApkObjectId:       item.ApkObjectId,
+		LogObjectId:       item.LogObjectId,
+	}
+}
+
+func mapStorageObject(item *models.TStorageObject) *core.StorageObject {
+	if item == nil {
+		return nil
+	}
+	return &core.StorageObject{
+		Id:           item.Id,
+		TenantId:     item.TenantId,
+		AppId:        item.AppId,
+		ObjectType:   core.StorageObjectType(item.ObjectType),
+		ObjectKey:    item.ObjectKey,
+		OriginalName: item.OriginalName,
+		ContentType:  item.ContentType,
+		SizeBytes:    item.SizeBytes,
+		Sha256:       stringValue(item.Sha256),
+		Status:       core.StorageObjectStatus(item.Status),
+		CreateBy:     item.CreateBy,
+		CreateTime:   millis(item.CreateTime),
+		UpdateTime:   millis(item.UpdateTime),
 	}
 }
 

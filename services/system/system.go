@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"appforge/common/rpcauth"
 	pb "appforge/proto/system"
 	"appforge/services/system/internal/config"
 	admin "appforge/services/system/internal/server/admin"
@@ -42,6 +43,9 @@ func main() {
 	mon.DisableInfoLog()
 
 	ctx := svc.NewServiceContext(c)
+	if err := rpcauth.ValidateToken(c.InternalRpc.Token); err != nil {
+		panic(err)
+	}
 
 	server := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		pb.RegisterAdminServer(grpcServer, admin.NewAdminServer(ctx))
@@ -52,6 +56,8 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
+	server.AddUnaryInterceptors(rpcauth.UnaryServerInterceptor(c.InternalRpc.Token))
+	server.AddStreamInterceptors(rpcauth.StreamServerInterceptor(c.InternalRpc.Token))
 
 	defer server.Stop()
 

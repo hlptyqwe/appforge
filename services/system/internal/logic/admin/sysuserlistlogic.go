@@ -35,7 +35,7 @@ func (l *SysUserListLogic) SysUserList(in *system.SysUserListReq) (*system.SysUs
 	if err != nil {
 		return nil, err
 	}
-	appScope := effectiveAppScope(in.GetAppScope())
+	appScope := effectiveAppScope(l.ctx, in.GetAppScope())
 	cursor, limit := pageValues(in.GetPage())
 	items, total, err := l.svcCtx.UserModel.FindPage(l.ctx, models.UserPageFilter{
 		Keyword: strings.TrimSpace(in.GetKeyword()), TenantId: tenant,

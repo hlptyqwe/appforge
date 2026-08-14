@@ -34,7 +34,7 @@ func (l *ReportBuildProgressLogic) ReportBuildProgress(in *builder.ReportBuildPr
 	if err != nil {
 		return nil, err
 	}
-	resp, err := client.ReportBuildProgress(toCoreContext(l.ctx), &core.ReportBuildProgressReq{TaskId: in.TaskId, BuilderId: in.BuilderId, Status: core.BuildTaskStatus(in.Status), Message: in.Message, Progress: in.Progress})
+	resp, err := client.ReportBuildProgress(toCoreContext(l.ctx), &core.ReportBuildProgressReq{TaskId: in.TaskId, BuilderId: in.BuilderId, Status: core.BuildTaskStatus(in.Status), Message: in.Message, Progress: in.Progress, BuilderAttempt: in.BuilderAttempt})
 	if err != nil {
 		return nil, err
 	}

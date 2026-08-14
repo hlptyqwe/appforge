@@ -20,6 +20,18 @@ CoreRpc:
       - 127.0.0.1:2379
     Key: core.rpc
 
+BuilderRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: builder.rpc
+  Middlewares:
+    Duration: false
+
+# 仅用于本地开发。生产环境必须由 Secret Manager 注入独立的 32 字节 Base64 密钥。
+SigningSecrets:
+  MasterKeyBase64: YXBwZm9yZ2UtZGV2LXNpZ25pbmcta2V5LTAwMDAwMSE=
+
 # 仅记录会修改数据的后台操作；查询请求不写操作日志。
 Audit:
   Routes:

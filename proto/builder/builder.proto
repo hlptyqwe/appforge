@@ -36,6 +36,7 @@ message BuildTask {
   int32 priority = 12;
   string source_apk_url = 13;
   string build_config_json = 14;
+  int64 source_apk_object_id = 15; // 原始APK私有对象ID
 }
 
 message ClaimBuildTaskReq {
@@ -52,6 +53,7 @@ message HeartbeatBuildTaskReq {
   int64 task_id = 1;
   string builder_id = 2;
   int32 lease_seconds = 3;
+  int32 builder_attempt = 4; // 本次领取代次，用于阻止过期Worker回写
 }
 
 message ReportBuildProgressReq {
@@ -60,6 +62,7 @@ message ReportBuildProgressReq {
   BuildTaskStatus status = 3; // 当前构建任务状态
   string message = 4;
   int32 progress = 5;
+  int32 builder_attempt = 6; // 本次领取代次，用于阻止过期Worker回写
 }
 
 message CompleteBuildTaskReq {
@@ -69,6 +72,11 @@ message CompleteBuildTaskReq {
   string apk_sha256 = 4;
   int64 apk_size = 5;
   string log_url = 6;
+  string apk_object_key = 7; // 构建产物私有对象Key
+  string log_object_key = 8; // 构建日志私有对象Key
+  string log_sha256 = 9; // 构建日志SHA-256
+  int64 log_size = 10; // 构建日志大小，单位字节
+  int32 builder_attempt = 11; // 本次领取代次，用于阻止过期Worker回写
 }
 
 message FailBuildTaskReq {
@@ -76,9 +84,23 @@ message FailBuildTaskReq {
   string builder_id = 2;
   string error_message = 3;
   string log_url = 4;
+  string log_object_key = 5; // 构建日志私有对象Key
+  string log_sha256 = 6; // 构建日志SHA-256
+  int64 log_size = 7; // 构建日志大小，单位字节
+  int32 builder_attempt = 8; // 本次领取代次，用于阻止过期Worker回写
+}
+
+// 校验签名文件、别名和密码请求，仅允许内部API调用。
+message ValidateSigningMaterialReq {
+  string keystore_object_key = 1; // 签名文件私有对象Key
+  string key_alias = 2; // 待校验的签名别名
+  string keystore_password_ciphertext = 3; // Keystore密码密文
+  string key_password_ciphertext = 4; // Key密码密文
 }
 
 service Builder {
+  // 使用实际签名工具校验签名材料，成功后方可创建可用签名配置。
+  rpc ValidateSigningMaterial(ValidateSigningMaterialReq) returns (RespBase);
   rpc ClaimBuildTask(ClaimBuildTaskReq) returns (BuildTaskResp);
   rpc HeartbeatBuildTask(HeartbeatBuildTaskReq) returns (RespBase);
   rpc ReportBuildProgress(ReportBuildProgressReq) returns (RespBase);

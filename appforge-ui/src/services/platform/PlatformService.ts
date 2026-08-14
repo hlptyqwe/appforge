@@ -33,6 +33,7 @@ export type PlatformVersion = {
   versionName: string
   sourceApkUrl?: string
   sourceApkSha256?: string
+  sourceApkObjectId: number
   releaseNotes?: string
   buildConfigJson?: string
   status: number
@@ -60,6 +61,7 @@ export type PlatformSigningConfig = {
   appId: number
   name: string
   keystoreObjectKey: string
+  keystoreObjectId: number
   keyAlias: string
   secretRef?: string
   status: number
@@ -86,6 +88,9 @@ export type PlatformBuildTask = {
   apkSha256?: string
   apkSize: number
   logUrl?: string
+  sourceApkObjectId: number
+  apkObjectId: number
+  logObjectId: number
   errorMessage?: string
   queuedAt: number
   startTime?: number
@@ -110,6 +115,7 @@ export class PlatformService {
   createApplication = api.createApplication
   listVersions = api.listVersions
   createVersion = api.createVersion
+  uploadObject = api.uploadObject
   listChannels = api.listChannels
   createChannel = api.createChannel
   listSigningConfigs = api.listSigningConfigs
@@ -117,6 +123,7 @@ export class PlatformService {
   listBuildTasks = api.listBuildTasks
   createBuildTask = api.createBuildTask
   getChannelStats = api.getChannelStats
+  getStorageDownload = api.getStorageDownload
 }
 
 export type PlatformListCall = (params: PlatformListReq) => Promise<RespBase<any[]>>

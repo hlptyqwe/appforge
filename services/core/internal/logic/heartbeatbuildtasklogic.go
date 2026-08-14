@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"time"
 
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
@@ -30,9 +29,9 @@ func (l *HeartbeatBuildTaskLogic) HeartbeatBuildTask(in *core.HeartbeatBuildTask
 	if in == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is required")
 	}
-	if err := updateTaskWithBuilder(l.ctx, l.svcCtx, in.TaskId, in.BuilderId,
-		`UPDATE t_build_task SET lease_until = ?, update_time = CURRENT_TIMESTAMP WHERE status IN (?, ?, ?) AND id = ? AND builder_id = ?`,
-		time.Now().Add(time.Duration(leaseSeconds(in.LeaseSeconds))*time.Second), buildStatusBuilding, buildStatusSigning, buildStatusUploading); err != nil {
+	if err := updateTaskWithBuilder(l.ctx, l.svcCtx, in.TaskId, in.BuilderId, in.BuilderAttempt,
+		`UPDATE t_build_task SET lease_until = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? SECOND), update_time = CURRENT_TIMESTAMP WHERE status IN (?, ?, ?) AND id = ? AND builder_id = ? AND builder_attempt = ? AND lease_until > CURRENT_TIMESTAMP`,
+		leaseSeconds(in.LeaseSeconds), buildStatusBuilding, buildStatusSigning, buildStatusUploading); err != nil {
 		return nil, err
 	}
 

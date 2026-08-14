@@ -3,8 +3,10 @@ package logic
 import (
 	"context"
 	"database/sql"
+	"encoding/hex"
+	"fmt"
+	"path"
 	"strings"
-	"time"
 
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
@@ -16,8 +18,8 @@ import (
 )
 
 const buildTaskSelect = `SELECT id, tenant_id, app_id, version_id, channel_id, signing_config_id,
-channel_code, version_code, version_name, source_apk_url, build_config, status, builder_id,
-builder_attempt, priority, apk_url, apk_sha256, apk_size, log_url, error_message, queued_at,
+channel_code, version_code, version_name, source_apk_object_id, source_apk_url, build_config, status, builder_id,
+builder_attempt, priority, apk_object_id, apk_url, apk_sha256, apk_size, log_object_id, log_url, error_message, queued_at,
 start_time, finish_time, lease_until, create_by, create_time, update_time FROM t_build_task`
 
 func validateBuilderRequest(builderID string) error {
@@ -39,12 +41,11 @@ func leaseSeconds(value int32) int32 {
 
 func claimTask(ctx context.Context, svcCtx *svc.ServiceContext, builderID string, seconds int32) (*models.TBuildTask, error) {
 	var item models.TBuildTask
-	leaseUntil := time.Now().Add(time.Duration(seconds) * time.Second)
 	err := svcCtx.DB.TransactCtx(ctx, func(txCtx context.Context, session sqlx.Session) error {
-		if err := session.QueryRowCtx(txCtx, &item, buildTaskSelect+` WHERE status = ? OR (status IN (?, ?, ?) AND (lease_until IS NULL OR lease_until < ?)) ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE`, buildStatusPending, buildStatusBuilding, buildStatusSigning, buildStatusUploading, time.Now()); err != nil {
+		if err := session.QueryRowCtx(txCtx, &item, buildTaskSelect+` WHERE status = ? OR (status IN (?, ?, ?) AND (lease_until IS NULL OR lease_until < CURRENT_TIMESTAMP)) ORDER BY priority DESC, id ASC LIMIT 1 FOR UPDATE`, buildStatusPending, buildStatusBuilding, buildStatusSigning, buildStatusUploading); err != nil {
 			return err
 		}
-		result, err := session.ExecCtx(txCtx, `UPDATE t_build_task SET status = ?, builder_id = ?, builder_attempt = builder_attempt + 1, start_time = COALESCE(start_time, ?), lease_until = ?, update_time = CURRENT_TIMESTAMP WHERE id = ?`, buildStatusBuilding, builderID, time.Now(), leaseUntil, item.Id)
+		result, err := session.ExecCtx(txCtx, `UPDATE t_build_task SET status = ?, builder_id = ?, builder_attempt = builder_attempt + 1, start_time = COALESCE(start_time, CURRENT_TIMESTAMP), lease_until = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL ? SECOND), update_time = CURRENT_TIMESTAMP WHERE id = ?`, buildStatusBuilding, builderID, seconds, item.Id)
 		if err != nil {
 			return err
 		}
@@ -57,10 +58,6 @@ func claimTask(ctx context.Context, svcCtx *svc.ServiceContext, builderID string
 		item.Status = buildStatusBuilding
 		item.BuilderId = nullString(builderID)
 		item.BuilderAttempt++
-		if !item.StartTime.Valid {
-			item.StartTime = nullTime(time.Now())
-		}
-		item.LeaseUntil = nullTime(leaseUntil)
 		return nil
 	})
 	if err != nil {
@@ -72,14 +69,17 @@ func claimTask(ctx context.Context, svcCtx *svc.ServiceContext, builderID string
 	return &item, nil
 }
 
-func updateTaskWithBuilder(ctx context.Context, svcCtx *svc.ServiceContext, taskID int64, builderID string, query string, args ...any) error {
+func updateTaskWithBuilder(ctx context.Context, svcCtx *svc.ServiceContext, taskID int64, builderID string, builderAttempt int32, query string, args ...any) error {
 	if err := validateBuilderRequest(builderID); err != nil {
 		return err
 	}
 	if err := requirePositive(taskID, "task_id"); err != nil {
 		return err
 	}
-	queryArgs := append(args, taskID, builderID)
+	if err := requirePositive(int64(builderAttempt), "builder_attempt"); err != nil {
+		return err
+	}
+	queryArgs := append(args, taskID, builderID, builderAttempt)
 	result, err := svcCtx.DB.ExecCtx(ctx, query, queryArgs...)
 	if err != nil {
 		return status.Errorf(codes.Internal, "update build task failed: %v", err)
@@ -96,4 +96,41 @@ func updateTaskWithBuilder(ctx context.Context, svcCtx *svc.ServiceContext, task
 
 func workerBase() *core.RespBase {
 	return &core.RespBase{Base: okBase()}
+}
+
+type buildArtifact struct {
+	ObjectKey    string
+	OriginalName string
+	ContentType  string
+	Size         int64
+	SHA256       string
+	ObjectType   int64
+}
+
+func validateBuildArtifact(tenantID int64, artifact buildArtifact, namespace string) error {
+	key := strings.TrimSpace(artifact.ObjectKey)
+	prefix := fmt.Sprintf("tenants/%d/%s/", tenantID, namespace)
+	if key == "" || path.Clean(key) != key || !strings.HasPrefix(key, prefix) {
+		return status.Error(codes.InvalidArgument, "invalid build artifact object key")
+	}
+	if artifact.Size < 0 {
+		return status.Error(codes.InvalidArgument, "build artifact size must not be negative")
+	}
+	sha := strings.TrimSpace(artifact.SHA256)
+	decoded, err := hex.DecodeString(sha)
+	if err != nil || len(decoded) != 32 || sha != strings.ToLower(sha) {
+		return status.Error(codes.InvalidArgument, "build artifact sha256 is invalid")
+	}
+	return nil
+}
+
+func insertBuildArtifact(ctx context.Context, session sqlx.Session, tenantID, appID int64, artifact buildArtifact) (int64, error) {
+	result, err := session.ExecCtx(ctx, `INSERT INTO t_storage_object
+(tenant_id, app_id, object_type, object_key, original_name, content_type, size_bytes, sha256, status, create_by)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`, tenantID, appID, artifact.ObjectType, artifact.ObjectKey,
+		artifact.OriginalName, artifact.ContentType, artifact.Size, artifact.SHA256, storageStatusBound)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
 }

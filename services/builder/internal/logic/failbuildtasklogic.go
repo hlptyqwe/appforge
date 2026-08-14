@@ -34,7 +34,10 @@ func (l *FailBuildTaskLogic) FailBuildTask(in *builder.FailBuildTaskReq) (*build
 	if err != nil {
 		return nil, err
 	}
-	resp, err := client.FailBuildTask(toCoreContext(l.ctx), &core.FailBuildTaskReq{TaskId: in.TaskId, BuilderId: in.BuilderId, ErrorMessage: in.ErrorMessage, LogUrl: in.LogUrl})
+	resp, err := client.FailBuildTask(toCoreContext(l.ctx), &core.FailBuildTaskReq{
+		TaskId: in.TaskId, BuilderId: in.BuilderId, ErrorMessage: in.ErrorMessage, LogUrl: in.LogUrl,
+		LogObjectKey: in.LogObjectKey, LogSha256: in.LogSha256, LogSize: in.LogSize, BuilderAttempt: in.BuilderAttempt,
+	})
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"appforge/common/etcd"
+	"appforge/common/rpcauth"
 	pb "appforge/proto/builder"
 	"appforge/services/builder/internal/config"
 	builderServer "appforge/services/builder/internal/server"
@@ -33,12 +34,17 @@ func main() {
 	}
 
 	ctx := svc.NewServiceContext(c)
+	if err := rpcauth.ValidateToken(c.InternalRpc.Token); err != nil {
+		log.Fatal(err)
+	}
 	server := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		pb.RegisterBuilderServer(grpcServer, builderServer.NewBuilderServer(ctx))
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)
 		}
 	})
+	server.AddUnaryInterceptors(rpcauth.UnaryServerInterceptor(c.InternalRpc.Token))
+	server.AddStreamInterceptors(rpcauth.StreamServerInterceptor(c.InternalRpc.Token))
 	defer server.Stop()
 
 	fmt.Printf("Starting builder rpc server at %s...\n", c.ListenOn)

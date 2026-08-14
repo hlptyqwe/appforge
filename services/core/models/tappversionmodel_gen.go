@@ -43,20 +43,21 @@ type (
 	}
 
 	TAppVersion struct {
-		Id              int64          `db:"id"`                // 版本ID
-		TenantId        int64          `db:"tenant_id"`         // 所属租户ID
-		AppId           int64          `db:"app_id"`            // 应用ID
-		VersionCode     int64          `db:"version_code"`      // Android versionCode
-		VersionName     string         `db:"version_name"`      // Android versionName
-		SourceApkUrl    sql.NullString `db:"source_apk_url"`    // 原始APK地址
-		SourceApkSha256 sql.NullString `db:"source_apk_sha256"` // 原始APK SHA-256
-		ReleaseNotes    sql.NullString `db:"release_notes"`     // 版本说明
-		BuildConfig     sql.NullString `db:"build_config"`      // 构建配置
-		Status          int64          `db:"status"`            // 状态：1草稿 2已发布 3已停用
-		PublishedAt     sql.NullTime   `db:"published_at"`      // 发布时间
-		CreateBy        int64          `db:"create_by"`         // 创建人ID
-		CreateTime      time.Time      `db:"create_time"`       // 创建时间
-		UpdateTime      time.Time      `db:"update_time"`       // 更新时间
+		Id                int64          `db:"id"`                   // 版本ID
+		TenantId          int64          `db:"tenant_id"`            // 所属租户ID
+		AppId             int64          `db:"app_id"`               // 应用ID
+		VersionCode       int64          `db:"version_code"`         // Android versionCode
+		VersionName       string         `db:"version_name"`         // Android versionName
+		SourceApkObjectId int64          `db:"source_apk_object_id"` // 原始APK存储对象ID
+		SourceApkUrl      sql.NullString `db:"source_apk_url"`       // 原始APK地址
+		SourceApkSha256   sql.NullString `db:"source_apk_sha256"`    // 原始APK SHA-256
+		ReleaseNotes      sql.NullString `db:"release_notes"`        // 版本说明
+		BuildConfig       sql.NullString `db:"build_config"`         // 构建配置
+		Status            int64          `db:"status"`               // 状态：1草稿 2已发布 3已停用
+		PublishedAt       sql.NullTime   `db:"published_at"`         // 发布时间
+		CreateBy          int64          `db:"create_by"`            // 创建人ID
+		CreateTime        time.Time      `db:"create_time"`          // 创建时间
+		UpdateTime        time.Time      `db:"update_time"`          // 更新时间
 	}
 )
 
@@ -123,8 +124,8 @@ func (m *defaultTAppVersionModel) Insert(ctx context.Context, data *TAppVersion)
 	tAppVersionAppIdVersionCodeKey := fmt.Sprintf("%s%v:%v", cacheTAppVersionAppIdVersionCodePrefix, data.AppId, data.VersionCode)
 	tAppVersionIdKey := fmt.Sprintf("%s%v", cacheTAppVersionIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, tAppVersionRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.TenantId, data.AppId, data.VersionCode, data.VersionName, data.SourceApkUrl, data.SourceApkSha256, data.ReleaseNotes, data.BuildConfig, data.Status, data.PublishedAt, data.CreateBy)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, tAppVersionRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.TenantId, data.AppId, data.VersionCode, data.VersionName, data.SourceApkObjectId, data.SourceApkUrl, data.SourceApkSha256, data.ReleaseNotes, data.BuildConfig, data.Status, data.PublishedAt, data.CreateBy)
 	}, tAppVersionAppIdVersionCodeKey, tAppVersionIdKey)
 	return ret, err
 }
@@ -139,7 +140,7 @@ func (m *defaultTAppVersionModel) Update(ctx context.Context, newData *TAppVersi
 	tAppVersionIdKey := fmt.Sprintf("%s%v", cacheTAppVersionIdPrefix, data.Id)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, tAppVersionRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, newData.TenantId, newData.AppId, newData.VersionCode, newData.VersionName, newData.SourceApkUrl, newData.SourceApkSha256, newData.ReleaseNotes, newData.BuildConfig, newData.Status, newData.PublishedAt, newData.CreateBy, newData.Id)
+		return conn.ExecCtx(ctx, query, newData.TenantId, newData.AppId, newData.VersionCode, newData.VersionName, newData.SourceApkObjectId, newData.SourceApkUrl, newData.SourceApkSha256, newData.ReleaseNotes, newData.BuildConfig, newData.Status, newData.PublishedAt, newData.CreateBy, newData.Id)
 	}, tAppVersionAppIdVersionCodeKey, tAppVersionIdKey)
 	return err
 }

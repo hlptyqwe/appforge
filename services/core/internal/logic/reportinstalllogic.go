@@ -40,6 +40,15 @@ func (l *ReportInstallLogic) ReportInstall(in *core.InstallReportReq) (*core.Res
 	if err := requireText(in.InstallId, "install_id", 128); err != nil {
 		return nil, err
 	}
+	for _, check := range []struct {
+		value string
+		field string
+		max   int
+	}{{in.AppVersion, "app_version", 64}, {in.DeviceModel, "device_model", 128}, {in.Ip, "ip", 64}} {
+		if err := requireOptionalText(check.value, check.field, check.max); err != nil {
+			return nil, err
+		}
+	}
 	channel, err := l.svcCtx.ChannelModel.FindOneByChannelCode(l.ctx, strings.TrimSpace(in.ChannelCode))
 	if err != nil {
 		return nil, notFoundOrInternal(err, "channel")

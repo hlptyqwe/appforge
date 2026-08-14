@@ -1,4 +1,5 @@
 import { get, post } from '@/utils/request'
+import axios from 'axios'
 import type {
   PlatformApplication,
   PlatformBuildTask,
@@ -9,8 +10,62 @@ import type {
   PlatformVersion,
 } from '@/services/platform/PlatformService'
 import type { RespBase } from '@/services/BaseService'
+import { PLATFORM_API_BASE } from '@/config/environment'
 
-const base = '/admin/core'
+const base = PLATFORM_API_BASE
+
+export type PlatformStorageObject = {
+  objectId: number
+  appId: number
+  objectType: number
+  originalName: string
+  sizeBytes: number
+  sha256: string
+  status: number
+}
+
+type PlatformUploadTicket = {
+  objectId: number
+  uploadUrl: string
+  expiresAt: number
+}
+
+export type PlatformStorageDownload = {
+	downloadUrl: string
+	expiresAt: number
+}
+
+export const getStorageDownload = (objectId: number) =>
+	get<PlatformStorageDownload>(`${base}/storage/objects/${objectId}/download`)
+
+export async function uploadObject(
+  file: File,
+  objectType: 1 | 2,
+  appId: number,
+  onProgress?: (percent: number) => void,
+): Promise<RespBase<PlatformStorageObject>> {
+  const ticket = await post<PlatformUploadTicket>(`${base}/uploads/initiate`, {
+    appId,
+    objectType,
+    fileName: file.name,
+    sizeBytes: file.size,
+    contentType: file.type || 'application/octet-stream',
+  })
+  if (ticket.code !== 200 || !ticket.data) {
+    return { code: ticket.code, msg: ticket.msg }
+  }
+
+  await axios.put(ticket.data.uploadUrl, file, {
+    headers: { 'Content-Type': file.type || 'application/octet-stream' },
+    timeout: 0,
+    transformRequest: [(value) => value],
+    onUploadProgress: (event) => {
+      const total = event.total || file.size
+      if (total > 0) onProgress?.(Math.min(100, Math.round((event.loaded * 100) / total)))
+    },
+  })
+  return post<PlatformStorageObject>(`${base}/uploads/${ticket.data.objectId}/complete`)
+}
 
 export const listApplications = (params: PlatformListReq) =>
   get<PlatformApplication[]>(`${base}/applications`, params)

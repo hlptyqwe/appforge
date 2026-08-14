@@ -1,6 +1,8 @@
 package config
 
 import (
+	"appforge/common/rpcauth"
+
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/zrpc"
 )
@@ -15,4 +17,5 @@ type Config struct {
 		AccessSecret string
 		AccessExpire int64
 	} `json:"Jwt" yaml:"Jwt"`
+	InternalRpc rpcauth.Config
 }

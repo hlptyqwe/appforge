@@ -3,6 +3,7 @@ package adminlogic
 import (
 	"context"
 
+	"appforge/common/utils"
 	"appforge/proto/system"
 	"appforge/services/system/internal/svc"
 
@@ -35,12 +36,18 @@ func (l *SysPermListLogic) SysPermList(in *system.Empty) (*system.SysPermListRes
 	}
 
 	var rows []permissionRow
-	if err := l.svcCtx.DB.QueryRowsCtx(l.ctx, &rows, `
+	query := `
 		SELECT perms, method, path, name, app_scope
 		FROM sys_menu
 		WHERE menu_type = 3 AND enabled = 1
-		  AND perms <> '' AND method <> '' AND path <> ''
-		ORDER BY app_scope, path, method, id`); err != nil {
+		  AND perms <> '' AND method <> '' AND path <> ''`
+	args := make([]any, 0, 1)
+	if scope, scopeErr := utils.GetAppScopeFromMd(l.ctx); scopeErr == nil && scope > 0 {
+		query += " AND app_scope = ?"
+		args = append(args, scope)
+	}
+	query += " ORDER BY app_scope, path, method, id"
+	if err := l.svcCtx.DB.QueryRowsCtx(l.ctx, &rows, query, args...); err != nil {
 		return nil, status.Errorf(codes.Internal, "query permission routes failed: %v", err)
 	}
 

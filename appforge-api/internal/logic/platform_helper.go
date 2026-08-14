@@ -28,7 +28,7 @@ func MapPlatformVersion(item *core.Version) types.PlatformVersion {
 	if item == nil {
 		return types.PlatformVersion{}
 	}
-	return types.PlatformVersion{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId, VersionCode: item.VersionCode, VersionName: item.VersionName, SourceApkUrl: item.SourceApkUrl, SourceApkSha256: item.SourceApkSha256, ReleaseNotes: item.ReleaseNotes, BuildConfigJson: item.BuildConfigJson, Status: int32(item.Status), PublishedAt: item.PublishedAt, CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime}
+	return types.PlatformVersion{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId, VersionCode: item.VersionCode, VersionName: item.VersionName, SourceApkUrl: item.SourceApkUrl, SourceApkSha256: item.SourceApkSha256, SourceApkObjectId: item.SourceApkObjectId, ReleaseNotes: item.ReleaseNotes, BuildConfigJson: item.BuildConfigJson, Status: int32(item.Status), PublishedAt: item.PublishedAt, CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime}
 }
 
 func MapPlatformChannel(item *core.Channel) types.PlatformChannel {
@@ -42,14 +42,14 @@ func MapPlatformSigningConfig(item *core.SigningConfig) types.PlatformSigningCon
 	if item == nil {
 		return types.PlatformSigningConfig{}
 	}
-	return types.PlatformSigningConfig{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId, Name: item.Name, KeystoreObjectKey: item.KeystoreObjectKey, KeyAlias: item.KeyAlias, SecretRef: item.SecretRef, Status: item.Status, LastVerifiedAt: item.LastVerifiedAt, CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime}
+	return types.PlatformSigningConfig{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId, Name: item.Name, KeystoreObjectKey: item.KeystoreObjectKey, KeystoreObjectId: item.KeystoreObjectId, KeyAlias: item.KeyAlias, SecretRef: item.SecretRef, Status: item.Status, LastVerifiedAt: item.LastVerifiedAt, CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime}
 }
 
 func MapPlatformBuildTask(item *core.BuildTask) types.PlatformBuildTask {
 	if item == nil {
 		return types.PlatformBuildTask{}
 	}
-	return types.PlatformBuildTask{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId, VersionId: item.VersionId, ChannelId: item.ChannelId, SigningConfigId: item.SigningConfigId, ChannelCode: item.ChannelCode, VersionCode: item.VersionCode, VersionName: item.VersionName, Status: int32(item.Status), BuilderId: item.BuilderId, BuilderAttempt: item.BuilderAttempt, Priority: item.Priority, ApkUrl: item.ApkUrl, ApkSha256: item.ApkSha256, ApkSize: item.ApkSize, LogUrl: item.LogUrl, ErrorMessage: item.ErrorMessage, QueuedAt: item.QueuedAt, StartTime: item.StartTime, FinishTime: item.FinishTime, CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime}
+	return types.PlatformBuildTask{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId, VersionId: item.VersionId, ChannelId: item.ChannelId, SigningConfigId: item.SigningConfigId, ChannelCode: item.ChannelCode, VersionCode: item.VersionCode, VersionName: item.VersionName, Status: int32(item.Status), BuilderId: item.BuilderId, BuilderAttempt: item.BuilderAttempt, Priority: item.Priority, ApkUrl: item.ApkUrl, ApkSha256: item.ApkSha256, ApkSize: item.ApkSize, LogUrl: item.LogUrl, SourceApkObjectId: item.SourceApkObjectId, ApkObjectId: item.ApkObjectId, LogObjectId: item.LogObjectId, ErrorMessage: item.ErrorMessage, QueuedAt: item.QueuedAt, StartTime: item.StartTime, FinishTime: item.FinishTime, CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime}
 }
 
 func MapPlatformStats(item *core.ChannelStats) types.PlatformChannelStats {

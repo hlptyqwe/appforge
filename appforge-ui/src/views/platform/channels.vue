@@ -19,7 +19,7 @@ import { platformService } from '@/services'
       { prop: 'channelCode', label: '渠道编码' },
       { prop: 'channelName', label: '渠道名称' },
       { prop: 'landingUrl', label: '落地页' },
-      { prop: 'downloadUrl', label: '下载地址' },
+      { prop: 'channelCode', label: '推广链接', publicDownload: true },
       { prop: 'status', label: '状态' },
     ]"
     :fields="[

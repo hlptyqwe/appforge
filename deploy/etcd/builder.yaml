@@ -1,13 +1,36 @@
 Name: builder.rpc
 ListenOn: 0.0.0.0:8082
 Mode: dev
+Middlewares:
+  Stat: false
 Etcd:
   Hosts:
     - etcd:2379
   Key: builder.rpc
 CoreRpc:
   Target: core-rpc:8081
+BuilderRpc:
+  Target: builder-rpc:8082
 Builder:
   Id: builder-dev-01
   LeaseSeconds: 120
+  PollInterval: 2s
+  TempDir: /tmp/appforge-builder
 
+ObjectCleanup:
+  Interval: 10s
+  StaleAfter: 1m
+  BatchSize: 100
+
+ObjectStorage:
+  OssType: 3
+  Minio:
+    Endpoint: http://minio:9000
+    BucketUrl: http://localhost:9000/appforge
+    AccessKeyId: appforge
+    AccessKeySecret: appforge_dev_minio
+    BucketName: appforge
+
+# 仅用于本地开发，必须与 admin-api 使用同一密钥；生产环境由 Secret Manager 注入。
+SigningSecrets:
+  MasterKeyBase64: YXBwZm9yZ2UtZGV2LXNpZ25pbmcta2V5LTAwMDAwMSE=

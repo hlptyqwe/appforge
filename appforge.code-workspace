@@ -46,11 +46,13 @@
     "editor.fontSize": 10,
     "editor.formatOnSave": false,
     "cSpell.words": [
+      "Aliyun",
       "appforge",
       "goctl",
       "gofmt",
       "logx",
       "otpauth",
+      "Presign",
       "reqenc",
       "sqlc",
       "sqlx",

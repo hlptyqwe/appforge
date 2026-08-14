@@ -28,8 +28,8 @@ func buildSensitiveAuditRoutes(routes []config.AuditRoute) ([]auditRouteSpec, er
 		if !isSupportedAuditMethod(method) {
 			return nil, fmt.Errorf("Audit.Routes[%d].Method %q is not supported", i, route.Method)
 		}
-		if !strings.HasPrefix(path, "/admin/") {
-			return nil, fmt.Errorf("Audit.Routes[%d].Path %q must start with /admin/", i, route.Path)
+		if !strings.HasPrefix(path, "/admin/") && !strings.HasPrefix(path, "/agent/") {
+			return nil, fmt.Errorf("Audit.Routes[%d].Path %q must start with /admin/ or /agent/", i, route.Path)
 		}
 		key := method + " " + path
 		if _, ok := seen[key]; ok {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"appforge/common/secretbox"
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
 	"appforge/services/core/models"
@@ -41,7 +42,7 @@ func (l *CreateSigningConfigLogic) CreateSigningConfig(in *core.CreateSigningCon
 	if err := requireText(in.Name, "name", 128); err != nil {
 		return nil, err
 	}
-	if err := requireText(in.KeystoreObjectKey, "keystore_object_key", 500); err != nil {
+	if err := requirePositive(in.KeystoreObjectId, "keystore_object_id"); err != nil {
 		return nil, err
 	}
 	if err := requireText(in.KeyAlias, "key_alias", 128); err != nil {
@@ -59,11 +60,30 @@ func (l *CreateSigningConfigLogic) CreateSigningConfig(in *core.CreateSigningCon
 	} else if findErr != nil && findErr != models.ErrNotFound {
 		return nil, status.Errorf(codes.Internal, "check signing config failed: %v", findErr)
 	}
+	storageObject, err := l.svcCtx.StorageObjectModel.FindOne(l.ctx, in.KeystoreObjectId)
+	if err != nil {
+		return nil, notFoundOrInternal(err, "keystore")
+	}
+	if storageObject.TenantId != tenant ||
+		(storageObject.AppId != 0 && storageObject.AppId != in.AppId) ||
+		storageObject.ObjectType != int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE) ||
+		storageObject.Status != storageStatusReady {
+		return nil, status.Error(codes.FailedPrecondition, "keystore is not ready for this application")
+	}
+	if strings.TrimSpace(in.SecretRef) == "" &&
+		(strings.TrimSpace(in.KeystorePasswordCiphertext) == "" || strings.TrimSpace(in.KeyPasswordCiphertext) == "") {
+		return nil, status.Error(codes.InvalidArgument, "encrypted keystore and key passwords are required")
+	}
+	if strings.TrimSpace(in.SecretRef) == "" &&
+		(!secretbox.IsSealed(in.KeystorePasswordCiphertext) || !secretbox.IsSealed(in.KeyPasswordCiphertext)) {
+		return nil, status.Error(codes.InvalidArgument, "keystore and key passwords must use the supported encrypted envelope")
+	}
 	_, err = l.svcCtx.SigningConfigModel.Insert(l.ctx, &models.TAppSigningConfig{
 		TenantId:                   tenant,
 		AppId:                      in.AppId,
 		Name:                       strings.TrimSpace(in.Name),
-		KeystoreObjectKey:          strings.TrimSpace(in.KeystoreObjectKey),
+		KeystoreObjectId:           in.KeystoreObjectId,
+		KeystoreObjectKey:          storageObject.ObjectKey,
 		KeyAlias:                   strings.TrimSpace(in.KeyAlias),
 		KeystorePasswordCiphertext: nullString(in.KeystorePasswordCiphertext),
 		KeyPasswordCiphertext:      nullString(in.KeyPasswordCiphertext),
@@ -73,6 +93,11 @@ func (l *CreateSigningConfigLogic) CreateSigningConfig(in *core.CreateSigningCon
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "create signing config failed: %v", err)
+	}
+	storageObject.AppId = in.AppId
+	storageObject.Status = storageStatusBound
+	if err := l.svcCtx.StorageObjectModel.Update(l.ctx, storageObject); err != nil {
+		return nil, status.Errorf(codes.Internal, "bind keystore failed: %v", err)
 	}
 	item, err := l.svcCtx.SigningConfigModel.FindOneByTenantIdAppIdName(l.ctx, tenant, in.AppId, strings.TrimSpace(in.Name))
 	if err != nil {

@@ -17,15 +17,23 @@ import { platformService } from '@/services'
       { prop: 'appId', label: '应用 ID' },
       { prop: 'versionCode', label: 'Version Code' },
       { prop: 'versionName', label: '版本名称' },
-      { prop: 'sourceApkUrl', label: '原始 APK' },
+      { prop: 'sourceApkObjectId', label: '原始 APK', downloadObject: true },
+      { prop: 'sourceApkSha256', label: 'APK SHA-256' },
       { prop: 'status', label: '状态' },
     ]"
     :fields="[
       { prop: 'appId', label: '应用 ID', type: 'number', required: true },
       { prop: 'versionCode', label: 'Version Code', type: 'number', required: true },
       { prop: 'versionName', label: '版本名称', required: true },
-      { prop: 'sourceApkUrl', label: '原始 APK URL' },
-      { prop: 'sourceApkSha256', label: 'APK SHA-256' },
+      {
+        prop: 'sourceApkObjectId',
+        label: '原始 APK',
+        type: 'file',
+        required: true,
+        accept: '.apk,application/vnd.android.package-archive',
+        objectType: 1,
+        maxBytes: 2147483648,
+      },
       { prop: 'releaseNotes', label: '发布说明', type: 'textarea' },
       { prop: 'buildConfigJson', label: '构建配置 JSON', type: 'textarea' },
     ]"

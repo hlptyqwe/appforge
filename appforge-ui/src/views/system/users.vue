@@ -18,6 +18,9 @@ import {
   getOptionValueLabel,
 } from '@/utils/options'
 import CrudQueryCard from '@/components/common/CrudQueryCard.vue'
+import { IS_AGENT } from '@/config/environment'
+
+const currentAppScope = IS_AGENT ? 2 : 1
 
 const { t } = useI18n()
 const optionGroups = ref<OptionGroup[]>([])
@@ -125,11 +128,11 @@ const { form: editForm } = useForm({
     nickname: '',
     enabled: 1,
     roleIds: [] as number[],
-    appScope: 1,
+    appScope: currentAppScope,
   },
 })
 const selectableRoles = computed(() =>
-	roles.value.filter((role) => role.appScope === 1),
+	roles.value.filter((role) => role.appScope === currentAppScope),
 )
 const { loading: editFormLoading, withLoading: withEditLoading } = useLoading()
 
@@ -141,7 +144,7 @@ function openCreate() {
   editForm.nickname = ''
   editForm.enabled = 1
   editForm.roleIds = []
-  editForm.appScope = 1
+  editForm.appScope = currentAppScope
   editVisible.value = true
 }
 
@@ -154,7 +157,7 @@ function openEdit(row: SysUserItem) {
   editForm.nickname = row.nickname || ''
   editForm.enabled = row.enabled
   editForm.roleIds = (row.roleIds || []).slice()
-  editForm.appScope = row.appScope || 1
+  editForm.appScope = row.appScope || currentAppScope
   editVisible.value = true
 }
 

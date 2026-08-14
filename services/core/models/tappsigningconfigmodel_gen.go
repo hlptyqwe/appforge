@@ -47,6 +47,7 @@ type (
 		TenantId                   int64          `db:"tenant_id"`                    // 所属租户ID
 		AppId                      int64          `db:"app_id"`                       // 应用ID
 		Name                       string         `db:"name"`                         // 签名配置名称
+		KeystoreObjectId           int64          `db:"keystore_object_id"`           // 签名文件存储对象ID
 		KeystoreObjectKey          string         `db:"keystore_object_key"`          // 私有对象存储中的keystore对象Key
 		KeyAlias                   string         `db:"key_alias"`                    // 签名别名
 		KeystorePasswordCiphertext sql.NullString `db:"keystore_password_ciphertext"` // keystore密码密文
@@ -123,8 +124,8 @@ func (m *defaultTAppSigningConfigModel) Insert(ctx context.Context, data *TAppSi
 	tAppSigningConfigIdKey := fmt.Sprintf("%s%v", cacheTAppSigningConfigIdPrefix, data.Id)
 	tAppSigningConfigTenantIdAppIdNameKey := fmt.Sprintf("%s%v:%v:%v", cacheTAppSigningConfigTenantIdAppIdNamePrefix, data.TenantId, data.AppId, data.Name)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, tAppSigningConfigRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.TenantId, data.AppId, data.Name, data.KeystoreObjectKey, data.KeyAlias, data.KeystorePasswordCiphertext, data.KeyPasswordCiphertext, data.SecretRef, data.Status, data.LastVerifiedAt, data.CreateBy)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, tAppSigningConfigRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.TenantId, data.AppId, data.Name, data.KeystoreObjectId, data.KeystoreObjectKey, data.KeyAlias, data.KeystorePasswordCiphertext, data.KeyPasswordCiphertext, data.SecretRef, data.Status, data.LastVerifiedAt, data.CreateBy)
 	}, tAppSigningConfigIdKey, tAppSigningConfigTenantIdAppIdNameKey)
 	return ret, err
 }
@@ -139,7 +140,7 @@ func (m *defaultTAppSigningConfigModel) Update(ctx context.Context, newData *TAp
 	tAppSigningConfigTenantIdAppIdNameKey := fmt.Sprintf("%s%v:%v:%v", cacheTAppSigningConfigTenantIdAppIdNamePrefix, data.TenantId, data.AppId, data.Name)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, tAppSigningConfigRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, newData.TenantId, newData.AppId, newData.Name, newData.KeystoreObjectKey, newData.KeyAlias, newData.KeystorePasswordCiphertext, newData.KeyPasswordCiphertext, newData.SecretRef, newData.Status, newData.LastVerifiedAt, newData.CreateBy, newData.Id)
+		return conn.ExecCtx(ctx, query, newData.TenantId, newData.AppId, newData.Name, newData.KeystoreObjectId, newData.KeystoreObjectKey, newData.KeyAlias, newData.KeystorePasswordCiphertext, newData.KeyPasswordCiphertext, newData.SecretRef, newData.Status, newData.LastVerifiedAt, newData.CreateBy, newData.Id)
 	}, tAppSigningConfigIdKey, tAppSigningConfigTenantIdAppIdNameKey)
 	return err
 }

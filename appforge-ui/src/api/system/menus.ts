@@ -8,12 +8,13 @@ import type {
   SysMenuListReq,
   SysMenuListResp,
 } from '@/services'
+import { TEAM_API_BASE } from '@/config/environment'
 
 export async function apiMenuTree(roleId: number): Promise<RespBase<MenuNode[]>> {
-  return await get(`/admin/system/menus/tree/${roleId}`)
+	return await get(`${TEAM_API_BASE}/menus/tree/${roleId}`)
 }
 export async function apiPermList(): Promise<RespBase<PermItem[]>> {
-  return await get('/admin/system/perms')
+	return await get(`${TEAM_API_BASE}/perms`)
 }
 
 /** 新增菜单 */

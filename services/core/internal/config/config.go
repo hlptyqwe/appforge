@@ -2,6 +2,8 @@
 package config
 
 import (
+	"appforge/common/rpcauth"
+
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/zrpc"
 )
@@ -11,5 +13,6 @@ type Config struct {
 	Mysql struct {
 		DataSource string
 	} `json:"Mysql" yaml:"Mysql"`
-	CacheRedis cache.CacheConf `json:"CacheRedis" yaml:"CacheRedis"`
+	CacheRedis  cache.CacheConf `json:"CacheRedis" yaml:"CacheRedis"`
+	InternalRpc rpcauth.Config
 }

@@ -39,8 +39,8 @@ func (l *ReportBuildProgressLogic) ReportBuildProgress(in *core.ReportBuildProgr
 	if in.Progress < 0 || in.Progress > 100 {
 		return nil, status.Error(codes.InvalidArgument, "progress must be between 0 and 100")
 	}
-	if err := updateTaskWithBuilder(l.ctx, l.svcCtx, in.TaskId, in.BuilderId,
-		`UPDATE t_build_task SET status = ?, error_message = NULLIF(?, ''), update_time = CURRENT_TIMESTAMP WHERE status IN (?, ?, ?) AND id = ? AND builder_id = ?`,
+	if err := updateTaskWithBuilder(l.ctx, l.svcCtx, in.TaskId, in.BuilderId, in.BuilderAttempt,
+		`UPDATE t_build_task SET status = ?, error_message = NULLIF(?, ''), update_time = CURRENT_TIMESTAMP WHERE status IN (?, ?, ?) AND id = ? AND builder_id = ? AND builder_attempt = ? AND lease_until > CURRENT_TIMESTAMP`,
 		statusValue, in.Message, buildStatusBuilding, buildStatusSigning, buildStatusUploading); err != nil {
 		return nil, err
 	}

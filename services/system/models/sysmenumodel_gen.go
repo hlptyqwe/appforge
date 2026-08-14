@@ -42,7 +42,7 @@ type (
 	SysMenu struct {
 		Id          int64  `db:"id"`           // 菜单ID
 		ParentId    int64  `db:"parent_id"`    // 父级ID
-		AppScope    int64  `db:"app_scope"`    // 应用范围：1 APK渠道分发管理平台
+		AppScope    int64  `db:"app_scope"`    // 应用范围：1平台管理端 2代理端
 		Name        string `db:"name"`         // 名称
 		MenuType    int64  `db:"menu_type"`    // 菜单类型：0未知 1目录 2菜单 3按钮
 		Method      string `db:"method"`       // 请求方法 GET POST PUT DELETE

@@ -34,7 +34,7 @@ func (l *HeartbeatBuildTaskLogic) HeartbeatBuildTask(in *builder.HeartbeatBuildT
 	if err != nil {
 		return nil, err
 	}
-	resp, err := client.HeartbeatBuildTask(toCoreContext(l.ctx), &core.HeartbeatBuildTaskReq{TaskId: in.TaskId, BuilderId: in.BuilderId, LeaseSeconds: in.LeaseSeconds})
+	resp, err := client.HeartbeatBuildTask(toCoreContext(l.ctx), &core.HeartbeatBuildTaskReq{TaskId: in.TaskId, BuilderId: in.BuilderId, LeaseSeconds: in.LeaseSeconds, BuilderAttempt: in.BuilderAttempt})
 	if err != nil {
 		return nil, err
 	}

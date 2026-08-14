@@ -32,6 +32,33 @@ CREATE TABLE t_app_application (
 
 
 -- =============================
+-- 对象存储元数据
+-- 对象类型：1原始APK 2签名文件 3构建APK 4构建日志
+-- 状态：1上传中 2已就绪 3已绑定 4已删除 5失败
+-- =============================
+DROP TABLE IF EXISTS t_storage_object;
+CREATE TABLE t_storage_object (
+  id BIGINT NOT NULL AUTO_INCREMENT COMMENT '存储对象ID',
+  tenant_id BIGINT NOT NULL COMMENT '所属租户ID',
+  app_id BIGINT NOT NULL DEFAULT 0 COMMENT '关联应用ID，上传时允许为0',
+  object_type TINYINT NOT NULL COMMENT '对象类型：1原始APK 2签名文件 3构建APK 4构建日志',
+  object_key VARCHAR(500) NOT NULL COMMENT '私有对象存储Key',
+  original_name VARCHAR(255) NOT NULL COMMENT '用户上传时的原始文件名',
+  content_type VARCHAR(128) NOT NULL DEFAULT 'application/octet-stream' COMMENT '对象内容类型',
+  size_bytes BIGINT NOT NULL DEFAULT 0 COMMENT '对象大小，单位字节',
+  sha256 CHAR(64) DEFAULT NULL COMMENT '对象SHA-256，小写十六进制',
+  status TINYINT NOT NULL DEFAULT 1 COMMENT '状态：1上传中 2已就绪 3已绑定 4已删除 5失败',
+  create_by BIGINT NOT NULL DEFAULT 0 COMMENT '创建人ID',
+  create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_storage_object_key (object_key) COMMENT '对象Key唯一索引',
+  KEY idx_storage_tenant_type_status (tenant_id, object_type, status) COMMENT '租户对象类型状态查询索引',
+  KEY idx_storage_tenant_app (tenant_id, app_id) COMMENT '租户应用对象查询索引'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='私有对象存储元数据';
+
+
+-- =============================
 -- 应用版本
 -- =============================
 DROP TABLE IF EXISTS t_app_version;
@@ -41,6 +68,7 @@ CREATE TABLE t_app_version (
   app_id BIGINT NOT NULL COMMENT '应用ID',
   version_code BIGINT NOT NULL COMMENT 'Android versionCode',
   version_name VARCHAR(64) NOT NULL COMMENT 'Android versionName',
+  source_apk_object_id BIGINT NOT NULL DEFAULT 0 COMMENT '原始APK存储对象ID',
   source_apk_url VARCHAR(500) DEFAULT NULL COMMENT '原始APK地址',
   source_apk_sha256 CHAR(64) DEFAULT NULL COMMENT '原始APK SHA-256',
   release_notes TEXT COMMENT '版本说明',
@@ -53,7 +81,8 @@ CREATE TABLE t_app_version (
   PRIMARY KEY (id),
   UNIQUE KEY uk_version_app_code (app_id, version_code),
   KEY idx_version_tenant_app (tenant_id, app_id),
-  KEY idx_version_status (app_id, status)
+  KEY idx_version_status (app_id, status),
+  KEY idx_version_source_object (source_apk_object_id) COMMENT '原始APK对象查询索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='APK应用版本';
 
 
@@ -66,6 +95,7 @@ CREATE TABLE t_app_signing_config (
   tenant_id BIGINT NOT NULL COMMENT '所属租户ID',
   app_id BIGINT NOT NULL COMMENT '应用ID',
   name VARCHAR(128) NOT NULL COMMENT '签名配置名称',
+  keystore_object_id BIGINT NOT NULL DEFAULT 0 COMMENT '签名文件存储对象ID',
   keystore_object_key VARCHAR(500) NOT NULL COMMENT '私有对象存储中的keystore对象Key',
   key_alias VARCHAR(128) NOT NULL COMMENT '签名别名',
   keystore_password_ciphertext VARCHAR(1024) DEFAULT NULL COMMENT 'keystore密码密文',
@@ -78,7 +108,8 @@ CREATE TABLE t_app_signing_config (
   update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (id),
   UNIQUE KEY uk_signing_tenant_app_name (tenant_id, app_id, name),
-  KEY idx_signing_app_status (app_id, status)
+  KEY idx_signing_app_status (app_id, status),
+  KEY idx_signing_keystore_object (keystore_object_id) COMMENT '签名文件对象查询索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='APK签名配置';
 
 
@@ -121,15 +152,18 @@ CREATE TABLE t_build_task (
   channel_code VARCHAR(32) NOT NULL COMMENT '构建时使用的渠道编码快照',
   version_code BIGINT NOT NULL COMMENT '构建时使用的versionCode快照',
   version_name VARCHAR(64) NOT NULL COMMENT '构建时使用的versionName快照',
+  source_apk_object_id BIGINT NOT NULL DEFAULT 0 COMMENT '构建时使用的原始APK对象ID快照',
   source_apk_url VARCHAR(500) DEFAULT NULL COMMENT '构建时使用的原始APK地址快照',
   build_config JSON DEFAULT NULL COMMENT '构建时使用的构建配置快照',
   status VARCHAR(16) NOT NULL DEFAULT 'PENDING' COMMENT '构建状态',
   builder_id VARCHAR(128) DEFAULT NULL COMMENT 'Builder工作节点ID',
   builder_attempt INT NOT NULL DEFAULT 0 COMMENT 'Builder尝试次数',
   priority INT NOT NULL DEFAULT 0 COMMENT '任务优先级，值越大越优先',
+  apk_object_id BIGINT NOT NULL DEFAULT 0 COMMENT '构建产物APK存储对象ID',
   apk_url VARCHAR(500) DEFAULT NULL COMMENT '构建产物下载地址',
   apk_sha256 CHAR(64) DEFAULT NULL COMMENT '构建产物SHA-256',
   apk_size BIGINT NOT NULL DEFAULT 0 COMMENT '构建产物大小（字节）',
+  log_object_id BIGINT NOT NULL DEFAULT 0 COMMENT '构建日志存储对象ID',
   log_url VARCHAR(500) DEFAULT NULL COMMENT '构建日志地址',
   error_message VARCHAR(2000) DEFAULT NULL COMMENT '失败原因',
   queued_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '进入队列时间',
@@ -143,7 +177,9 @@ CREATE TABLE t_build_task (
   KEY idx_build_queue (status, priority, queued_at, id),
   KEY idx_build_tenant_app (tenant_id, app_id, create_time),
   KEY idx_build_channel (channel_id, create_time),
-  KEY idx_build_builder_lease (builder_id, lease_until)
+  KEY idx_build_builder_lease (builder_id, lease_until),
+  KEY idx_build_source_object (source_apk_object_id) COMMENT '构建源APK对象查询索引',
+  KEY idx_build_apk_object (apk_object_id) COMMENT '构建产物对象查询索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='APK动态构建任务';
 
 

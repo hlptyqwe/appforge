@@ -35,7 +35,7 @@ func (l *SysRoleListLogic) SysRoleList(in *system.SysRoleListReq) (*system.SysRo
 	if err != nil {
 		return nil, err
 	}
-	appScope := effectiveAppScope(in.GetAppScope())
+	appScope := effectiveAppScope(l.ctx, in.GetAppScope())
 	cursor, limit := pageValues(in.GetPage())
 	items, total, err := l.svcCtx.RoleModel.FindPage(l.ctx, models.RolePageFilter{
 		Keyword: strings.TrimSpace(in.GetKeyword()), TenantId: tenant,

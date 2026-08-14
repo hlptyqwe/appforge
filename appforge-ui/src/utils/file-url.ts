@@ -10,6 +10,11 @@ function joinUrl(base: string, path: string) {
   return `${base}${path}`
 }
 
+export function buildApiUrl(path: string) {
+  if (!path) return ENV.API_BASE_URL
+  return /^https?:\/\//i.test(path) ? path : joinUrl(ENV.API_BASE_URL, path)
+}
+
 export function buildAssetUrl(
   url?: string,
   options: {
@@ -18,7 +23,7 @@ export function buildAssetUrl(
 ) {
   if (!url) return ''
 
-  const fullUrl = /^https?:\/\//i.test(url) ? url : joinUrl(ENV.API_BASE_URL, url)
+  const fullUrl = buildApiUrl(url)
 
   if (options.withTimestamp === false) {
     return fullUrl

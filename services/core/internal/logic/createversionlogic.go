@@ -44,6 +44,9 @@ func (l *CreateVersionLogic) CreateVersion(in *core.CreateVersionReq) (*core.Ver
 	if err := requireText(in.VersionName, "version_name", 64); err != nil {
 		return nil, err
 	}
+	if err := requirePositive(in.SourceApkObjectId, "source_apk_object_id"); err != nil {
+		return nil, err
+	}
 	app, err := l.svcCtx.ApplicationModel.FindOne(l.ctx, in.AppId)
 	if err != nil {
 		return nil, notFoundOrInternal(err, "application")
@@ -56,21 +59,37 @@ func (l *CreateVersionLogic) CreateVersion(in *core.CreateVersionReq) (*core.Ver
 	} else if findErr != nil && findErr != models.ErrNotFound {
 		return nil, status.Error(codes.Internal, "check version_code failed")
 	}
+	storageObject, err := l.svcCtx.StorageObjectModel.FindOne(l.ctx, in.SourceApkObjectId)
+	if err != nil {
+		return nil, notFoundOrInternal(err, "source APK")
+	}
+	if storageObject.TenantId != tenant ||
+		(storageObject.AppId != 0 && storageObject.AppId != in.AppId) ||
+		storageObject.ObjectType != int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_SOURCE_APK) ||
+		storageObject.Status != storageStatusReady {
+		return nil, status.Error(codes.FailedPrecondition, "source APK is not ready for this application")
+	}
 
 	_, err = l.svcCtx.VersionModel.Insert(l.ctx, &models.TAppVersion{
-		TenantId:        tenant,
-		AppId:           in.AppId,
-		VersionCode:     in.VersionCode,
-		VersionName:     strings.TrimSpace(in.VersionName),
-		SourceApkUrl:    nullString(in.SourceApkUrl),
-		SourceApkSha256: nullString(in.SourceApkSha256),
-		ReleaseNotes:    nullString(in.ReleaseNotes),
-		BuildConfig:     nullString(in.BuildConfigJson),
-		Status:          int64(core.VersionStatus_VERSION_STATUS_DRAFT),
-		CreateBy:        actorID(l.ctx),
+		TenantId:          tenant,
+		AppId:             in.AppId,
+		VersionCode:       in.VersionCode,
+		VersionName:       strings.TrimSpace(in.VersionName),
+		SourceApkObjectId: in.SourceApkObjectId,
+		SourceApkUrl:      nullString(storageObject.ObjectKey),
+		SourceApkSha256:   storageObject.Sha256,
+		ReleaseNotes:      nullString(in.ReleaseNotes),
+		BuildConfig:       nullString(in.BuildConfigJson),
+		Status:            int64(core.VersionStatus_VERSION_STATUS_DRAFT),
+		CreateBy:          actorID(l.ctx),
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "create version failed: %v", err)
+	}
+	storageObject.AppId = in.AppId
+	storageObject.Status = storageStatusBound
+	if err := l.svcCtx.StorageObjectModel.Update(l.ctx, storageObject); err != nil {
+		return nil, status.Errorf(codes.Internal, "bind source APK failed: %v", err)
 	}
 	item, err := l.svcCtx.VersionModel.FindOneByAppIdVersionCode(l.ctx, in.AppId, in.VersionCode)
 	if err != nil {

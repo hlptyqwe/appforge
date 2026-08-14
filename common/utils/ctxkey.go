@@ -6,6 +6,7 @@ const (
 	CtxKeyTenantId      string = "x-tenant-id"
 	CtxKeyTenantCode    string = "x-tenant-code"
 	CtxKeyUserType      string = "x-user-type"
+	CtxKeyAppScope      string = "x-app-scope"
 	CtxKeyClientIp      string = "x-client-ip"
 	CtxKeyMerchantId    string = "x-merchant-id"
 	CtxKeyChatUserId    string = "x-chat-user-id"

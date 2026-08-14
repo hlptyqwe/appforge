@@ -6,7 +6,8 @@
 - Redis 7.4：模型缓存与权限缓存
 - etcd 3.6：初始化 common、system、core、builder、admin-api 配置
 - MinIO：APK、keystore 和构建产物的开发对象存储
-- system RPC、core RPC、builder RPC、admin API、admin UI
+- system RPC、core RPC、builder RPC、常驻 builder worker、统一 API
+- 平台管理端 `admin-ui` 与租户代理端 `agent-ui`
 
 ## 启动
 
@@ -22,18 +23,26 @@ make ps
 
 | 服务 | 地址 |
 | --- | --- |
-| 管理后台 | http://localhost:5173 |
-| Admin API | http://localhost:8888 |
+| 平台管理端 | http://localhost:5173 |
+| 租户代理端 | http://localhost:5174 |
+| API（管理端、代理端及公开下载） | http://localhost:8888 |
 | MinIO API | http://localhost:9000 |
 | MinIO Console | http://localhost:9001 |
 | MySQL | localhost:3306 |
 | Redis | localhost:6379 |
 | etcd | localhost:2379 |
 
-默认后台账号：
+默认平台管理端账号：
 
 ```text
 用户名：appforge
+密码：AppForge@123
+```
+
+默认租户代理端账号：
+
+```text
+用户名：agent
 密码：AppForge@123
 ```
 
@@ -76,19 +85,31 @@ make reset-db
 
 ## 初始化规则
 
-MySQL 仅在 `mysql-data` 为空时执行初始化脚本，执行顺序是：
+MySQL 仅在 `mysql-data` 为空时执行前三项初始化脚本；随后 `mysql-migrate` 每次启动都会幂等执行迁移：
 
 1. `services/system/system.sql`
 2. `services/core/core.sql`
 3. `deploy/mysql/init/30-seed.sql`
+4. `deploy/mysql/migrations/*.sql`
 
-种子数据只包含：默认租户、`owner/admin/viewer` 三个角色、一个 owner 账号、前端菜单、API 路由权限和系统/对象存储配置。业务表不写演示数据。
+种子数据只包含：默认租户、平台管理员、代理端租户 Owner、基础角色、两端菜单、API 路由权限和系统/对象存储配置。业务表不写演示数据。平台管理员属于平台作用域和租户 `0`；代理端 Owner 属于默认租户 `1`，两者不能互相调用对方的受保护接口。
 
 菜单与接口权限仍采用 RBAC：
 
 - `owner`：全部菜单和接口权限
 - `admin`：应用、版本、渠道、签名配置、构建任务的管理权限
 - `viewer`：业务菜单及 GET 查询权限
+
+## APK 上传、构建与下载
+
+- 两个前端容器使用同源 API：Nginx 将 `/admin/`、`/agent/`、`/api/` 和 `/d/` 转发到 `admin-api`，其余路径回退到 Vue 入口以支持页面刷新。
+- APK 与 Keystore 由浏览器通过 API 获取预签名地址后直传 MinIO，桶保持私有。
+- 版本和签名配置保存对象 ID，不需要客户手工填写 MinIO 地址。
+- `builder-worker` 自动领取任务，注入渠道文件、执行 `zipalign`、重新签名、校验并上传 APK 与构建日志。
+- 浏览器直传会显示上传百分比；超过时限仍未完成或校验失败的对象由 Worker 定期从私有桶删除并标记为 `DELETED`。
+- 代理端可下载授权对象；公开推广链接使用 `http://localhost:8888/d/{channelCode}`，API 记录幂等点击/下载后跳转到短时签名地址。
+- `builder_id + builder_attempt + lease` 共同构成任务写入凭据，过期 Worker 无法覆盖被重新领取的任务。
+- RPC 服务要求 `InternalRpc.Token`，无内部凭证的直连请求会返回 `Unauthenticated`。生产环境必须使用 Secret Manager 注入独立随机值，不能复用仓库中的开发值。
 
 修改 `system.sql` 或 `core.sql` 后，先按项目根目录 `AGENTS.md` 的规则执行对应服务的 `make gen-model`。已有数据库卷不会自动重放 SQL；确认不需要保留本地数据后，再执行 `make reset-db`。
 

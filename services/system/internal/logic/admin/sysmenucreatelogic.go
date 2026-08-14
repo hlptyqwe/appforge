@@ -38,7 +38,7 @@ func (l *SysMenuCreateLogic) SysMenuCreate(in *system.SysMenuCreateReq) (*system
 	if in.GetMenuType() == system.MenuType_MENU_TYPE_UNKNOWN {
 		return nil, status.Error(codes.InvalidArgument, "menu_type is required")
 	}
-	appScope := effectiveAppScope(in.GetAppScope())
+	appScope := effectiveAppScope(l.ctx, in.GetAppScope())
 	if in.GetParentId() > 0 {
 		parent, err := l.svcCtx.MenuModel.FindOne(l.ctx, in.GetParentId())
 		if err != nil || parent.AppScope != appScope {

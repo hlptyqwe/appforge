@@ -19,29 +19,37 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Core_CreateApplication_FullMethodName   = "/core.Core/CreateApplication"
-	Core_GetApplication_FullMethodName      = "/core.Core/GetApplication"
-	Core_ListApplications_FullMethodName    = "/core.Core/ListApplications"
-	Core_CreateVersion_FullMethodName       = "/core.Core/CreateVersion"
-	Core_GetVersion_FullMethodName          = "/core.Core/GetVersion"
-	Core_ListVersions_FullMethodName        = "/core.Core/ListVersions"
-	Core_CreateChannel_FullMethodName       = "/core.Core/CreateChannel"
-	Core_GetChannel_FullMethodName          = "/core.Core/GetChannel"
-	Core_ListChannels_FullMethodName        = "/core.Core/ListChannels"
-	Core_CreateSigningConfig_FullMethodName = "/core.Core/CreateSigningConfig"
-	Core_GetSigningConfig_FullMethodName    = "/core.Core/GetSigningConfig"
-	Core_ListSigningConfigs_FullMethodName  = "/core.Core/ListSigningConfigs"
-	Core_CreateBuildTask_FullMethodName     = "/core.Core/CreateBuildTask"
-	Core_GetBuildTask_FullMethodName        = "/core.Core/GetBuildTask"
-	Core_ListBuildTasks_FullMethodName      = "/core.Core/ListBuildTasks"
-	Core_ReportInstall_FullMethodName       = "/core.Core/ReportInstall"
-	Core_ReportChannelEvent_FullMethodName  = "/core.Core/ReportChannelEvent"
-	Core_GetChannelStats_FullMethodName     = "/core.Core/GetChannelStats"
-	Core_ClaimBuildTask_FullMethodName      = "/core.Core/ClaimBuildTask"
-	Core_HeartbeatBuildTask_FullMethodName  = "/core.Core/HeartbeatBuildTask"
-	Core_ReportBuildProgress_FullMethodName = "/core.Core/ReportBuildProgress"
-	Core_CompleteBuildTask_FullMethodName   = "/core.Core/CompleteBuildTask"
-	Core_FailBuildTask_FullMethodName       = "/core.Core/FailBuildTask"
+	Core_CreateApplication_FullMethodName          = "/core.Core/CreateApplication"
+	Core_GetApplication_FullMethodName             = "/core.Core/GetApplication"
+	Core_ListApplications_FullMethodName           = "/core.Core/ListApplications"
+	Core_CreateStorageObject_FullMethodName        = "/core.Core/CreateStorageObject"
+	Core_GetStorageObject_FullMethodName           = "/core.Core/GetStorageObject"
+	Core_CompleteStorageObject_FullMethodName      = "/core.Core/CompleteStorageObject"
+	Core_FailStorageObject_FullMethodName          = "/core.Core/FailStorageObject"
+	Core_ClaimExpiredStorageObjects_FullMethodName = "/core.Core/ClaimExpiredStorageObjects"
+	Core_MarkStorageObjectDeleted_FullMethodName   = "/core.Core/MarkStorageObjectDeleted"
+	Core_CreateVersion_FullMethodName              = "/core.Core/CreateVersion"
+	Core_GetVersion_FullMethodName                 = "/core.Core/GetVersion"
+	Core_ListVersions_FullMethodName               = "/core.Core/ListVersions"
+	Core_CreateChannel_FullMethodName              = "/core.Core/CreateChannel"
+	Core_GetChannel_FullMethodName                 = "/core.Core/GetChannel"
+	Core_ListChannels_FullMethodName               = "/core.Core/ListChannels"
+	Core_CreateSigningConfig_FullMethodName        = "/core.Core/CreateSigningConfig"
+	Core_GetSigningConfig_FullMethodName           = "/core.Core/GetSigningConfig"
+	Core_ListSigningConfigs_FullMethodName         = "/core.Core/ListSigningConfigs"
+	Core_CreateBuildTask_FullMethodName            = "/core.Core/CreateBuildTask"
+	Core_GetBuildTask_FullMethodName               = "/core.Core/GetBuildTask"
+	Core_ListBuildTasks_FullMethodName             = "/core.Core/ListBuildTasks"
+	Core_ReportInstall_FullMethodName              = "/core.Core/ReportInstall"
+	Core_ReportChannelEvent_FullMethodName         = "/core.Core/ReportChannelEvent"
+	Core_GetChannelStats_FullMethodName            = "/core.Core/GetChannelStats"
+	Core_ResolveChannelDownload_FullMethodName     = "/core.Core/ResolveChannelDownload"
+	Core_ClaimBuildTask_FullMethodName             = "/core.Core/ClaimBuildTask"
+	Core_GetBuildExecutionContext_FullMethodName   = "/core.Core/GetBuildExecutionContext"
+	Core_HeartbeatBuildTask_FullMethodName         = "/core.Core/HeartbeatBuildTask"
+	Core_ReportBuildProgress_FullMethodName        = "/core.Core/ReportBuildProgress"
+	Core_CompleteBuildTask_FullMethodName          = "/core.Core/CompleteBuildTask"
+	Core_FailBuildTask_FullMethodName              = "/core.Core/FailBuildTask"
 )
 
 // CoreClient is the client API for Core service.
@@ -51,6 +59,18 @@ type CoreClient interface {
 	CreateApplication(ctx context.Context, in *CreateApplicationReq, opts ...grpc.CallOption) (*ApplicationResp, error)
 	GetApplication(ctx context.Context, in *ApplicationIdReq, opts ...grpc.CallOption) (*ApplicationResp, error)
 	ListApplications(ctx context.Context, in *ApplicationListReq, opts ...grpc.CallOption) (*ApplicationListResp, error)
+	// 创建待上传的私有存储对象元数据。
+	CreateStorageObject(ctx context.Context, in *CreateStorageObjectReq, opts ...grpc.CallOption) (*StorageObjectResp, error)
+	// 查询当前租户的私有存储对象。
+	GetStorageObject(ctx context.Context, in *StorageObjectIdReq, opts ...grpc.CallOption) (*StorageObjectResp, error)
+	// 完成上传校验并把对象置为可用。
+	CompleteStorageObject(ctx context.Context, in *CompleteStorageObjectReq, opts ...grpc.CallOption) (*StorageObjectResp, error)
+	// 标记上传或校验失败。
+	FailStorageObject(ctx context.Context, in *FailStorageObjectReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 领取超时未完成或失败的上传对象，供后台清理物理文件。
+	ClaimExpiredStorageObjects(ctx context.Context, in *ClaimExpiredStorageObjectsReq, opts ...grpc.CallOption) (*ClaimExpiredStorageObjectsResp, error)
+	// 确认物理对象已删除并把元数据置为已删除。
+	MarkStorageObjectDeleted(ctx context.Context, in *MarkStorageObjectDeletedReq, opts ...grpc.CallOption) (*RespBase, error)
 	CreateVersion(ctx context.Context, in *CreateVersionReq, opts ...grpc.CallOption) (*VersionResp, error)
 	GetVersion(ctx context.Context, in *VersionIdReq, opts ...grpc.CallOption) (*VersionResp, error)
 	ListVersions(ctx context.Context, in *VersionListReq, opts ...grpc.CallOption) (*VersionListResp, error)
@@ -66,7 +86,11 @@ type CoreClient interface {
 	ReportInstall(ctx context.Context, in *InstallReportReq, opts ...grpc.CallOption) (*RespBase, error)
 	ReportChannelEvent(ctx context.Context, in *ReportChannelEventReq, opts ...grpc.CallOption) (*RespBase, error)
 	GetChannelStats(ctx context.Context, in *ChannelStatsReq, opts ...grpc.CallOption) (*ChannelStatsResp, error)
+	// 解析渠道最新成功产物并幂等记录点击、下载事件。
+	ResolveChannelDownload(ctx context.Context, in *ResolveChannelDownloadReq, opts ...grpc.CallOption) (*ChannelDownloadArtifactResp, error)
 	ClaimBuildTask(ctx context.Context, in *ClaimBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
+	// 读取当前Builder已领取任务的内部执行上下文。
+	GetBuildExecutionContext(ctx context.Context, in *GetBuildExecutionContextReq, opts ...grpc.CallOption) (*BuildExecutionContextResp, error)
 	HeartbeatBuildTask(ctx context.Context, in *HeartbeatBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
 	ReportBuildProgress(ctx context.Context, in *ReportBuildProgressReq, opts ...grpc.CallOption) (*RespBase, error)
 	CompleteBuildTask(ctx context.Context, in *CompleteBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
@@ -105,6 +129,66 @@ func (c *coreClient) ListApplications(ctx context.Context, in *ApplicationListRe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ApplicationListResp)
 	err := c.cc.Invoke(ctx, Core_ListApplications_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CreateStorageObject(ctx context.Context, in *CreateStorageObjectReq, opts ...grpc.CallOption) (*StorageObjectResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StorageObjectResp)
+	err := c.cc.Invoke(ctx, Core_CreateStorageObject_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetStorageObject(ctx context.Context, in *StorageObjectIdReq, opts ...grpc.CallOption) (*StorageObjectResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StorageObjectResp)
+	err := c.cc.Invoke(ctx, Core_GetStorageObject_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) CompleteStorageObject(ctx context.Context, in *CompleteStorageObjectReq, opts ...grpc.CallOption) (*StorageObjectResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StorageObjectResp)
+	err := c.cc.Invoke(ctx, Core_CompleteStorageObject_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) FailStorageObject(ctx context.Context, in *FailStorageObjectReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_FailStorageObject_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ClaimExpiredStorageObjects(ctx context.Context, in *ClaimExpiredStorageObjectsReq, opts ...grpc.CallOption) (*ClaimExpiredStorageObjectsResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ClaimExpiredStorageObjectsResp)
+	err := c.cc.Invoke(ctx, Core_ClaimExpiredStorageObjects_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) MarkStorageObjectDeleted(ctx context.Context, in *MarkStorageObjectDeletedReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Core_MarkStorageObjectDeleted_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -261,10 +345,30 @@ func (c *coreClient) GetChannelStats(ctx context.Context, in *ChannelStatsReq, o
 	return out, nil
 }
 
+func (c *coreClient) ResolveChannelDownload(ctx context.Context, in *ResolveChannelDownloadReq, opts ...grpc.CallOption) (*ChannelDownloadArtifactResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChannelDownloadArtifactResp)
+	err := c.cc.Invoke(ctx, Core_ResolveChannelDownload_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *coreClient) ClaimBuildTask(ctx context.Context, in *ClaimBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BuildTaskResp)
 	err := c.cc.Invoke(ctx, Core_ClaimBuildTask_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetBuildExecutionContext(ctx context.Context, in *GetBuildExecutionContextReq, opts ...grpc.CallOption) (*BuildExecutionContextResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildExecutionContextResp)
+	err := c.cc.Invoke(ctx, Core_GetBuildExecutionContext_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -318,6 +422,18 @@ type CoreServer interface {
 	CreateApplication(context.Context, *CreateApplicationReq) (*ApplicationResp, error)
 	GetApplication(context.Context, *ApplicationIdReq) (*ApplicationResp, error)
 	ListApplications(context.Context, *ApplicationListReq) (*ApplicationListResp, error)
+	// 创建待上传的私有存储对象元数据。
+	CreateStorageObject(context.Context, *CreateStorageObjectReq) (*StorageObjectResp, error)
+	// 查询当前租户的私有存储对象。
+	GetStorageObject(context.Context, *StorageObjectIdReq) (*StorageObjectResp, error)
+	// 完成上传校验并把对象置为可用。
+	CompleteStorageObject(context.Context, *CompleteStorageObjectReq) (*StorageObjectResp, error)
+	// 标记上传或校验失败。
+	FailStorageObject(context.Context, *FailStorageObjectReq) (*RespBase, error)
+	// 领取超时未完成或失败的上传对象，供后台清理物理文件。
+	ClaimExpiredStorageObjects(context.Context, *ClaimExpiredStorageObjectsReq) (*ClaimExpiredStorageObjectsResp, error)
+	// 确认物理对象已删除并把元数据置为已删除。
+	MarkStorageObjectDeleted(context.Context, *MarkStorageObjectDeletedReq) (*RespBase, error)
 	CreateVersion(context.Context, *CreateVersionReq) (*VersionResp, error)
 	GetVersion(context.Context, *VersionIdReq) (*VersionResp, error)
 	ListVersions(context.Context, *VersionListReq) (*VersionListResp, error)
@@ -333,7 +449,11 @@ type CoreServer interface {
 	ReportInstall(context.Context, *InstallReportReq) (*RespBase, error)
 	ReportChannelEvent(context.Context, *ReportChannelEventReq) (*RespBase, error)
 	GetChannelStats(context.Context, *ChannelStatsReq) (*ChannelStatsResp, error)
+	// 解析渠道最新成功产物并幂等记录点击、下载事件。
+	ResolveChannelDownload(context.Context, *ResolveChannelDownloadReq) (*ChannelDownloadArtifactResp, error)
 	ClaimBuildTask(context.Context, *ClaimBuildTaskReq) (*BuildTaskResp, error)
+	// 读取当前Builder已领取任务的内部执行上下文。
+	GetBuildExecutionContext(context.Context, *GetBuildExecutionContextReq) (*BuildExecutionContextResp, error)
 	HeartbeatBuildTask(context.Context, *HeartbeatBuildTaskReq) (*RespBase, error)
 	ReportBuildProgress(context.Context, *ReportBuildProgressReq) (*RespBase, error)
 	CompleteBuildTask(context.Context, *CompleteBuildTaskReq) (*RespBase, error)
@@ -356,6 +476,24 @@ func (UnimplementedCoreServer) GetApplication(context.Context, *ApplicationIdReq
 }
 func (UnimplementedCoreServer) ListApplications(context.Context, *ApplicationListReq) (*ApplicationListResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListApplications not implemented")
+}
+func (UnimplementedCoreServer) CreateStorageObject(context.Context, *CreateStorageObjectReq) (*StorageObjectResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateStorageObject not implemented")
+}
+func (UnimplementedCoreServer) GetStorageObject(context.Context, *StorageObjectIdReq) (*StorageObjectResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetStorageObject not implemented")
+}
+func (UnimplementedCoreServer) CompleteStorageObject(context.Context, *CompleteStorageObjectReq) (*StorageObjectResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CompleteStorageObject not implemented")
+}
+func (UnimplementedCoreServer) FailStorageObject(context.Context, *FailStorageObjectReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method FailStorageObject not implemented")
+}
+func (UnimplementedCoreServer) ClaimExpiredStorageObjects(context.Context, *ClaimExpiredStorageObjectsReq) (*ClaimExpiredStorageObjectsResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ClaimExpiredStorageObjects not implemented")
+}
+func (UnimplementedCoreServer) MarkStorageObjectDeleted(context.Context, *MarkStorageObjectDeletedReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method MarkStorageObjectDeleted not implemented")
 }
 func (UnimplementedCoreServer) CreateVersion(context.Context, *CreateVersionReq) (*VersionResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateVersion not implemented")
@@ -402,8 +540,14 @@ func (UnimplementedCoreServer) ReportChannelEvent(context.Context, *ReportChanne
 func (UnimplementedCoreServer) GetChannelStats(context.Context, *ChannelStatsReq) (*ChannelStatsResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetChannelStats not implemented")
 }
+func (UnimplementedCoreServer) ResolveChannelDownload(context.Context, *ResolveChannelDownloadReq) (*ChannelDownloadArtifactResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResolveChannelDownload not implemented")
+}
 func (UnimplementedCoreServer) ClaimBuildTask(context.Context, *ClaimBuildTaskReq) (*BuildTaskResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ClaimBuildTask not implemented")
+}
+func (UnimplementedCoreServer) GetBuildExecutionContext(context.Context, *GetBuildExecutionContextReq) (*BuildExecutionContextResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBuildExecutionContext not implemented")
 }
 func (UnimplementedCoreServer) HeartbeatBuildTask(context.Context, *HeartbeatBuildTaskReq) (*RespBase, error) {
 	return nil, status.Error(codes.Unimplemented, "method HeartbeatBuildTask not implemented")
@@ -488,6 +632,114 @@ func _Core_ListApplications_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CoreServer).ListApplications(ctx, req.(*ApplicationListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CreateStorageObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateStorageObjectReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CreateStorageObject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CreateStorageObject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CreateStorageObject(ctx, req.(*CreateStorageObjectReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetStorageObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StorageObjectIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetStorageObject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetStorageObject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetStorageObject(ctx, req.(*StorageObjectIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_CompleteStorageObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompleteStorageObjectReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).CompleteStorageObject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_CompleteStorageObject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).CompleteStorageObject(ctx, req.(*CompleteStorageObjectReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_FailStorageObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FailStorageObjectReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).FailStorageObject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_FailStorageObject_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).FailStorageObject(ctx, req.(*FailStorageObjectReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ClaimExpiredStorageObjects_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ClaimExpiredStorageObjectsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ClaimExpiredStorageObjects(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ClaimExpiredStorageObjects_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ClaimExpiredStorageObjects(ctx, req.(*ClaimExpiredStorageObjectsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_MarkStorageObjectDeleted_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MarkStorageObjectDeletedReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).MarkStorageObjectDeleted(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_MarkStorageObjectDeleted_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).MarkStorageObjectDeleted(ctx, req.(*MarkStorageObjectDeletedReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -762,6 +1014,24 @@ func _Core_GetChannelStats_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Core_ResolveChannelDownload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveChannelDownloadReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ResolveChannelDownload(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ResolveChannelDownload_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ResolveChannelDownload(ctx, req.(*ResolveChannelDownloadReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Core_ClaimBuildTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ClaimBuildTaskReq)
 	if err := dec(in); err != nil {
@@ -776,6 +1046,24 @@ func _Core_ClaimBuildTask_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CoreServer).ClaimBuildTask(ctx, req.(*ClaimBuildTaskReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetBuildExecutionContext_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBuildExecutionContextReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetBuildExecutionContext(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetBuildExecutionContext_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetBuildExecutionContext(ctx, req.(*GetBuildExecutionContextReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -872,6 +1160,30 @@ var Core_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Core_ListApplications_Handler,
 		},
 		{
+			MethodName: "CreateStorageObject",
+			Handler:    _Core_CreateStorageObject_Handler,
+		},
+		{
+			MethodName: "GetStorageObject",
+			Handler:    _Core_GetStorageObject_Handler,
+		},
+		{
+			MethodName: "CompleteStorageObject",
+			Handler:    _Core_CompleteStorageObject_Handler,
+		},
+		{
+			MethodName: "FailStorageObject",
+			Handler:    _Core_FailStorageObject_Handler,
+		},
+		{
+			MethodName: "ClaimExpiredStorageObjects",
+			Handler:    _Core_ClaimExpiredStorageObjects_Handler,
+		},
+		{
+			MethodName: "MarkStorageObjectDeleted",
+			Handler:    _Core_MarkStorageObjectDeleted_Handler,
+		},
+		{
 			MethodName: "CreateVersion",
 			Handler:    _Core_CreateVersion_Handler,
 		},
@@ -932,8 +1244,16 @@ var Core_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Core_GetChannelStats_Handler,
 		},
 		{
+			MethodName: "ResolveChannelDownload",
+			Handler:    _Core_ResolveChannelDownload_Handler,
+		},
+		{
 			MethodName: "ClaimBuildTask",
 			Handler:    _Core_ClaimBuildTask_Handler,
+		},
+		{
+			MethodName: "GetBuildExecutionContext",
+			Handler:    _Core_GetBuildExecutionContext_Handler,
 		},
 		{
 			MethodName: "HeartbeatBuildTask",

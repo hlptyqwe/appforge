@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"appforge/common/utils"
 	"appforge/proto/system"
 	"appforge/services/system/internal/svc"
 	"appforge/services/system/models"
@@ -37,8 +38,8 @@ func (l *SysUserCreateLogic) SysUserCreate(in *system.SysUserCreateReq) (*system
 	if err != nil {
 		return nil, err
 	}
-	appScope := effectiveAppScope(in.GetAppScope())
-	if existing, err := l.svcCtx.UserModel.FindOneByTenantIdAppScopeUsername(l.ctx, tenant, appScope, strings.TrimSpace(in.GetUsername())); err == nil && existing != nil {
+	appScope := effectiveAppScope(l.ctx, in.GetAppScope())
+	if existing, err := l.svcCtx.UserModel.FindOneByAppScopeUsername(l.ctx, appScope, strings.TrimSpace(in.GetUsername())); err == nil && existing != nil {
 		return nil, status.Error(codes.AlreadyExists, "username already exists")
 	}
 	hashed, err := bcrypt.GenerateFromPassword([]byte(in.GetPassword()), bcrypt.DefaultCost)
@@ -62,6 +63,10 @@ func (l *SysUserCreateLogic) SysUserCreate(in *system.SysUserCreateReq) (*system
 		item.Enabled = 1
 	}
 	if item.UserType == int64(system.UserType_USER_TYPE_SYSTEM_ADMIN) {
+		callerType, callerErr := utils.GetUserTypeFromMd(l.ctx)
+		if callerErr != nil || callerType != int64(system.UserType_USER_TYPE_SYSTEM_ADMIN) || tenantID(l.ctx) != 0 {
+			return nil, status.Error(codes.PermissionDenied, "only system administrators can create system administrators")
+		}
 		item.TenantId = 0
 	}
 	result, err := l.svcCtx.UserModel.Insert(l.ctx, item)

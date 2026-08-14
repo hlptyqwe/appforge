@@ -16,19 +16,25 @@ import { platformService } from '@/services'
     :columns="[
       { prop: 'appId', label: '应用 ID' },
       { prop: 'name', label: '配置名称' },
-      { prop: 'keystoreObjectKey', label: 'Keystore 对象键' },
+      { prop: 'keystoreObjectId', label: 'Keystore 对象 ID' },
       { prop: 'keyAlias', label: 'Key Alias' },
-      { prop: 'secretRef', label: '密钥引用' },
       { prop: 'status', label: '状态' },
     ]"
     :fields="[
       { prop: 'appId', label: '应用 ID', type: 'number', required: true },
       { prop: 'name', label: '配置名称', required: true },
-      { prop: 'keystoreObjectKey', label: 'Keystore 对象键', required: true },
+      {
+        prop: 'keystoreObjectId',
+        label: 'Keystore 文件',
+        type: 'file',
+        required: true,
+        accept: '.jks,.keystore,.p12,.pfx',
+        objectType: 2,
+        maxBytes: 10485760,
+      },
       { prop: 'keyAlias', label: 'Key Alias', required: true },
-      { prop: 'keystorePasswordCiphertext', label: 'Keystore 密码密文', type: 'password', required: true },
-      { prop: 'keyPasswordCiphertext', label: 'Key 密码密文', type: 'password', required: true },
-      { prop: 'secretRef', label: '密钥引用' },
+      { prop: 'keystorePassword', label: 'Keystore 密码', type: 'password', required: true },
+      { prop: 'keyPassword', label: 'Key 密码', type: 'password', required: true },
     ]"
   />
 </template>

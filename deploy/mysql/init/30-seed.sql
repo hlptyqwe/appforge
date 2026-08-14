@@ -23,31 +23,31 @@ INSERT INTO sys_tenant_domain (
    UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000,
    UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000);
 
--- 轻量 RBAC：owner 拥有全部权限，admin 管理业务，viewer 只读业务数据。
+-- 平台管理端 RBAC：开发环境 owner 拥有全部平台管理权限。
 INSERT INTO sys_role (
   id, tenant_id, app_scope, name, code, enabled, remark, create_times, update_times
 ) VALUES
-  (1, 1, 1, '所有者', 'owner', 1, '租户所有者，拥有全部菜单和接口权限',
+  (1, 0, 1, '平台所有者', 'owner', 1, '平台系统管理员，拥有全部管理端菜单和接口权限',
    UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000, UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000),
   (2, 1, 1, '业务管理员', 'admin', 1, '管理应用、版本、渠道、签名配置和构建任务',
    UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000, UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000),
   (3, 1, 1, '只读用户', 'viewer', 1, '只允许查看业务数据和统计记录',
    UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000, UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000);
 
--- 默认账号：appforge / AppForge@123。密码使用 bcrypt 存储。
+-- 本地平台账号：appforge / AppForge@123。仅用于开发环境，密码使用 bcrypt 存储。
 INSERT INTO sys_user (
   id, tenant_id, app_scope, user_type, is_owner, username, password, nickname,
   avatar, enabled, google_secret, google_enabled, perms_ver, last_login_ip,
   last_login_at, create_by, create_times, update_times
 ) VALUES (
-  1, 1, 1, 2, 1, 'appforge',
+  1, 0, 1, 1, 2, 'appforge',
   '$2y$10$bxPB8yeV4QLuCn5mNxzJB.cMVDtGXpRZiIF.r/u6c09RDBeUDGgaC',
-  'AppForge Owner', '', 1, '', 2, 1, '', 0, 0,
+  'AppForge Platform Owner', '', 1, '', 2, 1, '', 0, 0,
   UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000,
   UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000
 );
 
-INSERT INTO sys_user_role (tenant_id, user_id, role_id) VALUES (1, 1, 1);
+INSERT INTO sys_user_role (tenant_id, user_id, role_id) VALUES (0, 1, 1);
 
 -- 前端业务菜单。
 INSERT INTO sys_menu (
@@ -93,6 +93,14 @@ INSERT INTO sys_menu (
   (1042, 14, 1, '查看构建任务详情', 3, 'GET', '/core/build-tasks/:id', '', 'core:build-task:view', '', 2, 2, 1, 0, 0),
   (1043, 14, 1, '创建构建任务', 3, 'POST', '/core/build-tasks', '', 'core:build-task:add', '', 3, 2, 1, 0, 0),
   (1051, 15, 1, '查看渠道统计', 3, 'GET', '/core/channel-stats', '', 'core:channel-stats:view', '', 1, 2, 1, 0, 0);
+
+INSERT INTO sys_menu (
+  id, parent_id, app_scope, name, menu_type, method, path, component, perms,
+  icon, sort, visible, enabled, create_times, update_times
+) VALUES
+  (1061, 11, 1, '初始化业务文件上传', 3, 'POST', '/core/uploads/initiate', '', 'core:storage:upload', '', 10, 2, 1, 0, 0),
+  (1062, 11, 1, '完成业务文件上传', 3, 'POST', '/core/uploads/:id/complete', '', 'core:storage:upload', '', 11, 2, 1, 0, 0),
+  (1063, 14, 1, '下载业务文件', 3, 'GET', '/core/storage/objects/:id/download', '', 'core:storage:download', '', 12, 2, 1, 0, 0);
 
 -- System 接口权限。
 INSERT INTO sys_menu (
@@ -148,7 +156,7 @@ INSERT INTO sys_menu (
 
 -- owner：全部菜单和按钮权限。
 INSERT INTO sys_role_menu (tenant_id, role_id, menu_id)
-SELECT 1, 1, id FROM sys_menu;
+SELECT 0, 1, id FROM sys_menu;
 
 -- admin：全部 Core 业务菜单和操作权限。
 INSERT INTO sys_role_menu (tenant_id, role_id, menu_id)
@@ -190,7 +198,7 @@ INSERT INTO sys_config (
       'oss_type', 3,
       'oss_domain', 'http://localhost:9000/appforge',
       'minio', JSON_OBJECT(
-        'endpoint', 'minio:9000',
+        'endpoint', 'http://minio:9000',
         'access_key_id', 'appforge',
         'access_key_secret', 'appforge_dev_minio',
         'bucket_name', 'appforge',
@@ -201,4 +209,3 @@ INSERT INTO sys_config (
     UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000,
     UNIX_TIMESTAMP(CURRENT_TIMESTAMP(3)) * 1000
   );
-

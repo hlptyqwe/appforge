@@ -129,23 +129,24 @@ func (x *RespBase) GetBase() *common.RespBase {
 }
 
 type BuildTask struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Id              int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	TenantId        int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
-	AppId           int64                  `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
-	VersionId       int64                  `protobuf:"varint,4,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
-	ChannelId       int64                  `protobuf:"varint,5,opt,name=channel_id,json=channelId,proto3" json:"channel_id,omitempty"`
-	SigningConfigId int64                  `protobuf:"varint,6,opt,name=signing_config_id,json=signingConfigId,proto3" json:"signing_config_id,omitempty"`
-	ChannelCode     string                 `protobuf:"bytes,7,opt,name=channel_code,json=channelCode,proto3" json:"channel_code,omitempty"`
-	VersionCode     int64                  `protobuf:"varint,8,opt,name=version_code,json=versionCode,proto3" json:"version_code,omitempty"`
-	VersionName     string                 `protobuf:"bytes,9,opt,name=version_name,json=versionName,proto3" json:"version_name,omitempty"`
-	Status          BuildTaskStatus        `protobuf:"varint,10,opt,name=status,proto3,enum=builder.BuildTaskStatus" json:"status,omitempty"` // 构建任务状态
-	BuilderAttempt  int32                  `protobuf:"varint,11,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"`
-	Priority        int32                  `protobuf:"varint,12,opt,name=priority,proto3" json:"priority,omitempty"`
-	SourceApkUrl    string                 `protobuf:"bytes,13,opt,name=source_apk_url,json=sourceApkUrl,proto3" json:"source_apk_url,omitempty"`
-	BuildConfigJson string                 `protobuf:"bytes,14,opt,name=build_config_json,json=buildConfigJson,proto3" json:"build_config_json,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	TenantId          int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	AppId             int64                  `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`
+	VersionId         int64                  `protobuf:"varint,4,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
+	ChannelId         int64                  `protobuf:"varint,5,opt,name=channel_id,json=channelId,proto3" json:"channel_id,omitempty"`
+	SigningConfigId   int64                  `protobuf:"varint,6,opt,name=signing_config_id,json=signingConfigId,proto3" json:"signing_config_id,omitempty"`
+	ChannelCode       string                 `protobuf:"bytes,7,opt,name=channel_code,json=channelCode,proto3" json:"channel_code,omitempty"`
+	VersionCode       int64                  `protobuf:"varint,8,opt,name=version_code,json=versionCode,proto3" json:"version_code,omitempty"`
+	VersionName       string                 `protobuf:"bytes,9,opt,name=version_name,json=versionName,proto3" json:"version_name,omitempty"`
+	Status            BuildTaskStatus        `protobuf:"varint,10,opt,name=status,proto3,enum=builder.BuildTaskStatus" json:"status,omitempty"` // 构建任务状态
+	BuilderAttempt    int32                  `protobuf:"varint,11,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"`
+	Priority          int32                  `protobuf:"varint,12,opt,name=priority,proto3" json:"priority,omitempty"`
+	SourceApkUrl      string                 `protobuf:"bytes,13,opt,name=source_apk_url,json=sourceApkUrl,proto3" json:"source_apk_url,omitempty"`
+	BuildConfigJson   string                 `protobuf:"bytes,14,opt,name=build_config_json,json=buildConfigJson,proto3" json:"build_config_json,omitempty"`
+	SourceApkObjectId int64                  `protobuf:"varint,15,opt,name=source_apk_object_id,json=sourceApkObjectId,proto3" json:"source_apk_object_id,omitempty"` // 原始APK私有对象ID
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *BuildTask) Reset() {
@@ -276,6 +277,13 @@ func (x *BuildTask) GetBuildConfigJson() string {
 	return ""
 }
 
+func (x *BuildTask) GetSourceApkObjectId() int64 {
+	if x != nil {
+		return x.SourceApkObjectId
+	}
+	return 0
+}
+
 type ClaimBuildTaskReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	BuilderId     string                 `protobuf:"bytes,1,opt,name=builder_id,json=builderId,proto3" json:"builder_id,omitempty"`
@@ -381,12 +389,13 @@ func (x *BuildTaskResp) GetData() *BuildTask {
 }
 
 type HeartbeatBuildTaskReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TaskId        int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	BuilderId     string                 `protobuf:"bytes,2,opt,name=builder_id,json=builderId,proto3" json:"builder_id,omitempty"`
-	LeaseSeconds  int32                  `protobuf:"varint,3,opt,name=lease_seconds,json=leaseSeconds,proto3" json:"lease_seconds,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	TaskId         int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	BuilderId      string                 `protobuf:"bytes,2,opt,name=builder_id,json=builderId,proto3" json:"builder_id,omitempty"`
+	LeaseSeconds   int32                  `protobuf:"varint,3,opt,name=lease_seconds,json=leaseSeconds,proto3" json:"lease_seconds,omitempty"`
+	BuilderAttempt int32                  `protobuf:"varint,4,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"` // 本次领取代次，用于阻止过期Worker回写
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *HeartbeatBuildTaskReq) Reset() {
@@ -440,15 +449,23 @@ func (x *HeartbeatBuildTaskReq) GetLeaseSeconds() int32 {
 	return 0
 }
 
+func (x *HeartbeatBuildTaskReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
 type ReportBuildProgressReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TaskId        int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	BuilderId     string                 `protobuf:"bytes,2,opt,name=builder_id,json=builderId,proto3" json:"builder_id,omitempty"`
-	Status        BuildTaskStatus        `protobuf:"varint,3,opt,name=status,proto3,enum=builder.BuildTaskStatus" json:"status,omitempty"` // 当前构建任务状态
-	Message       string                 `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
-	Progress      int32                  `protobuf:"varint,5,opt,name=progress,proto3" json:"progress,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	TaskId         int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	BuilderId      string                 `protobuf:"bytes,2,opt,name=builder_id,json=builderId,proto3" json:"builder_id,omitempty"`
+	Status         BuildTaskStatus        `protobuf:"varint,3,opt,name=status,proto3,enum=builder.BuildTaskStatus" json:"status,omitempty"` // 当前构建任务状态
+	Message        string                 `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
+	Progress       int32                  `protobuf:"varint,5,opt,name=progress,proto3" json:"progress,omitempty"`
+	BuilderAttempt int32                  `protobuf:"varint,6,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"` // 本次领取代次，用于阻止过期Worker回写
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ReportBuildProgressReq) Reset() {
@@ -516,16 +533,28 @@ func (x *ReportBuildProgressReq) GetProgress() int32 {
 	return 0
 }
 
+func (x *ReportBuildProgressReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
 type CompleteBuildTaskReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TaskId        int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	BuilderId     string                 `protobuf:"bytes,2,opt,name=builder_id,json=builderId,proto3" json:"builder_id,omitempty"`
-	ApkUrl        string                 `protobuf:"bytes,3,opt,name=apk_url,json=apkUrl,proto3" json:"apk_url,omitempty"`
-	ApkSha256     string                 `protobuf:"bytes,4,opt,name=apk_sha256,json=apkSha256,proto3" json:"apk_sha256,omitempty"`
-	ApkSize       int64                  `protobuf:"varint,5,opt,name=apk_size,json=apkSize,proto3" json:"apk_size,omitempty"`
-	LogUrl        string                 `protobuf:"bytes,6,opt,name=log_url,json=logUrl,proto3" json:"log_url,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	TaskId         int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	BuilderId      string                 `protobuf:"bytes,2,opt,name=builder_id,json=builderId,proto3" json:"builder_id,omitempty"`
+	ApkUrl         string                 `protobuf:"bytes,3,opt,name=apk_url,json=apkUrl,proto3" json:"apk_url,omitempty"`
+	ApkSha256      string                 `protobuf:"bytes,4,opt,name=apk_sha256,json=apkSha256,proto3" json:"apk_sha256,omitempty"`
+	ApkSize        int64                  `protobuf:"varint,5,opt,name=apk_size,json=apkSize,proto3" json:"apk_size,omitempty"`
+	LogUrl         string                 `protobuf:"bytes,6,opt,name=log_url,json=logUrl,proto3" json:"log_url,omitempty"`
+	ApkObjectKey   string                 `protobuf:"bytes,7,opt,name=apk_object_key,json=apkObjectKey,proto3" json:"apk_object_key,omitempty"`       // 构建产物私有对象Key
+	LogObjectKey   string                 `protobuf:"bytes,8,opt,name=log_object_key,json=logObjectKey,proto3" json:"log_object_key,omitempty"`       // 构建日志私有对象Key
+	LogSha256      string                 `protobuf:"bytes,9,opt,name=log_sha256,json=logSha256,proto3" json:"log_sha256,omitempty"`                  // 构建日志SHA-256
+	LogSize        int64                  `protobuf:"varint,10,opt,name=log_size,json=logSize,proto3" json:"log_size,omitempty"`                      // 构建日志大小，单位字节
+	BuilderAttempt int32                  `protobuf:"varint,11,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"` // 本次领取代次，用于阻止过期Worker回写
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *CompleteBuildTaskReq) Reset() {
@@ -600,14 +629,53 @@ func (x *CompleteBuildTaskReq) GetLogUrl() string {
 	return ""
 }
 
+func (x *CompleteBuildTaskReq) GetApkObjectKey() string {
+	if x != nil {
+		return x.ApkObjectKey
+	}
+	return ""
+}
+
+func (x *CompleteBuildTaskReq) GetLogObjectKey() string {
+	if x != nil {
+		return x.LogObjectKey
+	}
+	return ""
+}
+
+func (x *CompleteBuildTaskReq) GetLogSha256() string {
+	if x != nil {
+		return x.LogSha256
+	}
+	return ""
+}
+
+func (x *CompleteBuildTaskReq) GetLogSize() int64 {
+	if x != nil {
+		return x.LogSize
+	}
+	return 0
+}
+
+func (x *CompleteBuildTaskReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
 type FailBuildTaskReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TaskId        int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	BuilderId     string                 `protobuf:"bytes,2,opt,name=builder_id,json=builderId,proto3" json:"builder_id,omitempty"`
-	ErrorMessage  string                 `protobuf:"bytes,3,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
-	LogUrl        string                 `protobuf:"bytes,4,opt,name=log_url,json=logUrl,proto3" json:"log_url,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	TaskId         int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	BuilderId      string                 `protobuf:"bytes,2,opt,name=builder_id,json=builderId,proto3" json:"builder_id,omitempty"`
+	ErrorMessage   string                 `protobuf:"bytes,3,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	LogUrl         string                 `protobuf:"bytes,4,opt,name=log_url,json=logUrl,proto3" json:"log_url,omitempty"`
+	LogObjectKey   string                 `protobuf:"bytes,5,opt,name=log_object_key,json=logObjectKey,proto3" json:"log_object_key,omitempty"`      // 构建日志私有对象Key
+	LogSha256      string                 `protobuf:"bytes,6,opt,name=log_sha256,json=logSha256,proto3" json:"log_sha256,omitempty"`                 // 构建日志SHA-256
+	LogSize        int64                  `protobuf:"varint,7,opt,name=log_size,json=logSize,proto3" json:"log_size,omitempty"`                      // 构建日志大小，单位字节
+	BuilderAttempt int32                  `protobuf:"varint,8,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"` // 本次领取代次，用于阻止过期Worker回写
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *FailBuildTaskReq) Reset() {
@@ -668,13 +736,110 @@ func (x *FailBuildTaskReq) GetLogUrl() string {
 	return ""
 }
 
+func (x *FailBuildTaskReq) GetLogObjectKey() string {
+	if x != nil {
+		return x.LogObjectKey
+	}
+	return ""
+}
+
+func (x *FailBuildTaskReq) GetLogSha256() string {
+	if x != nil {
+		return x.LogSha256
+	}
+	return ""
+}
+
+func (x *FailBuildTaskReq) GetLogSize() int64 {
+	if x != nil {
+		return x.LogSize
+	}
+	return 0
+}
+
+func (x *FailBuildTaskReq) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+// 校验签名文件、别名和密码请求，仅允许内部API调用。
+type ValidateSigningMaterialReq struct {
+	state                      protoimpl.MessageState `protogen:"open.v1"`
+	KeystoreObjectKey          string                 `protobuf:"bytes,1,opt,name=keystore_object_key,json=keystoreObjectKey,proto3" json:"keystore_object_key,omitempty"`                            // 签名文件私有对象Key
+	KeyAlias                   string                 `protobuf:"bytes,2,opt,name=key_alias,json=keyAlias,proto3" json:"key_alias,omitempty"`                                                         // 待校验的签名别名
+	KeystorePasswordCiphertext string                 `protobuf:"bytes,3,opt,name=keystore_password_ciphertext,json=keystorePasswordCiphertext,proto3" json:"keystore_password_ciphertext,omitempty"` // Keystore密码密文
+	KeyPasswordCiphertext      string                 `protobuf:"bytes,4,opt,name=key_password_ciphertext,json=keyPasswordCiphertext,proto3" json:"key_password_ciphertext,omitempty"`                // Key密码密文
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
+}
+
+func (x *ValidateSigningMaterialReq) Reset() {
+	*x = ValidateSigningMaterialReq{}
+	mi := &file_proto_builder_builder_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ValidateSigningMaterialReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ValidateSigningMaterialReq) ProtoMessage() {}
+
+func (x *ValidateSigningMaterialReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_builder_builder_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ValidateSigningMaterialReq.ProtoReflect.Descriptor instead.
+func (*ValidateSigningMaterialReq) Descriptor() ([]byte, []int) {
+	return file_proto_builder_builder_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ValidateSigningMaterialReq) GetKeystoreObjectKey() string {
+	if x != nil {
+		return x.KeystoreObjectKey
+	}
+	return ""
+}
+
+func (x *ValidateSigningMaterialReq) GetKeyAlias() string {
+	if x != nil {
+		return x.KeyAlias
+	}
+	return ""
+}
+
+func (x *ValidateSigningMaterialReq) GetKeystorePasswordCiphertext() string {
+	if x != nil {
+		return x.KeystorePasswordCiphertext
+	}
+	return ""
+}
+
+func (x *ValidateSigningMaterialReq) GetKeyPasswordCiphertext() string {
+	if x != nil {
+		return x.KeyPasswordCiphertext
+	}
+	return ""
+}
+
 var File_proto_builder_builder_proto protoreflect.FileDescriptor
 
 const file_proto_builder_builder_proto_rawDesc = "" +
 	"\n" +
 	"\x1bproto/builder/builder.proto\x12\abuilder\x1a\x19proto/common/common.proto\"0\n" +
 	"\bRespBase\x12$\n" +
-	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\"\xeb\x03\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\"\x9c\x04\n" +
 	"\tBuildTask\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
 	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
@@ -692,26 +857,29 @@ const file_proto_builder_builder_proto_rawDesc = "" +
 	"\x0fbuilder_attempt\x18\v \x01(\x05R\x0ebuilderAttempt\x12\x1a\n" +
 	"\bpriority\x18\f \x01(\x05R\bpriority\x12$\n" +
 	"\x0esource_apk_url\x18\r \x01(\tR\fsourceApkUrl\x12*\n" +
-	"\x11build_config_json\x18\x0e \x01(\tR\x0fbuildConfigJson\"W\n" +
+	"\x11build_config_json\x18\x0e \x01(\tR\x0fbuildConfigJson\x12/\n" +
+	"\x14source_apk_object_id\x18\x0f \x01(\x03R\x11sourceApkObjectId\"W\n" +
 	"\x11ClaimBuildTaskReq\x12\x1d\n" +
 	"\n" +
 	"builder_id\x18\x01 \x01(\tR\tbuilderId\x12#\n" +
 	"\rlease_seconds\x18\x02 \x01(\x05R\fleaseSeconds\"]\n" +
 	"\rBuildTaskResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12&\n" +
-	"\x04data\x18\x02 \x01(\v2\x12.builder.BuildTaskR\x04data\"t\n" +
+	"\x04data\x18\x02 \x01(\v2\x12.builder.BuildTaskR\x04data\"\x9d\x01\n" +
 	"\x15HeartbeatBuildTaskReq\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1d\n" +
 	"\n" +
 	"builder_id\x18\x02 \x01(\tR\tbuilderId\x12#\n" +
-	"\rlease_seconds\x18\x03 \x01(\x05R\fleaseSeconds\"\xb8\x01\n" +
+	"\rlease_seconds\x18\x03 \x01(\x05R\fleaseSeconds\x12'\n" +
+	"\x0fbuilder_attempt\x18\x04 \x01(\x05R\x0ebuilderAttempt\"\xe1\x01\n" +
 	"\x16ReportBuildProgressReq\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1d\n" +
 	"\n" +
 	"builder_id\x18\x02 \x01(\tR\tbuilderId\x120\n" +
 	"\x06status\x18\x03 \x01(\x0e2\x18.builder.BuildTaskStatusR\x06status\x12\x18\n" +
 	"\amessage\x18\x04 \x01(\tR\amessage\x12\x1a\n" +
-	"\bprogress\x18\x05 \x01(\x05R\bprogress\"\xba\x01\n" +
+	"\bprogress\x18\x05 \x01(\x05R\bprogress\x12'\n" +
+	"\x0fbuilder_attempt\x18\x06 \x01(\x05R\x0ebuilderAttempt\"\xe9\x02\n" +
 	"\x14CompleteBuildTaskReq\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1d\n" +
 	"\n" +
@@ -720,13 +888,30 @@ const file_proto_builder_builder_proto_rawDesc = "" +
 	"\n" +
 	"apk_sha256\x18\x04 \x01(\tR\tapkSha256\x12\x19\n" +
 	"\bapk_size\x18\x05 \x01(\x03R\aapkSize\x12\x17\n" +
-	"\alog_url\x18\x06 \x01(\tR\x06logUrl\"\x88\x01\n" +
+	"\alog_url\x18\x06 \x01(\tR\x06logUrl\x12$\n" +
+	"\x0eapk_object_key\x18\a \x01(\tR\fapkObjectKey\x12$\n" +
+	"\x0elog_object_key\x18\b \x01(\tR\flogObjectKey\x12\x1d\n" +
+	"\n" +
+	"log_sha256\x18\t \x01(\tR\tlogSha256\x12\x19\n" +
+	"\blog_size\x18\n" +
+	" \x01(\x03R\alogSize\x12'\n" +
+	"\x0fbuilder_attempt\x18\v \x01(\x05R\x0ebuilderAttempt\"\x91\x02\n" +
 	"\x10FailBuildTaskReq\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1d\n" +
 	"\n" +
 	"builder_id\x18\x02 \x01(\tR\tbuilderId\x12#\n" +
 	"\rerror_message\x18\x03 \x01(\tR\ferrorMessage\x12\x17\n" +
-	"\alog_url\x18\x04 \x01(\tR\x06logUrl*\xec\x01\n" +
+	"\alog_url\x18\x04 \x01(\tR\x06logUrl\x12$\n" +
+	"\x0elog_object_key\x18\x05 \x01(\tR\flogObjectKey\x12\x1d\n" +
+	"\n" +
+	"log_sha256\x18\x06 \x01(\tR\tlogSha256\x12\x19\n" +
+	"\blog_size\x18\a \x01(\x03R\alogSize\x12'\n" +
+	"\x0fbuilder_attempt\x18\b \x01(\x05R\x0ebuilderAttempt\"\xe3\x01\n" +
+	"\x1aValidateSigningMaterialReq\x12.\n" +
+	"\x13keystore_object_key\x18\x01 \x01(\tR\x11keystoreObjectKey\x12\x1b\n" +
+	"\tkey_alias\x18\x02 \x01(\tR\bkeyAlias\x12@\n" +
+	"\x1ckeystore_password_ciphertext\x18\x03 \x01(\tR\x1akeystorePasswordCiphertext\x126\n" +
+	"\x17key_password_ciphertext\x18\x04 \x01(\tR\x15keyPasswordCiphertext*\xec\x01\n" +
 	"\x0fBuildTaskStatus\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_UNKNOWN\x10\x00\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_PENDING\x10\x01\x12\x1e\n" +
@@ -734,8 +919,9 @@ const file_proto_builder_builder_proto_rawDesc = "" +
 	"\x19BUILD_TASK_STATUS_SIGNING\x10\x03\x12\x1f\n" +
 	"\x1bBUILD_TASK_STATUS_UPLOADING\x10\x04\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_SUCCESS\x10\x05\x12\x1c\n" +
-	"\x18BUILD_TASK_STATUS_FAILED\x10\x062\xe9\x02\n" +
-	"\aBuilder\x12D\n" +
+	"\x18BUILD_TASK_STATUS_FAILED\x10\x062\xbc\x03\n" +
+	"\aBuilder\x12Q\n" +
+	"\x17ValidateSigningMaterial\x12#.builder.ValidateSigningMaterialReq\x1a\x11.builder.RespBase\x12D\n" +
 	"\x0eClaimBuildTask\x12\x1a.builder.ClaimBuildTaskReq\x1a\x16.builder.BuildTaskResp\x12G\n" +
 	"\x12HeartbeatBuildTask\x12\x1e.builder.HeartbeatBuildTaskReq\x1a\x11.builder.RespBase\x12I\n" +
 	"\x13ReportBuildProgress\x12\x1f.builder.ReportBuildProgressReq\x1a\x11.builder.RespBase\x12E\n" +
@@ -755,37 +941,40 @@ func file_proto_builder_builder_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_builder_builder_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_builder_builder_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_proto_builder_builder_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_proto_builder_builder_proto_goTypes = []any{
-	(BuildTaskStatus)(0),           // 0: builder.BuildTaskStatus
-	(*RespBase)(nil),               // 1: builder.RespBase
-	(*BuildTask)(nil),              // 2: builder.BuildTask
-	(*ClaimBuildTaskReq)(nil),      // 3: builder.ClaimBuildTaskReq
-	(*BuildTaskResp)(nil),          // 4: builder.BuildTaskResp
-	(*HeartbeatBuildTaskReq)(nil),  // 5: builder.HeartbeatBuildTaskReq
-	(*ReportBuildProgressReq)(nil), // 6: builder.ReportBuildProgressReq
-	(*CompleteBuildTaskReq)(nil),   // 7: builder.CompleteBuildTaskReq
-	(*FailBuildTaskReq)(nil),       // 8: builder.FailBuildTaskReq
-	(*common.RespBase)(nil),        // 9: common.RespBase
+	(BuildTaskStatus)(0),               // 0: builder.BuildTaskStatus
+	(*RespBase)(nil),                   // 1: builder.RespBase
+	(*BuildTask)(nil),                  // 2: builder.BuildTask
+	(*ClaimBuildTaskReq)(nil),          // 3: builder.ClaimBuildTaskReq
+	(*BuildTaskResp)(nil),              // 4: builder.BuildTaskResp
+	(*HeartbeatBuildTaskReq)(nil),      // 5: builder.HeartbeatBuildTaskReq
+	(*ReportBuildProgressReq)(nil),     // 6: builder.ReportBuildProgressReq
+	(*CompleteBuildTaskReq)(nil),       // 7: builder.CompleteBuildTaskReq
+	(*FailBuildTaskReq)(nil),           // 8: builder.FailBuildTaskReq
+	(*ValidateSigningMaterialReq)(nil), // 9: builder.ValidateSigningMaterialReq
+	(*common.RespBase)(nil),            // 10: common.RespBase
 }
 var file_proto_builder_builder_proto_depIdxs = []int32{
-	9,  // 0: builder.RespBase.base:type_name -> common.RespBase
+	10, // 0: builder.RespBase.base:type_name -> common.RespBase
 	0,  // 1: builder.BuildTask.status:type_name -> builder.BuildTaskStatus
-	9,  // 2: builder.BuildTaskResp.base:type_name -> common.RespBase
+	10, // 2: builder.BuildTaskResp.base:type_name -> common.RespBase
 	2,  // 3: builder.BuildTaskResp.data:type_name -> builder.BuildTask
 	0,  // 4: builder.ReportBuildProgressReq.status:type_name -> builder.BuildTaskStatus
-	3,  // 5: builder.Builder.ClaimBuildTask:input_type -> builder.ClaimBuildTaskReq
-	5,  // 6: builder.Builder.HeartbeatBuildTask:input_type -> builder.HeartbeatBuildTaskReq
-	6,  // 7: builder.Builder.ReportBuildProgress:input_type -> builder.ReportBuildProgressReq
-	7,  // 8: builder.Builder.CompleteBuildTask:input_type -> builder.CompleteBuildTaskReq
-	8,  // 9: builder.Builder.FailBuildTask:input_type -> builder.FailBuildTaskReq
-	4,  // 10: builder.Builder.ClaimBuildTask:output_type -> builder.BuildTaskResp
-	1,  // 11: builder.Builder.HeartbeatBuildTask:output_type -> builder.RespBase
-	1,  // 12: builder.Builder.ReportBuildProgress:output_type -> builder.RespBase
-	1,  // 13: builder.Builder.CompleteBuildTask:output_type -> builder.RespBase
-	1,  // 14: builder.Builder.FailBuildTask:output_type -> builder.RespBase
-	10, // [10:15] is the sub-list for method output_type
-	5,  // [5:10] is the sub-list for method input_type
+	9,  // 5: builder.Builder.ValidateSigningMaterial:input_type -> builder.ValidateSigningMaterialReq
+	3,  // 6: builder.Builder.ClaimBuildTask:input_type -> builder.ClaimBuildTaskReq
+	5,  // 7: builder.Builder.HeartbeatBuildTask:input_type -> builder.HeartbeatBuildTaskReq
+	6,  // 8: builder.Builder.ReportBuildProgress:input_type -> builder.ReportBuildProgressReq
+	7,  // 9: builder.Builder.CompleteBuildTask:input_type -> builder.CompleteBuildTaskReq
+	8,  // 10: builder.Builder.FailBuildTask:input_type -> builder.FailBuildTaskReq
+	1,  // 11: builder.Builder.ValidateSigningMaterial:output_type -> builder.RespBase
+	4,  // 12: builder.Builder.ClaimBuildTask:output_type -> builder.BuildTaskResp
+	1,  // 13: builder.Builder.HeartbeatBuildTask:output_type -> builder.RespBase
+	1,  // 14: builder.Builder.ReportBuildProgress:output_type -> builder.RespBase
+	1,  // 15: builder.Builder.CompleteBuildTask:output_type -> builder.RespBase
+	1,  // 16: builder.Builder.FailBuildTask:output_type -> builder.RespBase
+	11, // [11:17] is the sub-list for method output_type
+	5,  // [5:11] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -802,7 +991,7 @@ func file_proto_builder_builder_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_builder_builder_proto_rawDesc), len(file_proto_builder_builder_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -34,6 +34,9 @@ func (l *SysUserDetailLogic) SysUserDetail(in *system.SysUserDetailReq) (*system
 	if err != nil {
 		return nil, notFound(err, "user")
 	}
+	if err := requireItemAppScope(l.ctx, user.AppScope); err != nil {
+		return nil, err
+	}
 
 	requestUserID := actorID(l.ctx)
 	if requestUserID > 0 && requestUserID != user.Id {

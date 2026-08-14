@@ -51,7 +51,7 @@ func (l *ListVersionsLogic) ListVersions(in *core.VersionListReq) (*core.Version
 	}
 	queryArgs := append(append([]any{}, args...), cursor, limit+1)
 	var items []models.TAppVersion
-	query := fmt.Sprintf("SELECT id, tenant_id, app_id, version_code, version_name, source_apk_url, source_apk_sha256, release_notes, build_config, status, published_at, create_by, create_time, update_time FROM t_app_version WHERE %s AND id > ? ORDER BY id ASC LIMIT ?", whereSQL)
+	query := fmt.Sprintf("SELECT id, tenant_id, app_id, version_code, version_name, source_apk_object_id, source_apk_url, source_apk_sha256, release_notes, build_config, status, published_at, create_by, create_time, update_time FROM t_app_version WHERE %s AND id > ? ORDER BY id ASC LIMIT ?", whereSQL)
 	if err := l.svcCtx.DB.QueryRowsCtx(l.ctx, &items, query, queryArgs...); err != nil {
 		return nil, status.Errorf(codes.Internal, "list versions failed: %v", err)
 	}

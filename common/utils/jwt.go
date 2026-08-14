@@ -125,6 +125,15 @@ func GetUserTypeFromCtx(ctx context.Context) (int64, error) {
 	return userType, nil
 }
 
+// GetAppScopeFromCtx 返回由认证中间件根据数据库用户记录写入的应用范围。
+func GetAppScopeFromCtx(ctx context.Context) (int64, error) {
+	appScope, ok := ctx.Value(CtxKeyAppScope).(int64)
+	if !ok {
+		return 0, fmt.Errorf("%s not found in context", CtxKeyAppScope)
+	}
+	return appScope, nil
+}
+
 func GetTenantCodeFromCtx(ctx context.Context) (string, error) {
 	tenantCode, ok := ctx.Value(CtxKeyTenantCode).(string)
 	if !ok {

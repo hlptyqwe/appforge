@@ -36,6 +36,9 @@ func (l *SysUserDeleteLogic) SysUserDelete(in *system.SysUserDeleteReq) (*system
 	if err != nil {
 		return nil, notFound(err, "user")
 	}
+	if err := requireItemAppScope(l.ctx, item.AppScope); err != nil {
+		return nil, err
+	}
 	if _, err := effectiveTenant(l.ctx, item.TenantId); err != nil {
 		return nil, err
 	}

@@ -82,7 +82,7 @@ const enUS = {
   options: {
     ENABLE_ENABLED: 'Enabled', ENABLE_DISABLED: 'Disabled', SWITCH_ON: 'Visible',
     SWITCH_OFF: 'Hidden', MENU_TYPE_DIR: 'Directory', MENU_TYPE_MENU: 'Menu',
-    MENU_TYPE_BUTTON: 'Button', APPLICATION_SCOPE_ADMIN: 'Admin',
+    MENU_TYPE_BUTTON: 'Button', APPLICATION_SCOPE_ADMIN: 'Admin', APPLICATION_SCOPE_AGENT: 'Agent',
   },
 }
 

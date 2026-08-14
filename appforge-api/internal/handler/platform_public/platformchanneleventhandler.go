@@ -9,6 +9,7 @@ import (
 	"appforge/admin-api/internal/logic/platform_public"
 	"appforge/admin-api/internal/svc"
 	"appforge/admin-api/internal/types"
+	"appforge/common/utils"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
@@ -19,6 +20,7 @@ func PlatformChannelEventHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
+		req.Ip = utils.GetClientIP(r)
 
 		l := platform_public.NewPlatformChannelEventLogic(r.Context(), svcCtx)
 		resp, err := l.PlatformChannelEvent(&req)

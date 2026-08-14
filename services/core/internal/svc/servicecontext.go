@@ -17,6 +17,7 @@ type ServiceContext struct {
 	BuildTaskModel     models.TBuildTaskModel
 	InstallModel       models.TChannelInstallModel
 	ChannelEventModel  models.TChannelEventModel
+	StorageObjectModel models.TStorageObjectModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -31,5 +32,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		BuildTaskModel:     models.NewTBuildTaskModel(conn, c.CacheRedis),
 		InstallModel:       models.NewTChannelInstallModel(conn, c.CacheRedis),
 		ChannelEventModel:  models.NewTChannelEventModel(conn, c.CacheRedis),
+		StorageObjectModel: models.NewTStorageObjectModel(conn, c.CacheRedis),
 	}
 }

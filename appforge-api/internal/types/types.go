@@ -13,6 +13,15 @@ type ChangeUserStatusReq struct {
 	Enabled int64 `json:"enabled"` // 0未知 1启用 2禁用
 }
 
+type CompletePlatformUploadReq struct {
+	Id int64 `path:"id"`
+}
+
+type CompletePlatformUploadResp struct {
+	RespBase
+	Data PlatformStorageObject `json:"data"`
+}
+
 type CreatePlatformApplicationReq struct {
 	AppCode     string `json:"appCode"`
 	AppName     string `json:"appName"`
@@ -39,23 +48,24 @@ type CreatePlatformChannelReq struct {
 }
 
 type CreatePlatformSigningConfigReq struct {
-	AppId                      int64  `json:"appId"`
-	Name                       string `json:"name"`
-	KeystoreObjectKey          string `json:"keystoreObjectKey"`
-	KeyAlias                   string `json:"keyAlias"`
-	KeystorePasswordCiphertext string `json:"keystorePasswordCiphertext"`
-	KeyPasswordCiphertext      string `json:"keyPasswordCiphertext"`
-	SecretRef                  string `json:"secretRef,optional"`
+	AppId            int64  `json:"appId"`
+	Name             string `json:"name"`
+	KeyAlias         string `json:"keyAlias"`
+	KeystorePassword string `json:"keystorePassword,optional"`
+	KeyPassword      string `json:"keyPassword,optional"`
+	SecretRef        string `json:"secretRef,optional"`
+	KeystoreObjectId int64  `json:"keystoreObjectId"`
 }
 
 type CreatePlatformVersionReq struct {
-	AppId           int64  `json:"appId"`
-	VersionCode     int64  `json:"versionCode"`
-	VersionName     string `json:"versionName"`
-	SourceApkUrl    string `json:"sourceApkUrl,optional"`
-	SourceApkSha256 string `json:"sourceApkSha256,optional"`
-	ReleaseNotes    string `json:"releaseNotes,optional"`
-	BuildConfigJson string `json:"buildConfigJson,optional"`
+	AppId             int64  `json:"appId"`
+	VersionCode       int64  `json:"versionCode"`
+	VersionName       string `json:"versionName"`
+	SourceApkUrl      string `json:"sourceApkUrl,optional"`
+	SourceApkSha256   string `json:"sourceApkSha256,optional"`
+	ReleaseNotes      string `json:"releaseNotes,optional"`
+	BuildConfigJson   string `json:"buildConfigJson,optional"`
+	SourceApkObjectId int64  `json:"sourceApkObjectId"`
 }
 
 type GetPlatformChannelStatsReq struct {
@@ -111,6 +121,19 @@ type Google2FAInitResp struct {
 
 type Google2FAResetReq struct {
 	UserId int64 `json:"userId"`
+}
+
+type InitiatePlatformUploadReq struct {
+	AppId       int64  `json:"appId,optional"`
+	ObjectType  int32  `json:"objectType"`
+	FileName    string `json:"fileName"`
+	SizeBytes   int64  `json:"sizeBytes"`
+	ContentType string `json:"contentType,optional"`
+}
+
+type InitiatePlatformUploadResp struct {
+	RespBase
+	Data PlatformUploadTicket `json:"data"`
 }
 
 type ListPlatformApplicationsReq struct {
@@ -270,30 +293,33 @@ type PlatformApplicationResp struct {
 }
 
 type PlatformBuildTask struct {
-	Id              int64  `json:"id"`
-	TenantId        int64  `json:"tenantId"`
-	AppId           int64  `json:"appId"`
-	VersionId       int64  `json:"versionId"`
-	ChannelId       int64  `json:"channelId"`
-	SigningConfigId int64  `json:"signingConfigId"`
-	ChannelCode     string `json:"channelCode"`
-	VersionCode     int64  `json:"versionCode"`
-	VersionName     string `json:"versionName"`
-	Status          int32  `json:"status"`
-	BuilderId       string `json:"builderId,optional"`
-	BuilderAttempt  int32  `json:"builderAttempt"`
-	Priority        int32  `json:"priority"`
-	ApkUrl          string `json:"apkUrl,optional"`
-	ApkSha256       string `json:"apkSha256,optional"`
-	ApkSize         int64  `json:"apkSize"`
-	LogUrl          string `json:"logUrl,optional"`
-	ErrorMessage    string `json:"errorMessage,optional"`
-	QueuedAt        int64  `json:"queuedAt"`
-	StartTime       int64  `json:"startTime,optional"`
-	FinishTime      int64  `json:"finishTime,optional"`
-	CreateBy        int64  `json:"createBy"`
-	CreateTime      int64  `json:"createTime"`
-	UpdateTime      int64  `json:"updateTime"`
+	Id                int64  `json:"id"`
+	TenantId          int64  `json:"tenantId"`
+	AppId             int64  `json:"appId"`
+	VersionId         int64  `json:"versionId"`
+	ChannelId         int64  `json:"channelId"`
+	SigningConfigId   int64  `json:"signingConfigId"`
+	ChannelCode       string `json:"channelCode"`
+	VersionCode       int64  `json:"versionCode"`
+	VersionName       string `json:"versionName"`
+	Status            int32  `json:"status"`
+	BuilderId         string `json:"builderId,optional"`
+	BuilderAttempt    int32  `json:"builderAttempt"`
+	Priority          int32  `json:"priority"`
+	ApkUrl            string `json:"apkUrl,optional"`
+	ApkSha256         string `json:"apkSha256,optional"`
+	ApkSize           int64  `json:"apkSize"`
+	LogUrl            string `json:"logUrl,optional"`
+	SourceApkObjectId int64  `json:"sourceApkObjectId"`
+	ApkObjectId       int64  `json:"apkObjectId"`
+	LogObjectId       int64  `json:"logObjectId"`
+	ErrorMessage      string `json:"errorMessage,optional"`
+	QueuedAt          int64  `json:"queuedAt"`
+	StartTime         int64  `json:"startTime,optional"`
+	FinishTime        int64  `json:"finishTime,optional"`
+	CreateBy          int64  `json:"createBy"`
+	CreateTime        int64  `json:"createTime"`
+	UpdateTime        int64  `json:"updateTime"`
 }
 
 type PlatformBuildTaskListResp struct {
@@ -318,6 +344,10 @@ type PlatformChannel struct {
 	CreateBy    int64  `json:"createBy"`
 	CreateTime  int64  `json:"createTime"`
 	UpdateTime  int64  `json:"updateTime"`
+}
+
+type PlatformChannelDownloadReq struct {
+	ChannelCode string `path:"channelCode"`
 }
 
 type PlatformChannelEventReq struct {
@@ -379,7 +409,8 @@ type PlatformSigningConfig struct {
 	TenantId          int64  `json:"tenantId"`
 	AppId             int64  `json:"appId"`
 	Name              string `json:"name"`
-	KeystoreObjectKey string `json:"keystoreObjectKey"`
+	KeystoreObjectKey string `json:"keystoreObjectKey,optional"`
+	KeystoreObjectId  int64  `json:"keystoreObjectId"`
 	KeyAlias          string `json:"keyAlias"`
 	SecretRef         string `json:"secretRef,optional"`
 	Status            int64  `json:"status"`
@@ -399,21 +430,52 @@ type PlatformSigningConfigResp struct {
 	Data PlatformSigningConfig `json:"data"`
 }
 
+type PlatformStorageDownload struct {
+	DownloadUrl string `json:"downloadUrl"`
+	ExpiresAt   int64  `json:"expiresAt"`
+}
+
+type PlatformStorageDownloadResp struct {
+	RespBase
+	Data PlatformStorageDownload `json:"data"`
+}
+
+type PlatformStorageObject struct {
+	ObjectId     int64  `json:"objectId"`
+	AppId        int64  `json:"appId"`
+	ObjectType   int32  `json:"objectType"`
+	OriginalName string `json:"originalName"`
+	SizeBytes    int64  `json:"sizeBytes"`
+	Sha256       string `json:"sha256"`
+	Status       int32  `json:"status"`
+}
+
+type PlatformStorageObjectIdReq struct {
+	Id int64 `path:"id"`
+}
+
+type PlatformUploadTicket struct {
+	ObjectId  int64  `json:"objectId"`
+	UploadUrl string `json:"uploadUrl"`
+	ExpiresAt int64  `json:"expiresAt"`
+}
+
 type PlatformVersion struct {
-	Id              int64  `json:"id"`
-	TenantId        int64  `json:"tenantId"`
-	AppId           int64  `json:"appId"`
-	VersionCode     int64  `json:"versionCode"`
-	VersionName     string `json:"versionName"`
-	SourceApkUrl    string `json:"sourceApkUrl,optional"`
-	SourceApkSha256 string `json:"sourceApkSha256,optional"`
-	ReleaseNotes    string `json:"releaseNotes,optional"`
-	BuildConfigJson string `json:"buildConfigJson,optional"`
-	Status          int32  `json:"status"`
-	PublishedAt     int64  `json:"publishedAt,optional"`
-	CreateBy        int64  `json:"createBy"`
-	CreateTime      int64  `json:"createTime"`
-	UpdateTime      int64  `json:"updateTime"`
+	Id                int64  `json:"id"`
+	TenantId          int64  `json:"tenantId"`
+	AppId             int64  `json:"appId"`
+	VersionCode       int64  `json:"versionCode"`
+	VersionName       string `json:"versionName"`
+	SourceApkUrl      string `json:"sourceApkUrl,optional"`
+	SourceApkSha256   string `json:"sourceApkSha256,optional"`
+	SourceApkObjectId int64  `json:"sourceApkObjectId"`
+	ReleaseNotes      string `json:"releaseNotes,optional"`
+	BuildConfigJson   string `json:"buildConfigJson,optional"`
+	Status            int32  `json:"status"`
+	PublishedAt       int64  `json:"publishedAt,optional"`
+	CreateBy          int64  `json:"createBy"`
+	CreateTime        int64  `json:"createTime"`
+	UpdateTime        int64  `json:"updateTime"`
 }
 
 type PlatformVersionListResp struct {

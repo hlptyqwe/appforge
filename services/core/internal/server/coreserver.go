@@ -38,6 +38,42 @@ func (s *CoreServer) ListApplications(ctx context.Context, in *core.ApplicationL
 	return l.ListApplications(in)
 }
 
+// 创建待上传的私有存储对象元数据。
+func (s *CoreServer) CreateStorageObject(ctx context.Context, in *core.CreateStorageObjectReq) (*core.StorageObjectResp, error) {
+	l := logic.NewCreateStorageObjectLogic(ctx, s.svcCtx)
+	return l.CreateStorageObject(in)
+}
+
+// 查询当前租户的私有存储对象。
+func (s *CoreServer) GetStorageObject(ctx context.Context, in *core.StorageObjectIdReq) (*core.StorageObjectResp, error) {
+	l := logic.NewGetStorageObjectLogic(ctx, s.svcCtx)
+	return l.GetStorageObject(in)
+}
+
+// 完成上传校验并把对象置为可用。
+func (s *CoreServer) CompleteStorageObject(ctx context.Context, in *core.CompleteStorageObjectReq) (*core.StorageObjectResp, error) {
+	l := logic.NewCompleteStorageObjectLogic(ctx, s.svcCtx)
+	return l.CompleteStorageObject(in)
+}
+
+// 标记上传或校验失败。
+func (s *CoreServer) FailStorageObject(ctx context.Context, in *core.FailStorageObjectReq) (*core.RespBase, error) {
+	l := logic.NewFailStorageObjectLogic(ctx, s.svcCtx)
+	return l.FailStorageObject(in)
+}
+
+// 领取超时未完成或失败的上传对象，供后台清理物理文件。
+func (s *CoreServer) ClaimExpiredStorageObjects(ctx context.Context, in *core.ClaimExpiredStorageObjectsReq) (*core.ClaimExpiredStorageObjectsResp, error) {
+	l := logic.NewClaimExpiredStorageObjectsLogic(ctx, s.svcCtx)
+	return l.ClaimExpiredStorageObjects(in)
+}
+
+// 确认物理对象已删除并把元数据置为已删除。
+func (s *CoreServer) MarkStorageObjectDeleted(ctx context.Context, in *core.MarkStorageObjectDeletedReq) (*core.RespBase, error) {
+	l := logic.NewMarkStorageObjectDeletedLogic(ctx, s.svcCtx)
+	return l.MarkStorageObjectDeleted(in)
+}
+
 func (s *CoreServer) CreateVersion(ctx context.Context, in *core.CreateVersionReq) (*core.VersionResp, error) {
 	l := logic.NewCreateVersionLogic(ctx, s.svcCtx)
 	return l.CreateVersion(in)
@@ -113,9 +149,21 @@ func (s *CoreServer) GetChannelStats(ctx context.Context, in *core.ChannelStatsR
 	return l.GetChannelStats(in)
 }
 
+// 解析渠道最新成功产物并幂等记录点击、下载事件。
+func (s *CoreServer) ResolveChannelDownload(ctx context.Context, in *core.ResolveChannelDownloadReq) (*core.ChannelDownloadArtifactResp, error) {
+	l := logic.NewResolveChannelDownloadLogic(ctx, s.svcCtx)
+	return l.ResolveChannelDownload(in)
+}
+
 func (s *CoreServer) ClaimBuildTask(ctx context.Context, in *core.ClaimBuildTaskReq) (*core.BuildTaskResp, error) {
 	l := logic.NewClaimBuildTaskLogic(ctx, s.svcCtx)
 	return l.ClaimBuildTask(in)
+}
+
+// 读取当前Builder已领取任务的内部执行上下文。
+func (s *CoreServer) GetBuildExecutionContext(ctx context.Context, in *core.GetBuildExecutionContextReq) (*core.BuildExecutionContextResp, error) {
+	l := logic.NewGetBuildExecutionContextLogic(ctx, s.svcCtx)
+	return l.GetBuildExecutionContext(in)
 }
 
 func (s *CoreServer) HeartbeatBuildTask(ctx context.Context, in *core.HeartbeatBuildTaskReq) (*core.RespBase, error) {

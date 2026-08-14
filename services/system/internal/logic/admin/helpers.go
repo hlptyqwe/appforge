@@ -165,11 +165,21 @@ func nullText(value string) sql.NullString {
 	return sql.NullString{String: value, Valid: value != ""}
 }
 
-func effectiveAppScope(value system.ApplicationScope) int64 {
+func effectiveAppScope(ctx context.Context, value system.ApplicationScope) int64 {
+	if scope, err := utils.GetAppScopeFromMd(ctx); err == nil && scope > 0 {
+		return scope
+	}
 	if value == system.ApplicationScope_APPLICATION_SCOPE_UNKNOWN {
 		return int64(system.ApplicationScope_APPLICATION_SCOPE_ADMIN)
 	}
 	return int64(value)
+}
+
+func requireItemAppScope(ctx context.Context, itemScope int64) error {
+	if scope, err := utils.GetAppScopeFromMd(ctx); err == nil && scope > 0 && scope != itemScope {
+		return status.Error(codes.PermissionDenied, "cross-application-scope access is not allowed")
+	}
+	return nil
 }
 
 func effectiveTenant(ctx context.Context, requested int64) (int64, error) {
@@ -294,8 +304,19 @@ func buildMenuTree(items []*system.SysMenuItem) []*system.SysMenuItem {
 
 func roleMenuItems(ctx context.Context, svcCtx *svc.ServiceContext, roleID int64) ([]*system.SysMenuItem, error) {
 	var rows []models.SysMenu
+	appScope := effectiveAppScope(ctx, system.ApplicationScope_APPLICATION_SCOPE_UNKNOWN)
+	if roleID > 0 {
+		role, err := svcCtx.RoleModel.FindOne(ctx, roleID)
+		if err != nil {
+			return nil, notFound(err, "role")
+		}
+		if err := requireItemAppScope(ctx, role.AppScope); err != nil {
+			return nil, err
+		}
+		appScope = role.AppScope
+	}
 	query := "SELECT id, parent_id, app_scope, name, menu_type, method, path, component, perms, icon, sort, visible, enabled, create_times, update_times FROM sys_menu WHERE app_scope = ? AND enabled = ? ORDER BY sort ASC, id ASC"
-	args := []any{int64(system.ApplicationScope_APPLICATION_SCOPE_ADMIN), int64(common.Enable_ENABLE_ENABLED)}
+	args := []any{appScope, int64(common.Enable_ENABLE_ENABLED)}
 	if roleID > 0 {
 		query = "SELECT m.id, m.parent_id, m.app_scope, m.name, m.menu_type, m.method, m.path, m.component, m.perms, m.icon, m.sort, m.visible, m.enabled, m.create_times, m.update_times FROM sys_menu m JOIN sys_role_menu rm ON rm.menu_id = m.id WHERE rm.role_id = ? AND m.app_scope = ? AND m.enabled = ? ORDER BY m.sort ASC, m.id ASC"
 		args = []any{roleID, args[0], args[1]}

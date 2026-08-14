@@ -1,21 +1,14 @@
-import { createMemoryHistory, createRouter, type RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { staticRoutes } from './staticRoutes'
 import { useAuthStore } from '@/stores/auth'
 import { getSystemCore } from '@/stores/core'
 import { buildRoutesFromMenus } from './dynamic'
+import { ENV } from '@/config/environment'
 
-const browserRootPath = '/'
 const memoryRouteStorageKey = 'admin-ui:memory-route'
 
-if (typeof window !== 'undefined') {
-  const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`
-  if (currentUrl !== browserRootPath) {
-    window.history.replaceState(window.history.state, '', browserRootPath)
-  }
-}
-
 export const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHistory(ENV.ROUTER_BASE),
   routes: staticRoutes,
 })
 

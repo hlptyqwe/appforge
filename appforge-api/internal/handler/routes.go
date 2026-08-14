@@ -5,6 +5,7 @@ package handler
 
 import (
 	"net/http"
+	"time"
 
 	auth_private "appforge/admin-api/internal/handler/auth_private"
 	auth_public "appforge/admin-api/internal/handler/auth_public"
@@ -118,6 +119,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: platform_private.GetPlatformSigningConfigHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodGet,
+				Path:    "/storage/objects/:id/download",
+				Handler: platform_private.GetPlatformStorageDownloadHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/uploads/:id/complete",
+				Handler: platform_private.CompletePlatformUploadHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/uploads/initiate",
+				Handler: platform_private.InitiatePlatformUploadHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodPost,
 				Path:    "/versions",
 				Handler: platform_private.CreatePlatformVersionHandler(serverCtx),
@@ -135,6 +151,17 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		},
 		rest.WithJwt(serverCtx.Config.Jwt.AccessSecret),
 		rest.WithPrefix("/admin/core"),
+		rest.WithTimeout(600000*time.Millisecond),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/d/:channelCode",
+				Handler: platform_public.PlatformChannelDownloadHandler(serverCtx),
+			},
+		},
 	)
 
 	server.AddRoutes(

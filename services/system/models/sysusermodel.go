@@ -51,17 +51,7 @@ var (
 )
 
 func (m *defaultSysUserModel) FindOneByUsername(ctx context.Context, username string, appScope int64) (*SysUser, error) {
-	var resp SysUser
-	query := fmt.Sprintf("select %s from %s where `username` = ? and `app_scope` = ? limit 1", sysUserRows, m.table)
-	err := m.QueryRowNoCacheCtx(ctx, &resp, query, username, appScope)
-	switch err {
-	case nil:
-		return &resp, nil
-	case sqlx.ErrNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, err
-	}
+	return m.FindOneByAppScopeUsername(ctx, appScope, username)
 }
 
 func (m *defaultSysUserModel) FindIdsByTenantId(ctx context.Context, tenantId int64) ([]int64, error) {

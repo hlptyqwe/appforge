@@ -1,13 +1,17 @@
 package middleware
 
-import "testing"
+import (
+	"testing"
+
+	"appforge/proto/system"
+)
 
 func TestGetRequiredPermissionStripsAdminPrefix(t *testing.T) {
 	rules := []PermissionRule{
 		mustRule(t, "GET", "/system/users", "sys:user:list"),
 	}
 
-	got := getRequiredPermission(rules, "/admin/system/users", "GET")
+	got := getRequiredPermission(rules, system.ApplicationScope_APPLICATION_SCOPE_ADMIN, "/admin/system/users", "GET")
 	if got != "sys:user:list" {
 		t.Fatalf("expected sys:user:list, got %q", got)
 	}
@@ -41,7 +45,7 @@ func TestGetRequiredPermissionMatchesPathParams(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := getRequiredPermission(rules, tt.path, tt.method)
+			got := getRequiredPermission(rules, system.ApplicationScope_APPLICATION_SCOPE_ADMIN, tt.path, tt.method)
 			if got != tt.want {
 				t.Fatalf("expected %q, got %q", tt.want, got)
 			}
@@ -54,7 +58,7 @@ func TestGetRequiredPermissionRequiresMethodMatch(t *testing.T) {
 		mustRule(t, "POST", "/system/users", "sys:user:add"),
 	}
 
-	got := getRequiredPermission(rules, "/admin/system/users", "GET")
+	got := getRequiredPermission(rules, system.ApplicationScope_APPLICATION_SCOPE_ADMIN, "/admin/system/users", "GET")
 	if got != "" {
 		t.Fatalf("expected no permission, got %q", got)
 	}
@@ -69,6 +73,7 @@ func mustRule(t *testing.T, method, path, permKey string) PermissionRule {
 	}
 
 	return PermissionRule{
+		AppScope:   system.ApplicationScope_APPLICATION_SCOPE_ADMIN,
 		Method:     method,
 		Path:       normalizePath(path),
 		PermKey:    permKey,

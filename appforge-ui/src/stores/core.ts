@@ -1,4 +1,5 @@
 import { get } from '@/utils/request'
+import { AUTH_API_BASE } from '@/config/environment'
 import type { OptionGroup, RespBase } from '@/services'
 
 type SystemCore = {
@@ -10,7 +11,7 @@ type SystemCore = {
 }
 
 export function getSystemCore(): Promise<RespBase<SystemCore>> {
-  return get<SystemCore>('/admin/system/core')
+	return get<SystemCore>(`${AUTH_API_BASE}/core`)
 }
 
 let coreOptionsPromise: Promise<RespBase<OptionGroup[]>> | null = null

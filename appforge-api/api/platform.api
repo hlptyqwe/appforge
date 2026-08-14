@@ -15,20 +15,21 @@ type PlatformApplication {
 }
 
 type PlatformVersion {
-	id              int64  `json:"id"`
-	tenantId        int64  `json:"tenantId"`
-	appId           int64  `json:"appId"`
-	versionCode     int64  `json:"versionCode"`
-	versionName     string `json:"versionName"`
-	sourceApkUrl    string `json:"sourceApkUrl,optional"`
-	sourceApkSha256 string `json:"sourceApkSha256,optional"`
-	releaseNotes    string `json:"releaseNotes,optional"`
-	buildConfigJson string `json:"buildConfigJson,optional"`
-	status          int32  `json:"status"`
-	publishedAt     int64  `json:"publishedAt,optional"`
-	createBy        int64  `json:"createBy"`
-	createTime      int64  `json:"createTime"`
-	updateTime      int64  `json:"updateTime"`
+	id                int64  `json:"id"`
+	tenantId          int64  `json:"tenantId"`
+	appId             int64  `json:"appId"`
+	versionCode       int64  `json:"versionCode"`
+	versionName       string `json:"versionName"`
+	sourceApkUrl      string `json:"sourceApkUrl,optional"`
+	sourceApkSha256   string `json:"sourceApkSha256,optional"`
+	sourceApkObjectId int64  `json:"sourceApkObjectId"`
+	releaseNotes      string `json:"releaseNotes,optional"`
+	buildConfigJson   string `json:"buildConfigJson,optional"`
+	status            int32  `json:"status"`
+	publishedAt       int64  `json:"publishedAt,optional"`
+	createBy          int64  `json:"createBy"`
+	createTime        int64  `json:"createTime"`
+	updateTime        int64  `json:"updateTime"`
 }
 
 type PlatformChannel {
@@ -51,7 +52,8 @@ type PlatformSigningConfig {
 	tenantId          int64  `json:"tenantId"`
 	appId             int64  `json:"appId"`
 	name              string `json:"name"`
-	keystoreObjectKey string `json:"keystoreObjectKey"`
+	keystoreObjectKey string `json:"keystoreObjectKey,optional"`
+	keystoreObjectId  int64  `json:"keystoreObjectId"`
 	keyAlias          string `json:"keyAlias"`
 	secretRef         string `json:"secretRef,optional"`
 	status            int64  `json:"status"`
@@ -62,30 +64,33 @@ type PlatformSigningConfig {
 }
 
 type PlatformBuildTask {
-	id              int64  `json:"id"`
-	tenantId        int64  `json:"tenantId"`
-	appId           int64  `json:"appId"`
-	versionId       int64  `json:"versionId"`
-	channelId       int64  `json:"channelId"`
-	signingConfigId int64  `json:"signingConfigId"`
-	channelCode     string `json:"channelCode"`
-	versionCode     int64  `json:"versionCode"`
-	versionName     string `json:"versionName"`
-	status          int32  `json:"status"`
-	builderId       string `json:"builderId,optional"`
-	builderAttempt  int32  `json:"builderAttempt"`
-	priority        int32  `json:"priority"`
-	apkUrl          string `json:"apkUrl,optional"`
-	apkSha256       string `json:"apkSha256,optional"`
-	apkSize         int64  `json:"apkSize"`
-	logUrl          string `json:"logUrl,optional"`
-	errorMessage    string `json:"errorMessage,optional"`
-	queuedAt        int64  `json:"queuedAt"`
-	startTime       int64  `json:"startTime,optional"`
-	finishTime      int64  `json:"finishTime,optional"`
-	createBy        int64  `json:"createBy"`
-	createTime      int64  `json:"createTime"`
-	updateTime      int64  `json:"updateTime"`
+	id                int64  `json:"id"`
+	tenantId          int64  `json:"tenantId"`
+	appId             int64  `json:"appId"`
+	versionId         int64  `json:"versionId"`
+	channelId         int64  `json:"channelId"`
+	signingConfigId   int64  `json:"signingConfigId"`
+	channelCode       string `json:"channelCode"`
+	versionCode       int64  `json:"versionCode"`
+	versionName       string `json:"versionName"`
+	status            int32  `json:"status"`
+	builderId         string `json:"builderId,optional"`
+	builderAttempt    int32  `json:"builderAttempt"`
+	priority          int32  `json:"priority"`
+	apkUrl            string `json:"apkUrl,optional"`
+	apkSha256         string `json:"apkSha256,optional"`
+	apkSize           int64  `json:"apkSize"`
+	logUrl            string `json:"logUrl,optional"`
+	sourceApkObjectId int64  `json:"sourceApkObjectId"`
+	apkObjectId       int64  `json:"apkObjectId"`
+	logObjectId       int64  `json:"logObjectId"`
+	errorMessage      string `json:"errorMessage,optional"`
+	queuedAt          int64  `json:"queuedAt"`
+	startTime         int64  `json:"startTime,optional"`
+	finishTime        int64  `json:"finishTime,optional"`
+	createBy          int64  `json:"createBy"`
+	createTime        int64  `json:"createTime"`
+	updateTime        int64  `json:"updateTime"`
 }
 
 type PlatformApplicationResp {
@@ -148,13 +153,14 @@ type CreatePlatformApplicationReq {
 }
 
 type CreatePlatformVersionReq {
-	appId           int64  `json:"appId"`
-	versionCode     int64  `json:"versionCode"`
-	versionName     string `json:"versionName"`
-	sourceApkUrl    string `json:"sourceApkUrl,optional"`
-	sourceApkSha256 string `json:"sourceApkSha256,optional"`
-	releaseNotes    string `json:"releaseNotes,optional"`
-	buildConfigJson string `json:"buildConfigJson,optional"`
+	appId             int64  `json:"appId"`
+	versionCode       int64  `json:"versionCode"`
+	versionName       string `json:"versionName"`
+	sourceApkUrl      string `json:"sourceApkUrl,optional"`
+	sourceApkSha256   string `json:"sourceApkSha256,optional"`
+	releaseNotes      string `json:"releaseNotes,optional"`
+	buildConfigJson   string `json:"buildConfigJson,optional"`
+	sourceApkObjectId int64  `json:"sourceApkObjectId"`
 }
 
 type CreatePlatformChannelReq {
@@ -166,13 +172,66 @@ type CreatePlatformChannelReq {
 }
 
 type CreatePlatformSigningConfigReq {
-	appId                      int64  `json:"appId"`
-	name                       string `json:"name"`
-	keystoreObjectKey          string `json:"keystoreObjectKey"`
-	keyAlias                   string `json:"keyAlias"`
-	keystorePasswordCiphertext string `json:"keystorePasswordCiphertext"`
-	keyPasswordCiphertext      string `json:"keyPasswordCiphertext"`
-	secretRef                  string `json:"secretRef,optional"`
+	appId            int64  `json:"appId"`
+	name             string `json:"name"`
+	keyAlias         string `json:"keyAlias"`
+	keystorePassword string `json:"keystorePassword,optional"`
+	keyPassword      string `json:"keyPassword,optional"`
+	secretRef        string `json:"secretRef,optional"`
+	keystoreObjectId int64  `json:"keystoreObjectId"`
+}
+
+// 私有对象上传类型：1原始APK，2签名文件。
+type InitiatePlatformUploadReq {
+	appId       int64  `json:"appId,optional"`
+	objectType  int32  `json:"objectType"`
+	fileName    string `json:"fileName"`
+	sizeBytes   int64  `json:"sizeBytes"`
+	contentType string `json:"contentType,optional"`
+}
+
+type PlatformUploadTicket {
+	objectId  int64  `json:"objectId"`
+	uploadUrl string `json:"uploadUrl"`
+	expiresAt int64  `json:"expiresAt"`
+}
+
+type InitiatePlatformUploadResp {
+	RespBase
+	data PlatformUploadTicket `json:"data"`
+}
+
+type PlatformStorageObject {
+	objectId     int64  `json:"objectId"`
+	appId        int64  `json:"appId"`
+	objectType   int32  `json:"objectType"`
+	originalName string `json:"originalName"`
+	sizeBytes    int64  `json:"sizeBytes"`
+	sha256       string `json:"sha256"`
+	status       int32  `json:"status"`
+}
+
+type CompletePlatformUploadReq {
+	id int64 `path:"id"`
+}
+
+type CompletePlatformUploadResp {
+	RespBase
+	data PlatformStorageObject `json:"data"`
+}
+
+type PlatformStorageObjectIdReq {
+	id int64 `path:"id"`
+}
+
+type PlatformStorageDownload {
+	downloadUrl string `json:"downloadUrl"`
+	expiresAt   int64  `json:"expiresAt"`
+}
+
+type PlatformStorageDownloadResp {
+	RespBase
+	data PlatformStorageDownload `json:"data"`
 }
 
 type CreatePlatformBuildTaskReq {
@@ -266,6 +325,18 @@ type PlatformChannelEventReq {
 	metadata    string `json:"metadata,optional"`
 }
 
+type PlatformChannelDownloadReq {
+	channelCode string `path:"channelCode"`
+}
+
+@server (
+	group: platform_public
+)
+service admin {
+	@handler PlatformChannelDownload
+	get /d/:channelCode (PlatformChannelDownloadReq)
+}
+
 @server (
 	prefix: /api
 	group:  platform_public
@@ -279,11 +350,21 @@ service admin {
 }
 
 @server (
-	prefix: /admin/core
-	group:  platform_private
-	jwt:    Jwt
+	prefix:  /admin/core
+	group:   platform_private
+	jwt:     Jwt
+	timeout: 10m
 )
 service admin {
+	@handler InitiatePlatformUpload
+	post /uploads/initiate (InitiatePlatformUploadReq) returns (InitiatePlatformUploadResp)
+
+	@handler CompletePlatformUpload
+	post /uploads/:id/complete (CompletePlatformUploadReq) returns (CompletePlatformUploadResp)
+
+	@handler GetPlatformStorageDownload
+	get /storage/objects/:id/download (PlatformStorageObjectIdReq) returns (PlatformStorageDownloadResp)
+
 	@handler CreatePlatformApplication
 	post /applications (CreatePlatformApplicationReq) returns (PlatformApplicationResp)
 

@@ -130,7 +130,9 @@ func auditModuleAction(permission, path, method string) (string, string) {
 	if obj, act, ok := parsePerm(permission); ok {
 		return obj, act
 	}
-	path = strings.Trim(strings.TrimPrefix(path, "/admin/"), "/")
+	path = strings.TrimPrefix(path, "/admin/")
+	path = strings.TrimPrefix(path, "/agent/")
+	path = strings.Trim(path, "/")
 	module := strings.Split(path, "/")[0]
 	if module == "" {
 		module = "unknown"
@@ -272,10 +274,24 @@ func redactAuditValue(value any) any {
 
 func isAuditSecretKey(key string) bool {
 	normalized := strings.NewReplacer("_", "", "-", "").Replace(strings.ToLower(strings.TrimSpace(key)))
+	// Product-specific fields such as keystorePassword, keyPassword,
+	// tenantPassword and passwordCiphertext must be covered as well as the
+	// generic JSON names. Matching semantic fragments prevents a new password
+	// field from silently becoming audit-log plaintext.
+	for _, fragment := range []string{"password", "privatekey", "ciphertext", "mnemonic"} {
+		if strings.Contains(normalized, fragment) {
+			return true
+		}
+	}
+	for _, suffix := range []string{"token", "secret"} {
+		if strings.HasSuffix(normalized, suffix) {
+			return true
+		}
+	}
 	switch normalized {
-	case "password", "pwd", "paypassword", "token", "accesstoken", "refreshtoken",
+	case "pwd", "token", "accesstoken", "refreshtoken",
 		"authorization", "cookie", "secret", "apikey", "accesskey", "secretkey",
-		"privatekey", "sessionkey", "mnemonic", "googlecode", "otp", "verificationcode":
+		"sessionkey", "googlecode", "otp", "verificationcode":
 		return true
 	default:
 		return false

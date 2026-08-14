@@ -3,6 +3,8 @@
 package config
 
 import (
+	"appforge/common/rpcauth"
+
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
 )
@@ -13,9 +15,14 @@ type Config struct {
 		AccessSecret string
 		AccessExpire int64
 	} `json:"Jwt" yaml:"Jwt"`
-	Audit     AuditConfig
-	SystemRpc zrpc.RpcClientConf
-	CoreRpc   zrpc.RpcClientConf
+	Audit          AuditConfig
+	InternalRpc    rpcauth.Config
+	SystemRpc      zrpc.RpcClientConf
+	CoreRpc        zrpc.RpcClientConf
+	BuilderRpc     zrpc.RpcClientConf
+	SigningSecrets struct {
+		MasterKeyBase64 string
+	} `json:"SigningSecrets" yaml:"SigningSecrets"`
 }
 
 type AuditConfig struct {

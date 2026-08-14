@@ -17,6 +17,9 @@ import {
 import { useAuthStore } from '@/stores/auth'
 import CrudQueryCard from '@/components/common/CrudQueryCard.vue'
 import TenantSelect from '@/components/TenantSelect.vue'
+import { IS_AGENT } from '@/config/environment'
+
+const currentAppScope = IS_AGENT ? 2 : 1
 
 type RoleMenuNode = MenuNode & {
   parentId?: number
@@ -91,7 +94,7 @@ const { pagination, updateFromResponse, resetAndLoad, nextAndLoad, prevAndLoad }
 const { loading, withLoading } = useLoading()
 const { confirm } = useConfirm()
 const { form: queryForm } = useForm({
-	initialData: { keyword: '', enabled: 0 as 0 | 1 | 2, appScope: 1 as number | undefined },
+	initialData: { keyword: '', enabled: 0 as 0 | 1 | 2, appScope: currentAppScope as number | undefined },
 })
 
 const tableData = ref<SysRole[]>([])
@@ -166,7 +169,7 @@ function loadList() {
 function resetQuery() {
   queryForm.keyword = ''
   queryForm.enabled = 0
-	queryForm.appScope = 1
+	queryForm.appScope = currentAppScope
   loadList()
 }
 
@@ -189,7 +192,7 @@ const { form: editForm } = useForm({
     code: '',
     remark: '',
     enabled: 1 as 1 | 2,
-    appScope: 1,
+    appScope: currentAppScope,
   },
 })
 const editIsUpdate = computed(() => editForm.id > 0)
@@ -202,7 +205,7 @@ function openCreate() {
   editForm.code = ''
   editForm.remark = ''
   editForm.enabled = 1
-  editForm.appScope = 1
+  editForm.appScope = currentAppScope
   editVisible.value = true
 }
 function openUpdate(row: SysRole) {
@@ -213,7 +216,7 @@ function openUpdate(row: SysRole) {
   editForm.code = row.code
   editForm.remark = row.remark || ''
   editForm.enabled = row.enabled === 2 ? 2 : 1
-  editForm.appScope = row.appScope || 1
+  editForm.appScope = row.appScope || currentAppScope
   editVisible.value = true
 }
 

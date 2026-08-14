@@ -8,9 +8,9 @@ import (
 
 	"appforge/proto/system"
 	"appforge/services/system/internal/svc"
-	"appforge/services/system/models"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -50,30 +50,73 @@ func (l *SysTenantCreateLogic) SysTenantCreate(in *system.SysTenantCreateReq) (*
 	if code == "" {
 		code = fmt.Sprintf("tenant_%d", now)
 	}
-	tenant := &models.SysTenant{
-		TenantCode: code, TenantName: strings.TrimSpace(in.GetTenantName()), Enabled: int64(in.GetEnabled()),
-		ExpireTime: in.GetExpireTime(), ContactName: nullText(in.GetContactName()), ContactPhone: nullText(in.GetContactPhone()),
-		Remark: nullText(in.GetRemark()), CreateBy: nullText(fmt.Sprintf("%d", actorID(l.ctx))), CreateTimes: now, UpdateTimes: now,
+	enabled := int64(in.GetEnabled())
+	if enabled == 0 {
+		enabled = 1
 	}
-	if tenant.Enabled == 0 {
-		tenant.Enabled = 1
-	}
-	result, err := l.svcCtx.TenantMode.Insert(l.ctx, tenant)
+	actor := actorID(l.ctx)
+	tenantName := strings.TrimSpace(in.GetTenantName())
+	username := strings.TrimSpace(in.GetUsername())
+	appScope := int64(system.ApplicationScope_APPLICATION_SCOPE_AGENT)
+	err = l.svcCtx.DB.TransactCtx(l.ctx, func(txCtx context.Context, session sqlx.Session) error {
+		tenantResult, execErr := session.ExecCtx(txCtx, `INSERT INTO sys_tenant
+(tenant_code, tenant_name, enabled, expire_time, contact_name, contact_phone, remark, create_by, create_times, update_by, update_times)
+VALUES (?, ?, ?, ?, NULLIF(?, ''), NULLIF(?, ''), NULLIF(?, ''), ?, ?, ?, ?)`,
+			code, tenantName, enabled, in.GetExpireTime(), strings.TrimSpace(in.GetContactName()),
+			strings.TrimSpace(in.GetContactPhone()), strings.TrimSpace(in.GetRemark()), fmt.Sprintf("%d", actor), now,
+			fmt.Sprintf("%d", actor), now)
+		if execErr != nil {
+			return fmt.Errorf("create tenant: %w", execErr)
+		}
+		tenantID, execErr := tenantResult.LastInsertId()
+		if execErr != nil {
+			return fmt.Errorf("resolve created tenant id: %w", execErr)
+		}
+		if tenantID <= 0 {
+			return fmt.Errorf("resolve created tenant id: non-positive id")
+		}
+
+		ownerResult, execErr := session.ExecCtx(txCtx, `INSERT INTO sys_user
+(tenant_id, app_scope, user_type, is_owner, username, password, nickname, avatar, enabled, google_secret,
+ google_enabled, perms_ver, last_login_ip, last_login_at, create_by, create_times, update_times)
+VALUES (?, ?, ?, 1, ?, ?, ?, '', 1, '', 2, 1, '', 0, ?, ?, ?)`,
+			tenantID, appScope, int64(system.UserType_USER_TYPE_TENANT_OWNER), username, string(password), tenantName, actor, now, now)
+		if execErr != nil {
+			return fmt.Errorf("create tenant owner: %w", execErr)
+		}
+		ownerID, execErr := ownerResult.LastInsertId()
+		if execErr != nil {
+			return fmt.Errorf("resolve tenant owner id: %w", execErr)
+		}
+		if ownerID <= 0 {
+			return fmt.Errorf("resolve tenant owner id: non-positive id")
+		}
+
+		roleResult, execErr := session.ExecCtx(txCtx, `INSERT INTO sys_role
+(tenant_id, app_scope, name, code, enabled, remark, create_times, update_times)
+VALUES (?, ?, '所有者', 'owner', 1, '代理端租户所有者', ?, ?)`, tenantID, appScope, now, now)
+		if execErr != nil {
+			return fmt.Errorf("create tenant owner role: %w", execErr)
+		}
+		roleID, execErr := roleResult.LastInsertId()
+		if execErr != nil {
+			return fmt.Errorf("resolve tenant owner role id: %w", execErr)
+		}
+		if roleID <= 0 {
+			return fmt.Errorf("resolve tenant owner role id: non-positive id")
+		}
+		if _, execErr = session.ExecCtx(txCtx,
+			`INSERT INTO sys_user_role (tenant_id, user_id, role_id) VALUES (?, ?, ?)`, tenantID, ownerID, roleID); execErr != nil {
+			return fmt.Errorf("assign tenant owner role: %w", execErr)
+		}
+		if _, execErr = session.ExecCtx(txCtx, `INSERT INTO sys_role_menu (tenant_id, role_id, menu_id)
+SELECT ?, ?, id FROM sys_menu WHERE app_scope = ?`, tenantID, roleID, appScope); execErr != nil {
+			return fmt.Errorf("grant tenant owner permissions: %w", execErr)
+		}
+		return nil
+	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "create tenant failed: %v", err)
-	}
-	tenant.Id, err = result.LastInsertId()
-	if err != nil || tenant.Id <= 0 {
-		return nil, status.Errorf(codes.Internal, "resolve created tenant id failed: %v", err)
-	}
-	owner := &models.SysUser{
-		TenantId: tenant.Id, AppScope: int64(system.ApplicationScope_APPLICATION_SCOPE_ADMIN),
-		UserType: int64(system.UserType_USER_TYPE_TENANT_OWNER), IsOwner: 1,
-		Username: strings.TrimSpace(in.GetUsername()), Password: string(password), Nickname: tenant.TenantName,
-		Enabled: 1, GoogleEnabled: 2, PermsVer: 1, CreateBy: actorID(l.ctx), CreateTimes: now, UpdateTimes: now,
-	}
-	if _, err := l.svcCtx.UserModel.Insert(l.ctx, owner); err != nil {
-		return nil, status.Errorf(codes.Internal, "create tenant owner failed: %v", err)
+		return nil, status.Errorf(codes.Internal, "create tenant transaction failed: %v", err)
 	}
 	return &system.RespBase{Base: responseBase()}, nil
 }

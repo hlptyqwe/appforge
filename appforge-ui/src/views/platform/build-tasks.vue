@@ -20,7 +20,8 @@ import { platformService } from '@/services'
       { prop: 'channelCode', label: '渠道' },
       { prop: 'status', label: '状态' },
       { prop: 'builderId', label: '构建器' },
-      { prop: 'apkUrl', label: 'APK 地址' },
+      { prop: 'apkObjectId', label: 'APK 下载', downloadObject: true },
+      { prop: 'logObjectId', label: '构建日志', downloadObject: true },
       { prop: 'errorMessage', label: '错误信息' },
     ]"
     :fields="[

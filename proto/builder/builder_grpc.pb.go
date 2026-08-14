@@ -19,17 +19,20 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Builder_ClaimBuildTask_FullMethodName      = "/builder.Builder/ClaimBuildTask"
-	Builder_HeartbeatBuildTask_FullMethodName  = "/builder.Builder/HeartbeatBuildTask"
-	Builder_ReportBuildProgress_FullMethodName = "/builder.Builder/ReportBuildProgress"
-	Builder_CompleteBuildTask_FullMethodName   = "/builder.Builder/CompleteBuildTask"
-	Builder_FailBuildTask_FullMethodName       = "/builder.Builder/FailBuildTask"
+	Builder_ValidateSigningMaterial_FullMethodName = "/builder.Builder/ValidateSigningMaterial"
+	Builder_ClaimBuildTask_FullMethodName          = "/builder.Builder/ClaimBuildTask"
+	Builder_HeartbeatBuildTask_FullMethodName      = "/builder.Builder/HeartbeatBuildTask"
+	Builder_ReportBuildProgress_FullMethodName     = "/builder.Builder/ReportBuildProgress"
+	Builder_CompleteBuildTask_FullMethodName       = "/builder.Builder/CompleteBuildTask"
+	Builder_FailBuildTask_FullMethodName           = "/builder.Builder/FailBuildTask"
 )
 
 // BuilderClient is the client API for Builder service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BuilderClient interface {
+	// 使用实际签名工具校验签名材料，成功后方可创建可用签名配置。
+	ValidateSigningMaterial(ctx context.Context, in *ValidateSigningMaterialReq, opts ...grpc.CallOption) (*RespBase, error)
 	ClaimBuildTask(ctx context.Context, in *ClaimBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error)
 	HeartbeatBuildTask(ctx context.Context, in *HeartbeatBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
 	ReportBuildProgress(ctx context.Context, in *ReportBuildProgressReq, opts ...grpc.CallOption) (*RespBase, error)
@@ -43,6 +46,16 @@ type builderClient struct {
 
 func NewBuilderClient(cc grpc.ClientConnInterface) BuilderClient {
 	return &builderClient{cc}
+}
+
+func (c *builderClient) ValidateSigningMaterial(ctx context.Context, in *ValidateSigningMaterialReq, opts ...grpc.CallOption) (*RespBase, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RespBase)
+	err := c.cc.Invoke(ctx, Builder_ValidateSigningMaterial_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *builderClient) ClaimBuildTask(ctx context.Context, in *ClaimBuildTaskReq, opts ...grpc.CallOption) (*BuildTaskResp, error) {
@@ -99,6 +112,8 @@ func (c *builderClient) FailBuildTask(ctx context.Context, in *FailBuildTaskReq,
 // All implementations must embed UnimplementedBuilderServer
 // for forward compatibility.
 type BuilderServer interface {
+	// 使用实际签名工具校验签名材料，成功后方可创建可用签名配置。
+	ValidateSigningMaterial(context.Context, *ValidateSigningMaterialReq) (*RespBase, error)
 	ClaimBuildTask(context.Context, *ClaimBuildTaskReq) (*BuildTaskResp, error)
 	HeartbeatBuildTask(context.Context, *HeartbeatBuildTaskReq) (*RespBase, error)
 	ReportBuildProgress(context.Context, *ReportBuildProgressReq) (*RespBase, error)
@@ -114,6 +129,9 @@ type BuilderServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBuilderServer struct{}
 
+func (UnimplementedBuilderServer) ValidateSigningMaterial(context.Context, *ValidateSigningMaterialReq) (*RespBase, error) {
+	return nil, status.Error(codes.Unimplemented, "method ValidateSigningMaterial not implemented")
+}
 func (UnimplementedBuilderServer) ClaimBuildTask(context.Context, *ClaimBuildTaskReq) (*BuildTaskResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ClaimBuildTask not implemented")
 }
@@ -148,6 +166,24 @@ func RegisterBuilderServer(s grpc.ServiceRegistrar, srv BuilderServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Builder_ServiceDesc, srv)
+}
+
+func _Builder_ValidateSigningMaterial_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateSigningMaterialReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BuilderServer).ValidateSigningMaterial(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Builder_ValidateSigningMaterial_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BuilderServer).ValidateSigningMaterial(ctx, req.(*ValidateSigningMaterialReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Builder_ClaimBuildTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -247,6 +283,10 @@ var Builder_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "builder.Builder",
 	HandlerType: (*BuilderServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ValidateSigningMaterial",
+			Handler:    _Builder_ValidateSigningMaterial_Handler,
+		},
 		{
 			MethodName: "ClaimBuildTask",
 			Handler:    _Builder_ClaimBuildTask_Handler,

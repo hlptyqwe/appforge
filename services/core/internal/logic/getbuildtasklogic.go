@@ -5,6 +5,7 @@ import (
 
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
+	"appforge/services/core/models"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc/codes"
@@ -36,7 +37,12 @@ func (l *GetBuildTaskLogic) GetBuildTask(in *core.BuildTaskIdReq) (*core.BuildTa
 	if err := requirePositive(in.Id, "id"); err != nil {
 		return nil, err
 	}
-	item, err := l.svcCtx.BuildTaskModel.FindOne(l.ctx, in.Id)
+	// Worker updates use guarded SQL predicates (owner, attempt and lease), which
+	// cannot be expressed through the generated whole-row cache model. Read the
+	// mutable task state from MySQL so the API never serves a stale PENDING
+	// snapshot after a worker transition.
+	var item models.TBuildTask
+	err = l.svcCtx.DB.QueryRowCtx(l.ctx, &item, buildTaskSelect+` WHERE id = ? LIMIT 1`, in.Id)
 	if err != nil {
 		return nil, notFoundOrInternal(err, "build task")
 	}
@@ -44,5 +50,5 @@ func (l *GetBuildTaskLogic) GetBuildTask(in *core.BuildTaskIdReq) (*core.BuildTa
 		return nil, err
 	}
 
-	return &core.BuildTaskResp{Base: okBase(), Data: mapBuildTask(item)}, nil
+	return &core.BuildTaskResp{Base: okBase(), Data: mapBuildTask(&item)}, nil
 }
