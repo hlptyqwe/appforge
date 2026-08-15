@@ -173,6 +173,54 @@ export type PlatformLocalAgentRegistration = {
   expiresAt: number
 }
 
+export type PlatformDeploymentComponent = {
+  code: string
+  name: string
+  status: 'healthy' | 'degraded' | 'unhealthy' | 'checking'
+  message?: string
+  checkedAt: number
+}
+
+export type PlatformDeploymentMigration = {
+  version: string
+  description: string
+}
+
+export type PlatformDeploymentLicense = {
+  enabled: boolean
+  status: 'valid' | 'invalid' | 'not_required'
+  licenseId?: string
+  customer?: string
+  deploymentId?: string
+  deploymentModes?: string[]
+  features?: string[]
+  notBefore?: number
+  notAfter?: number
+  sequence?: number
+  maxTenants?: number
+  maxBuilders?: number
+  fingerprint?: string
+}
+
+export type PlatformDeploymentStatus = {
+  deploymentId: string
+  deploymentMode: string
+  productVersion: string
+  targetSchemaVersion: string
+  actualSchemaVersion: string
+  schemaCompatible: boolean
+  maxVersionSkew: number
+  agentProtocolCurrent: number
+  agentProtocolMinimum: number
+  upgradeReady: boolean
+  diagnosticsCommand: string
+  migrationCount: number
+  recentMigrations: PlatformDeploymentMigration[]
+  components: PlatformDeploymentComponent[]
+  license: PlatformDeploymentLicense
+  checkedAt: number
+}
+
 export type PlatformBuildConcurrencyPolicy = {
   id: number
   tenantId: number
@@ -680,6 +728,7 @@ export class PlatformService {
   createLocalAgentRegistration = api.createLocalAgentRegistration
   drainLocalAgent = api.drainLocalAgent
   revokeLocalAgent = api.revokeLocalAgent
+  getDeploymentStatus = api.getDeploymentStatus
   getChannelStats = api.getChannelStats
   getStorageDownload = api.getStorageDownload
   listBillingPlans = api.listBillingPlans

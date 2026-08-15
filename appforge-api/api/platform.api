@@ -1489,6 +1489,63 @@ type CreatePlatformBillingCheckoutReq {
 	planId int64 `json:"planId"`
 }
 
+// V7 企业部署组件健康状态。
+type PlatformDeploymentComponent {
+	code      string `json:"code"`
+	name      string `json:"name"`
+	status    string `json:"status"`
+	message   string `json:"message,optional"`
+	checkedAt int64  `json:"checkedAt"`
+}
+
+// V7 企业部署数据库迁移记录。
+type PlatformDeploymentMigration {
+	version     string `json:"version"`
+	description string `json:"description"`
+}
+
+// V7 离线企业许可证公开状态，不包含密钥和本地路径。
+type PlatformDeploymentLicense {
+	enabled         bool     `json:"enabled"`
+	status          string   `json:"status"`
+	licenseId       string   `json:"licenseId,optional"`
+	customer        string   `json:"customer,optional"`
+	deploymentId    string   `json:"deploymentId,optional"`
+	deploymentModes []string `json:"deploymentModes,optional"`
+	features        []string `json:"features,optional"`
+	notBefore       int64    `json:"notBefore,optional"`
+	notAfter        int64    `json:"notAfter,optional"`
+	sequence        uint64   `json:"sequence,optional"`
+	maxTenants      int64    `json:"maxTenants,optional"`
+	maxBuilders     int64    `json:"maxBuilders,optional"`
+	fingerprint     string   `json:"fingerprint,optional"`
+}
+
+// V7 企业部署、升级和诊断只读状态。
+type PlatformDeploymentStatus {
+	deploymentId         string                        `json:"deploymentId"`
+	deploymentMode       string                        `json:"deploymentMode"`
+	productVersion       string                        `json:"productVersion"`
+	targetSchemaVersion  string                        `json:"targetSchemaVersion"`
+	actualSchemaVersion  string                        `json:"actualSchemaVersion"`
+	schemaCompatible     bool                          `json:"schemaCompatible"`
+	maxVersionSkew       int32                         `json:"maxVersionSkew"`
+	agentProtocolCurrent int32                         `json:"agentProtocolCurrent"`
+	agentProtocolMinimum int32                         `json:"agentProtocolMinimum"`
+	upgradeReady         bool                          `json:"upgradeReady"`
+	diagnosticsCommand   string                        `json:"diagnosticsCommand"`
+	migrationCount       int64                         `json:"migrationCount"`
+	recentMigrations     []PlatformDeploymentMigration `json:"recentMigrations"`
+	components           []PlatformDeploymentComponent `json:"components"`
+	license              PlatformDeploymentLicense     `json:"license"`
+	checkedAt            int64                         `json:"checkedAt"`
+}
+
+type PlatformDeploymentStatusResp {
+	RespBase
+	data PlatformDeploymentStatus `json:"data"`
+}
+
 // V7 Local Builder Agent管理模型。
 type PlatformLocalAgentCapability {
 	capabilityKey   string `json:"capabilityKey"`
@@ -1895,6 +1952,9 @@ service admin {
 
 	@handler RevokePlatformLocalAgent
 	post /enterprise/local-agents/:id/revoke (RevokePlatformLocalAgentReq) returns (PlatformLocalAgentResp)
+
+	@handler GetPlatformDeploymentStatus
+	get /enterprise/deployment returns (PlatformDeploymentStatusResp)
 
 	@handler GetPlatformChannelStats
 	get /channel-stats (GetPlatformChannelStatsReq) returns (PlatformChannelStatsResp)

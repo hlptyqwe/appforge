@@ -14,89 +14,91 @@ import (
 )
 
 type (
-	AssignUserRolesReq       = system.AssignUserRolesReq
-	ChangeUserStatusReq      = system.ChangeUserStatusReq
-	CreateOpLogReq           = system.CreateOpLogReq
-	Empty                    = system.Empty
-	Google2FABindReq         = system.Google2FABindReq
-	Google2FADisableReq      = system.Google2FADisableReq
-	Google2FAEnableReq       = system.Google2FAEnableReq
-	Google2FAInitData        = system.Google2FAInitData
-	Google2FAInitReq         = system.Google2FAInitReq
-	Google2FAInitResp        = system.Google2FAInitResp
-	Google2FAResetReq        = system.Google2FAResetReq
-	LoginData                = system.LoginData
-	LoginLogItem             = system.LoginLogItem
-	LoginLogListReq          = system.LoginLogListReq
-	LoginLogListResp         = system.LoginLogListResp
-	LoginReq                 = system.LoginReq
-	LoginResp                = system.LoginResp
-	LoginUserPermsReq        = system.LoginUserPermsReq
-	LoginUserPermsResp       = system.LoginUserPermsResp
-	OpLogItem                = system.OpLogItem
-	OpLogListReq             = system.OpLogListReq
-	OpLogListResp            = system.OpLogListResp
-	ProfileData              = system.ProfileData
-	ProfileResp              = system.ProfileResp
-	ProfileUser              = system.ProfileUser
-	ResetUserPwdReq          = system.ResetUserPwdReq
-	ResolveTenantDomainReq   = system.ResolveTenantDomainReq
-	ResolveTenantDomainResp  = system.ResolveTenantDomainResp
-	RespBase                 = system.RespBase
-	SysConfigByKeysReq       = system.SysConfigByKeysReq
-	SysConfigByKeysResp      = system.SysConfigByKeysResp
-	SysConfigCreateReq       = system.SysConfigCreateReq
-	SysConfigDeleteReq       = system.SysConfigDeleteReq
-	SysConfigDetailReq       = system.SysConfigDetailReq
-	SysConfigDetailResp      = system.SysConfigDetailResp
-	SysConfigItem            = system.SysConfigItem
-	SysConfigListReq         = system.SysConfigListReq
-	SysConfigListResp        = system.SysConfigListResp
-	SysConfigUpdateReq       = system.SysConfigUpdateReq
-	SysMenuCreateReq         = system.SysMenuCreateReq
-	SysMenuDeleteReq         = system.SysMenuDeleteReq
-	SysMenuItem              = system.SysMenuItem
-	SysMenuListReq           = system.SysMenuListReq
-	SysMenuListResp          = system.SysMenuListResp
-	SysMenuNode              = system.SysMenuNode
-	SysMenuTreeReq           = system.SysMenuTreeReq
-	SysMenuTreeResp          = system.SysMenuTreeResp
-	SysMenuUpdateReq         = system.SysMenuUpdateReq
-	SysPermItem              = system.SysPermItem
-	SysPermListResp          = system.SysPermListResp
-	SysRoleCreateReq         = system.SysRoleCreateReq
-	SysRoleDeleteReq         = system.SysRoleDeleteReq
-	SysRoleGrantDetailData   = system.SysRoleGrantDetailData
-	SysRoleGrantDetailReq    = system.SysRoleGrantDetailReq
-	SysRoleGrantDetailResp   = system.SysRoleGrantDetailResp
-	SysRoleGrantReq          = system.SysRoleGrantReq
-	SysRoleItem              = system.SysRoleItem
-	SysRoleListReq           = system.SysRoleListReq
-	SysRoleListResp          = system.SysRoleListResp
-	SysRoleUpdateReq         = system.SysRoleUpdateReq
-	SysTenantCreateReq       = system.SysTenantCreateReq
-	SysTenantDeleteReq       = system.SysTenantDeleteReq
-	SysTenantDetailReq       = system.SysTenantDetailReq
-	SysTenantDetailResp      = system.SysTenantDetailResp
-	SysTenantDomainCreateReq = system.SysTenantDomainCreateReq
-	SysTenantDomainDeleteReq = system.SysTenantDomainDeleteReq
-	SysTenantDomainItem      = system.SysTenantDomainItem
-	SysTenantDomainListReq   = system.SysTenantDomainListReq
-	SysTenantDomainListResp  = system.SysTenantDomainListResp
-	SysTenantDomainUpdateReq = system.SysTenantDomainUpdateReq
-	SysTenantItem            = system.SysTenantItem
-	SysTenantListReq         = system.SysTenantListReq
-	SysTenantListResp        = system.SysTenantListResp
-	SysTenantUpdateReq       = system.SysTenantUpdateReq
-	SysUserCreateReq         = system.SysUserCreateReq
-	SysUserDeleteReq         = system.SysUserDeleteReq
-	SysUserDetailReq         = system.SysUserDetailReq
-	SysUserDetailResp        = system.SysUserDetailResp
-	SysUserItem              = system.SysUserItem
-	SysUserListReq           = system.SysUserListReq
-	SysUserListResp          = system.SysUserListResp
-	SysUserUpdateReq         = system.SysUserUpdateReq
-	UpdateProfileReq         = system.UpdateProfileReq
+	AssignUserRolesReq           = system.AssignUserRolesReq
+	ChangeUserStatusReq          = system.ChangeUserStatusReq
+	CreateOpLogReq               = system.CreateOpLogReq
+	DeploymentDatabaseStatusResp = system.DeploymentDatabaseStatusResp
+	DeploymentMigrationItem      = system.DeploymentMigrationItem
+	Empty                        = system.Empty
+	Google2FABindReq             = system.Google2FABindReq
+	Google2FADisableReq          = system.Google2FADisableReq
+	Google2FAEnableReq           = system.Google2FAEnableReq
+	Google2FAInitData            = system.Google2FAInitData
+	Google2FAInitReq             = system.Google2FAInitReq
+	Google2FAInitResp            = system.Google2FAInitResp
+	Google2FAResetReq            = system.Google2FAResetReq
+	LoginData                    = system.LoginData
+	LoginLogItem                 = system.LoginLogItem
+	LoginLogListReq              = system.LoginLogListReq
+	LoginLogListResp             = system.LoginLogListResp
+	LoginReq                     = system.LoginReq
+	LoginResp                    = system.LoginResp
+	LoginUserPermsReq            = system.LoginUserPermsReq
+	LoginUserPermsResp           = system.LoginUserPermsResp
+	OpLogItem                    = system.OpLogItem
+	OpLogListReq                 = system.OpLogListReq
+	OpLogListResp                = system.OpLogListResp
+	ProfileData                  = system.ProfileData
+	ProfileResp                  = system.ProfileResp
+	ProfileUser                  = system.ProfileUser
+	ResetUserPwdReq              = system.ResetUserPwdReq
+	ResolveTenantDomainReq       = system.ResolveTenantDomainReq
+	ResolveTenantDomainResp      = system.ResolveTenantDomainResp
+	RespBase                     = system.RespBase
+	SysConfigByKeysReq           = system.SysConfigByKeysReq
+	SysConfigByKeysResp          = system.SysConfigByKeysResp
+	SysConfigCreateReq           = system.SysConfigCreateReq
+	SysConfigDeleteReq           = system.SysConfigDeleteReq
+	SysConfigDetailReq           = system.SysConfigDetailReq
+	SysConfigDetailResp          = system.SysConfigDetailResp
+	SysConfigItem                = system.SysConfigItem
+	SysConfigListReq             = system.SysConfigListReq
+	SysConfigListResp            = system.SysConfigListResp
+	SysConfigUpdateReq           = system.SysConfigUpdateReq
+	SysMenuCreateReq             = system.SysMenuCreateReq
+	SysMenuDeleteReq             = system.SysMenuDeleteReq
+	SysMenuItem                  = system.SysMenuItem
+	SysMenuListReq               = system.SysMenuListReq
+	SysMenuListResp              = system.SysMenuListResp
+	SysMenuNode                  = system.SysMenuNode
+	SysMenuTreeReq               = system.SysMenuTreeReq
+	SysMenuTreeResp              = system.SysMenuTreeResp
+	SysMenuUpdateReq             = system.SysMenuUpdateReq
+	SysPermItem                  = system.SysPermItem
+	SysPermListResp              = system.SysPermListResp
+	SysRoleCreateReq             = system.SysRoleCreateReq
+	SysRoleDeleteReq             = system.SysRoleDeleteReq
+	SysRoleGrantDetailData       = system.SysRoleGrantDetailData
+	SysRoleGrantDetailReq        = system.SysRoleGrantDetailReq
+	SysRoleGrantDetailResp       = system.SysRoleGrantDetailResp
+	SysRoleGrantReq              = system.SysRoleGrantReq
+	SysRoleItem                  = system.SysRoleItem
+	SysRoleListReq               = system.SysRoleListReq
+	SysRoleListResp              = system.SysRoleListResp
+	SysRoleUpdateReq             = system.SysRoleUpdateReq
+	SysTenantCreateReq           = system.SysTenantCreateReq
+	SysTenantDeleteReq           = system.SysTenantDeleteReq
+	SysTenantDetailReq           = system.SysTenantDetailReq
+	SysTenantDetailResp          = system.SysTenantDetailResp
+	SysTenantDomainCreateReq     = system.SysTenantDomainCreateReq
+	SysTenantDomainDeleteReq     = system.SysTenantDomainDeleteReq
+	SysTenantDomainItem          = system.SysTenantDomainItem
+	SysTenantDomainListReq       = system.SysTenantDomainListReq
+	SysTenantDomainListResp      = system.SysTenantDomainListResp
+	SysTenantDomainUpdateReq     = system.SysTenantDomainUpdateReq
+	SysTenantItem                = system.SysTenantItem
+	SysTenantListReq             = system.SysTenantListReq
+	SysTenantListResp            = system.SysTenantListResp
+	SysTenantUpdateReq           = system.SysTenantUpdateReq
+	SysUserCreateReq             = system.SysUserCreateReq
+	SysUserDeleteReq             = system.SysUserDeleteReq
+	SysUserDetailReq             = system.SysUserDetailReq
+	SysUserDetailResp            = system.SysUserDetailResp
+	SysUserItem                  = system.SysUserItem
+	SysUserListReq               = system.SysUserListReq
+	SysUserListResp              = system.SysUserListResp
+	SysUserUpdateReq             = system.SysUserUpdateReq
+	UpdateProfileReq             = system.UpdateProfileReq
 
 	Admin interface {
 		Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
@@ -145,6 +147,8 @@ type (
 		SysTenantDomainCreate(ctx context.Context, in *SysTenantDomainCreateReq, opts ...grpc.CallOption) (*RespBase, error)
 		SysTenantDomainUpdate(ctx context.Context, in *SysTenantDomainUpdateReq, opts ...grpc.CallOption) (*RespBase, error)
 		SysTenantDomainDelete(ctx context.Context, in *SysTenantDomainDeleteReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 查询数据库实际迁移状态，供企业部署只读诊断页面使用。
+		GetDeploymentDatabaseStatus(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeploymentDatabaseStatusResp, error)
 	}
 
 	defaultAdmin struct {
@@ -386,4 +390,10 @@ func (m *defaultAdmin) SysTenantDomainUpdate(ctx context.Context, in *SysTenantD
 func (m *defaultAdmin) SysTenantDomainDelete(ctx context.Context, in *SysTenantDomainDeleteReq, opts ...grpc.CallOption) (*RespBase, error) {
 	client := system.NewAdminClient(m.cli.Conn())
 	return client.SysTenantDomainDelete(ctx, in, opts...)
+}
+
+// 查询数据库实际迁移状态，供企业部署只读诊断页面使用。
+func (m *defaultAdmin) GetDeploymentDatabaseStatus(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeploymentDatabaseStatusResp, error) {
+	client := system.NewAdminClient(m.cli.Conn())
+	return client.GetDeploymentDatabaseStatus(ctx, in, opts...)
 }

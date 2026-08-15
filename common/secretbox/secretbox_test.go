@@ -33,12 +33,14 @@ func TestOpenRejectsTampering(t *testing.T) {
 	key := base64.StdEncoding.EncodeToString([]byte("0123456789abcdef0123456789abcdef"))
 	box, _ := New(key)
 	sealed, _ := box.Seal("secret")
-	last := sealed[len(sealed)-1]
-	replacement := byte('A')
-	if last == replacement {
-		replacement = 'B'
+	parts := strings.Split(sealed, ".")
+	ciphertext, err := base64.RawURLEncoding.DecodeString(parts[2])
+	if err != nil || len(ciphertext) == 0 {
+		t.Fatalf("decode sealed ciphertext: %v", err)
 	}
-	sealed = sealed[:len(sealed)-1] + string(replacement)
+	ciphertext[len(ciphertext)/2] ^= 0x01
+	parts[2] = base64.RawURLEncoding.EncodeToString(ciphertext)
+	sealed = strings.Join(parts, ".")
 	if _, err := box.Open(sealed); err == nil {
 		t.Fatal("Open() accepted tampered ciphertext")
 	}

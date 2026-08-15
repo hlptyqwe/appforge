@@ -26,6 +26,8 @@ type Config struct {
 	CACertificate   string        `json:"CACertificate" yaml:"CACertificate"`
 	Timeout         time.Duration `json:"Timeout" yaml:"Timeout"`
 	QueueSize       int           `json:"QueueSize" yaml:"QueueSize"`
+	MaxAttempts     int           `json:"MaxAttempts" yaml:"MaxAttempts"`
+	RetryBackoff    time.Duration `json:"RetryBackoff" yaml:"RetryBackoff"`
 	AllowHTTP       bool          `json:"AllowHTTP" yaml:"AllowHTTP"`
 }
 
@@ -49,6 +51,7 @@ type Exporter struct {
 	client  *http.Client
 	queue   chan Event
 	dropped atomic.Uint64
+	failed  atomic.Uint64
 }
 
 func New(config Config) (*Exporter, error) {
@@ -64,6 +67,12 @@ func New(config Config) (*Exporter, error) {
 	}
 	if config.Timeout <= 0 {
 		config.Timeout = 10 * time.Second
+	}
+	if config.MaxAttempts <= 0 || config.MaxAttempts > 20 {
+		config.MaxAttempts = 5
+	}
+	if config.RetryBackoff <= 0 {
+		config.RetryBackoff = 500 * time.Millisecond
 	}
 	tlsConfig := &tls.Config{MinVersion: tls.VersionTLS12}
 	if strings.TrimSpace(config.CACertificate) != "" {
@@ -94,7 +103,9 @@ func (exporter *Exporter) Start(ctx context.Context) {
 			case <-ctx.Done():
 				return
 			case event := <-exporter.queue:
-				_ = exporter.send(ctx, event)
+				if exporter.sendWithRetry(ctx, event) != nil {
+					exporter.failed.Add(1)
+				}
 			}
 		}
 	}()
@@ -120,6 +131,35 @@ func (exporter *Exporter) Dropped() uint64 {
 		return 0
 	}
 	return exporter.dropped.Load()
+}
+
+// Failed returns events that exhausted the configured delivery attempts.
+func (exporter *Exporter) Failed() uint64 {
+	if exporter == nil {
+		return 0
+	}
+	return exporter.failed.Load()
+}
+
+func (exporter *Exporter) sendWithRetry(ctx context.Context, event Event) error {
+	var lastErr error
+	for attempt := 1; attempt <= exporter.config.MaxAttempts; attempt++ {
+		if lastErr = exporter.send(ctx, event); lastErr == nil {
+			return nil
+		}
+		if attempt == exporter.config.MaxAttempts {
+			break
+		}
+		delay := exporter.config.RetryBackoff * time.Duration(1<<min(attempt-1, 6))
+		timer := time.NewTimer(delay)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return ctx.Err()
+		case <-timer.C:
+		}
+	}
+	return lastErr
 }
 
 func (exporter *Exporter) send(ctx context.Context, event Event) error {

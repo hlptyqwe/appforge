@@ -74,6 +74,7 @@
       "reqenc",
       "secretbox",
       "secretprovider",
+      "siem",
       "sqlc",
       "sqlx",
       "storepass",

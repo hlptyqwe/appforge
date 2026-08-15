@@ -67,6 +67,11 @@ spec:
             - {name: APPFORGE_SIEM_ENDPOINT, value: {{ $root.Values.observability.siemWebhook | quote }}}
             - {name: APPFORGE_SIEM_TOKEN_FILE, value: /etc/appforge/siem/token}
             - {name: APPFORGE_SIEM_CA_FILE, value: /etc/appforge/siem/ca.crt}
+            - {name: APPFORGE_DEPLOYMENT_ID, value: {{ $root.Values.offlineLicense.deploymentId | quote }}}
+            - {name: APPFORGE_DEPLOYMENT_MODE, value: {{ $root.Values.global.deploymentMode | quote }}}
+            - {name: APPFORGE_VERSION, value: {{ $root.Values.image.tag | quote }}}
+            - {name: APPFORGE_SCHEMA_VERSION, value: {{ $root.Values.upgrade.schemaVersion | quote }}}
+            - {name: APPFORGE_MAX_VERSION_SKEW, value: {{ $root.Values.upgrade.maxVersionSkew | quote }}}
           {{- end }}
           {{- if gt ($component.port | int) 0 }}
           ports:

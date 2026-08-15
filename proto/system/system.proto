@@ -601,6 +601,21 @@ message ResolveTenantDomainResp {
   string target_origin = 3;
 }
 
+// 企业部署数据库迁移记录。
+message DeploymentMigrationItem {
+  string version = 1; // 迁移版本标识
+  string description = 2; // 迁移中文说明
+}
+
+// 企业部署数据库状态响应。
+message DeploymentDatabaseStatusResp {
+  common.RespBase base = 1; // 通用响应
+  string latest_schema_version = 2; // 数据库中最新迁移版本
+  int64 migration_count = 3; // 已执行迁移总数
+  repeated DeploymentMigrationItem recent_migrations = 4; // 最近十条迁移记录
+  int64 checked_at = 5; // 实际查询完成时间，Unix毫秒
+}
+
 //////////////////////
 // Service
 //////////////////////
@@ -651,6 +666,8 @@ service Admin {
   rpc SysTenantDomainCreate(SysTenantDomainCreateReq) returns (RespBase);
   rpc SysTenantDomainUpdate(SysTenantDomainUpdateReq) returns (RespBase);
   rpc SysTenantDomainDelete(SysTenantDomainDeleteReq) returns (RespBase);
+  // 查询数据库实际迁移状态，供企业部署只读诊断页面使用。
+  rpc GetDeploymentDatabaseStatus(Empty) returns (DeploymentDatabaseStatusResp);
 }
 
 service App {

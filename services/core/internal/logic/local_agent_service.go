@@ -38,8 +38,9 @@ const (
 	localRegistrationPending  = int64(1)
 	localRegistrationUsed     = int64(2)
 	localRegistrationRevoked  = int64(4)
-	localProtocolCurrent      = int32(2)
+	localProtocolCurrent      = int32(3)
 	localProtocolMinimum      = int32(1)
+	localTaskBundleProtocol   = int64(3)
 	hybridArtifactVerified    = int64(2)
 )
 
@@ -405,6 +406,9 @@ func claimLocalAgentBuildTask(ctx context.Context, svcCtx *svc.ServiceContext, i
 		return nil, err
 	}
 	if agent.Status != localAgentOnline || agent.DrainStatus != localAgentAccepting {
+		return &core.LocalAgentBuildTaskResp{Base: okBase(), ArtifactMode: core.HybridArtifactMode(agent.ArtifactMode)}, nil
+	}
+	if agent.ProtocolVersion < localTaskBundleProtocol {
 		return &core.LocalAgentBuildTaskResp{Base: okBase(), ArtifactMode: core.HybridArtifactMode(agent.ArtifactMode)}, nil
 	}
 	apps := parseAppIDs(agent.AllowedAppIds)
@@ -881,6 +885,24 @@ func upsertHybridArtifact(ctx context.Context, session sqlx.Session, agent *mode
 	if artifactType < core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_SOURCE_APK || artifactType > core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE {
 		return status.Error(codes.InvalidArgument, "artifact_type is invalid")
 	}
+	if agent.ArtifactMode == int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE) {
+		objectID, err := parseControlPlaneStorageReference(reference)
+		if err != nil {
+			return err
+		}
+		var object models.TStorageObject
+		if err := session.QueryRowCtx(ctx, &object, storageObjectSelect+` WHERE id=? FOR UPDATE`, objectID); err != nil {
+			return status.Error(codes.NotFound, "control-plane Artifact object was not found")
+		}
+		if err := validateControlPlaneStorageObject(&object, task, artifactType, digest, size); err != nil {
+			return err
+		}
+		if object.Status == storageStatusReady {
+			if _, err := session.ExecCtx(ctx, `UPDATE t_storage_object SET status=? WHERE id=? AND status=?`, storageStatusBound, object.Id, storageStatusReady); err != nil {
+				return status.Errorf(codes.Internal, "bind control-plane Artifact object: %v", err)
+			}
+		}
+	}
 	_, err := session.ExecCtx(ctx, `INSERT INTO t_hybrid_artifact_reference
 (tenant_id,agent_id,task_id,builder_attempt,artifact_type,storage_mode,object_reference,sha256,size_bytes,status,verified_at)
 VALUES (?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP(3)) ON DUPLICATE KEY UPDATE
@@ -895,6 +917,51 @@ status=IF(object_reference=VALUES(object_reference) AND sha256=VALUES(sha256) AN
 	}
 	if matches != 1 {
 		return status.Error(codes.AlreadyExists, "Artifact idempotency key is already used with different integrity data")
+	}
+	return nil
+}
+
+func parseControlPlaneStorageReference(reference string) (int64, error) {
+	value := strings.TrimSpace(reference)
+	const prefix = "storage-object://"
+	if !strings.HasPrefix(value, prefix) {
+		return 0, status.Error(codes.InvalidArgument, "control-plane Artifact must use a storage-object reference")
+	}
+	identifier := strings.TrimPrefix(value, prefix)
+	id, err := strconv.ParseInt(identifier, 10, 64)
+	if err != nil || id <= 0 || value != fmt.Sprintf("%s%d", prefix, id) {
+		return 0, status.Error(codes.InvalidArgument, "control-plane Artifact storage-object reference is invalid")
+	}
+	return id, nil
+}
+
+func validateControlPlaneStorageObject(object *models.TStorageObject, task *models.TBuildTask, artifactType core.HybridArtifactType, digest string, size int64) error {
+	if object == nil || task == nil {
+		return status.Error(codes.InvalidArgument, "control-plane Artifact context is required")
+	}
+	expectedObjectType := int64(0)
+	switch artifactType {
+	case core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_SOURCE_APK:
+		expectedObjectType = int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_SOURCE_APK)
+	case core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK:
+		expectedObjectType = int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK)
+	case core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG:
+		expectedObjectType = int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG)
+	default:
+		return status.Error(codes.InvalidArgument, "control-plane storage does not support this Artifact type")
+	}
+	normalizedDigest := strings.ToLower(strings.TrimSpace(digest))
+	if object.TenantId != task.TenantId || object.AppId != task.AppId {
+		return status.Error(codes.PermissionDenied, "control-plane Artifact tenant or application mismatch")
+	}
+	if object.ObjectType != expectedObjectType {
+		return status.Error(codes.FailedPrecondition, "control-plane Artifact object type mismatch")
+	}
+	if object.Status != storageStatusReady && object.Status != storageStatusBound {
+		return status.Error(codes.FailedPrecondition, "control-plane Artifact object is not verified")
+	}
+	if object.SizeBytes != size || !object.Sha256.Valid || object.Sha256.String != normalizedDigest {
+		return status.Error(codes.FailedPrecondition, "control-plane Artifact integrity metadata mismatch")
 	}
 	return nil
 }

@@ -19,52 +19,53 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Admin_Login_FullMethodName                 = "/system.Admin/Login"
-	Admin_GetProfile_FullMethodName            = "/system.Admin/GetProfile"
-	Admin_UpdateProfile_FullMethodName         = "/system.Admin/UpdateProfile"
-	Admin_Google2FAInit_FullMethodName         = "/system.Admin/Google2FAInit"
-	Admin_Google2FABind_FullMethodName         = "/system.Admin/Google2FABind"
-	Admin_Google2FAEnable_FullMethodName       = "/system.Admin/Google2FAEnable"
-	Admin_Google2FADisable_FullMethodName      = "/system.Admin/Google2FADisable"
-	Admin_Google2FAReset_FullMethodName        = "/system.Admin/Google2FAReset"
-	Admin_SysUserList_FullMethodName           = "/system.Admin/SysUserList"
-	Admin_SysUserDetail_FullMethodName         = "/system.Admin/SysUserDetail"
-	Admin_SysUserCreate_FullMethodName         = "/system.Admin/SysUserCreate"
-	Admin_SysUserUpdate_FullMethodName         = "/system.Admin/SysUserUpdate"
-	Admin_SysUserDelete_FullMethodName         = "/system.Admin/SysUserDelete"
-	Admin_ChangeUserStatus_FullMethodName      = "/system.Admin/ChangeUserStatus"
-	Admin_ResetUserPwd_FullMethodName          = "/system.Admin/ResetUserPwd"
-	Admin_AssignUserRoles_FullMethodName       = "/system.Admin/AssignUserRoles"
-	Admin_SysRoleList_FullMethodName           = "/system.Admin/SysRoleList"
-	Admin_SysRoleCreate_FullMethodName         = "/system.Admin/SysRoleCreate"
-	Admin_SysRoleUpdate_FullMethodName         = "/system.Admin/SysRoleUpdate"
-	Admin_SysRoleDelete_FullMethodName         = "/system.Admin/SysRoleDelete"
-	Admin_SysRoleGrant_FullMethodName          = "/system.Admin/SysRoleGrant"
-	Admin_SysRoleGrantDetail_FullMethodName    = "/system.Admin/SysRoleGrantDetail"
-	Admin_SysPermList_FullMethodName           = "/system.Admin/SysPermList"
-	Admin_GetMenuTree_FullMethodName           = "/system.Admin/GetMenuTree"
-	Admin_SysMenuCreate_FullMethodName         = "/system.Admin/SysMenuCreate"
-	Admin_SysMenuUpdate_FullMethodName         = "/system.Admin/SysMenuUpdate"
-	Admin_SysMenuDelete_FullMethodName         = "/system.Admin/SysMenuDelete"
-	Admin_SysMenuList_FullMethodName           = "/system.Admin/SysMenuList"
-	Admin_LoginLogList_FullMethodName          = "/system.Admin/LoginLogList"
-	Admin_OpLogList_FullMethodName             = "/system.Admin/OpLogList"
-	Admin_CreateOpLog_FullMethodName           = "/system.Admin/CreateOpLog"
-	Admin_SysConfigCreate_FullMethodName       = "/system.Admin/SysConfigCreate"
-	Admin_SysConfigUpdate_FullMethodName       = "/system.Admin/SysConfigUpdate"
-	Admin_SysConfigDelete_FullMethodName       = "/system.Admin/SysConfigDelete"
-	Admin_SysConfigList_FullMethodName         = "/system.Admin/SysConfigList"
-	Admin_SysConfigDetail_FullMethodName       = "/system.Admin/SysConfigDetail"
-	Admin_LoginUserPerms_FullMethodName        = "/system.Admin/LoginUserPerms"
-	Admin_SysTenantCreate_FullMethodName       = "/system.Admin/SysTenantCreate"
-	Admin_SysTenantUpdate_FullMethodName       = "/system.Admin/SysTenantUpdate"
-	Admin_SysTenantDelete_FullMethodName       = "/system.Admin/SysTenantDelete"
-	Admin_SysTenantList_FullMethodName         = "/system.Admin/SysTenantList"
-	Admin_SysTenantDetail_FullMethodName       = "/system.Admin/SysTenantDetail"
-	Admin_SysTenantDomainList_FullMethodName   = "/system.Admin/SysTenantDomainList"
-	Admin_SysTenantDomainCreate_FullMethodName = "/system.Admin/SysTenantDomainCreate"
-	Admin_SysTenantDomainUpdate_FullMethodName = "/system.Admin/SysTenantDomainUpdate"
-	Admin_SysTenantDomainDelete_FullMethodName = "/system.Admin/SysTenantDomainDelete"
+	Admin_Login_FullMethodName                       = "/system.Admin/Login"
+	Admin_GetProfile_FullMethodName                  = "/system.Admin/GetProfile"
+	Admin_UpdateProfile_FullMethodName               = "/system.Admin/UpdateProfile"
+	Admin_Google2FAInit_FullMethodName               = "/system.Admin/Google2FAInit"
+	Admin_Google2FABind_FullMethodName               = "/system.Admin/Google2FABind"
+	Admin_Google2FAEnable_FullMethodName             = "/system.Admin/Google2FAEnable"
+	Admin_Google2FADisable_FullMethodName            = "/system.Admin/Google2FADisable"
+	Admin_Google2FAReset_FullMethodName              = "/system.Admin/Google2FAReset"
+	Admin_SysUserList_FullMethodName                 = "/system.Admin/SysUserList"
+	Admin_SysUserDetail_FullMethodName               = "/system.Admin/SysUserDetail"
+	Admin_SysUserCreate_FullMethodName               = "/system.Admin/SysUserCreate"
+	Admin_SysUserUpdate_FullMethodName               = "/system.Admin/SysUserUpdate"
+	Admin_SysUserDelete_FullMethodName               = "/system.Admin/SysUserDelete"
+	Admin_ChangeUserStatus_FullMethodName            = "/system.Admin/ChangeUserStatus"
+	Admin_ResetUserPwd_FullMethodName                = "/system.Admin/ResetUserPwd"
+	Admin_AssignUserRoles_FullMethodName             = "/system.Admin/AssignUserRoles"
+	Admin_SysRoleList_FullMethodName                 = "/system.Admin/SysRoleList"
+	Admin_SysRoleCreate_FullMethodName               = "/system.Admin/SysRoleCreate"
+	Admin_SysRoleUpdate_FullMethodName               = "/system.Admin/SysRoleUpdate"
+	Admin_SysRoleDelete_FullMethodName               = "/system.Admin/SysRoleDelete"
+	Admin_SysRoleGrant_FullMethodName                = "/system.Admin/SysRoleGrant"
+	Admin_SysRoleGrantDetail_FullMethodName          = "/system.Admin/SysRoleGrantDetail"
+	Admin_SysPermList_FullMethodName                 = "/system.Admin/SysPermList"
+	Admin_GetMenuTree_FullMethodName                 = "/system.Admin/GetMenuTree"
+	Admin_SysMenuCreate_FullMethodName               = "/system.Admin/SysMenuCreate"
+	Admin_SysMenuUpdate_FullMethodName               = "/system.Admin/SysMenuUpdate"
+	Admin_SysMenuDelete_FullMethodName               = "/system.Admin/SysMenuDelete"
+	Admin_SysMenuList_FullMethodName                 = "/system.Admin/SysMenuList"
+	Admin_LoginLogList_FullMethodName                = "/system.Admin/LoginLogList"
+	Admin_OpLogList_FullMethodName                   = "/system.Admin/OpLogList"
+	Admin_CreateOpLog_FullMethodName                 = "/system.Admin/CreateOpLog"
+	Admin_SysConfigCreate_FullMethodName             = "/system.Admin/SysConfigCreate"
+	Admin_SysConfigUpdate_FullMethodName             = "/system.Admin/SysConfigUpdate"
+	Admin_SysConfigDelete_FullMethodName             = "/system.Admin/SysConfigDelete"
+	Admin_SysConfigList_FullMethodName               = "/system.Admin/SysConfigList"
+	Admin_SysConfigDetail_FullMethodName             = "/system.Admin/SysConfigDetail"
+	Admin_LoginUserPerms_FullMethodName              = "/system.Admin/LoginUserPerms"
+	Admin_SysTenantCreate_FullMethodName             = "/system.Admin/SysTenantCreate"
+	Admin_SysTenantUpdate_FullMethodName             = "/system.Admin/SysTenantUpdate"
+	Admin_SysTenantDelete_FullMethodName             = "/system.Admin/SysTenantDelete"
+	Admin_SysTenantList_FullMethodName               = "/system.Admin/SysTenantList"
+	Admin_SysTenantDetail_FullMethodName             = "/system.Admin/SysTenantDetail"
+	Admin_SysTenantDomainList_FullMethodName         = "/system.Admin/SysTenantDomainList"
+	Admin_SysTenantDomainCreate_FullMethodName       = "/system.Admin/SysTenantDomainCreate"
+	Admin_SysTenantDomainUpdate_FullMethodName       = "/system.Admin/SysTenantDomainUpdate"
+	Admin_SysTenantDomainDelete_FullMethodName       = "/system.Admin/SysTenantDomainDelete"
+	Admin_GetDeploymentDatabaseStatus_FullMethodName = "/system.Admin/GetDeploymentDatabaseStatus"
 )
 
 // AdminClient is the client API for Admin service.
@@ -121,6 +122,8 @@ type AdminClient interface {
 	SysTenantDomainCreate(ctx context.Context, in *SysTenantDomainCreateReq, opts ...grpc.CallOption) (*RespBase, error)
 	SysTenantDomainUpdate(ctx context.Context, in *SysTenantDomainUpdateReq, opts ...grpc.CallOption) (*RespBase, error)
 	SysTenantDomainDelete(ctx context.Context, in *SysTenantDomainDeleteReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 查询数据库实际迁移状态，供企业部署只读诊断页面使用。
+	GetDeploymentDatabaseStatus(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeploymentDatabaseStatusResp, error)
 }
 
 type adminClient struct {
@@ -591,6 +594,16 @@ func (c *adminClient) SysTenantDomainDelete(ctx context.Context, in *SysTenantDo
 	return out, nil
 }
 
+func (c *adminClient) GetDeploymentDatabaseStatus(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeploymentDatabaseStatusResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeploymentDatabaseStatusResp)
+	err := c.cc.Invoke(ctx, Admin_GetDeploymentDatabaseStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServer is the server API for Admin service.
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility.
@@ -645,6 +658,8 @@ type AdminServer interface {
 	SysTenantDomainCreate(context.Context, *SysTenantDomainCreateReq) (*RespBase, error)
 	SysTenantDomainUpdate(context.Context, *SysTenantDomainUpdateReq) (*RespBase, error)
 	SysTenantDomainDelete(context.Context, *SysTenantDomainDeleteReq) (*RespBase, error)
+	// 查询数据库实际迁移状态，供企业部署只读诊断页面使用。
+	GetDeploymentDatabaseStatus(context.Context, *Empty) (*DeploymentDatabaseStatusResp, error)
 	mustEmbedUnimplementedAdminServer()
 }
 
@@ -792,6 +807,9 @@ func (UnimplementedAdminServer) SysTenantDomainUpdate(context.Context, *SysTenan
 }
 func (UnimplementedAdminServer) SysTenantDomainDelete(context.Context, *SysTenantDomainDeleteReq) (*RespBase, error) {
 	return nil, status.Error(codes.Unimplemented, "method SysTenantDomainDelete not implemented")
+}
+func (UnimplementedAdminServer) GetDeploymentDatabaseStatus(context.Context, *Empty) (*DeploymentDatabaseStatusResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDeploymentDatabaseStatus not implemented")
 }
 func (UnimplementedAdminServer) mustEmbedUnimplementedAdminServer() {}
 func (UnimplementedAdminServer) testEmbeddedByValue()               {}
@@ -1642,6 +1660,24 @@ func _Admin_SysTenantDomainDelete_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Admin_GetDeploymentDatabaseStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).GetDeploymentDatabaseStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_GetDeploymentDatabaseStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).GetDeploymentDatabaseStatus(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Admin_ServiceDesc is the grpc.ServiceDesc for Admin service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1832,6 +1868,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SysTenantDomainDelete",
 			Handler:    _Admin_SysTenantDomainDelete_Handler,
+		},
+		{
+			MethodName: "GetDeploymentDatabaseStatus",
+			Handler:    _Admin_GetDeploymentDatabaseStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -20,7 +20,12 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 FROM alpine:3.21
 
-RUN addgroup -S appforge && adduser -S -G appforge appforge
+RUN apk add --no-cache tzdata \
+    && addgroup -S -g 65532 appforge \
+    && adduser -S -D -H -u 65532 -G appforge appforge \
+    && mkdir -p /var/lib/appforge-license \
+    && chown appforge:appforge /var/lib/appforge-license \
+    && chmod 0700 /var/lib/appforge-license
 COPY --from=builder /out/appforge /usr/local/bin/appforge
 
 USER appforge

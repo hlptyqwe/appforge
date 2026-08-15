@@ -50,6 +50,9 @@ func main() {
 	if err := etcd.LoadFromEtcdAndMerge(strings.Split(*endpoints, ","), []string{*commonKey, *configKey}, &c); err != nil {
 		panic(err)
 	}
+	if err := config.ApplyDeploymentEnvironment(&c); err != nil {
+		panic(fmt.Sprintf("load deployment metadata: %v", err))
+	}
 	if endpoint := strings.TrimSpace(os.Getenv("APPFORGE_SIEM_ENDPOINT")); endpoint != "" {
 		c.Audit.SIEM.Enabled = true
 		c.Audit.SIEM.Endpoint = endpoint

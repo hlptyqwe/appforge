@@ -89,7 +89,7 @@ assert_zero "账单金额字段没有浮点类型" \
 )
 (
   cd "$repo_root/services/core"
-  APPFORGE_BILLING_TEST_DSN="${mysql_user}:${mysql_password}@tcp(127.0.0.1:3306)/${mysql_database}?charset=utf8mb4&parseTime=true&loc=Local" \
+  APPFORGE_BILLING_TEST_DSN="${mysql_user}:${mysql_password}@tcp(127.0.0.1:3306)/${mysql_database}?charset=utf8mb4&parseTime=true&loc=Asia%2FHong_Kong" \
     GOCACHE="$go_cache" go test ./internal/logic -run TestBillingRuntimeAcceptance -count=1
 )
 echo "通过: Stripe 验签、并发额度、重复/乱序事件、退款与争议运行时验收"

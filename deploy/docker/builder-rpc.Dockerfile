@@ -18,8 +18,8 @@ FROM debian:bookworm-slim
 RUN apt-get update \
     && apt-get install -y --no-install-recommends default-jre-headless ca-certificates netcat-openbsd \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system appforge \
-    && useradd --system --gid appforge --create-home appforge
+    && groupadd --system --gid 65532 appforge \
+    && useradd --system --uid 65532 --gid 65532 --create-home appforge
 
 COPY --from=builder /out/appforge-builder-rpc /usr/local/bin/appforge-builder-rpc
 

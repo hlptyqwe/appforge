@@ -10,6 +10,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -44,7 +45,25 @@ func TestLocalAgentRuntimeAcceptance(t *testing.T) {
 	ctx := context.WithValue(context.Background(), utils.CtxKeyTenantId, application.TenantID)
 	code := fmt.Sprintf("v7-runtime-%d", time.Now().UnixNano())
 	var agentID int64
+	var taskID int64
 	t.Cleanup(func() {
+		if taskID > 0 {
+			cleanupQueries := []string{
+				`DELETE d FROM t_webhook_delivery d JOIN t_outbox_event o ON o.id=d.outbox_event_id WHERE o.aggregate_type='build' AND o.aggregate_id=?`,
+				`DELETE FROM t_hybrid_artifact_reference WHERE task_id=?`,
+				`DELETE FROM t_build_scheduler_event WHERE task_id=?`,
+				`DELETE FROM t_build_slot_lease WHERE task_id=?`,
+				`DELETE FROM t_usage_ledger WHERE resource_type='build' AND resource_id=?`,
+				`DELETE FROM t_quota_reservation WHERE resource_type='build' AND resource_id=?`,
+				`DELETE FROM t_outbox_event WHERE aggregate_type='build' AND aggregate_id=?`,
+				`DELETE FROM t_build_task WHERE id=?`,
+			}
+			for _, query := range cleanupQueries {
+				if _, cleanupErr := db.ExecCtx(context.Background(), query, taskID); cleanupErr != nil {
+					t.Logf("cleanup Local Agent fault task: %v", cleanupErr)
+				}
+			}
+		}
 		if agentID <= 0 {
 			return
 		}
@@ -76,8 +95,8 @@ func TestLocalAgentRuntimeAcceptance(t *testing.T) {
 	_, csr := acceptanceAgentCSR(t)
 	registerTimestamp := time.Now().UnixMilli()
 	registered, err := registerLocalAgent(context.Background(), svcCtx, &core.RegisterLocalAgentReq{
-		RegistrationToken: registration.RegistrationToken, CsrPem: csr, AgentVersion: "1.0.0",
-		ProtocolVersion: 2, Nonce: "registration-nonce-0001", Timestamp: registerTimestamp, SourceIp: "192.0.2.10",
+		RegistrationToken: registration.RegistrationToken, CsrPem: csr, AgentVersion: "1.1.0",
+		ProtocolVersion: 3, Nonce: "registration-nonce-0001", Timestamp: registerTimestamp, SourceIp: "192.0.2.10",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -86,8 +105,8 @@ func TestLocalAgentRuntimeAcceptance(t *testing.T) {
 		t.Fatalf("unexpected registration result: %#v", registered)
 	}
 	if _, err := registerLocalAgent(context.Background(), svcCtx, &core.RegisterLocalAgentReq{
-		RegistrationToken: registration.RegistrationToken, CsrPem: csr, AgentVersion: "1.0.0",
-		ProtocolVersion: 2, Nonce: "registration-nonce-0002", Timestamp: registerTimestamp + 1,
+		RegistrationToken: registration.RegistrationToken, CsrPem: csr, AgentVersion: "1.1.0",
+		ProtocolVersion: 3, Nonce: "registration-nonce-0002", Timestamp: registerTimestamp + 1,
 	}); err == nil {
 		t.Fatal("one-time registration token was accepted twice")
 	}
@@ -101,11 +120,11 @@ func TestLocalAgentRuntimeAcceptance(t *testing.T) {
 	}
 	firstAuth := auth(registered.Certificate)
 	if _, err := heartbeatLocalAgent(context.Background(), svcCtx, &core.HeartbeatLocalAgentReq{Auth: firstAuth,
-		AgentVersion: "1.0.0", ProtocolVersion: 2, Capabilities: []*core.LocalAgentCapability{{CapabilityKey: "apk", CapabilityValue: "true"}}}); err != nil {
+		AgentVersion: "1.1.0", ProtocolVersion: 3, Capabilities: []*core.LocalAgentCapability{{CapabilityKey: "apk", CapabilityValue: "true"}}}); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := heartbeatLocalAgent(context.Background(), svcCtx, &core.HeartbeatLocalAgentReq{Auth: firstAuth,
-		AgentVersion: "1.0.0", ProtocolVersion: 2}); status.Code(err) != codes.AlreadyExists {
+		AgentVersion: "1.1.0", ProtocolVersion: 3}); status.Code(err) != codes.AlreadyExists {
 		t.Fatalf("replayed nonce/timestamp code = %v, err=%v", status.Code(err), err)
 	}
 
@@ -120,24 +139,87 @@ func TestLocalAgentRuntimeAcceptance(t *testing.T) {
 		t.Fatal("certificate rotation reused the old serial")
 	}
 	if _, err := heartbeatLocalAgent(context.Background(), svcCtx, &core.HeartbeatLocalAgentReq{
-		Auth: auth(registered.Certificate), AgentVersion: "1.0.0", ProtocolVersion: 2,
+		Auth: auth(registered.Certificate), AgentVersion: "1.1.0", ProtocolVersion: 3,
 	}); status.Code(err) != codes.Unauthenticated {
 		t.Fatalf("rotated certificate remained valid: code=%v err=%v", status.Code(err), err)
 	}
 	if _, err := heartbeatLocalAgent(context.Background(), svcCtx, &core.HeartbeatLocalAgentReq{
-		Auth: auth(rotated.Certificate), AgentVersion: "1.0.1", ProtocolVersion: 2,
+		Auth: auth(rotated.Certificate), AgentVersion: "1.1.0", ProtocolVersion: 3,
 	}); err != nil {
 		t.Fatalf("new certificate was not accepted: %v", err)
+	}
+
+	created, err := db.ExecCtx(context.Background(), `INSERT INTO t_build_task
+(tenant_id,app_id,version_id,channel_id,signing_config_id,channel_code,version_code,version_name,
+source_apk_object_id,pool_code,status,builder_attempt,priority,queued_at,create_by)
+VALUES (?,?,?,?,?,'fault-injection',1,'1.0',1,?,'PENDING',0,1000,CURRENT_TIMESTAMP(3),0)`,
+		application.TenantID, application.ID, 1, 1, 1, "enterprise-runtime")
+	if err != nil {
+		t.Fatal(err)
+	}
+	taskID, err = created.LastInsertId()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := db.ExecCtx(context.Background(), `INSERT INTO t_quota_reservation
+(tenant_id,metric,quantity,resource_type,resource_id,idempotency_key,period_key,status,expires_at,confirmed_at)
+VALUES (?,'build.count',1,'build',?,CONCAT('build:',?),DATE_FORMAT(CURRENT_DATE,'%Y-%m'),2,DATE_ADD(CURRENT_TIMESTAMP(3),INTERVAL 1 HOUR),CURRENT_TIMESTAMP(3))`,
+		application.TenantID, taskID, taskID); err != nil {
+		t.Fatal(err)
+	}
+	firstClaim, err := claimLocalAgentBuildTask(context.Background(), svcCtx, &core.ClaimLocalAgentBuildTaskReq{
+		Auth: auth(rotated.Certificate), LeaseSeconds: 120,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if firstClaim.Task == nil || firstClaim.Task.Id != taskID || firstClaim.Task.BuilderAttempt != 1 {
+		t.Fatalf("unexpected first Local Agent claim: %#v", firstClaim.Task)
+	}
+	if _, err := db.ExecCtx(context.Background(), `UPDATE t_build_task SET lease_until=DATE_SUB(CURRENT_TIMESTAMP(3),INTERVAL 1 SECOND) WHERE id=?`, taskID); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := db.ExecCtx(context.Background(), `UPDATE t_build_slot_lease SET lease_until=DATE_SUB(CURRENT_TIMESTAMP(3),INTERVAL 1 SECOND) WHERE task_id=? AND builder_attempt=?`, taskID, firstClaim.Task.BuilderAttempt); err != nil {
+		t.Fatal(err)
+	}
+	secondClaim, err := claimLocalAgentBuildTask(context.Background(), svcCtx, &core.ClaimLocalAgentBuildTaskReq{
+		Auth: auth(rotated.Certificate), LeaseSeconds: 120,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if secondClaim.Task == nil || secondClaim.Task.Id != taskID || secondClaim.Task.BuilderAttempt != 2 {
+		t.Fatalf("expired Local Agent task was not fenced and recovered: %#v", secondClaim.Task)
+	}
+	if _, err := renewLocalAgentTaskLease(context.Background(), svcCtx, &core.RenewLocalAgentTaskLeaseReq{
+		Auth: auth(rotated.Certificate), TaskId: taskID, BuilderAttempt: 1, LeaseSeconds: 120,
+	}); status.Code(err) != codes.NotFound {
+		t.Fatalf("old attempt renewed after recovery: code=%v err=%v", status.Code(err), err)
+	}
+	if _, err := completeLocalAgentBuildTask(context.Background(), svcCtx, &core.CompleteLocalAgentBuildTaskReq{
+		Auth: auth(rotated.Certificate), TaskId: taskID, BuilderAttempt: 1,
+		ApkReference: "local-artifact://fault/old.apk", ApkSha256: strings.Repeat("a", 64), ApkSize: 1,
+	}); status.Code(err) != codes.NotFound {
+		t.Fatalf("old attempt completed after recovery: code=%v err=%v", status.Code(err), err)
 	}
 	if _, err := drainLocalAgent(ctx, svcCtx, &core.DrainLocalAgentReq{Id: agentID,
 		DrainStatus: core.LocalAgentDrainStatus_LOCAL_AGENT_DRAIN_STATUS_DRAINING}); err != nil {
 		t.Fatal(err)
 	}
+	claimed, err := claimLocalAgentBuildTask(context.Background(), svcCtx, &core.ClaimLocalAgentBuildTaskReq{
+		Auth: auth(rotated.Certificate), LeaseSeconds: 120,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if claimed.Task != nil {
+		t.Fatal("draining Local Agent claimed a new task")
+	}
 	if _, err := revokeLocalAgent(ctx, svcCtx, &core.RevokeLocalAgentReq{Id: agentID, Reason: "acceptance completed"}); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := heartbeatLocalAgent(context.Background(), svcCtx, &core.HeartbeatLocalAgentReq{
-		Auth: auth(rotated.Certificate), AgentVersion: "1.0.1", ProtocolVersion: 2,
+		Auth: auth(rotated.Certificate), AgentVersion: "1.1.0", ProtocolVersion: 3,
 	}); status.Code(err) != codes.PermissionDenied {
 		t.Fatalf("revoked Agent was accepted: code=%v err=%v", status.Code(err), err)
 	}

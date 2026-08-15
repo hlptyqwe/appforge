@@ -31,9 +31,21 @@ const form = reactive({
 
 const registerCommand = computed(
   () =>
+    "read -rsp '一次性注册码: ' APPFORGE_REGISTRATION_TOKEN && echo && " +
+    'printf \'%s\' "$APPFORGE_REGISTRATION_TOKEN" | ' +
     `appforge-local-agent register --control-url ${window.location.origin} ` +
-    '--gateway-url https://<control-plane-host>:9443 --gateway-ca /path/to/gateway-ca.crt ' +
-    `--token ${registrationToken.value}`,
+    '--control-ca /path/to/control-ca.crt --gateway-url https://<control-plane-host>:9443 ' +
+    '--gateway-ca /path/to/gateway-ca.crt --token-stdin; ' +
+    'unset APPFORGE_REGISTRATION_TOKEN',
+)
+
+const certificateWarningWindowMs = 24 * 60 * 60 * 1000
+const expiringCertificateCount = computed(
+  () =>
+    agents.value.filter((agent) => {
+      const expiresAt = agent.certificateNotAfter || 0
+      return expiresAt > 0 && expiresAt <= Date.now() + certificateWarningWindowMs
+    }).length,
 )
 
 const statusLabels: Record<
@@ -171,6 +183,16 @@ function formatTime(value?: number) {
   return value ? new Date(value).toLocaleString() : '-'
 }
 
+function certificateAlert(value?: number) {
+  if (!value) return null
+  const remaining = value - Date.now()
+  if (remaining <= 0) return { label: '已过期', type: 'danger' as const }
+  if (remaining <= certificateWarningWindowMs) {
+    return { label: '24小时内到期', type: 'warning' as const }
+  }
+  return null
+}
+
 onMounted(async () => {
   await Promise.all([loadAgents(), loadApplications()])
 })
@@ -206,6 +228,14 @@ onMounted(async () => {
     </el-card>
 
     <el-card shadow="never" class="table-card">
+      <el-alert
+        v-if="expiringCertificateCount > 0"
+        :title="`${expiringCertificateCount} 个节点证书已过期或将在 24 小时内到期，请确认自动轮换或重新注册`"
+        type="warning"
+        show-icon
+        :closable="false"
+        style="margin-bottom: 16px"
+      />
       <el-table v-loading="loading" :data="agents" stripe>
         <el-table-column prop="agentCode" label="节点编码" min-width="150" />
         <el-table-column prop="agentName" label="节点名称" min-width="150" />
@@ -245,7 +275,14 @@ onMounted(async () => {
         </el-table-column>
         <el-table-column label="证书到期" min-width="180">
           <template #default="{ row }">
-            {{ formatTime(row.certificateNotAfter) }}
+            <div>{{ formatTime(row.certificateNotAfter) }}</div>
+            <el-tag
+              v-if="certificateAlert(row.certificateNotAfter)"
+              size="small"
+              :type="certificateAlert(row.certificateNotAfter)?.type"
+            >
+              {{ certificateAlert(row.certificateNotAfter)?.label }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column label="最近心跳" min-width="180">

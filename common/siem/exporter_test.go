@@ -3,10 +3,13 @@ package siem
 import (
 	"context"
 	"encoding/json"
+	"encoding/pem"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -63,5 +66,81 @@ func (*emptyReader) Read([]byte) (int, error) { return 0, io.EOF }
 func TestExporterRejectsPlainHTTPInProductionMode(t *testing.T) {
 	if _, err := New(Config{Enabled: true, Endpoint: "http://siem.internal/events"}); err == nil {
 		t.Fatal("expected insecure SIEM endpoint rejection")
+	}
+}
+
+func TestExporterUsesRealTLSRotatesTokenAndRetries(t *testing.T) {
+	var firstAttempts atomic.Int32
+	received := make(chan Event, 2)
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var event Event
+		if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
+			http.Error(w, "invalid event", http.StatusBadRequest)
+			return
+		}
+		expectedToken := "siem-token-one"
+		if event.Action == "second" {
+			expectedToken = "siem-token-two"
+		}
+		if r.Header.Get("Authorization") != "Bearer "+expectedToken {
+			http.Error(w, "invalid token", http.StatusUnauthorized)
+			return
+		}
+		if event.Action == "first" && firstAttempts.Add(1) == 1 {
+			http.Error(w, "temporary failure", http.StatusServiceUnavailable)
+			return
+		}
+		received <- event
+		w.WriteHeader(http.StatusAccepted)
+	}))
+	defer server.Close()
+
+	temporary := t.TempDir()
+	caPath := filepath.Join(temporary, "siem-ca.pem")
+	caPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: server.Certificate().Raw})
+	if err := os.WriteFile(caPath, caPEM, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	tokenPath := filepath.Join(temporary, "siem-token")
+	if err := os.WriteFile(tokenPath, []byte("siem-token-one\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	exporter, err := New(Config{
+		Enabled: true, Endpoint: server.URL, BearerTokenFile: tokenPath, CACertificate: caPath,
+		Timeout: time.Second, QueueSize: 2, MaxAttempts: 3, RetryBackoff: time.Millisecond,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	exporter.Start(ctx)
+	if !exporter.Export(Event{Action: "first", Request: `{"password":"***"}`}) {
+		t.Fatal("first event was not queued")
+	}
+	select {
+	case event := <-received:
+		if event.Action != "first" || firstAttempts.Load() != 2 {
+			t.Fatalf("retry result = %#v, attempts=%d", event, firstAttempts.Load())
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("retried TLS event was not delivered")
+	}
+	if err := os.WriteFile(tokenPath, []byte("siem-token-two\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if !exporter.Export(Event{Action: "second"}) {
+		t.Fatal("second event was not queued")
+	}
+	select {
+	case event := <-received:
+		if event.Action != "second" {
+			t.Fatalf("unexpected second event: %#v", event)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("event using rotated token was not delivered")
+	}
+	if exporter.Dropped() != 0 || exporter.Failed() != 0 {
+		t.Fatalf("unexpected counters: dropped=%d failed=%d", exporter.Dropped(), exporter.Failed())
 	}
 }

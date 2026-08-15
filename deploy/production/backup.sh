@@ -23,16 +23,16 @@ trap resume_services EXIT
 docker compose -f "$delivery_dir/docker-compose.yml" stop "${writers[@]}" minio >/dev/null
 
 docker compose -f "$delivery_dir/docker-compose.yml" exec -T mysql sh -c \
-  'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqldump -uroot --single-transaction --routines --events "$MYSQL_DATABASE"' > "$target/mysql.sql"
+  'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqldump -h127.0.0.1 -uroot --single-transaction --routines --events "$MYSQL_DATABASE"' > "$target/mysql.sql"
 docker compose -f "$delivery_dir/docker-compose.yml" exec -T etcd etcdctl snapshot save /tmp/etcd.snapshot >/dev/null
 docker compose -f "$delivery_dir/docker-compose.yml" cp etcd:/tmp/etcd.snapshot "$target/etcd.snapshot" >/dev/null
 docker compose -f "$delivery_dir/docker-compose.yml" run --rm --no-deps --entrypoint /bin/sh \
-  -v "$target:/backup" minio -c 'tar -C /data -czf /backup/object-data.tar.gz .'
+  -v "$target:/backup" archive -c 'tar -C /data -czf /backup/object-data.tar.gz .'
 
 sha256sum "$target/mysql.sql" "$target/etcd.snapshot" "$target/object-data.tar.gz" > "$target/SHA256SUMS"
 printf '{"version":"%s","createdAt":"%s","rpoMinutes":%s,"schemaVersion":"%s"}\n' \
   "$APPFORGE_VERSION" "$stamp" "${APPFORGE_RPO_MINUTES:-15}" \
-  "$(docker compose -f "$delivery_dir/docker-compose.yml" exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mysql -u"$MYSQL_USER" -D"$MYSQL_DATABASE" -N -e "SELECT COALESCE(MAX(version),\"none\") FROM sys_schema_migration"')" \
+  "$(docker compose -f "$delivery_dir/docker-compose.yml" exec -T mysql sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mysql -h127.0.0.1 -u"$MYSQL_USER" -D"$MYSQL_DATABASE" -N -e "SELECT version FROM sys_schema_migration ORDER BY CAST(SUBSTRING_INDEX(version,\"_\",1) AS UNSIGNED) DESC,CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(version,\"_\",2),\"_\",-1) AS UNSIGNED) DESC,applied_at DESC LIMIT 1"')" \
   > "$target/manifest.json"
 resume_services
 trap - EXIT

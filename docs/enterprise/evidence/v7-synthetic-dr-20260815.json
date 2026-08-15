@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "scenario": "isolated-synthetic",
+  "acceptanceScript": "deploy/acceptance/v7-backup-restore.sh",
+  "recoveryPointMarkerAt": 1786770921790,
+  "backupCompletedAt": 1786770923506,
+  "restoreStartedAt": 1786770923538,
+  "recoveryVerifiedAt": 1786770931787,
+  "rpoSeconds": 2,
+  "rpoTargetSeconds": 900,
+  "rtoSeconds": 9,
+  "rtoTargetSeconds": 7200,
+  "verifiedData": [
+    "synthetic-mysql",
+    "synthetic-etcd",
+    "synthetic-object"
+  ],
+  "limitations": [
+    "not-full-business-dataset",
+    "not-customer-target-environment"
+  ]
+}

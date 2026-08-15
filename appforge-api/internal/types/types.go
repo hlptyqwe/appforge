@@ -1008,6 +1008,59 @@ type PlatformChannelStatsResp struct {
 	Data PlatformChannelStats `json:"data"`
 }
 
+type PlatformDeploymentComponent struct {
+	Code      string `json:"code"`
+	Name      string `json:"name"`
+	Status    string `json:"status"`
+	Message   string `json:"message,optional"`
+	CheckedAt int64  `json:"checkedAt"`
+}
+
+type PlatformDeploymentLicense struct {
+	Enabled         bool     `json:"enabled"`
+	Status          string   `json:"status"`
+	LicenseId       string   `json:"licenseId,optional"`
+	Customer        string   `json:"customer,optional"`
+	DeploymentId    string   `json:"deploymentId,optional"`
+	DeploymentModes []string `json:"deploymentModes,optional"`
+	Features        []string `json:"features,optional"`
+	NotBefore       int64    `json:"notBefore,optional"`
+	NotAfter        int64    `json:"notAfter,optional"`
+	Sequence        uint64   `json:"sequence,optional"`
+	MaxTenants      int64    `json:"maxTenants,optional"`
+	MaxBuilders     int64    `json:"maxBuilders,optional"`
+	Fingerprint     string   `json:"fingerprint,optional"`
+}
+
+type PlatformDeploymentMigration struct {
+	Version     string `json:"version"`
+	Description string `json:"description"`
+}
+
+type PlatformDeploymentStatus struct {
+	DeploymentId         string                        `json:"deploymentId"`
+	DeploymentMode       string                        `json:"deploymentMode"`
+	ProductVersion       string                        `json:"productVersion"`
+	TargetSchemaVersion  string                        `json:"targetSchemaVersion"`
+	ActualSchemaVersion  string                        `json:"actualSchemaVersion"`
+	SchemaCompatible     bool                          `json:"schemaCompatible"`
+	MaxVersionSkew       int32                         `json:"maxVersionSkew"`
+	AgentProtocolCurrent int32                         `json:"agentProtocolCurrent"`
+	AgentProtocolMinimum int32                         `json:"agentProtocolMinimum"`
+	UpgradeReady         bool                          `json:"upgradeReady"`
+	DiagnosticsCommand   string                        `json:"diagnosticsCommand"`
+	MigrationCount       int64                         `json:"migrationCount"`
+	RecentMigrations     []PlatformDeploymentMigration `json:"recentMigrations"`
+	Components           []PlatformDeploymentComponent `json:"components"`
+	License              PlatformDeploymentLicense     `json:"license"`
+	CheckedAt            int64                         `json:"checkedAt"`
+}
+
+type PlatformDeploymentStatusResp struct {
+	RespBase
+	Data PlatformDeploymentStatus `json:"data"`
+}
+
 type PlatformIdReq struct {
 	Id int64 `path:"id"`
 }

@@ -1,0 +1,31 @@
+{
+  "evidenceType": "v7-local-performance-smoke",
+  "executedAt": "2026-08-15T13:56:00+08:00",
+  "status": "passed",
+  "environment": "local Docker development deployment",
+  "probes": [
+    {
+      "name": "healthz",
+      "requests": 500,
+      "concurrency": 32,
+      "errors": 0,
+      "averageSeconds": 0.008354,
+      "p95Seconds": 0.030928,
+      "p95GateSeconds": 0.25
+    },
+    {
+      "name": "authenticated deployment status",
+      "requests": 150,
+      "concurrency": 12,
+      "errors": 0,
+      "averageSeconds": 0.017893,
+      "p95Seconds": 0.026213,
+      "p95GateSeconds": 1.0
+    }
+  ],
+  "limitations": [
+    "This is a bounded local concurrency smoke test, not a customer capacity, peak-load or SLA result.",
+    "The deployment status request covers JWT/RBAC, API, System/Core/Builder gRPC health and database migration reads, but does not execute APK builds.",
+    "Long-duration stability, build throughput, object storage throughput and target-environment sizing remain unverified."
+  ]
+}

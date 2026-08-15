@@ -30,3 +30,27 @@ spec:
         - ipBlock: {cidr: {{ . | quote }}}
     {{- end }}
 {{- end }}
+{{- if .Values.networkPolicy.enabled }}
+{{- range $rule := .Values.networkPolicy.externalEgressRules }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: appforge-egress-{{ $rule.name }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: appforge
+      app.kubernetes.io/component: {{ $rule.component }}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        {{- range $cidr := $rule.cidrs }}
+        - ipBlock: {cidr: {{ $cidr | quote }}}
+        {{- end }}
+      ports:
+        {{- range $port := $rule.ports }}
+        - {protocol: {{ $port.protocol }}, port: {{ $port.port }}}
+        {{- end }}
+{{- end }}
+{{- end }}

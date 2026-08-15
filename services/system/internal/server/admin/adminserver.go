@@ -252,3 +252,9 @@ func (s *AdminServer) SysTenantDomainDelete(ctx context.Context, in *system.SysT
 	l := adminlogic.NewSysTenantDomainDeleteLogic(ctx, s.svcCtx)
 	return l.SysTenantDomainDelete(in)
 }
+
+// 查询数据库实际迁移状态，供企业部署只读诊断页面使用。
+func (s *AdminServer) GetDeploymentDatabaseStatus(ctx context.Context, in *system.Empty) (*system.DeploymentDatabaseStatusResp, error) {
+	l := adminlogic.NewGetDeploymentDatabaseStatusLogic(ctx, s.svcCtx)
+	return l.GetDeploymentDatabaseStatus(in)
+}

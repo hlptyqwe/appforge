@@ -1,0 +1,31 @@
+services:
+  local-agent:
+    command:
+      - run
+      - --state-dir
+      - /var/lib/appforge-agent
+      - --secret-root
+      - /etc/appforge/local-secrets
+      - --executor
+      - /acceptance-bin/local-agent-runtime-executor.sh
+      - --poll
+      - 200ms
+      - --max-concurrency
+      - "1"
+      - --lease-seconds
+      - "6"
+      - --rotate-before
+      - ${APPFORGE_ACCEPTANCE_ROTATE_BEFORE:-1h}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ${APPFORGE_ACCEPTANCE_EXECUTOR:?required}:/acceptance-bin/local-agent-runtime-executor.sh:ro
+      - acceptance-state:/acceptance
+    healthcheck:
+      interval: 1s
+      timeout: 2s
+      retries: 3
+      start_period: 1s
+
+volumes:
+  acceptance-state:

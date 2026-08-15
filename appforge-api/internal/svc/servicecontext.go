@@ -19,16 +19,20 @@ import (
 
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/metadata"
 )
 
 type ServiceContext struct {
-	Config     config.Config
-	SystemCli  system.AdminClient
-	CoreCli    core.CoreClient
-	BuilderCli builder.BuilderClient
-	Secrets    *secretbox.Box
-	License    *offlinelicense.VerifiedLicense
+	Config        config.Config
+	SystemCli     system.AdminClient
+	CoreCli       core.CoreClient
+	BuilderCli    builder.BuilderClient
+	SystemHealth  grpc_health_v1.HealthClient
+	CoreHealth    grpc_health_v1.HealthClient
+	BuilderHealth grpc_health_v1.HealthClient
+	Secrets       *secretbox.Box
+	License       *offlinelicense.VerifiedLicense
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -85,11 +89,14 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		panic(fmt.Sprintf("initialize signing secret encryption: %v", err))
 	}
 	return &ServiceContext{
-		Config:     c,
-		SystemCli:  system.NewAdminClient(systemClient.Conn()),
-		CoreCli:    core.NewCoreClient(coreClient.Conn()),
-		BuilderCli: builder.NewBuilderClient(builderClient.Conn()),
-		Secrets:    secrets,
-		License:    verifiedLicense,
+		Config:        c,
+		SystemCli:     system.NewAdminClient(systemClient.Conn()),
+		CoreCli:       core.NewCoreClient(coreClient.Conn()),
+		BuilderCli:    builder.NewBuilderClient(builderClient.Conn()),
+		SystemHealth:  grpc_health_v1.NewHealthClient(systemClient.Conn()),
+		CoreHealth:    grpc_health_v1.NewHealthClient(coreClient.Conn()),
+		BuilderHealth: grpc_health_v1.NewHealthClient(builderClient.Conn()),
+		Secrets:       secrets,
+		License:       verifiedLicense,
 	}
 }

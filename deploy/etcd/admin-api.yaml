@@ -75,6 +75,16 @@ OfflineLicense:
   DeploymentMode: ""
   ClockRollbackTolerance: 5m
 
+# 只读展示的部署与兼容信息；生产环境由 Compose/Helm 环境变量覆盖。
+Deployment:
+  DeploymentId: local-development
+  DeploymentMode: saas
+  ProductVersion: 0.0.0-dev
+  TargetSchemaVersion: 20260815_111_v7_deployment_console
+  MaxVersionSkew: 1
+  AgentProtocolCurrent: 3
+  AgentProtocolMinimum: 2
+
 # 仅记录会修改数据的后台操作；查询请求不写操作日志。
 Audit:
   SIEM:
@@ -84,6 +94,8 @@ Audit:
     CACertificate: ""
     Timeout: 10s
     QueueSize: 1000
+    MaxAttempts: 5
+    RetryBackoff: 500ms
     AllowHTTP: false
   Routes:
     - Method: POST

@@ -19,7 +19,7 @@ func NewOfflineLicenseMiddleware(license *offlinelicense.VerifiedLicense) *Offli
 
 func (m *OfflineLicenseMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/healthz" || m.license == nil {
+		if licenseExemptPath(r.URL.Path) || m.license == nil {
 			next(w, r)
 			return
 		}
@@ -30,5 +30,14 @@ func (m *OfflineLicenseMiddleware) Handle(next http.HandlerFunc) http.HandlerFun
 			return
 		}
 		next(w, r)
+	}
+}
+
+func licenseExemptPath(path string) bool {
+	switch path {
+	case "/healthz", "/readyz", "/admin/core/enterprise/deployment":
+		return true
+	default:
+		return false
 	}
 }

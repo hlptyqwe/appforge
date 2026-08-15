@@ -3,6 +3,10 @@
 package config
 
 import (
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"appforge/common/rpcauth"
@@ -31,6 +35,74 @@ type Config struct {
 	Billing             BillingConfig             `json:"Billing" yaml:"Billing"`
 	LocalAgentGateway   LocalAgentGatewayConfig   `json:"LocalAgentGateway" yaml:"LocalAgentGateway"`
 	OfflineLicense      OfflineLicenseConfig      `json:"OfflineLicense" yaml:"OfflineLicense"`
+	Deployment          DeploymentConfig          `json:"Deployment" yaml:"Deployment"`
+}
+
+type DeploymentConfig struct {
+	DeploymentId         string `json:"DeploymentId" yaml:"DeploymentId"`
+	DeploymentMode       string `json:"DeploymentMode" yaml:"DeploymentMode"`
+	ProductVersion       string `json:"ProductVersion" yaml:"ProductVersion"`
+	TargetSchemaVersion  string `json:"TargetSchemaVersion" yaml:"TargetSchemaVersion"`
+	MaxVersionSkew       int32  `json:"MaxVersionSkew" yaml:"MaxVersionSkew"`
+	AgentProtocolCurrent int32  `json:"AgentProtocolCurrent" yaml:"AgentProtocolCurrent"`
+	AgentProtocolMinimum int32  `json:"AgentProtocolMinimum" yaml:"AgentProtocolMinimum"`
+}
+
+// ApplyDeploymentEnvironment applies immutable release/deployment metadata
+// supplied by Compose or Helm. It deliberately accepts no command or file path.
+func ApplyDeploymentEnvironment(c *Config) error {
+	if c == nil {
+		return fmt.Errorf("config is required")
+	}
+	overrideString(&c.Deployment.DeploymentId, "APPFORGE_DEPLOYMENT_ID")
+	overrideString(&c.Deployment.DeploymentMode, "APPFORGE_DEPLOYMENT_MODE")
+	overrideString(&c.Deployment.ProductVersion, "APPFORGE_VERSION")
+	overrideString(&c.Deployment.TargetSchemaVersion, "APPFORGE_SCHEMA_VERSION")
+	if value := strings.TrimSpace(os.Getenv("APPFORGE_MAX_VERSION_SKEW")); value != "" {
+		parsed, err := strconv.ParseInt(value, 10, 32)
+		if err != nil {
+			return fmt.Errorf("APPFORGE_MAX_VERSION_SKEW must be an integer: %w", err)
+		}
+		c.Deployment.MaxVersionSkew = int32(parsed)
+	}
+	if c.Deployment.DeploymentId == "" {
+		c.Deployment.DeploymentId = "local-development"
+	}
+	if c.Deployment.DeploymentMode == "" {
+		c.Deployment.DeploymentMode = "saas"
+	}
+	if c.Deployment.ProductVersion == "" {
+		c.Deployment.ProductVersion = "0.0.0-dev"
+	}
+	if c.Deployment.TargetSchemaVersion == "" {
+		c.Deployment.TargetSchemaVersion = "20260815_111_v7_deployment_console"
+	}
+	if c.Deployment.MaxVersionSkew <= 0 {
+		c.Deployment.MaxVersionSkew = 1
+	}
+	if c.Deployment.AgentProtocolCurrent <= 0 {
+		c.Deployment.AgentProtocolCurrent = 3
+	}
+	if c.Deployment.AgentProtocolMinimum <= 0 {
+		c.Deployment.AgentProtocolMinimum = 2
+	}
+	if c.Deployment.AgentProtocolMinimum > c.Deployment.AgentProtocolCurrent {
+		return fmt.Errorf("minimum Agent protocol cannot exceed current protocol")
+	}
+	switch c.Deployment.DeploymentMode {
+	case "saas", "dedicated", "private", "hybrid":
+	default:
+		return fmt.Errorf("unsupported deployment mode %q", c.Deployment.DeploymentMode)
+	}
+	return nil
+}
+
+func overrideString(target *string, environmentKey string) {
+	if value := strings.TrimSpace(os.Getenv(environmentKey)); value != "" {
+		*target = value
+	} else {
+		*target = strings.TrimSpace(*target)
+	}
 }
 
 type OfflineLicenseConfig struct {

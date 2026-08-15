@@ -5888,6 +5888,136 @@ func (x *ResolveTenantDomainResp) GetTargetOrigin() string {
 	return ""
 }
 
+// 企业部署数据库迁移记录。
+type DeploymentMigrationItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Version       string                 `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`         // 迁移版本标识
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"` // 迁移中文说明
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeploymentMigrationItem) Reset() {
+	*x = DeploymentMigrationItem{}
+	mi := &file_proto_system_system_proto_msgTypes[83]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeploymentMigrationItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeploymentMigrationItem) ProtoMessage() {}
+
+func (x *DeploymentMigrationItem) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_system_system_proto_msgTypes[83]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeploymentMigrationItem.ProtoReflect.Descriptor instead.
+func (*DeploymentMigrationItem) Descriptor() ([]byte, []int) {
+	return file_proto_system_system_proto_rawDescGZIP(), []int{83}
+}
+
+func (x *DeploymentMigrationItem) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *DeploymentMigrationItem) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+// 企业部署数据库状态响应。
+type DeploymentDatabaseStatusResp struct {
+	state               protoimpl.MessageState     `protogen:"open.v1"`
+	Base                *common.RespBase           `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                                                            // 通用响应
+	LatestSchemaVersion string                     `protobuf:"bytes,2,opt,name=latest_schema_version,json=latestSchemaVersion,proto3" json:"latest_schema_version,omitempty"` // 数据库中最新迁移版本
+	MigrationCount      int64                      `protobuf:"varint,3,opt,name=migration_count,json=migrationCount,proto3" json:"migration_count,omitempty"`                 // 已执行迁移总数
+	RecentMigrations    []*DeploymentMigrationItem `protobuf:"bytes,4,rep,name=recent_migrations,json=recentMigrations,proto3" json:"recent_migrations,omitempty"`            // 最近十条迁移记录
+	CheckedAt           int64                      `protobuf:"varint,5,opt,name=checked_at,json=checkedAt,proto3" json:"checked_at,omitempty"`                                // 实际查询完成时间，Unix毫秒
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *DeploymentDatabaseStatusResp) Reset() {
+	*x = DeploymentDatabaseStatusResp{}
+	mi := &file_proto_system_system_proto_msgTypes[84]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeploymentDatabaseStatusResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeploymentDatabaseStatusResp) ProtoMessage() {}
+
+func (x *DeploymentDatabaseStatusResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_system_system_proto_msgTypes[84]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeploymentDatabaseStatusResp.ProtoReflect.Descriptor instead.
+func (*DeploymentDatabaseStatusResp) Descriptor() ([]byte, []int) {
+	return file_proto_system_system_proto_rawDescGZIP(), []int{84}
+}
+
+func (x *DeploymentDatabaseStatusResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *DeploymentDatabaseStatusResp) GetLatestSchemaVersion() string {
+	if x != nil {
+		return x.LatestSchemaVersion
+	}
+	return ""
+}
+
+func (x *DeploymentDatabaseStatusResp) GetMigrationCount() int64 {
+	if x != nil {
+		return x.MigrationCount
+	}
+	return 0
+}
+
+func (x *DeploymentDatabaseStatusResp) GetRecentMigrations() []*DeploymentMigrationItem {
+	if x != nil {
+		return x.RecentMigrations
+	}
+	return nil
+}
+
+func (x *DeploymentDatabaseStatusResp) GetCheckedAt() int64 {
+	if x != nil {
+		return x.CheckedAt
+	}
+	return 0
+}
+
 var File_proto_system_system_proto protoreflect.FileDescriptor
 
 const file_proto_system_system_proto_rawDesc = "" +
@@ -6371,7 +6501,17 @@ const file_proto_system_system_proto_rawDesc = "" +
 	"\x17ResolveTenantDomainResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12?\n" +
 	"\rsource_status\x18\x02 \x01(\x0e2\x1a.system.TenantDomainStatusR\fsourceStatus\x12#\n" +
-	"\rtarget_origin\x18\x03 \x01(\tR\ftargetOrigin2\xc3\x17\n" +
+	"\rtarget_origin\x18\x03 \x01(\tR\ftargetOrigin\"U\n" +
+	"\x17DeploymentMigrationItem\x12\x18\n" +
+	"\aversion\x18\x01 \x01(\tR\aversion\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\"\x8e\x02\n" +
+	"\x1cDeploymentDatabaseStatusResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x122\n" +
+	"\x15latest_schema_version\x18\x02 \x01(\tR\x13latestSchemaVersion\x12'\n" +
+	"\x0fmigration_count\x18\x03 \x01(\x03R\x0emigrationCount\x12L\n" +
+	"\x11recent_migrations\x18\x04 \x03(\v2\x1f.system.DeploymentMigrationItemR\x10recentMigrations\x12\x1d\n" +
+	"\n" +
+	"checked_at\x18\x05 \x01(\x03R\tcheckedAt2\x97\x18\n" +
 	"\x05Admin\x12,\n" +
 	"\x05Login\x12\x10.system.LoginReq\x1a\x11.system.LoginResp\x120\n" +
 	"\n" +
@@ -6419,7 +6559,8 @@ const file_proto_system_system_proto_rawDesc = "" +
 	"\x13SysTenantDomainList\x12\x1e.system.SysTenantDomainListReq\x1a\x1f.system.SysTenantDomainListResp\x12K\n" +
 	"\x15SysTenantDomainCreate\x12 .system.SysTenantDomainCreateReq\x1a\x10.system.RespBase\x12K\n" +
 	"\x15SysTenantDomainUpdate\x12 .system.SysTenantDomainUpdateReq\x1a\x10.system.RespBase\x12K\n" +
-	"\x15SysTenantDomainDelete\x12 .system.SysTenantDomainDeleteReq\x1a\x10.system.RespBase2\x9d\x01\n" +
+	"\x15SysTenantDomainDelete\x12 .system.SysTenantDomainDeleteReq\x1a\x10.system.RespBase\x12R\n" +
+	"\x1bGetDeploymentDatabaseStatus\x12\r.system.Empty\x1a$.system.DeploymentDatabaseStatusResp2\x9d\x01\n" +
 	"\x03App\x12J\n" +
 	"\x0fSysConfigDetail\x12\x1a.system.SysConfigDetailReq\x1a\x1b.system.SysConfigDetailResp\x12J\n" +
 	"\x0fSysTenantDetail\x12\x1a.system.SysTenantDetailReq\x1a\x1b.system.SysTenantDetailResp2\x8a\x03\n" +
@@ -6442,333 +6583,339 @@ func file_proto_system_system_proto_rawDescGZIP() []byte {
 	return file_proto_system_system_proto_rawDescData
 }
 
-var file_proto_system_system_proto_msgTypes = make([]protoimpl.MessageInfo, 83)
+var file_proto_system_system_proto_msgTypes = make([]protoimpl.MessageInfo, 85)
 var file_proto_system_system_proto_goTypes = []any{
-	(*Empty)(nil),                    // 0: system.Empty
-	(*RespBase)(nil),                 // 1: system.RespBase
-	(*LoginReq)(nil),                 // 2: system.LoginReq
-	(*LoginResp)(nil),                // 3: system.LoginResp
-	(*LoginData)(nil),                // 4: system.LoginData
-	(*ProfileUser)(nil),              // 5: system.ProfileUser
-	(*SysMenuNode)(nil),              // 6: system.SysMenuNode
-	(*ProfileData)(nil),              // 7: system.ProfileData
-	(*ProfileResp)(nil),              // 8: system.ProfileResp
-	(*UpdateProfileReq)(nil),         // 9: system.UpdateProfileReq
-	(*SysMenuItem)(nil),              // 10: system.SysMenuItem
-	(*SysMenuTreeReq)(nil),           // 11: system.SysMenuTreeReq
-	(*SysMenuTreeResp)(nil),          // 12: system.SysMenuTreeResp
-	(*Google2FAInitReq)(nil),         // 13: system.Google2FAInitReq
-	(*Google2FAInitResp)(nil),        // 14: system.Google2FAInitResp
-	(*Google2FAInitData)(nil),        // 15: system.Google2FAInitData
-	(*Google2FABindReq)(nil),         // 16: system.Google2FABindReq
-	(*Google2FAEnableReq)(nil),       // 17: system.Google2FAEnableReq
-	(*Google2FADisableReq)(nil),      // 18: system.Google2FADisableReq
-	(*Google2FAResetReq)(nil),        // 19: system.Google2FAResetReq
-	(*SysUserItem)(nil),              // 20: system.SysUserItem
-	(*SysUserListReq)(nil),           // 21: system.SysUserListReq
-	(*SysUserListResp)(nil),          // 22: system.SysUserListResp
-	(*SysUserDetailReq)(nil),         // 23: system.SysUserDetailReq
-	(*SysUserDetailResp)(nil),        // 24: system.SysUserDetailResp
-	(*SysUserCreateReq)(nil),         // 25: system.SysUserCreateReq
-	(*SysUserUpdateReq)(nil),         // 26: system.SysUserUpdateReq
-	(*SysUserDeleteReq)(nil),         // 27: system.SysUserDeleteReq
-	(*ChangeUserStatusReq)(nil),      // 28: system.ChangeUserStatusReq
-	(*ResetUserPwdReq)(nil),          // 29: system.ResetUserPwdReq
-	(*AssignUserRolesReq)(nil),       // 30: system.AssignUserRolesReq
-	(*SysRoleItem)(nil),              // 31: system.SysRoleItem
-	(*SysRoleListReq)(nil),           // 32: system.SysRoleListReq
-	(*SysRoleListResp)(nil),          // 33: system.SysRoleListResp
-	(*SysRoleCreateReq)(nil),         // 34: system.SysRoleCreateReq
-	(*SysRoleUpdateReq)(nil),         // 35: system.SysRoleUpdateReq
-	(*SysRoleDeleteReq)(nil),         // 36: system.SysRoleDeleteReq
-	(*SysRoleGrantReq)(nil),          // 37: system.SysRoleGrantReq
-	(*SysRoleGrantDetailReq)(nil),    // 38: system.SysRoleGrantDetailReq
-	(*SysRoleGrantDetailResp)(nil),   // 39: system.SysRoleGrantDetailResp
-	(*SysRoleGrantDetailData)(nil),   // 40: system.SysRoleGrantDetailData
-	(*SysPermItem)(nil),              // 41: system.SysPermItem
-	(*SysPermListResp)(nil),          // 42: system.SysPermListResp
-	(*SysMenuCreateReq)(nil),         // 43: system.SysMenuCreateReq
-	(*SysMenuUpdateReq)(nil),         // 44: system.SysMenuUpdateReq
-	(*SysMenuDeleteReq)(nil),         // 45: system.SysMenuDeleteReq
-	(*SysMenuListReq)(nil),           // 46: system.SysMenuListReq
-	(*SysMenuListResp)(nil),          // 47: system.SysMenuListResp
-	(*LoginLogItem)(nil),             // 48: system.LoginLogItem
-	(*LoginLogListReq)(nil),          // 49: system.LoginLogListReq
-	(*LoginLogListResp)(nil),         // 50: system.LoginLogListResp
-	(*OpLogItem)(nil),                // 51: system.OpLogItem
-	(*OpLogListReq)(nil),             // 52: system.OpLogListReq
-	(*OpLogListResp)(nil),            // 53: system.OpLogListResp
-	(*CreateOpLogReq)(nil),           // 54: system.CreateOpLogReq
-	(*SysConfigCreateReq)(nil),       // 55: system.SysConfigCreateReq
-	(*SysConfigUpdateReq)(nil),       // 56: system.SysConfigUpdateReq
-	(*SysConfigDeleteReq)(nil),       // 57: system.SysConfigDeleteReq
-	(*SysConfigItem)(nil),            // 58: system.SysConfigItem
-	(*SysConfigListReq)(nil),         // 59: system.SysConfigListReq
-	(*SysConfigListResp)(nil),        // 60: system.SysConfigListResp
-	(*SysConfigDetailReq)(nil),       // 61: system.SysConfigDetailReq
-	(*SysConfigDetailResp)(nil),      // 62: system.SysConfigDetailResp
-	(*SysConfigByKeysReq)(nil),       // 63: system.SysConfigByKeysReq
-	(*SysConfigByKeysResp)(nil),      // 64: system.SysConfigByKeysResp
-	(*LoginUserPermsReq)(nil),        // 65: system.LoginUserPermsReq
-	(*LoginUserPermsResp)(nil),       // 66: system.LoginUserPermsResp
-	(*SysTenantItem)(nil),            // 67: system.SysTenantItem
-	(*SysTenantListReq)(nil),         // 68: system.SysTenantListReq
-	(*SysTenantListResp)(nil),        // 69: system.SysTenantListResp
-	(*SysTenantCreateReq)(nil),       // 70: system.SysTenantCreateReq
-	(*SysTenantUpdateReq)(nil),       // 71: system.SysTenantUpdateReq
-	(*SysTenantDeleteReq)(nil),       // 72: system.SysTenantDeleteReq
-	(*SysTenantDetailReq)(nil),       // 73: system.SysTenantDetailReq
-	(*SysTenantDetailResp)(nil),      // 74: system.SysTenantDetailResp
-	(*SysTenantDomainItem)(nil),      // 75: system.SysTenantDomainItem
-	(*SysTenantDomainListReq)(nil),   // 76: system.SysTenantDomainListReq
-	(*SysTenantDomainListResp)(nil),  // 77: system.SysTenantDomainListResp
-	(*SysTenantDomainCreateReq)(nil), // 78: system.SysTenantDomainCreateReq
-	(*SysTenantDomainUpdateReq)(nil), // 79: system.SysTenantDomainUpdateReq
-	(*SysTenantDomainDeleteReq)(nil), // 80: system.SysTenantDomainDeleteReq
-	(*ResolveTenantDomainReq)(nil),   // 81: system.ResolveTenantDomainReq
-	(*ResolveTenantDomainResp)(nil),  // 82: system.ResolveTenantDomainResp
-	(*common.RespBase)(nil),          // 83: common.RespBase
-	(ApplicationScope)(0),            // 84: system.ApplicationScope
-	(common.Enable)(0),               // 85: common.Enable
-	(UserType)(0),                    // 86: system.UserType
-	(common.YesNo)(0),                // 87: common.YesNo
-	(MenuType)(0),                    // 88: system.MenuType
-	(common.Switch)(0),               // 89: common.Switch
-	(RequestMethod)(0),               // 90: system.RequestMethod
-	(*common.PageReq)(nil),           // 91: common.PageReq
-	(SysConfigType)(0),               // 92: system.SysConfigType
-	(TenantDomainStatus)(0),          // 93: system.TenantDomainStatus
+	(*Empty)(nil),                        // 0: system.Empty
+	(*RespBase)(nil),                     // 1: system.RespBase
+	(*LoginReq)(nil),                     // 2: system.LoginReq
+	(*LoginResp)(nil),                    // 3: system.LoginResp
+	(*LoginData)(nil),                    // 4: system.LoginData
+	(*ProfileUser)(nil),                  // 5: system.ProfileUser
+	(*SysMenuNode)(nil),                  // 6: system.SysMenuNode
+	(*ProfileData)(nil),                  // 7: system.ProfileData
+	(*ProfileResp)(nil),                  // 8: system.ProfileResp
+	(*UpdateProfileReq)(nil),             // 9: system.UpdateProfileReq
+	(*SysMenuItem)(nil),                  // 10: system.SysMenuItem
+	(*SysMenuTreeReq)(nil),               // 11: system.SysMenuTreeReq
+	(*SysMenuTreeResp)(nil),              // 12: system.SysMenuTreeResp
+	(*Google2FAInitReq)(nil),             // 13: system.Google2FAInitReq
+	(*Google2FAInitResp)(nil),            // 14: system.Google2FAInitResp
+	(*Google2FAInitData)(nil),            // 15: system.Google2FAInitData
+	(*Google2FABindReq)(nil),             // 16: system.Google2FABindReq
+	(*Google2FAEnableReq)(nil),           // 17: system.Google2FAEnableReq
+	(*Google2FADisableReq)(nil),          // 18: system.Google2FADisableReq
+	(*Google2FAResetReq)(nil),            // 19: system.Google2FAResetReq
+	(*SysUserItem)(nil),                  // 20: system.SysUserItem
+	(*SysUserListReq)(nil),               // 21: system.SysUserListReq
+	(*SysUserListResp)(nil),              // 22: system.SysUserListResp
+	(*SysUserDetailReq)(nil),             // 23: system.SysUserDetailReq
+	(*SysUserDetailResp)(nil),            // 24: system.SysUserDetailResp
+	(*SysUserCreateReq)(nil),             // 25: system.SysUserCreateReq
+	(*SysUserUpdateReq)(nil),             // 26: system.SysUserUpdateReq
+	(*SysUserDeleteReq)(nil),             // 27: system.SysUserDeleteReq
+	(*ChangeUserStatusReq)(nil),          // 28: system.ChangeUserStatusReq
+	(*ResetUserPwdReq)(nil),              // 29: system.ResetUserPwdReq
+	(*AssignUserRolesReq)(nil),           // 30: system.AssignUserRolesReq
+	(*SysRoleItem)(nil),                  // 31: system.SysRoleItem
+	(*SysRoleListReq)(nil),               // 32: system.SysRoleListReq
+	(*SysRoleListResp)(nil),              // 33: system.SysRoleListResp
+	(*SysRoleCreateReq)(nil),             // 34: system.SysRoleCreateReq
+	(*SysRoleUpdateReq)(nil),             // 35: system.SysRoleUpdateReq
+	(*SysRoleDeleteReq)(nil),             // 36: system.SysRoleDeleteReq
+	(*SysRoleGrantReq)(nil),              // 37: system.SysRoleGrantReq
+	(*SysRoleGrantDetailReq)(nil),        // 38: system.SysRoleGrantDetailReq
+	(*SysRoleGrantDetailResp)(nil),       // 39: system.SysRoleGrantDetailResp
+	(*SysRoleGrantDetailData)(nil),       // 40: system.SysRoleGrantDetailData
+	(*SysPermItem)(nil),                  // 41: system.SysPermItem
+	(*SysPermListResp)(nil),              // 42: system.SysPermListResp
+	(*SysMenuCreateReq)(nil),             // 43: system.SysMenuCreateReq
+	(*SysMenuUpdateReq)(nil),             // 44: system.SysMenuUpdateReq
+	(*SysMenuDeleteReq)(nil),             // 45: system.SysMenuDeleteReq
+	(*SysMenuListReq)(nil),               // 46: system.SysMenuListReq
+	(*SysMenuListResp)(nil),              // 47: system.SysMenuListResp
+	(*LoginLogItem)(nil),                 // 48: system.LoginLogItem
+	(*LoginLogListReq)(nil),              // 49: system.LoginLogListReq
+	(*LoginLogListResp)(nil),             // 50: system.LoginLogListResp
+	(*OpLogItem)(nil),                    // 51: system.OpLogItem
+	(*OpLogListReq)(nil),                 // 52: system.OpLogListReq
+	(*OpLogListResp)(nil),                // 53: system.OpLogListResp
+	(*CreateOpLogReq)(nil),               // 54: system.CreateOpLogReq
+	(*SysConfigCreateReq)(nil),           // 55: system.SysConfigCreateReq
+	(*SysConfigUpdateReq)(nil),           // 56: system.SysConfigUpdateReq
+	(*SysConfigDeleteReq)(nil),           // 57: system.SysConfigDeleteReq
+	(*SysConfigItem)(nil),                // 58: system.SysConfigItem
+	(*SysConfigListReq)(nil),             // 59: system.SysConfigListReq
+	(*SysConfigListResp)(nil),            // 60: system.SysConfigListResp
+	(*SysConfigDetailReq)(nil),           // 61: system.SysConfigDetailReq
+	(*SysConfigDetailResp)(nil),          // 62: system.SysConfigDetailResp
+	(*SysConfigByKeysReq)(nil),           // 63: system.SysConfigByKeysReq
+	(*SysConfigByKeysResp)(nil),          // 64: system.SysConfigByKeysResp
+	(*LoginUserPermsReq)(nil),            // 65: system.LoginUserPermsReq
+	(*LoginUserPermsResp)(nil),           // 66: system.LoginUserPermsResp
+	(*SysTenantItem)(nil),                // 67: system.SysTenantItem
+	(*SysTenantListReq)(nil),             // 68: system.SysTenantListReq
+	(*SysTenantListResp)(nil),            // 69: system.SysTenantListResp
+	(*SysTenantCreateReq)(nil),           // 70: system.SysTenantCreateReq
+	(*SysTenantUpdateReq)(nil),           // 71: system.SysTenantUpdateReq
+	(*SysTenantDeleteReq)(nil),           // 72: system.SysTenantDeleteReq
+	(*SysTenantDetailReq)(nil),           // 73: system.SysTenantDetailReq
+	(*SysTenantDetailResp)(nil),          // 74: system.SysTenantDetailResp
+	(*SysTenantDomainItem)(nil),          // 75: system.SysTenantDomainItem
+	(*SysTenantDomainListReq)(nil),       // 76: system.SysTenantDomainListReq
+	(*SysTenantDomainListResp)(nil),      // 77: system.SysTenantDomainListResp
+	(*SysTenantDomainCreateReq)(nil),     // 78: system.SysTenantDomainCreateReq
+	(*SysTenantDomainUpdateReq)(nil),     // 79: system.SysTenantDomainUpdateReq
+	(*SysTenantDomainDeleteReq)(nil),     // 80: system.SysTenantDomainDeleteReq
+	(*ResolveTenantDomainReq)(nil),       // 81: system.ResolveTenantDomainReq
+	(*ResolveTenantDomainResp)(nil),      // 82: system.ResolveTenantDomainResp
+	(*DeploymentMigrationItem)(nil),      // 83: system.DeploymentMigrationItem
+	(*DeploymentDatabaseStatusResp)(nil), // 84: system.DeploymentDatabaseStatusResp
+	(*common.RespBase)(nil),              // 85: common.RespBase
+	(ApplicationScope)(0),                // 86: system.ApplicationScope
+	(common.Enable)(0),                   // 87: common.Enable
+	(UserType)(0),                        // 88: system.UserType
+	(common.YesNo)(0),                    // 89: common.YesNo
+	(MenuType)(0),                        // 90: system.MenuType
+	(common.Switch)(0),                   // 91: common.Switch
+	(RequestMethod)(0),                   // 92: system.RequestMethod
+	(*common.PageReq)(nil),               // 93: common.PageReq
+	(SysConfigType)(0),                   // 94: system.SysConfigType
+	(TenantDomainStatus)(0),              // 95: system.TenantDomainStatus
 }
 var file_proto_system_system_proto_depIdxs = []int32{
-	83,  // 0: system.RespBase.base:type_name -> common.RespBase
-	84,  // 1: system.LoginReq.app_scope:type_name -> system.ApplicationScope
-	83,  // 2: system.LoginResp.base:type_name -> common.RespBase
+	85,  // 0: system.RespBase.base:type_name -> common.RespBase
+	86,  // 1: system.LoginReq.app_scope:type_name -> system.ApplicationScope
+	85,  // 2: system.LoginResp.base:type_name -> common.RespBase
 	4,   // 3: system.LoginResp.data:type_name -> system.LoginData
-	85,  // 4: system.LoginData.google2fa_enabled:type_name -> common.Enable
-	86,  // 5: system.LoginData.user_type:type_name -> system.UserType
-	87,  // 6: system.LoginData.is_owner:type_name -> common.YesNo
-	84,  // 7: system.LoginData.app_scope:type_name -> system.ApplicationScope
-	86,  // 8: system.ProfileUser.user_type:type_name -> system.UserType
-	87,  // 9: system.ProfileUser.is_owner:type_name -> common.YesNo
-	85,  // 10: system.ProfileUser.google2fa_enabled:type_name -> common.Enable
-	84,  // 11: system.ProfileUser.app_scope:type_name -> system.ApplicationScope
-	88,  // 12: system.SysMenuNode.menu_type:type_name -> system.MenuType
-	89,  // 13: system.SysMenuNode.visible:type_name -> common.Switch
-	85,  // 14: system.SysMenuNode.enabled:type_name -> common.Enable
+	87,  // 4: system.LoginData.google2fa_enabled:type_name -> common.Enable
+	88,  // 5: system.LoginData.user_type:type_name -> system.UserType
+	89,  // 6: system.LoginData.is_owner:type_name -> common.YesNo
+	86,  // 7: system.LoginData.app_scope:type_name -> system.ApplicationScope
+	88,  // 8: system.ProfileUser.user_type:type_name -> system.UserType
+	89,  // 9: system.ProfileUser.is_owner:type_name -> common.YesNo
+	87,  // 10: system.ProfileUser.google2fa_enabled:type_name -> common.Enable
+	86,  // 11: system.ProfileUser.app_scope:type_name -> system.ApplicationScope
+	90,  // 12: system.SysMenuNode.menu_type:type_name -> system.MenuType
+	91,  // 13: system.SysMenuNode.visible:type_name -> common.Switch
+	87,  // 14: system.SysMenuNode.enabled:type_name -> common.Enable
 	6,   // 15: system.SysMenuNode.children:type_name -> system.SysMenuNode
-	84,  // 16: system.SysMenuNode.app_scope:type_name -> system.ApplicationScope
+	86,  // 16: system.SysMenuNode.app_scope:type_name -> system.ApplicationScope
 	5,   // 17: system.ProfileData.user:type_name -> system.ProfileUser
 	6,   // 18: system.ProfileData.menus:type_name -> system.SysMenuNode
-	83,  // 19: system.ProfileResp.base:type_name -> common.RespBase
+	85,  // 19: system.ProfileResp.base:type_name -> common.RespBase
 	7,   // 20: system.ProfileResp.data:type_name -> system.ProfileData
-	88,  // 21: system.SysMenuItem.menu_type:type_name -> system.MenuType
-	90,  // 22: system.SysMenuItem.method:type_name -> system.RequestMethod
-	89,  // 23: system.SysMenuItem.visible:type_name -> common.Switch
-	85,  // 24: system.SysMenuItem.enabled:type_name -> common.Enable
-	84,  // 25: system.SysMenuItem.app_scope:type_name -> system.ApplicationScope
-	83,  // 26: system.SysMenuTreeResp.base:type_name -> common.RespBase
+	90,  // 21: system.SysMenuItem.menu_type:type_name -> system.MenuType
+	92,  // 22: system.SysMenuItem.method:type_name -> system.RequestMethod
+	91,  // 23: system.SysMenuItem.visible:type_name -> common.Switch
+	87,  // 24: system.SysMenuItem.enabled:type_name -> common.Enable
+	86,  // 25: system.SysMenuItem.app_scope:type_name -> system.ApplicationScope
+	85,  // 26: system.SysMenuTreeResp.base:type_name -> common.RespBase
 	10,  // 27: system.SysMenuTreeResp.data:type_name -> system.SysMenuItem
-	83,  // 28: system.Google2FAInitResp.base:type_name -> common.RespBase
+	85,  // 28: system.Google2FAInitResp.base:type_name -> common.RespBase
 	15,  // 29: system.Google2FAInitResp.data:type_name -> system.Google2FAInitData
-	85,  // 30: system.SysUserItem.enabled:type_name -> common.Enable
-	85,  // 31: system.SysUserItem.google2fa_enabled:type_name -> common.Enable
-	86,  // 32: system.SysUserItem.user_type:type_name -> system.UserType
-	87,  // 33: system.SysUserItem.is_owner:type_name -> common.YesNo
-	84,  // 34: system.SysUserItem.app_scope:type_name -> system.ApplicationScope
-	91,  // 35: system.SysUserListReq.page:type_name -> common.PageReq
-	85,  // 36: system.SysUserListReq.enabled:type_name -> common.Enable
-	84,  // 37: system.SysUserListReq.app_scope:type_name -> system.ApplicationScope
-	83,  // 38: system.SysUserListResp.base:type_name -> common.RespBase
+	87,  // 30: system.SysUserItem.enabled:type_name -> common.Enable
+	87,  // 31: system.SysUserItem.google2fa_enabled:type_name -> common.Enable
+	88,  // 32: system.SysUserItem.user_type:type_name -> system.UserType
+	89,  // 33: system.SysUserItem.is_owner:type_name -> common.YesNo
+	86,  // 34: system.SysUserItem.app_scope:type_name -> system.ApplicationScope
+	93,  // 35: system.SysUserListReq.page:type_name -> common.PageReq
+	87,  // 36: system.SysUserListReq.enabled:type_name -> common.Enable
+	86,  // 37: system.SysUserListReq.app_scope:type_name -> system.ApplicationScope
+	85,  // 38: system.SysUserListResp.base:type_name -> common.RespBase
 	20,  // 39: system.SysUserListResp.data:type_name -> system.SysUserItem
-	83,  // 40: system.SysUserDetailResp.base:type_name -> common.RespBase
+	85,  // 40: system.SysUserDetailResp.base:type_name -> common.RespBase
 	20,  // 41: system.SysUserDetailResp.data:type_name -> system.SysUserItem
-	85,  // 42: system.SysUserCreateReq.enabled:type_name -> common.Enable
-	86,  // 43: system.SysUserCreateReq.user_type:type_name -> system.UserType
-	87,  // 44: system.SysUserCreateReq.is_owner:type_name -> common.YesNo
-	84,  // 45: system.SysUserCreateReq.app_scope:type_name -> system.ApplicationScope
-	85,  // 46: system.SysUserUpdateReq.enabled:type_name -> common.Enable
-	86,  // 47: system.SysUserUpdateReq.user_type:type_name -> system.UserType
-	87,  // 48: system.SysUserUpdateReq.is_owner:type_name -> common.YesNo
-	84,  // 49: system.SysUserUpdateReq.app_scope:type_name -> system.ApplicationScope
-	85,  // 50: system.ChangeUserStatusReq.enabled:type_name -> common.Enable
-	85,  // 51: system.SysRoleItem.enabled:type_name -> common.Enable
-	84,  // 52: system.SysRoleItem.app_scope:type_name -> system.ApplicationScope
-	91,  // 53: system.SysRoleListReq.page:type_name -> common.PageReq
-	85,  // 54: system.SysRoleListReq.enabled:type_name -> common.Enable
-	84,  // 55: system.SysRoleListReq.app_scope:type_name -> system.ApplicationScope
-	83,  // 56: system.SysRoleListResp.base:type_name -> common.RespBase
+	87,  // 42: system.SysUserCreateReq.enabled:type_name -> common.Enable
+	88,  // 43: system.SysUserCreateReq.user_type:type_name -> system.UserType
+	89,  // 44: system.SysUserCreateReq.is_owner:type_name -> common.YesNo
+	86,  // 45: system.SysUserCreateReq.app_scope:type_name -> system.ApplicationScope
+	87,  // 46: system.SysUserUpdateReq.enabled:type_name -> common.Enable
+	88,  // 47: system.SysUserUpdateReq.user_type:type_name -> system.UserType
+	89,  // 48: system.SysUserUpdateReq.is_owner:type_name -> common.YesNo
+	86,  // 49: system.SysUserUpdateReq.app_scope:type_name -> system.ApplicationScope
+	87,  // 50: system.ChangeUserStatusReq.enabled:type_name -> common.Enable
+	87,  // 51: system.SysRoleItem.enabled:type_name -> common.Enable
+	86,  // 52: system.SysRoleItem.app_scope:type_name -> system.ApplicationScope
+	93,  // 53: system.SysRoleListReq.page:type_name -> common.PageReq
+	87,  // 54: system.SysRoleListReq.enabled:type_name -> common.Enable
+	86,  // 55: system.SysRoleListReq.app_scope:type_name -> system.ApplicationScope
+	85,  // 56: system.SysRoleListResp.base:type_name -> common.RespBase
 	31,  // 57: system.SysRoleListResp.data:type_name -> system.SysRoleItem
-	85,  // 58: system.SysRoleCreateReq.enabled:type_name -> common.Enable
-	84,  // 59: system.SysRoleCreateReq.app_scope:type_name -> system.ApplicationScope
-	85,  // 60: system.SysRoleUpdateReq.enabled:type_name -> common.Enable
-	84,  // 61: system.SysRoleUpdateReq.app_scope:type_name -> system.ApplicationScope
-	83,  // 62: system.SysRoleGrantDetailResp.base:type_name -> common.RespBase
+	87,  // 58: system.SysRoleCreateReq.enabled:type_name -> common.Enable
+	86,  // 59: system.SysRoleCreateReq.app_scope:type_name -> system.ApplicationScope
+	87,  // 60: system.SysRoleUpdateReq.enabled:type_name -> common.Enable
+	86,  // 61: system.SysRoleUpdateReq.app_scope:type_name -> system.ApplicationScope
+	85,  // 62: system.SysRoleGrantDetailResp.base:type_name -> common.RespBase
 	40,  // 63: system.SysRoleGrantDetailResp.data:type_name -> system.SysRoleGrantDetailData
-	90,  // 64: system.SysPermItem.method:type_name -> system.RequestMethod
-	84,  // 65: system.SysPermItem.app_scope:type_name -> system.ApplicationScope
-	83,  // 66: system.SysPermListResp.base:type_name -> common.RespBase
+	92,  // 64: system.SysPermItem.method:type_name -> system.RequestMethod
+	86,  // 65: system.SysPermItem.app_scope:type_name -> system.ApplicationScope
+	85,  // 66: system.SysPermListResp.base:type_name -> common.RespBase
 	41,  // 67: system.SysPermListResp.data:type_name -> system.SysPermItem
-	88,  // 68: system.SysMenuCreateReq.menu_type:type_name -> system.MenuType
-	90,  // 69: system.SysMenuCreateReq.method:type_name -> system.RequestMethod
-	89,  // 70: system.SysMenuCreateReq.visible:type_name -> common.Switch
-	85,  // 71: system.SysMenuCreateReq.enabled:type_name -> common.Enable
-	84,  // 72: system.SysMenuCreateReq.app_scope:type_name -> system.ApplicationScope
-	88,  // 73: system.SysMenuUpdateReq.menu_type:type_name -> system.MenuType
-	90,  // 74: system.SysMenuUpdateReq.method:type_name -> system.RequestMethod
-	89,  // 75: system.SysMenuUpdateReq.visible:type_name -> common.Switch
-	85,  // 76: system.SysMenuUpdateReq.enabled:type_name -> common.Enable
-	84,  // 77: system.SysMenuUpdateReq.app_scope:type_name -> system.ApplicationScope
-	91,  // 78: system.SysMenuListReq.page:type_name -> common.PageReq
-	88,  // 79: system.SysMenuListReq.menu_type:type_name -> system.MenuType
-	85,  // 80: system.SysMenuListReq.enabled:type_name -> common.Enable
-	89,  // 81: system.SysMenuListReq.visible:type_name -> common.Switch
-	84,  // 82: system.SysMenuListReq.app_scope:type_name -> system.ApplicationScope
-	83,  // 83: system.SysMenuListResp.base:type_name -> common.RespBase
+	90,  // 68: system.SysMenuCreateReq.menu_type:type_name -> system.MenuType
+	92,  // 69: system.SysMenuCreateReq.method:type_name -> system.RequestMethod
+	91,  // 70: system.SysMenuCreateReq.visible:type_name -> common.Switch
+	87,  // 71: system.SysMenuCreateReq.enabled:type_name -> common.Enable
+	86,  // 72: system.SysMenuCreateReq.app_scope:type_name -> system.ApplicationScope
+	90,  // 73: system.SysMenuUpdateReq.menu_type:type_name -> system.MenuType
+	92,  // 74: system.SysMenuUpdateReq.method:type_name -> system.RequestMethod
+	91,  // 75: system.SysMenuUpdateReq.visible:type_name -> common.Switch
+	87,  // 76: system.SysMenuUpdateReq.enabled:type_name -> common.Enable
+	86,  // 77: system.SysMenuUpdateReq.app_scope:type_name -> system.ApplicationScope
+	93,  // 78: system.SysMenuListReq.page:type_name -> common.PageReq
+	90,  // 79: system.SysMenuListReq.menu_type:type_name -> system.MenuType
+	87,  // 80: system.SysMenuListReq.enabled:type_name -> common.Enable
+	91,  // 81: system.SysMenuListReq.visible:type_name -> common.Switch
+	86,  // 82: system.SysMenuListReq.app_scope:type_name -> system.ApplicationScope
+	85,  // 83: system.SysMenuListResp.base:type_name -> common.RespBase
 	10,  // 84: system.SysMenuListResp.data:type_name -> system.SysMenuItem
-	91,  // 85: system.LoginLogListReq.page:type_name -> common.PageReq
-	83,  // 86: system.LoginLogListResp.base:type_name -> common.RespBase
+	93,  // 85: system.LoginLogListReq.page:type_name -> common.PageReq
+	85,  // 86: system.LoginLogListResp.base:type_name -> common.RespBase
 	48,  // 87: system.LoginLogListResp.data:type_name -> system.LoginLogItem
-	90,  // 88: system.OpLogItem.method:type_name -> system.RequestMethod
-	91,  // 89: system.OpLogListReq.page:type_name -> common.PageReq
-	90,  // 90: system.OpLogListReq.method:type_name -> system.RequestMethod
-	83,  // 91: system.OpLogListResp.base:type_name -> common.RespBase
+	92,  // 88: system.OpLogItem.method:type_name -> system.RequestMethod
+	93,  // 89: system.OpLogListReq.page:type_name -> common.PageReq
+	92,  // 90: system.OpLogListReq.method:type_name -> system.RequestMethod
+	85,  // 91: system.OpLogListResp.base:type_name -> common.RespBase
 	51,  // 92: system.OpLogListResp.data:type_name -> system.OpLogItem
-	90,  // 93: system.CreateOpLogReq.method:type_name -> system.RequestMethod
-	91,  // 94: system.SysConfigListReq.page:type_name -> common.PageReq
-	83,  // 95: system.SysConfigListResp.base:type_name -> common.RespBase
+	92,  // 93: system.CreateOpLogReq.method:type_name -> system.RequestMethod
+	93,  // 94: system.SysConfigListReq.page:type_name -> common.PageReq
+	85,  // 95: system.SysConfigListResp.base:type_name -> common.RespBase
 	58,  // 96: system.SysConfigListResp.data:type_name -> system.SysConfigItem
-	92,  // 97: system.SysConfigDetailReq.config_key:type_name -> system.SysConfigType
-	83,  // 98: system.SysConfigDetailResp.base:type_name -> common.RespBase
+	94,  // 97: system.SysConfigDetailReq.config_key:type_name -> system.SysConfigType
+	85,  // 98: system.SysConfigDetailResp.base:type_name -> common.RespBase
 	58,  // 99: system.SysConfigDetailResp.data:type_name -> system.SysConfigItem
-	83,  // 100: system.SysConfigByKeysResp.base:type_name -> common.RespBase
+	85,  // 100: system.SysConfigByKeysResp.base:type_name -> common.RespBase
 	58,  // 101: system.SysConfigByKeysResp.data:type_name -> system.SysConfigItem
-	85,  // 102: system.SysTenantItem.enabled:type_name -> common.Enable
-	91,  // 103: system.SysTenantListReq.page:type_name -> common.PageReq
-	85,  // 104: system.SysTenantListReq.enabled:type_name -> common.Enable
-	83,  // 105: system.SysTenantListResp.base:type_name -> common.RespBase
+	87,  // 102: system.SysTenantItem.enabled:type_name -> common.Enable
+	93,  // 103: system.SysTenantListReq.page:type_name -> common.PageReq
+	87,  // 104: system.SysTenantListReq.enabled:type_name -> common.Enable
+	85,  // 105: system.SysTenantListResp.base:type_name -> common.RespBase
 	67,  // 106: system.SysTenantListResp.data:type_name -> system.SysTenantItem
-	85,  // 107: system.SysTenantCreateReq.enabled:type_name -> common.Enable
-	85,  // 108: system.SysTenantUpdateReq.enabled:type_name -> common.Enable
-	83,  // 109: system.SysTenantDetailResp.base:type_name -> common.RespBase
+	87,  // 107: system.SysTenantCreateReq.enabled:type_name -> common.Enable
+	87,  // 108: system.SysTenantUpdateReq.enabled:type_name -> common.Enable
+	85,  // 109: system.SysTenantDetailResp.base:type_name -> common.RespBase
 	67,  // 110: system.SysTenantDetailResp.data:type_name -> system.SysTenantItem
-	93,  // 111: system.SysTenantDomainItem.status:type_name -> system.TenantDomainStatus
-	83,  // 112: system.SysTenantDomainListResp.base:type_name -> common.RespBase
+	95,  // 111: system.SysTenantDomainItem.status:type_name -> system.TenantDomainStatus
+	85,  // 112: system.SysTenantDomainListResp.base:type_name -> common.RespBase
 	75,  // 113: system.SysTenantDomainListResp.data:type_name -> system.SysTenantDomainItem
-	93,  // 114: system.SysTenantDomainCreateReq.status:type_name -> system.TenantDomainStatus
-	93,  // 115: system.SysTenantDomainUpdateReq.status:type_name -> system.TenantDomainStatus
-	83,  // 116: system.ResolveTenantDomainResp.base:type_name -> common.RespBase
-	93,  // 117: system.ResolveTenantDomainResp.source_status:type_name -> system.TenantDomainStatus
-	2,   // 118: system.Admin.Login:input_type -> system.LoginReq
-	0,   // 119: system.Admin.GetProfile:input_type -> system.Empty
-	9,   // 120: system.Admin.UpdateProfile:input_type -> system.UpdateProfileReq
-	13,  // 121: system.Admin.Google2FAInit:input_type -> system.Google2FAInitReq
-	16,  // 122: system.Admin.Google2FABind:input_type -> system.Google2FABindReq
-	17,  // 123: system.Admin.Google2FAEnable:input_type -> system.Google2FAEnableReq
-	18,  // 124: system.Admin.Google2FADisable:input_type -> system.Google2FADisableReq
-	19,  // 125: system.Admin.Google2FAReset:input_type -> system.Google2FAResetReq
-	21,  // 126: system.Admin.SysUserList:input_type -> system.SysUserListReq
-	23,  // 127: system.Admin.SysUserDetail:input_type -> system.SysUserDetailReq
-	25,  // 128: system.Admin.SysUserCreate:input_type -> system.SysUserCreateReq
-	26,  // 129: system.Admin.SysUserUpdate:input_type -> system.SysUserUpdateReq
-	27,  // 130: system.Admin.SysUserDelete:input_type -> system.SysUserDeleteReq
-	28,  // 131: system.Admin.ChangeUserStatus:input_type -> system.ChangeUserStatusReq
-	29,  // 132: system.Admin.ResetUserPwd:input_type -> system.ResetUserPwdReq
-	30,  // 133: system.Admin.AssignUserRoles:input_type -> system.AssignUserRolesReq
-	32,  // 134: system.Admin.SysRoleList:input_type -> system.SysRoleListReq
-	34,  // 135: system.Admin.SysRoleCreate:input_type -> system.SysRoleCreateReq
-	35,  // 136: system.Admin.SysRoleUpdate:input_type -> system.SysRoleUpdateReq
-	36,  // 137: system.Admin.SysRoleDelete:input_type -> system.SysRoleDeleteReq
-	37,  // 138: system.Admin.SysRoleGrant:input_type -> system.SysRoleGrantReq
-	38,  // 139: system.Admin.SysRoleGrantDetail:input_type -> system.SysRoleGrantDetailReq
-	0,   // 140: system.Admin.SysPermList:input_type -> system.Empty
-	11,  // 141: system.Admin.GetMenuTree:input_type -> system.SysMenuTreeReq
-	43,  // 142: system.Admin.SysMenuCreate:input_type -> system.SysMenuCreateReq
-	44,  // 143: system.Admin.SysMenuUpdate:input_type -> system.SysMenuUpdateReq
-	45,  // 144: system.Admin.SysMenuDelete:input_type -> system.SysMenuDeleteReq
-	46,  // 145: system.Admin.SysMenuList:input_type -> system.SysMenuListReq
-	49,  // 146: system.Admin.LoginLogList:input_type -> system.LoginLogListReq
-	52,  // 147: system.Admin.OpLogList:input_type -> system.OpLogListReq
-	54,  // 148: system.Admin.CreateOpLog:input_type -> system.CreateOpLogReq
-	55,  // 149: system.Admin.SysConfigCreate:input_type -> system.SysConfigCreateReq
-	56,  // 150: system.Admin.SysConfigUpdate:input_type -> system.SysConfigUpdateReq
-	57,  // 151: system.Admin.SysConfigDelete:input_type -> system.SysConfigDeleteReq
-	59,  // 152: system.Admin.SysConfigList:input_type -> system.SysConfigListReq
-	61,  // 153: system.Admin.SysConfigDetail:input_type -> system.SysConfigDetailReq
-	65,  // 154: system.Admin.LoginUserPerms:input_type -> system.LoginUserPermsReq
-	70,  // 155: system.Admin.SysTenantCreate:input_type -> system.SysTenantCreateReq
-	71,  // 156: system.Admin.SysTenantUpdate:input_type -> system.SysTenantUpdateReq
-	72,  // 157: system.Admin.SysTenantDelete:input_type -> system.SysTenantDeleteReq
-	68,  // 158: system.Admin.SysTenantList:input_type -> system.SysTenantListReq
-	73,  // 159: system.Admin.SysTenantDetail:input_type -> system.SysTenantDetailReq
-	76,  // 160: system.Admin.SysTenantDomainList:input_type -> system.SysTenantDomainListReq
-	78,  // 161: system.Admin.SysTenantDomainCreate:input_type -> system.SysTenantDomainCreateReq
-	79,  // 162: system.Admin.SysTenantDomainUpdate:input_type -> system.SysTenantDomainUpdateReq
-	80,  // 163: system.Admin.SysTenantDomainDelete:input_type -> system.SysTenantDomainDeleteReq
-	61,  // 164: system.App.SysConfigDetail:input_type -> system.SysConfigDetailReq
-	73,  // 165: system.App.SysTenantDetail:input_type -> system.SysTenantDetailReq
-	61,  // 166: system.System.SysConfigDetail:input_type -> system.SysConfigDetailReq
-	63,  // 167: system.System.SysConfigByKeys:input_type -> system.SysConfigByKeysReq
-	68,  // 168: system.System.SysTenantList:input_type -> system.SysTenantListReq
-	73,  // 169: system.System.SysTenantDetail:input_type -> system.SysTenantDetailReq
-	81,  // 170: system.System.ResolveTenantDomain:input_type -> system.ResolveTenantDomainReq
-	3,   // 171: system.Admin.Login:output_type -> system.LoginResp
-	8,   // 172: system.Admin.GetProfile:output_type -> system.ProfileResp
-	1,   // 173: system.Admin.UpdateProfile:output_type -> system.RespBase
-	14,  // 174: system.Admin.Google2FAInit:output_type -> system.Google2FAInitResp
-	1,   // 175: system.Admin.Google2FABind:output_type -> system.RespBase
-	1,   // 176: system.Admin.Google2FAEnable:output_type -> system.RespBase
-	1,   // 177: system.Admin.Google2FADisable:output_type -> system.RespBase
-	1,   // 178: system.Admin.Google2FAReset:output_type -> system.RespBase
-	22,  // 179: system.Admin.SysUserList:output_type -> system.SysUserListResp
-	24,  // 180: system.Admin.SysUserDetail:output_type -> system.SysUserDetailResp
-	1,   // 181: system.Admin.SysUserCreate:output_type -> system.RespBase
-	1,   // 182: system.Admin.SysUserUpdate:output_type -> system.RespBase
-	1,   // 183: system.Admin.SysUserDelete:output_type -> system.RespBase
-	1,   // 184: system.Admin.ChangeUserStatus:output_type -> system.RespBase
-	1,   // 185: system.Admin.ResetUserPwd:output_type -> system.RespBase
-	1,   // 186: system.Admin.AssignUserRoles:output_type -> system.RespBase
-	33,  // 187: system.Admin.SysRoleList:output_type -> system.SysRoleListResp
-	1,   // 188: system.Admin.SysRoleCreate:output_type -> system.RespBase
-	1,   // 189: system.Admin.SysRoleUpdate:output_type -> system.RespBase
-	1,   // 190: system.Admin.SysRoleDelete:output_type -> system.RespBase
-	1,   // 191: system.Admin.SysRoleGrant:output_type -> system.RespBase
-	39,  // 192: system.Admin.SysRoleGrantDetail:output_type -> system.SysRoleGrantDetailResp
-	42,  // 193: system.Admin.SysPermList:output_type -> system.SysPermListResp
-	12,  // 194: system.Admin.GetMenuTree:output_type -> system.SysMenuTreeResp
-	1,   // 195: system.Admin.SysMenuCreate:output_type -> system.RespBase
-	1,   // 196: system.Admin.SysMenuUpdate:output_type -> system.RespBase
-	1,   // 197: system.Admin.SysMenuDelete:output_type -> system.RespBase
-	47,  // 198: system.Admin.SysMenuList:output_type -> system.SysMenuListResp
-	50,  // 199: system.Admin.LoginLogList:output_type -> system.LoginLogListResp
-	53,  // 200: system.Admin.OpLogList:output_type -> system.OpLogListResp
-	1,   // 201: system.Admin.CreateOpLog:output_type -> system.RespBase
-	1,   // 202: system.Admin.SysConfigCreate:output_type -> system.RespBase
-	1,   // 203: system.Admin.SysConfigUpdate:output_type -> system.RespBase
-	1,   // 204: system.Admin.SysConfigDelete:output_type -> system.RespBase
-	60,  // 205: system.Admin.SysConfigList:output_type -> system.SysConfigListResp
-	62,  // 206: system.Admin.SysConfigDetail:output_type -> system.SysConfigDetailResp
-	66,  // 207: system.Admin.LoginUserPerms:output_type -> system.LoginUserPermsResp
-	1,   // 208: system.Admin.SysTenantCreate:output_type -> system.RespBase
-	1,   // 209: system.Admin.SysTenantUpdate:output_type -> system.RespBase
-	1,   // 210: system.Admin.SysTenantDelete:output_type -> system.RespBase
-	69,  // 211: system.Admin.SysTenantList:output_type -> system.SysTenantListResp
-	74,  // 212: system.Admin.SysTenantDetail:output_type -> system.SysTenantDetailResp
-	77,  // 213: system.Admin.SysTenantDomainList:output_type -> system.SysTenantDomainListResp
-	1,   // 214: system.Admin.SysTenantDomainCreate:output_type -> system.RespBase
-	1,   // 215: system.Admin.SysTenantDomainUpdate:output_type -> system.RespBase
-	1,   // 216: system.Admin.SysTenantDomainDelete:output_type -> system.RespBase
-	62,  // 217: system.App.SysConfigDetail:output_type -> system.SysConfigDetailResp
-	74,  // 218: system.App.SysTenantDetail:output_type -> system.SysTenantDetailResp
-	62,  // 219: system.System.SysConfigDetail:output_type -> system.SysConfigDetailResp
-	64,  // 220: system.System.SysConfigByKeys:output_type -> system.SysConfigByKeysResp
-	69,  // 221: system.System.SysTenantList:output_type -> system.SysTenantListResp
-	74,  // 222: system.System.SysTenantDetail:output_type -> system.SysTenantDetailResp
-	82,  // 223: system.System.ResolveTenantDomain:output_type -> system.ResolveTenantDomainResp
-	171, // [171:224] is the sub-list for method output_type
-	118, // [118:171] is the sub-list for method input_type
-	118, // [118:118] is the sub-list for extension type_name
-	118, // [118:118] is the sub-list for extension extendee
-	0,   // [0:118] is the sub-list for field type_name
+	95,  // 114: system.SysTenantDomainCreateReq.status:type_name -> system.TenantDomainStatus
+	95,  // 115: system.SysTenantDomainUpdateReq.status:type_name -> system.TenantDomainStatus
+	85,  // 116: system.ResolveTenantDomainResp.base:type_name -> common.RespBase
+	95,  // 117: system.ResolveTenantDomainResp.source_status:type_name -> system.TenantDomainStatus
+	85,  // 118: system.DeploymentDatabaseStatusResp.base:type_name -> common.RespBase
+	83,  // 119: system.DeploymentDatabaseStatusResp.recent_migrations:type_name -> system.DeploymentMigrationItem
+	2,   // 120: system.Admin.Login:input_type -> system.LoginReq
+	0,   // 121: system.Admin.GetProfile:input_type -> system.Empty
+	9,   // 122: system.Admin.UpdateProfile:input_type -> system.UpdateProfileReq
+	13,  // 123: system.Admin.Google2FAInit:input_type -> system.Google2FAInitReq
+	16,  // 124: system.Admin.Google2FABind:input_type -> system.Google2FABindReq
+	17,  // 125: system.Admin.Google2FAEnable:input_type -> system.Google2FAEnableReq
+	18,  // 126: system.Admin.Google2FADisable:input_type -> system.Google2FADisableReq
+	19,  // 127: system.Admin.Google2FAReset:input_type -> system.Google2FAResetReq
+	21,  // 128: system.Admin.SysUserList:input_type -> system.SysUserListReq
+	23,  // 129: system.Admin.SysUserDetail:input_type -> system.SysUserDetailReq
+	25,  // 130: system.Admin.SysUserCreate:input_type -> system.SysUserCreateReq
+	26,  // 131: system.Admin.SysUserUpdate:input_type -> system.SysUserUpdateReq
+	27,  // 132: system.Admin.SysUserDelete:input_type -> system.SysUserDeleteReq
+	28,  // 133: system.Admin.ChangeUserStatus:input_type -> system.ChangeUserStatusReq
+	29,  // 134: system.Admin.ResetUserPwd:input_type -> system.ResetUserPwdReq
+	30,  // 135: system.Admin.AssignUserRoles:input_type -> system.AssignUserRolesReq
+	32,  // 136: system.Admin.SysRoleList:input_type -> system.SysRoleListReq
+	34,  // 137: system.Admin.SysRoleCreate:input_type -> system.SysRoleCreateReq
+	35,  // 138: system.Admin.SysRoleUpdate:input_type -> system.SysRoleUpdateReq
+	36,  // 139: system.Admin.SysRoleDelete:input_type -> system.SysRoleDeleteReq
+	37,  // 140: system.Admin.SysRoleGrant:input_type -> system.SysRoleGrantReq
+	38,  // 141: system.Admin.SysRoleGrantDetail:input_type -> system.SysRoleGrantDetailReq
+	0,   // 142: system.Admin.SysPermList:input_type -> system.Empty
+	11,  // 143: system.Admin.GetMenuTree:input_type -> system.SysMenuTreeReq
+	43,  // 144: system.Admin.SysMenuCreate:input_type -> system.SysMenuCreateReq
+	44,  // 145: system.Admin.SysMenuUpdate:input_type -> system.SysMenuUpdateReq
+	45,  // 146: system.Admin.SysMenuDelete:input_type -> system.SysMenuDeleteReq
+	46,  // 147: system.Admin.SysMenuList:input_type -> system.SysMenuListReq
+	49,  // 148: system.Admin.LoginLogList:input_type -> system.LoginLogListReq
+	52,  // 149: system.Admin.OpLogList:input_type -> system.OpLogListReq
+	54,  // 150: system.Admin.CreateOpLog:input_type -> system.CreateOpLogReq
+	55,  // 151: system.Admin.SysConfigCreate:input_type -> system.SysConfigCreateReq
+	56,  // 152: system.Admin.SysConfigUpdate:input_type -> system.SysConfigUpdateReq
+	57,  // 153: system.Admin.SysConfigDelete:input_type -> system.SysConfigDeleteReq
+	59,  // 154: system.Admin.SysConfigList:input_type -> system.SysConfigListReq
+	61,  // 155: system.Admin.SysConfigDetail:input_type -> system.SysConfigDetailReq
+	65,  // 156: system.Admin.LoginUserPerms:input_type -> system.LoginUserPermsReq
+	70,  // 157: system.Admin.SysTenantCreate:input_type -> system.SysTenantCreateReq
+	71,  // 158: system.Admin.SysTenantUpdate:input_type -> system.SysTenantUpdateReq
+	72,  // 159: system.Admin.SysTenantDelete:input_type -> system.SysTenantDeleteReq
+	68,  // 160: system.Admin.SysTenantList:input_type -> system.SysTenantListReq
+	73,  // 161: system.Admin.SysTenantDetail:input_type -> system.SysTenantDetailReq
+	76,  // 162: system.Admin.SysTenantDomainList:input_type -> system.SysTenantDomainListReq
+	78,  // 163: system.Admin.SysTenantDomainCreate:input_type -> system.SysTenantDomainCreateReq
+	79,  // 164: system.Admin.SysTenantDomainUpdate:input_type -> system.SysTenantDomainUpdateReq
+	80,  // 165: system.Admin.SysTenantDomainDelete:input_type -> system.SysTenantDomainDeleteReq
+	0,   // 166: system.Admin.GetDeploymentDatabaseStatus:input_type -> system.Empty
+	61,  // 167: system.App.SysConfigDetail:input_type -> system.SysConfigDetailReq
+	73,  // 168: system.App.SysTenantDetail:input_type -> system.SysTenantDetailReq
+	61,  // 169: system.System.SysConfigDetail:input_type -> system.SysConfigDetailReq
+	63,  // 170: system.System.SysConfigByKeys:input_type -> system.SysConfigByKeysReq
+	68,  // 171: system.System.SysTenantList:input_type -> system.SysTenantListReq
+	73,  // 172: system.System.SysTenantDetail:input_type -> system.SysTenantDetailReq
+	81,  // 173: system.System.ResolveTenantDomain:input_type -> system.ResolveTenantDomainReq
+	3,   // 174: system.Admin.Login:output_type -> system.LoginResp
+	8,   // 175: system.Admin.GetProfile:output_type -> system.ProfileResp
+	1,   // 176: system.Admin.UpdateProfile:output_type -> system.RespBase
+	14,  // 177: system.Admin.Google2FAInit:output_type -> system.Google2FAInitResp
+	1,   // 178: system.Admin.Google2FABind:output_type -> system.RespBase
+	1,   // 179: system.Admin.Google2FAEnable:output_type -> system.RespBase
+	1,   // 180: system.Admin.Google2FADisable:output_type -> system.RespBase
+	1,   // 181: system.Admin.Google2FAReset:output_type -> system.RespBase
+	22,  // 182: system.Admin.SysUserList:output_type -> system.SysUserListResp
+	24,  // 183: system.Admin.SysUserDetail:output_type -> system.SysUserDetailResp
+	1,   // 184: system.Admin.SysUserCreate:output_type -> system.RespBase
+	1,   // 185: system.Admin.SysUserUpdate:output_type -> system.RespBase
+	1,   // 186: system.Admin.SysUserDelete:output_type -> system.RespBase
+	1,   // 187: system.Admin.ChangeUserStatus:output_type -> system.RespBase
+	1,   // 188: system.Admin.ResetUserPwd:output_type -> system.RespBase
+	1,   // 189: system.Admin.AssignUserRoles:output_type -> system.RespBase
+	33,  // 190: system.Admin.SysRoleList:output_type -> system.SysRoleListResp
+	1,   // 191: system.Admin.SysRoleCreate:output_type -> system.RespBase
+	1,   // 192: system.Admin.SysRoleUpdate:output_type -> system.RespBase
+	1,   // 193: system.Admin.SysRoleDelete:output_type -> system.RespBase
+	1,   // 194: system.Admin.SysRoleGrant:output_type -> system.RespBase
+	39,  // 195: system.Admin.SysRoleGrantDetail:output_type -> system.SysRoleGrantDetailResp
+	42,  // 196: system.Admin.SysPermList:output_type -> system.SysPermListResp
+	12,  // 197: system.Admin.GetMenuTree:output_type -> system.SysMenuTreeResp
+	1,   // 198: system.Admin.SysMenuCreate:output_type -> system.RespBase
+	1,   // 199: system.Admin.SysMenuUpdate:output_type -> system.RespBase
+	1,   // 200: system.Admin.SysMenuDelete:output_type -> system.RespBase
+	47,  // 201: system.Admin.SysMenuList:output_type -> system.SysMenuListResp
+	50,  // 202: system.Admin.LoginLogList:output_type -> system.LoginLogListResp
+	53,  // 203: system.Admin.OpLogList:output_type -> system.OpLogListResp
+	1,   // 204: system.Admin.CreateOpLog:output_type -> system.RespBase
+	1,   // 205: system.Admin.SysConfigCreate:output_type -> system.RespBase
+	1,   // 206: system.Admin.SysConfigUpdate:output_type -> system.RespBase
+	1,   // 207: system.Admin.SysConfigDelete:output_type -> system.RespBase
+	60,  // 208: system.Admin.SysConfigList:output_type -> system.SysConfigListResp
+	62,  // 209: system.Admin.SysConfigDetail:output_type -> system.SysConfigDetailResp
+	66,  // 210: system.Admin.LoginUserPerms:output_type -> system.LoginUserPermsResp
+	1,   // 211: system.Admin.SysTenantCreate:output_type -> system.RespBase
+	1,   // 212: system.Admin.SysTenantUpdate:output_type -> system.RespBase
+	1,   // 213: system.Admin.SysTenantDelete:output_type -> system.RespBase
+	69,  // 214: system.Admin.SysTenantList:output_type -> system.SysTenantListResp
+	74,  // 215: system.Admin.SysTenantDetail:output_type -> system.SysTenantDetailResp
+	77,  // 216: system.Admin.SysTenantDomainList:output_type -> system.SysTenantDomainListResp
+	1,   // 217: system.Admin.SysTenantDomainCreate:output_type -> system.RespBase
+	1,   // 218: system.Admin.SysTenantDomainUpdate:output_type -> system.RespBase
+	1,   // 219: system.Admin.SysTenantDomainDelete:output_type -> system.RespBase
+	84,  // 220: system.Admin.GetDeploymentDatabaseStatus:output_type -> system.DeploymentDatabaseStatusResp
+	62,  // 221: system.App.SysConfigDetail:output_type -> system.SysConfigDetailResp
+	74,  // 222: system.App.SysTenantDetail:output_type -> system.SysTenantDetailResp
+	62,  // 223: system.System.SysConfigDetail:output_type -> system.SysConfigDetailResp
+	64,  // 224: system.System.SysConfigByKeys:output_type -> system.SysConfigByKeysResp
+	69,  // 225: system.System.SysTenantList:output_type -> system.SysTenantListResp
+	74,  // 226: system.System.SysTenantDetail:output_type -> system.SysTenantDetailResp
+	82,  // 227: system.System.ResolveTenantDomain:output_type -> system.ResolveTenantDomainResp
+	174, // [174:228] is the sub-list for method output_type
+	120, // [120:174] is the sub-list for method input_type
+	120, // [120:120] is the sub-list for extension type_name
+	120, // [120:120] is the sub-list for extension extendee
+	0,   // [0:120] is the sub-list for field type_name
 }
 
 func init() { file_proto_system_system_proto_init() }
@@ -6786,7 +6933,7 @@ func file_proto_system_system_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_system_system_proto_rawDesc), len(file_proto_system_system_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   83,
+			NumMessages:   85,
 			NumExtensions: 0,
 			NumServices:   3,
 		},

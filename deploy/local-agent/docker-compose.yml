@@ -1,0 +1,79 @@
+name: appforge-local-agent
+
+x-agent-security: &agent-security
+  image: ${APPFORGE_LOCAL_AGENT_IMAGE:?required}
+  user: "65532:65532"
+  read_only: true
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  tmpfs:
+    - /tmp:size=2g,mode=0700,uid=65532,gid=65532
+
+services:
+  local-agent:
+    <<: *agent-security
+    restart: unless-stopped
+    stop_grace_period: 30m
+    command:
+      - run
+      - --state-dir
+      - /var/lib/appforge-agent
+      - --secret-root
+      - /etc/appforge/local-secrets
+      - --max-concurrency
+      - ${APPFORGE_LOCAL_AGENT_MAX_CONCURRENCY:-1}
+      - --lease-seconds
+      - ${APPFORGE_LOCAL_AGENT_LEASE_SECONDS:-120}
+      - --rotate-before
+      - ${APPFORGE_LOCAL_AGENT_ROTATE_BEFORE:-6h}
+    volumes:
+      - agent-state:/var/lib/appforge-agent
+      - agent-secrets:/etc/appforge/local-secrets:ro
+    healthcheck:
+      test: ["CMD", "appforge-local-agent", "health", "--state-dir", "/var/lib/appforge-agent"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  registration:
+    <<: *agent-security
+    profiles: [registration]
+    restart: "no"
+    command:
+      - register
+      - --control-url
+      - ${APPFORGE_CONTROL_URL:?required}
+      - --control-ca
+      - /etc/appforge/control-ca.crt
+      - --gateway-url
+      - ${APPFORGE_LOCAL_AGENT_GATEWAY_URL:?required}
+      - --gateway-ca
+      - /etc/appforge/gateway-ca.crt
+      - --token-stdin
+      - --state-dir
+      - /var/lib/appforge-agent
+    volumes:
+      - agent-state:/var/lib/appforge-agent
+      - ${APPFORGE_CONTROL_CA_FILE:-./runtime/control-ca.crt}:/etc/appforge/control-ca.crt:ro
+      - ${APPFORGE_GATEWAY_CA_FILE:-./runtime/gateway-ca.crt}:/etc/appforge/gateway-ca.crt:ro
+
+  secret-import:
+    <<: *agent-security
+    profiles: [maintenance]
+    restart: "no"
+    command:
+      - secret-import
+      - --secret-root
+      - /etc/appforge/local-secrets
+      - --name
+      - ${APPFORGE_LOCAL_SECRET_NAME:-signing.json}
+      - --input-stdin
+    volumes:
+      - agent-secrets:/etc/appforge/local-secrets
+
+volumes:
+  agent-state:
+  agent-secrets:

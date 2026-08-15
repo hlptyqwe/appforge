@@ -6,11 +6,10 @@ Etcd:
     - etcd:2379
   Key: system.rpc
 Mysql:
-  DataSource: appforge:appforge_dev_password@tcp(mysql:3306)/appforge?charset=utf8mb4&parseTime=true&loc=Local
+  DataSource: appforge:appforge_dev_password@tcp(mysql:3306)/appforge?charset=utf8mb4&parseTime=true&loc=Asia%2FHong_Kong
 CacheRedis:
   - Host: redis:6379
     Type: node
 Jwt:
   AccessSecret: appforge-dev-jwt-secret-change-before-production
   AccessExpire: 86400
-

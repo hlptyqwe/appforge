@@ -9,7 +9,7 @@ x-appforge-service: &appforge-service
   cap_drop:
     - ALL
   tmpfs:
-    - /tmp:size=512m,mode=1770
+    - /tmp:size=512m,mode=1770,uid=65532,gid=65532
   networks:
     - appforge-backend
 
@@ -80,6 +80,41 @@ services:
       - object-data:/data
     networks: [appforge-backend]
 
+  minio-init:
+    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+    restart: "no"
+    read_only: true
+    user: "65532:65532"
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    environment:
+      MC_CONFIG_DIR: /tmp/mc
+      MINIO_ACCESS_KEY: ${APPFORGE_MINIO_ACCESS_KEY:?required}
+      MINIO_SECRET_KEY: ${APPFORGE_MINIO_SECRET_KEY:?required}
+    tmpfs:
+      - /tmp:size=16m,mode=0700,uid=65532,gid=65532
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        until mc alias set appforge http://minio:9000 "$$MINIO_ACCESS_KEY" "$$MINIO_SECRET_KEY" >/dev/null; do sleep 2; done
+        mc mb --ignore-existing appforge/appforge
+        mc anonymous set none appforge/appforge
+    depends_on:
+      minio: {condition: service_started}
+    networks: [appforge-backend]
+
+  archive:
+    image: alpine:3.22
+    profiles: [tools]
+    restart: "no"
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    volumes:
+      - object-data:/data
+      - etcd-data:/etcd-data
+    networks: [appforge-backend]
+
   migrate:
     image: ${APPFORGE_IMAGE_REGISTRY:?required}/migrate:${APPFORGE_VERSION:?required}
     restart: "no"
@@ -93,7 +128,7 @@ services:
       APPFORGE_PUBLIC_ORIGIN: ${APPFORGE_PUBLIC_ORIGIN:?required}
       APPFORGE_MINIO_ACCESS_KEY: ${APPFORGE_MINIO_ACCESS_KEY:?required}
       APPFORGE_MINIO_SECRET_KEY: ${APPFORGE_MINIO_SECRET_KEY:?required}
-    command: ["--expected=20260814_109_v7_enterprise_menu"]
+    command: ["--expected=20260815_111_v7_deployment_console"]
     depends_on:
       mysql:
         condition: service_healthy
@@ -134,6 +169,7 @@ services:
       APPFORGE_BUILDER_ENDPOINT: builder-worker
     depends_on:
       builder-rpc: {condition: service_started}
+      minio-init: {condition: service_completed_successfully}
 
   webhook-worker:
     <<: *appforge-service
@@ -175,6 +211,11 @@ services:
       APPFORGE_SIEM_ENDPOINT: ${APPFORGE_SIEM_ENDPOINT:?required}
       APPFORGE_SIEM_TOKEN_FILE: /etc/appforge/siem/token
       APPFORGE_SIEM_CA_FILE: /etc/appforge/siem/ca.crt
+      APPFORGE_DEPLOYMENT_ID: ${APPFORGE_DEPLOYMENT_ID:?required}
+      APPFORGE_DEPLOYMENT_MODE: ${APPFORGE_DEPLOYMENT_MODE:?required}
+      APPFORGE_VERSION: ${APPFORGE_VERSION:?required}
+      APPFORGE_SCHEMA_VERSION: ${APPFORGE_SCHEMA_VERSION:-20260815_111_v7_deployment_console}
+      APPFORGE_MAX_VERSION_SKEW: ${APPFORGE_MAX_VERSION_SKEW:-1}
     volumes:
       - ${APPFORGE_TLS_CERT_FILE:?required}:/etc/appforge/tls/tls.crt:ro
       - ${APPFORGE_TLS_KEY_FILE:?required}:/etc/appforge/tls/tls.key:ro
@@ -188,6 +229,7 @@ services:
       system-rpc: {condition: service_started}
       core-rpc: {condition: service_started}
       builder-rpc: {condition: service_started}
+      minio-init: {condition: service_completed_successfully}
     networks: [appforge-frontend, appforge-backend]
 
   source-trigger-worker:
@@ -212,8 +254,8 @@ services:
     cap_add: ["NET_BIND_SERVICE"]
     ports: ["${APPFORGE_ADMIN_HTTPS_PORT:-8443}:8443"]
     tmpfs:
-      - /tmp:size=64m,mode=1770
-      - /var/cache/nginx:size=64m,mode=0770
+      - /tmp:size=64m,mode=1770,uid=101,gid=101
+      - /var/cache/nginx:size=64m,mode=0770,uid=101,gid=101
     volumes:
       - ${APPFORGE_TLS_CERT_FILE:?required}:/etc/appforge/tls/tls.crt:ro
       - ${APPFORGE_TLS_KEY_FILE:?required}:/etc/appforge/tls/tls.key:ro
@@ -231,8 +273,8 @@ services:
     cap_drop: ["ALL"]
     ports: ["${APPFORGE_AGENT_HTTPS_PORT:-443}:8443"]
     tmpfs:
-      - /tmp:size=64m,mode=1770
-      - /var/cache/nginx:size=64m,mode=0770
+      - /tmp:size=64m,mode=1770,uid=101,gid=101
+      - /var/cache/nginx:size=64m,mode=0770,uid=101,gid=101
     volumes:
       - ${APPFORGE_TLS_CERT_FILE:?required}:/etc/appforge/tls/tls.crt:ro
       - ${APPFORGE_TLS_KEY_FILE:?required}:/etc/appforge/tls/tls.key:ro

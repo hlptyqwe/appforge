@@ -23,6 +23,7 @@ import type {
   PlatformBuildSchedulerEvent,
   PlatformLocalAgent,
   PlatformLocalAgentRegistration,
+  PlatformDeploymentStatus,
   PlatformChannel,
   PlatformChannelStats,
   PlatformListReq,
@@ -285,6 +286,8 @@ export const drainLocalAgent = (id: number, drainStatus: number, tenantId = 0) =
   })
 export const revokeLocalAgent = (id: number, reason: string, tenantId = 0) =>
   post<PlatformLocalAgent>(`${base}/enterprise/local-agents/${id}/revoke`, { reason, tenantId })
+export const getDeploymentStatus = () =>
+  get<PlatformDeploymentStatus>(`${base}/enterprise/deployment`)
 
 export const listBillingPlans = (
   params: { page?: number; pageSize?: number; status?: number } = {},

@@ -66,7 +66,10 @@ networkPolicy:
   enabled: true
   ingressNamespaceLabels:
     kubernetes.io/metadata.name: ingress-nginx
+  # 兼容旧配置；新交付禁止使用该全端口规则，改用 externalEgressRules。
   egressCIDRs: []
+  # 集群外依赖必须同时限定使用组件、CIDR 和端口；客户交付时按实际网络填写。
+  externalEgressRules: []
 
 observability:
   prometheus: true
@@ -74,5 +77,5 @@ observability:
   siemWebhook: ""
 
 upgrade:
-  schemaVersion: "20260814_109_v7_enterprise_menu"
+  schemaVersion: "20260815_111_v7_deployment_console"
   maxVersionSkew: 1

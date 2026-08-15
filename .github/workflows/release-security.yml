@@ -3,7 +3,6 @@ name: release-security
 on:
   push:
     tags: ["v[0-9]+.[0-9]+.[0-9]+"]
-  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -60,7 +59,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate immutable semantic-version metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}
+          tags: type=semver,pattern={{version}}
       - name: Build and push immutable image
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -69,24 +75,91 @@ jobs:
           push: true
           provenance: mode=max
           sbom: true
-          tags: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}:${{ github.ref_name }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
       - name: Generate SPDX SBOM
         uses: anchore/sbom-action@v0
         with:
-          image: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}:${{ github.ref_name }}
+          image: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}@${{ steps.build.outputs.digest }}
           format: spdx-json
           output-file: ${{ matrix.component }}.spdx.json
       - name: Vulnerability gate
         uses: aquasecurity/trivy-action@0.30.0
         with:
-          image-ref: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}:${{ github.ref_name }}
+          image-ref: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}@${{ steps.build.outputs.digest }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: "1"
+      - name: Generate vulnerability report
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}@${{ steps.build.outputs.digest }}
+          format: sarif
+          output: ${{ matrix.component }}.trivy.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "0"
+      - name: Upload vulnerability report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ matrix.component }}.trivy.sarif
+          category: appforge-${{ matrix.component }}
       - uses: sigstore/cosign-installer@v3
-      - name: Keyless image signing
-        run: cosign sign --yes ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}:${{ github.ref_name }}
+      - name: Keyless digest signing and verification
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          CERTIFICATE_IDENTITY: https://github.com/${{ github.repository }}/.github/workflows/release-security.yml@${{ github.ref }}
+        run: |
+          set -euo pipefail
+          image_ref="${IMAGE}@${DIGEST}"
+          cosign sign --yes "$image_ref"
+          cosign verify "$image_ref" \
+            --certificate-identity "$CERTIFICATE_IDENTITY" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com
+          printf '%s\n' "$image_ref" > ${{ matrix.component }}.image.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: sbom-${{ matrix.component }}
-          path: ${{ matrix.component }}.spdx.json
+          name: release-evidence-${{ matrix.component }}
+          if-no-files-found: error
+          path: |
+            ${{ matrix.component }}.spdx.json
+            ${{ matrix.component }}.trivy.sarif
+            ${{ matrix.component }}.image.txt
+
+  delivery-tools:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.4"
+          cache-dependency-path: |
+            appforge-api/go.sum
+            appforgectl/go.mod
+      - uses: sigstore/cosign-installer@v3
+      - name: Build offline license tools
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          for arch in amd64 arm64; do
+            (cd appforge-api && CGO_ENABLED=0 GOOS=linux GOARCH="$arch" go build -trimpath -ldflags="-s -w" -o "../dist/licensectl-linux-$arch" ./cmd/licensectl)
+            (cd appforgectl && CGO_ENABLED=0 GOOS=linux GOARCH="$arch" go build -trimpath -ldflags="-s -w" -o "../dist/appforgectl-linux-$arch" .)
+          done
+          (cd dist && sha256sum appforgectl-linux-* licensectl-linux-* > SHA256SUMS)
+      - name: Sign and verify delivery checksums
+        env:
+          CERTIFICATE_IDENTITY: https://github.com/${{ github.repository }}/.github/workflows/release-security.yml@${{ github.ref }}
+        run: |
+          set -euo pipefail
+          cosign sign-blob --yes --bundle dist/SHA256SUMS.sigstore.json dist/SHA256SUMS
+          cosign verify-blob \
+            --bundle dist/SHA256SUMS.sigstore.json \
+            --certificate-identity "$CERTIFICATE_IDENTITY" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            dist/SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: delivery-tools-${{ github.ref_name }}
+          if-no-files-found: error
+          path: dist/

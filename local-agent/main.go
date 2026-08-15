@@ -20,6 +20,7 @@ import (
 	"log"
 	"math/big"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -30,9 +31,9 @@ import (
 	"time"
 )
 
-const version = "1.0.0"
+const version = "1.1.0"
 
-const protocolVersion int32 = 2
+const protocolVersion int32 = 3
 
 type state struct {
 	AgentID       int64  `json:"agentId"`
@@ -52,6 +53,7 @@ type task struct {
 	ID             int64  `json:"id"`
 	TenantID       int64  `json:"tenant_id"`
 	AppID          int64  `json:"app_id"`
+	VersionID      int64  `json:"version_id"`
 	BuilderAttempt int32  `json:"builder_attempt"`
 	ChannelCode    string `json:"channel_code"`
 	VersionCode    int64  `json:"version_code"`
@@ -59,18 +61,53 @@ type task struct {
 }
 
 type claimResponse struct {
-	Task         *task `json:"task"`
-	ArtifactMode int32 `json:"artifact_mode"`
+	Task         *task          `json:"task"`
+	ArtifactMode int32          `json:"artifact_mode"`
+	Bundle       *buildManifest `json:"bundle"`
+}
+
+type buildManifest struct {
+	SchemaVersion           int32        `json:"schema_version"`
+	Task                    *task        `json:"task"`
+	PackageName             string       `json:"package_name"`
+	APIHost                 string       `json:"api_host"`
+	ChannelName             string       `json:"channel_name"`
+	LandingURL              string       `json:"landing_url"`
+	KeyAlias                string       `json:"key_alias"`
+	SigningSecretRef        string       `json:"signing_secret_ref"`
+	SignerCertificateSHA256 string       `json:"signer_certificate_sha256"`
+	BrandingSnapshotJSON    string       `json:"branding_snapshot_json"`
+	TemplateSnapshotJSON    string       `json:"template_snapshot_json"`
+	Inputs                  []buildInput `json:"inputs"`
+	BlockedReason           string       `json:"blocked_reason"`
+}
+
+type buildInput struct {
+	Role         string `json:"role"`
+	ObjectID     int64  `json:"object_id"`
+	ObjectType   int32  `json:"object_type"`
+	OriginalName string `json:"original_name"`
+	ContentType  string `json:"content_type"`
+	SizeBytes    int64  `json:"size_bytes"`
+	SHA256       string `json:"sha256"`
+	LocalPath    string `json:"local_path,omitempty"`
 }
 
 type buildResult struct {
+	APKPath      string `json:"apkPath"`
 	APKReference string `json:"apkReference"`
 	APKSHA256    string `json:"apkSha256"`
 	APKSize      int64  `json:"apkSize"`
+	LogPath      string `json:"logPath"`
 	LogReference string `json:"logReference"`
 	LogSHA256    string `json:"logSha256"`
 	LogSize      int64  `json:"logSize"`
 	Error        string `json:"error"`
+}
+
+type localSigningSecret struct {
+	KeystorePassword string `json:"keystorePassword"`
+	KeyPassword      string `json:"keyPassword"`
 }
 
 type certificateResponse struct {
@@ -99,7 +136,15 @@ func main() {
 			log.Fatal(err)
 		}
 	case "version":
-		fmt.Printf("appforge-local-agent %s protocol=2\n", version)
+		fmt.Printf("appforge-local-agent %s protocol=%d\n", version, protocolVersion)
+	case "health":
+		if err := healthCommand(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
+	case "secret-import":
+		if err := secretImportCommand(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
 	case "offline-sign":
 		if err := offlineSignCommand(os.Args[2:]); err != nil {
 			log.Fatal(err)
@@ -114,23 +159,59 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: appforge-local-agent register|run|version|offline-sign|offline-verify")
+	fmt.Fprintln(os.Stderr, "usage: appforge-local-agent register|run|health|version|secret-import|offline-sign|offline-verify")
 	os.Exit(2)
 }
 
 func registerCommand(args []string) error {
 	flags := flag.NewFlagSet("register", flag.ContinueOnError)
 	controlURL := flags.String("control-url", "", "control-plane registration URL")
+	controlCA := flags.String("control-ca", "", "control-plane server CA PEM")
 	gatewayURL := flags.String("gateway-url", "", "mTLS Agent gateway URL")
 	gatewayCA := flags.String("gateway-ca", "", "gateway server CA PEM; defaults to the Agent CA returned by registration")
 	token := flags.String("token", "", "one-time registration token")
+	tokenFile := flags.String("token-file", "", "private file containing the one-time registration token")
+	tokenStdin := flags.Bool("token-stdin", false, "read the one-time registration token from standard input")
 	stateDir := flags.String("state-dir", defaultStateDir(), "Agent local state directory")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	if *controlURL == "" || *gatewayURL == "" || *token == "" {
-		return errors.New("control-url, gateway-url and token are required")
+	tokenSources := 0
+	if *token != "" {
+		tokenSources++
 	}
+	if *tokenFile != "" {
+		tokenSources++
+	}
+	if *tokenStdin {
+		tokenSources++
+	}
+	if *controlURL == "" || *gatewayURL == "" || tokenSources != 1 {
+		return errors.New("control-url, gateway-url and exactly one registration token source are required")
+	}
+	registrationToken := strings.TrimSpace(*token)
+	if *tokenFile != "" {
+		value, err := readPrivateToken(*tokenFile)
+		if err != nil {
+			return err
+		}
+		registrationToken = value
+	}
+	if *tokenStdin {
+		raw, err := io.ReadAll(io.LimitReader(os.Stdin, 4097))
+		if err != nil {
+			return err
+		}
+		registrationToken = strings.TrimSpace(string(raw))
+	}
+	if registrationToken == "" || len(registrationToken) > 4096 {
+		return errors.New("registration token is empty or too large")
+	}
+	absoluteStateDir, err := filepath.Abs(*stateDir)
+	if err != nil {
+		return err
+	}
+	*stateDir = absoluteStateDir
 	if err := os.MkdirAll(*stateDir, 0o700); err != nil {
 		return err
 	}
@@ -143,9 +224,13 @@ func registerCommand(args []string) error {
 		return err
 	}
 	csrPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE REQUEST", Bytes: csrDER})
-	payload := map[string]any{"registration_token": *token, "csr_pem": string(csrPEM), "agent_version": version, "protocol_version": 2, "nonce": newNonce(), "timestamp": time.Now().UnixMilli()}
+	payload := map[string]any{"registration_token": registrationToken, "csr_pem": string(csrPEM), "agent_version": version, "protocol_version": protocolVersion, "nonce": newNonce(), "timestamp": time.Now().UnixMilli()}
 	var response certificateResponse
-	if err := postJSON(context.Background(), http.DefaultClient, strings.TrimRight(*controlURL, "/")+"/public/v1/local-agent/register", payload, &response); err != nil {
+	registrationClient, err := clientWithServerCA(*controlCA)
+	if err != nil {
+		return err
+	}
+	if err := postJSON(context.Background(), registrationClient, strings.TrimRight(*controlURL, "/")+"/public/v1/local-agent/register", payload, &response); err != nil {
 		return err
 	}
 	if response.Data.ID <= 0 || response.Certificate.CertificatePEM == "" || response.CAPEM == "" {
@@ -187,10 +272,80 @@ func registerCommand(args []string) error {
 	return nil
 }
 
+func healthCommand(args []string) error {
+	flags := flag.NewFlagSet("health", flag.ContinueOnError)
+	stateDir := flags.String("state-dir", defaultStateDir(), "Agent local state directory")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	stateRoot, err := filepath.Abs(*stateDir)
+	if err != nil {
+		return err
+	}
+	current, err := loadState(stateRoot)
+	if err != nil {
+		return fmt.Errorf("load Agent state: %w", err)
+	}
+	if err := validateLocalState(stateRoot, &current); err != nil {
+		return err
+	}
+	client, err := mtlsClient(&current)
+	if err != nil {
+		return fmt.Errorf("validate Agent mTLS state: %w", err)
+	}
+	if transport, ok := client.Transport.(*http.Transport); ok {
+		transport.CloseIdleConnections()
+	}
+	fmt.Printf("healthy agent=%d version=%s protocol=%d\n", current.AgentID, version, protocolVersion)
+	return nil
+}
+
+func secretImportCommand(args []string) error {
+	flags := flag.NewFlagSet("secret-import", flag.ContinueOnError)
+	secretRoot := flags.String("secret-root", "/etc/appforge/local-secrets", "absolute Local Agent Secret root")
+	name := flags.String("name", "", "Secret JSON filename")
+	inputStdin := flags.Bool("input-stdin", false, "read strict Secret JSON from standard input")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if !*inputStdin {
+		return errors.New("input-stdin is required")
+	}
+	if !filepath.IsAbs(*secretRoot) {
+		return errors.New("Secret root must be absolute")
+	}
+	cleanName := filepath.Base(strings.TrimSpace(*name))
+	if cleanName == "" || cleanName == "." || cleanName != strings.TrimSpace(*name) ||
+		!strings.HasSuffix(strings.ToLower(cleanName), ".json") {
+		return errors.New("Secret name must be a single .json filename")
+	}
+	if err := os.MkdirAll(*secretRoot, 0o700); err != nil {
+		return err
+	}
+	if err := os.Chmod(*secretRoot, 0o700); err != nil {
+		return err
+	}
+	secret, err := decodeLocalSigningSecret(os.Stdin)
+	if err != nil {
+		return err
+	}
+	defer secret.erase()
+	encoded, err := json.Marshal(secret)
+	if err != nil {
+		return err
+	}
+	if err := writePrivateFile(filepath.Join(*secretRoot, cleanName), encoded); err != nil {
+		return err
+	}
+	fmt.Printf("Local signing Secret imported: local-file:///%s\n", cleanName)
+	return nil
+}
+
 func runCommand(args []string) error {
 	flags := flag.NewFlagSet("run", flag.ContinueOnError)
 	stateDir := flags.String("state-dir", defaultStateDir(), "Agent local state directory")
 	executor := flags.String("executor", "appforge-local-build", "fixed local build executable")
+	secretRoot := flags.String("secret-root", "/etc/appforge/local-secrets", "absolute root for local-file signing Secret references")
 	poll := flags.Duration("poll", 2*time.Second, "claim polling interval")
 	lease := flags.Int("lease-seconds", 120, "task lease seconds")
 	maxConcurrent := flags.Int("max-concurrency", 1, "maximum local builds")
@@ -204,9 +359,25 @@ func runCommand(args []string) error {
 	if *rotateBefore <= 0 {
 		return errors.New("rotate-before must be greater than zero")
 	}
+	absoluteStateDir, err := filepath.Abs(*stateDir)
+	if err != nil {
+		return err
+	}
+	*stateDir = absoluteStateDir
 	current, err := loadState(*stateDir)
 	if err != nil {
 		return err
+	}
+	if err := validateLocalState(*stateDir, &current); err != nil {
+		return err
+	}
+	if current.Protocol != protocolVersion || current.AgentVersion != version {
+		current.Protocol = protocolVersion
+		current.AgentVersion = version
+		encoded, _ := json.MarshalIndent(current, "", "  ")
+		if err := writePrivateFile(filepath.Join(*stateDir, "state.json"), encoded); err != nil {
+			return err
+		}
 	}
 	client, err := mtlsClient(&current)
 	if err != nil {
@@ -273,17 +444,33 @@ func runCommand(args []string) error {
 			continue
 		}
 		active.Add(1)
-		go func(item *task, mode int32) {
+		go func(item *task, mode int32, bundle *buildManifest) {
 			defer active.Done()
 			defer func() { <-slots }()
-			if err := executeTask(ctx, client, &current, *stateDir, *executor, *lease, item, mode); err != nil {
+			if err := executeTask(ctx, client, &current, *stateDir, *executor, *secretRoot, *lease, item, mode, bundle); err != nil {
 				log.Printf("task %d failed: %v", item.ID, err)
 			}
-		}(claim.Task, claim.ArtifactMode)
+		}(claim.Task, claim.ArtifactMode, claim.Bundle)
 	}
 }
 
-func executeTask(parent context.Context, client *http.Client, current *state, stateDir, executor string, lease int, item *task, mode int32) error {
+func executeTask(parent context.Context, client *http.Client, current *state, stateDir, executor, secretRoot string, lease int, item *task, mode int32, bundle *buildManifest) error {
+	if bundle == nil || bundle.SchemaVersion != protocolVersion {
+		message := "LOCAL_TASK_BUNDLE_REQUIRED"
+		_ = postJSON(parent, client, current.GatewayURL+"/v1/tasks/fail", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": message}, nil)
+		return errors.New(message)
+	}
+	if bundle.BlockedReason != "" {
+		_ = postJSON(parent, client, current.GatewayURL+"/v1/tasks/fail", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": bundle.BlockedReason}, nil)
+		return errors.New(bundle.BlockedReason)
+	}
+	secret, err := resolveLocalSigningSecret(secretRoot, bundle.SigningSecretRef)
+	if err != nil {
+		message := "LOCAL_SIGNING_SECRET_RESOLUTION_FAILED"
+		_ = postJSON(parent, client, current.GatewayURL+"/v1/tasks/fail", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": message}, nil)
+		return fmt.Errorf("%s: %w", message, err)
+	}
+	defer secret.erase()
 	workDir, err := os.MkdirTemp("", "appforge-local-task-")
 	if err != nil {
 		return err
@@ -291,7 +478,9 @@ func executeTask(parent context.Context, client *http.Client, current *state, st
 	defer os.RemoveAll(workDir)
 	taskFile := filepath.Join(workDir, "task.json")
 	resultFile := filepath.Join(workDir, "result.json")
-	encoded, _ := json.MarshalIndent(map[string]any{"task": item, "artifactMode": mode}, "", "  ")
+	executorBundle := *bundle
+	executorBundle.SigningSecretRef = ""
+	encoded, _ := json.MarshalIndent(map[string]any{"task": item, "artifactMode": mode, "bundle": &executorBundle}, "", "  ")
 	if err := os.WriteFile(taskFile, encoded, 0o600); err != nil {
 		return err
 	}
@@ -318,7 +507,9 @@ func executeTask(parent context.Context, client *http.Client, current *state, st
 	}()
 	_ = postJSON(ctx, client, current.GatewayURL+"/v1/tasks/progress", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "status": 2, "progress": 5, "message": "local executor started"}, nil)
 	command := exec.CommandContext(ctx, executor, "--task", taskFile, "--result", resultFile)
-	command.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + workDir, "TMPDIR=" + workDir, "APPFORGE_TASK_ID=" + fmt.Sprint(item.ID), "APPFORGE_ARTIFACT_MODE=" + fmt.Sprint(mode)}
+	command.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + workDir, "TMPDIR=" + workDir,
+		"APPFORGE_TASK_ID=" + fmt.Sprint(item.ID), "APPFORGE_ARTIFACT_MODE=" + fmt.Sprint(mode),
+		"APPFORGE_KEYSTORE_PASSWORD=" + secret.KeystorePassword, "APPFORGE_KEY_PASSWORD=" + secret.KeyPassword}
 	output, runErr := command.CombinedOutput()
 	cancel()
 	<-renewDone
@@ -339,6 +530,14 @@ func executeTask(parent context.Context, client *http.Client, current *state, st
 			return failErr
 		}
 		return runErr
+	}
+	if strings.TrimSpace(result.APKReference) == "" {
+		message := "LOCAL_ARTIFACT_UPLOAD_REQUIRED"
+		failErr := postJSON(parent, client, current.GatewayURL+"/v1/tasks/fail", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": message}, nil)
+		if failErr != nil {
+			return failErr
+		}
+		return errors.New(message)
 	}
 	return postJSON(parent, client, current.GatewayURL+"/v1/tasks/complete", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "apk_reference": result.APKReference, "apk_sha256": result.APKSHA256, "apk_size": result.APKSize, "log_reference": result.LogReference, "log_sha256": result.LogSHA256, "log_size": result.LogSize}, nil)
 }
@@ -440,6 +639,80 @@ func safeFileSuffix(value string) string {
 	return result.String()
 }
 
+func resolveLocalSigningSecret(root, reference string) (*localSigningSecret, error) {
+	root = strings.TrimSpace(root)
+	if root == "" || !filepath.IsAbs(root) {
+		return nil, errors.New("local Secret root must be an absolute path")
+	}
+	parsed, err := url.Parse(strings.TrimSpace(reference))
+	if err != nil || strings.ToLower(parsed.Scheme) != "local-file" || parsed.User != nil ||
+		(parsed.Host != "" && parsed.Host != "localhost") {
+		return nil, errors.New("signing Secret must use a local-file reference without a remote host")
+	}
+	resolvedRoot, err := filepath.EvalSymlinks(root)
+	if err != nil {
+		return nil, fmt.Errorf("resolve local Secret root: %w", err)
+	}
+	relative := strings.TrimPrefix(filepath.Clean("/"+parsed.Path), "/")
+	if relative == "" || relative == "." {
+		return nil, errors.New("local signing Secret path is required")
+	}
+	candidate := filepath.Join(resolvedRoot, relative)
+	resolved, err := filepath.EvalSymlinks(candidate)
+	if err != nil {
+		return nil, fmt.Errorf("resolve local signing Secret: %w", err)
+	}
+	if resolved != resolvedRoot && !strings.HasPrefix(resolved, resolvedRoot+string(filepath.Separator)) {
+		return nil, errors.New("local signing Secret escapes configured root")
+	}
+	info, err := os.Lstat(candidate)
+	if err != nil {
+		return nil, err
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		return nil, errors.New("local signing Secret symlinks are forbidden")
+	}
+	resolvedInfo, err := os.Stat(resolved)
+	if err != nil || !resolvedInfo.Mode().IsRegular() {
+		return nil, errors.New("local signing Secret is not a regular file")
+	}
+	if resolvedInfo.Mode().Perm()&0o077 != 0 {
+		return nil, errors.New("local signing Secret must not be accessible by group or others")
+	}
+	file, err := os.Open(resolved)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return decodeLocalSigningSecret(file)
+}
+
+func decodeLocalSigningSecret(reader io.Reader) (*localSigningSecret, error) {
+	decoder := json.NewDecoder(io.LimitReader(reader, 64<<10))
+	decoder.DisallowUnknownFields()
+	var secret localSigningSecret
+	if err := decoder.Decode(&secret); err != nil {
+		return nil, errors.New("local signing Secret must be strict JSON")
+	}
+	var trailing any
+	if err := decoder.Decode(&trailing); err != io.EOF {
+		return nil, errors.New("local signing Secret contains trailing data")
+	}
+	if secret.KeystorePassword == "" || secret.KeyPassword == "" || len(secret.KeystorePassword) > 4096 || len(secret.KeyPassword) > 4096 {
+		secret.erase()
+		return nil, errors.New("local signing Secret is incomplete")
+	}
+	return &secret, nil
+}
+
+func (secret *localSigningSecret) erase() {
+	if secret == nil {
+		return
+	}
+	secret.KeystorePassword = ""
+	secret.KeyPassword = ""
+}
+
 func nextAuth(current *state, stateDir string) map[string]any {
 	authStateMu.Lock()
 	defer authStateMu.Unlock()
@@ -474,14 +747,111 @@ func mtlsClient(current *state) (*http.Client, error) {
 	transport := &http.Transport{TLSClientConfig: &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{certificate}, RootCAs: pool}}
 	return &http.Client{Transport: transport, Timeout: 45 * time.Second}, nil
 }
+
+func clientWithServerCA(path string) (*http.Client, error) {
+	if strings.TrimSpace(path) == "" {
+		return &http.Client{Timeout: 45 * time.Second}, nil
+	}
+	caPEM, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("read control-plane CA: %w", err)
+	}
+	pool := x509.NewCertPool()
+	if !pool.AppendCertsFromPEM(caPEM) {
+		return nil, errors.New("control-plane CA is invalid")
+	}
+	return &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{
+		MinVersion: tls.VersionTLS12,
+		RootCAs:    pool,
+	}}, Timeout: 45 * time.Second}, nil
+}
+
+func validateLocalState(root string, current *state) error {
+	if current == nil || current.AgentID <= 0 || current.Protocol <= 0 || strings.TrimSpace(current.GatewayURL) == "" {
+		return errors.New("Agent state identity is incomplete")
+	}
+	gatewayURL, err := url.Parse(current.GatewayURL)
+	if err != nil || gatewayURL.Scheme != "https" || gatewayURL.Host == "" {
+		return errors.New("Agent gateway URL must use HTTPS")
+	}
+	for _, path := range []string{filepath.Join(root, "state.json"), current.Certificate, current.PrivateKey, current.ClientCA, current.GatewayCA} {
+		if strings.TrimSpace(path) == "" {
+			continue
+		}
+		if err := requirePrivateStateFile(root, path); err != nil {
+			return err
+		}
+	}
+	due, err := certificateExpiresWithin(current.Certificate, 0, time.Now())
+	if err != nil {
+		return err
+	}
+	if due {
+		return errors.New("Agent certificate is expired")
+	}
+	return nil
+}
+
+func requirePrivateStateFile(root, path string) error {
+	root, err := filepath.Abs(root)
+	if err != nil {
+		return err
+	}
+	resolvedRoot, err := filepath.EvalSymlinks(root)
+	if err != nil {
+		return errors.New("resolve Agent state directory failed")
+	}
+	path, err = filepath.Abs(path)
+	if err != nil || (path != root && !strings.HasPrefix(path, root+string(filepath.Separator))) {
+		return errors.New("Agent state file escapes state directory")
+	}
+	info, err := os.Lstat(path)
+	if err != nil || info.Mode()&os.ModeSymlink != 0 || !info.Mode().IsRegular() || info.Mode().Perm()&0o077 != 0 {
+		return errors.New("Agent state files must be private regular files")
+	}
+	resolvedPath, err := filepath.EvalSymlinks(path)
+	if err != nil || (resolvedPath != resolvedRoot && !strings.HasPrefix(resolvedPath, resolvedRoot+string(filepath.Separator))) {
+		return errors.New("resolved Agent state file escapes state directory")
+	}
+	return nil
+}
+
+func readPrivateToken(path string) (string, error) {
+	info, err := os.Lstat(path)
+	if err != nil || info.Mode()&os.ModeSymlink != 0 || !info.Mode().IsRegular() || info.Mode().Perm()&0o077 != 0 {
+		return "", errors.New("registration token file must be a private regular file")
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+	raw, err := io.ReadAll(io.LimitReader(file, 4097))
+	if err != nil {
+		return "", err
+	}
+	value := strings.TrimSpace(string(raw))
+	if value == "" || len(value) > 4096 {
+		return "", errors.New("registration token file is empty or too large")
+	}
+	return value, nil
+}
+
 func loadState(dir string) (state, error) {
 	var result state
-	data, err := os.ReadFile(filepath.Join(dir, "state.json"))
+	file, err := os.Open(filepath.Join(dir, "state.json"))
 	if err != nil {
 		return result, err
 	}
-	if err := json.Unmarshal(data, &result); err != nil {
+	defer file.Close()
+	decoder := json.NewDecoder(io.LimitReader(file, 64<<10))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&result); err != nil {
 		return result, err
+	}
+	var trailing any
+	if err := decoder.Decode(&trailing); err != io.EOF {
+		return result, errors.New("Agent state contains trailing data")
 	}
 	return result, nil
 }

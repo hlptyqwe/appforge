@@ -1,0 +1,23 @@
+{
+  "evidenceType": "v1-v7-base-regression",
+  "executedAt": "2026-08-15T13:56:00+08:00",
+  "status": "passed",
+  "command": "deploy/acceptance/v1-v7-regression-base.sh",
+  "coverage": {
+    "goModules": 11,
+    "frontend": "Vue/TypeScript type-check on Node v20.20.2",
+    "shell": "acceptance, production delivery and Local Agent scripts",
+    "runtimeAcceptance": ["V4 build cluster", "V5 open platform", "V6 commercialization", "V7 enterprise delivery"],
+    "performance": "bounded health and authenticated deployment-status concurrency smoke"
+  },
+  "issuesFoundAndFixed": [
+    "The frontend regression now enforces Node.js 20 or newer instead of silently using an incompatible system Node.js 14.",
+    "Three intentionally isolated development Builder nodes are recovered only through authenticated admin API and Core RPC precondition checks; the script does not update the database directly.",
+    "The secretbox tamper test now flips a decoded ciphertext byte, avoiding non-canonical Base64 characters that can decode to unchanged bytes."
+  ],
+  "limitations": [
+    "V3 Android device runtime acceptance was not executed because no explicitly authorized device was attached.",
+    "Customer capacity, peak-load, APK throughput and long-duration stability tests are not part of this base regression.",
+    "Control-plane-to-Agent Artifact E2E, real AWS, customer SIEM and formal release pipeline evidence remain separate V7 gates."
+  ]
+}

@@ -527,6 +527,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: platform_private.TestPlatformWebhookEndpointHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodGet,
+				Path:    "/enterprise/deployment",
+				Handler: platform_private.GetPlatformDeploymentStatusHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodPost,
 				Path:    "/enterprise/local-agents",
 				Handler: platform_private.CreatePlatformLocalAgentRegistrationHandler(serverCtx),

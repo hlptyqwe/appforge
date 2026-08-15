@@ -1,0 +1,25 @@
+{
+  "evidenceType": "v7-network-policy-runtime",
+  "executedAt": "2026-08-15T13:42:00+08:00",
+  "status": "passed",
+  "environment": {
+    "cluster": "ephemeral-kind",
+    "kubernetesVersion": "v1.32.2",
+    "cni": "Calico v3.32.1",
+    "calicoManifestSha256": "a1df919d9721cf667accdc3e72848911b0cb25cfab7d2478ad0c996302c95744"
+  },
+  "assertions": [
+    "api component can reach the explicitly allowed /32 CIDR on TCP/8443",
+    "the same CIDR is denied on undeclared TCP/8080",
+    "the core component is denied on TCP/8443 because the rule selects only api",
+    "AppForge-labeled pods retain internal connectivity",
+    "an ingress pod from the labeled ingress namespace can reach TCP/8888",
+    "a pod from an untrusted namespace is denied on TCP/8888"
+  ],
+  "cleanup": "ephemeral Kind cluster deleted and verified absent",
+  "limitations": [
+    "This evidence does not authorize or configure any customer production CIDR.",
+    "The customer target CNI, ingress controller, load balancer and final allowlist still require deployment-site verification.",
+    "The legacy egressCIDRs field remains for compatibility; new delivery values must use component-and-port-scoped externalEgressRules."
+  ]
+}

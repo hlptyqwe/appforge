@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 
 	"appforge/admin-api/internal/config"
 	"appforge/admin-api/internal/svc"
+	"appforge/proto/common"
 	"appforge/proto/core"
 
 	"google.golang.org/grpc/codes"
@@ -75,7 +77,25 @@ func StartLocalAgentGateway(ctx context.Context, cfg config.LocalAgentGatewayCon
 			return nil, err
 		}
 		injectAgentIdentity(req.Auth, identity)
-		return svcCtx.CoreCli.ClaimLocalAgentBuildTask(ctx, &req)
+		claimed, err := svcCtx.CoreCli.ClaimLocalAgentBuildTask(ctx, &req)
+		if err != nil || claimed.GetTask() == nil {
+			return claimed, err
+		}
+		execution, err := svcCtx.CoreCli.GetBuildExecutionContext(ctx, &core.GetBuildExecutionContextReq{
+			TaskId: claimed.Task.Id, BuilderId: fmt.Sprintf("local-%d", req.Auth.GetAgentId()),
+			BuilderAttempt: claimed.Task.BuilderAttempt,
+		})
+		if err != nil || execution.GetData() == nil {
+			if err == nil {
+				err = status.Error(codes.FailedPrecondition, "Local Agent build context is unavailable")
+			}
+			return nil, err
+		}
+		bundle, err := buildLocalAgentManifest(execution.Data)
+		if err != nil {
+			return nil, err
+		}
+		return &localAgentClaimEnvelope{Base: claimed.Base, Task: claimed.Task, ArtifactMode: claimed.ArtifactMode, Bundle: bundle}, nil
 	}))
 	mux.HandleFunc("/v1/tasks/renew", agentRPC(svcCtx, func(ctx context.Context, body []byte, identity agentTLSIdentity) (any, error) {
 		var req core.RenewLocalAgentTaskLeaseReq
@@ -146,14 +166,128 @@ func StartLocalAgentGateway(ctx context.Context, cfg config.LocalAgentGatewayCon
 type agentTLSIdentity struct{ serial, fingerprint string }
 type agentRPCFunc func(context.Context, []byte, agentTLSIdentity) (any, error)
 
+// localAgentClaimEnvelope is the protocol-3 response exposed by the mTLS
+// Gateway. The Core BuildExecutionContext is deliberately not serialized: it
+// contains control-plane ciphertext that must never be sent to an Agent.
+type localAgentClaimEnvelope struct {
+	Base         *common.RespBase         `json:"base,omitempty"`
+	Task         *core.BuildTask          `json:"task,omitempty"`
+	ArtifactMode core.HybridArtifactMode  `json:"artifact_mode"`
+	Bundle       *localAgentBuildManifest `json:"bundle,omitempty"`
+}
+
+type localAgentBuildManifest struct {
+	SchemaVersion           int32                  `json:"schema_version"`
+	Task                    *core.BuildTask        `json:"task"`
+	PackageName             string                 `json:"package_name"`
+	APIHost                 string                 `json:"api_host"`
+	ChannelName             string                 `json:"channel_name"`
+	LandingURL              string                 `json:"landing_url"`
+	KeyAlias                string                 `json:"key_alias"`
+	SigningSecretRef        string                 `json:"signing_secret_ref,omitempty"`
+	SignerCertificateSHA256 string                 `json:"signer_certificate_sha256"`
+	BrandingSnapshotJSON    string                 `json:"branding_snapshot_json,omitempty"`
+	TemplateSnapshotJSON    string                 `json:"template_snapshot_json,omitempty"`
+	Inputs                  []localAgentBuildInput `json:"inputs"`
+	BlockedReason           string                 `json:"blocked_reason,omitempty"`
+}
+
+type localAgentBuildInput struct {
+	Role         string                 `json:"role"`
+	ObjectID     int64                  `json:"object_id"`
+	ObjectType   core.StorageObjectType `json:"object_type"`
+	OriginalName string                 `json:"original_name"`
+	ContentType  string                 `json:"content_type"`
+	SizeBytes    int64                  `json:"size_bytes"`
+	SHA256       string                 `json:"sha256"`
+}
+
+func buildLocalAgentManifest(execution *core.BuildExecutionContext) (*localAgentBuildManifest, error) {
+	if execution == nil || execution.GetTask() == nil || execution.GetTask().GetId() <= 0 {
+		return nil, status.Error(codes.FailedPrecondition, "Local Agent build task is missing")
+	}
+	task := execution.GetTask()
+	bundle := &localAgentBuildManifest{
+		SchemaVersion: 3, Task: task, PackageName: execution.GetPackageName(), APIHost: execution.GetApiHost(),
+		ChannelName: execution.GetChannelName(), LandingURL: execution.GetLandingUrl(), KeyAlias: execution.GetKeyAlias(),
+		SigningSecretRef: execution.GetSecretRef(), SignerCertificateSHA256: execution.GetSignerCertificateSha256(),
+		BrandingSnapshotJSON: execution.GetBrandingSnapshotJson(), TemplateSnapshotJSON: execution.GetTemplateSnapshotJson(),
+		Inputs: make([]localAgentBuildInput, 0, 4+len(execution.GetTemplateFiles())),
+	}
+	if strings.TrimSpace(bundle.SigningSecretRef) == "" {
+		bundle.BlockedReason = "LOCAL_SIGNING_SECRET_REQUIRED"
+	} else if !strings.HasPrefix(strings.ToLower(strings.TrimSpace(bundle.SigningSecretRef)), "local-file://") {
+		bundle.BlockedReason = "LOCAL_SIGNING_SECRET_PROVIDER_UNSUPPORTED"
+	}
+	// V3 sensitive parameters are encrypted with the control-plane master key.
+	// Do not send their ciphertext to Agent. A future local parameter provider
+	// must replace them with customer-side references before this gate is lifted.
+	if strings.Contains(bundle.TemplateSnapshotJSON, "sb1.") {
+		bundle.TemplateSnapshotJSON = ""
+		if bundle.BlockedReason == "" {
+			bundle.BlockedReason = "LOCAL_TEMPLATE_SECRET_REQUIRED"
+		}
+	}
+	mandatory := []struct {
+		role   string
+		object *core.StorageObject
+	}{{"source_apk", execution.GetSourceApk()}, {"keystore", execution.GetKeystore()}}
+	for _, item := range mandatory {
+		if err := appendLocalAgentBuildInput(bundle, task, item.role, item.object, true); err != nil {
+			return nil, err
+		}
+	}
+	if err := appendLocalAgentBuildInput(bundle, task, "brand_logo", execution.GetBrandLogo(), false); err != nil {
+		return nil, err
+	}
+	if err := appendLocalAgentBuildInput(bundle, task, "brand_splash", execution.GetBrandSplash(), false); err != nil {
+		return nil, err
+	}
+	for _, object := range execution.GetTemplateFiles() {
+		if err := appendLocalAgentBuildInput(bundle, task, "template_file", object, true); err != nil {
+			return nil, err
+		}
+	}
+	return bundle, nil
+}
+
+func appendLocalAgentBuildInput(bundle *localAgentBuildManifest, task *core.BuildTask, role string, object *core.StorageObject, required bool) error {
+	if object == nil || object.GetId() <= 0 {
+		if required {
+			return status.Errorf(codes.FailedPrecondition, "Local Agent %s input is unavailable", role)
+		}
+		return nil
+	}
+	if object.GetTenantId() != task.GetTenantId() || object.GetAppId() != task.GetAppId() {
+		return status.Errorf(codes.PermissionDenied, "Local Agent %s input ownership mismatch", role)
+	}
+	if object.GetStatus() != core.StorageObjectStatus_STORAGE_OBJECT_STATUS_READY &&
+		object.GetStatus() != core.StorageObjectStatus_STORAGE_OBJECT_STATUS_BOUND {
+		return status.Errorf(codes.FailedPrecondition, "Local Agent %s input is not ready", role)
+	}
+	digest := strings.ToLower(strings.TrimSpace(object.GetSha256()))
+	if object.GetSizeBytes() <= 0 || len(digest) != sha256.Size*2 {
+		return status.Errorf(codes.FailedPrecondition, "Local Agent %s input integrity metadata is incomplete", role)
+	}
+	if _, err := hex.DecodeString(digest); err != nil {
+		return status.Errorf(codes.FailedPrecondition, "Local Agent %s input SHA-256 is invalid", role)
+	}
+	bundle.Inputs = append(bundle.Inputs, localAgentBuildInput{
+		Role: role, ObjectID: object.GetId(), ObjectType: object.GetObjectType(), OriginalName: object.GetOriginalName(),
+		ContentType: object.GetContentType(), SizeBytes: object.GetSizeBytes(), SHA256: digest,
+	})
+	return nil
+}
+
 func agentRPC(_ *svc.ServiceContext, call agentRPCFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeAgentError(w, status.Error(codes.Unimplemented, "method is not allowed"))
 			return
 		}
-		if r.TLS == nil || len(r.TLS.PeerCertificates) != 1 {
-			writeAgentError(w, status.Error(codes.Unauthenticated, "exactly one verified client certificate is required"))
+		identity, err := verifiedAgentIdentity(r)
+		if err != nil {
+			writeAgentError(w, err)
 			return
 		}
 		body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 2<<20))
@@ -161,11 +295,18 @@ func agentRPC(_ *svc.ServiceContext, call agentRPCFunc) http.HandlerFunc {
 			writeAgentError(w, status.Error(codes.InvalidArgument, "request body is invalid"))
 			return
 		}
-		certificate := r.TLS.PeerCertificates[0]
-		digest := sha256.Sum256(certificate.Raw)
-		response, err := call(r.Context(), body, agentTLSIdentity{serial: strings.ToLower(certificate.SerialNumber.Text(16)), fingerprint: hex.EncodeToString(digest[:])})
+		response, err := call(r.Context(), body, identity)
 		writeAgentJSON(w, response, err)
 	}
+}
+
+func verifiedAgentIdentity(r *http.Request) (agentTLSIdentity, error) {
+	if r.TLS == nil || len(r.TLS.PeerCertificates) != 1 {
+		return agentTLSIdentity{}, status.Error(codes.Unauthenticated, "exactly one verified client certificate is required")
+	}
+	certificate := r.TLS.PeerCertificates[0]
+	digest := sha256.Sum256(certificate.Raw)
+	return agentTLSIdentity{serial: strings.ToLower(certificate.SerialNumber.Text(16)), fingerprint: hex.EncodeToString(digest[:])}, nil
 }
 
 func injectAgentIdentity(auth *core.LocalAgentAuth, identity agentTLSIdentity) {
@@ -181,6 +322,7 @@ func decodeAgentJSON(r *http.Request, target any) error {
 	decoder.DisallowUnknownFields()
 	return decoder.Decode(target)
 }
+
 func writeAgentJSON(w http.ResponseWriter, value any, err error) {
 	if err != nil {
 		writeAgentError(w, err)

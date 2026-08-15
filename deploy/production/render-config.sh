@@ -34,7 +34,7 @@ Etcd:
   Hosts: [etcd:2379]
   Key: system.rpc
 Mysql:
-  DataSource: ${APPFORGE_MYSQL_USER}:${APPFORGE_MYSQL_PASSWORD}@tcp(mysql:3306)/${APPFORGE_MYSQL_DATABASE}?charset=utf8mb4&parseTime=true&loc=Local
+  DataSource: ${APPFORGE_MYSQL_USER}:${APPFORGE_MYSQL_PASSWORD}@tcp(mysql:3306)/${APPFORGE_MYSQL_DATABASE}?charset=utf8mb4&parseTime=true&loc=Asia%2FHong_Kong
 CacheRedis:
   - Host: redis:6379
     Type: node
@@ -52,7 +52,7 @@ Etcd:
   Hosts: [etcd:2379]
   Key: core.rpc
 Mysql:
-  DataSource: ${APPFORGE_MYSQL_USER}:${APPFORGE_MYSQL_PASSWORD}@tcp(mysql:3306)/${APPFORGE_MYSQL_DATABASE}?charset=utf8mb4&parseTime=true&loc=Local
+  DataSource: ${APPFORGE_MYSQL_USER}:${APPFORGE_MYSQL_PASSWORD}@tcp(mysql:3306)/${APPFORGE_MYSQL_DATABASE}?charset=utf8mb4&parseTime=true&loc=Asia%2FHong_Kong
 CacheRedis:
   - Host: redis:6379
     Type: node
@@ -159,4 +159,4 @@ sed -i.bak \
 rm -f "$runtime_dir/admin-api.yaml.bak"
 chmod 600 "$runtime_dir"/*.yaml
 
-echo "生产运行配置已生成到 $runtime_dir（内容包含 Secret，请勿归档或提交）"
+echo "生产运行配置已生成到 ${runtime_dir}（内容包含 Secret，请勿归档或提交）"
