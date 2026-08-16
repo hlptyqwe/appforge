@@ -32,6 +32,15 @@ jobs:
     timeout-minutes: 100
     steps:
       - uses: actions/checkout@v4
+      - name: Free unused ephemeral runner toolchains
+        run: |
+          set -euo pipefail
+          for unused_path in /usr/share/dotnet /usr/local/lib/android /opt/ghc; do
+            if [[ -d "$unused_path" ]]; then
+              sudo rm -rf -- "$unused_path"
+            fi
+          done
+          df -h /
       - name: Validate soak runner contract
         env:
           FIXTURE: ${{ runner.temp }}/soak-api-fixture
