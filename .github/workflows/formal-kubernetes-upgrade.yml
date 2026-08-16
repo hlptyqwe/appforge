@@ -124,6 +124,8 @@ jobs:
             .runtime.distinctAppImageCount == 9 and
             .runtime.failedHealthProbes == 0
           ' "dist/v7-formal-kubernetes-upgrade-v${BASE_VERSION}-v${TARGET_VERSION}.json" >/dev/null
+          report_payload=$(gzip -c "dist/v7-formal-kubernetes-upgrade-v${BASE_VERSION}-v${TARGET_VERSION}.json" | base64 -w0)
+          printf '::notice title=Formal Kubernetes acceptance evidence::%s\n' "$report_payload"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
