@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v3-android-runtime-current",
+  "acceptedAt": "2026-08-16T22:42:07Z",
+  "result": "passed",
+  "source": {
+    "artifactSet": "existing-synthetic-tasks-14-15",
+    "gitCommit": "2a06f471851583a67cc7c86a5c9f37e7b1a18550"
+  },
+  "device": {
+    "kind": "emulator",
+    "serialSha256": "04ab3fc382bfb33ea4fbc120f5172ecfc4aed71652e00977064492ca0f65a017",
+    "apiLevel": 29,
+    "abi": "arm64-v8a"
+  },
+  "application": {
+    "packageName": "com.appforge.v3runtime20260814",
+    "launchActivity": "com.appforge.acceptance.MainActivity",
+    "oldVersionCode": 20260820,
+    "newVersionCode": 20260821,
+    "certificateSha256": "59133f9c597d6968f37195a6b39330c0bef61a96be5faa7b98bedf0f60170d82",
+    "oldApkSha256": "41a32ac19b9aa9fb7a6ed07e5111931c11d8dd381b234a7a20d7670a00706046",
+    "newApkSha256": "4a77f04ee410775a9dbd6a7bbcf7b8239be467cd1814759072bb79d0ab85fb78",
+    "firstInstallTimePreserved": true,
+    "firstInstallTime": "2026-08-17 06:42:02"
+  },
+  "checks": {
+    "singleAuthorizedADBDevice": "passed",
+    "deviceKindConstraint": "passed",
+    "oldApkStaticMetadata": "passed",
+    "newApkStaticMetadata": "passed",
+    "sameSigningCertificate": "passed",
+    "oldInstallAndLaunch": "passed",
+    "newInPlaceUpgradeAndLaunch": "passed",
+    "applicationProcessAfterLaunch": "passed",
+    "uiText": "passed"
+  },
+  "limitations": [
+    "synthetic-v3-acceptance-application-only",
+    "emulator-does-not-replace-authorized-physical-device",
+    "does-not-access-customer-or-production-data"
+  ]
+}
