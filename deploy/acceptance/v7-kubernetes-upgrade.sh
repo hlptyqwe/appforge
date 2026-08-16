@@ -460,10 +460,10 @@ if "$kubectl_bin" --context "$context" -n "$namespace" get deployment -l app.kub
   exit 1
 fi
 schema_count=$("$kubectl_bin" --context "$context" -n "$namespace" exec deployment/mysql -- sh -c \
-  'MYSQL_PWD=kubernetes_acceptance_mysql mysql -uappforge -Dappforge -N -e "SELECT COUNT(*) FROM sys_schema_migration WHERE version=\"20260815_113_v7_air_gapped\""')
+  'MYSQL_PWD=kubernetes_acceptance_mysql mysql -h 127.0.0.1 -uappforge -Dappforge -N -e "SELECT COUNT(*) FROM sys_schema_migration WHERE version=\"20260815_113_v7_air_gapped\""')
 [[ $schema_count == 1 ]] || { echo "验收失败: 应用回滚后生产 Schema 113 不存在" >&2; exit 1; }
 air_gapped_table_count=$("$kubectl_bin" --context "$context" -n "$namespace" exec deployment/mysql -- sh -c \
-  'MYSQL_PWD=kubernetes_acceptance_mysql mysql -uappforge -Dappforge -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=\"t_air_gapped_package\""')
+  'MYSQL_PWD=kubernetes_acceptance_mysql mysql -h 127.0.0.1 -uappforge -Dappforge -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=\"t_air_gapped_package\""')
 [[ $air_gapped_table_count == 1 ]] || { echo "验收失败: 应用回滚后 AIR_GAPPED 表不存在" >&2; exit 1; }
 "$kubectl_bin" --context "$context" -n "$namespace" get deployment appforge-api -o jsonpath='{.status.availableReplicas}' | grep -Fxq '2'
 if [[ -n $report_file ]]; then
