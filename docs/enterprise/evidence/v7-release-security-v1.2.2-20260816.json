@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "kind": "appforge-v7-real-release-security-evidence",
+  "generatedAt": "2026-08-16T14:33:33Z",
+  "result": "passed",
+  "repository": "hlptyqwe/appforge",
+  "version": "1.2.2",
+  "gitCommit": "8635584e40b7619b71b45df60c39dbb216945928",
+  "workflow": {
+    "name": "release-security",
+    "runId": 31952709472,
+    "url": "https://github.com/hlptyqwe/appforge/actions/runs/31952709472",
+    "status": "completed",
+    "conclusion": "success",
+    "createdAt": "2026-08-16T14:26:30Z",
+    "updatedAt": "2026-08-16T14:33:33Z",
+    "jobCount": 21,
+    "nonSuccessJobCount": 0
+  },
+  "releaseContract": {
+    "signedAppForgeImageCount": 16,
+    "thirdPartyImageCount": 2,
+    "sourceDependencyGate": "success",
+    "aggregateEvidenceArtifact": "release-security-v1.2.2",
+    "aggregateEvidenceArtifactSizeBytes": 4785732,
+    "deliveryToolsArtifact": "delivery-tools-v1.2.2",
+    "deliveryToolsArtifactSizeBytes": 7991170
+  },
+  "anonymousRegistryChecks": [
+    {
+      "image": "ghcr.io/hlptyqwe/appforge/api:1.2.2",
+      "digest": "sha256:540f338c9cb84f433333c565d434f94ac99e64c8b80fbdd904fd4f02dd927ab7"
+    },
+    {
+      "image": "ghcr.io/hlptyqwe/appforge/mysql:1.2.2",
+      "digest": "sha256:76456f21e5823252713af5564f0f046682ea99b3da58e5617024b28ce091e836"
+    },
+    {
+      "image": "ghcr.io/hlptyqwe/appforge/etcd:1.2.2",
+      "digest": "sha256:5bf03396c4b92f91807492939970f2ee4b8cda801d44b1eb41c2bcde9fb59b42"
+    },
+    {
+      "image": "ghcr.io/hlptyqwe/appforge/minio:1.2.2",
+      "digest": "sha256:ee1ad485141dd0c214035b30efa998d721333b3dad6228c652da4235ea895607"
+    },
+    {
+      "image": "ghcr.io/hlptyqwe/appforge/minio-mc:1.2.2",
+      "digest": "sha256:fbce6a5f273668bcb9138b1a09a090326dbb3e022025c52f9b05d7002e5fdfdf"
+    }
+  ],
+  "localReproduction": {
+    "scanner": "Trivy 0.70.0",
+    "sourceTargets": 12,
+    "sourceHighCriticalFindings": 0,
+    "hardenedImages": [
+      "mysql",
+      "etcd",
+      "minio",
+      "minio-mc",
+      "migrate",
+      "etcd-init"
+    ],
+    "imageHighCriticalFindings": 0
+  },
+  "boundary": "真实 GitHub tag、OIDC、Cosign、Trivy、SBOM、许可证与聚合签名流水线已经通过；GitHub 发布镜像当前为 linux/amd64，仍需在客户 Linux、物理断网介质、目标对象存储、网络、SIEM 与容量环境完成交付复验。"
+}
