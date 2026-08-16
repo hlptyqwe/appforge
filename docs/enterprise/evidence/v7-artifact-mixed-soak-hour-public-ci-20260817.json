@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-artifact-mixed-soak-hour-public-ci",
+  "acceptedAt": "2026-08-16T22:34:14Z",
+  "result": "passed",
+  "source": {
+    "repository": "hlptyqwe/appforge",
+    "gitCommit": "0a8ebee676bd6aa117b743266f88a53fa8ccd8bd"
+  },
+  "mixedSoak": {
+    "runId": 31973439491,
+    "jobId": 95229297421,
+    "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31973439491",
+    "result": "success",
+    "runtime": "linux/amd64",
+    "environmentKind": "fixture",
+    "stackReadyAt": "2026-08-16T21:33:52Z",
+    "startedAt": "2026-08-16T21:33:52Z",
+    "completedAt": "2026-08-16T22:34:02Z",
+    "configuredDurationSeconds": 3600,
+    "actualDurationSecondsMinimum": 3600,
+    "runClass": "hour",
+    "qualifiesHourLevel": true,
+    "qualifiesDayLevel": false
+  },
+  "authenticatedAPI": {
+    "probes": [
+      "healthz",
+      "readyz",
+      "jwt-rbac-rpc-database-deployment-status"
+    ],
+    "observedErrors": 0,
+    "maximumConsecutiveErrors": 0,
+    "minimumRequestCountsPassed": true,
+    "p99BudgetsPassed": true
+  },
+  "apkBuild": {
+    "image": "appforge-local-agent:soak",
+    "builtFromCurrentSource": true,
+    "concurrency": 1,
+    "intervalSeconds": 10,
+    "completedAtLeast": 120,
+    "failed": 0,
+    "validation": [
+      "apk-signature",
+      "package-name",
+      "result-sha256"
+    ]
+  },
+  "objectStorage": {
+    "provider": "temporary-minio-prefix",
+    "objectMiB": 1,
+    "concurrency": 1,
+    "intervalSeconds": 1,
+    "roundTripsAtLeast": 600,
+    "bytesUploadedAtLeast": 629145600,
+    "bytesDownloadedAtLeast": 629145600,
+    "failed": 0,
+    "sha256Verified": true,
+    "deleteNotFoundVerified": true,
+    "temporaryPrefixRemoved": true,
+    "credentialsFromPrivateFiles": true,
+    "targetValuesReported": false
+  },
+  "platform": {
+    "deployment": "current-source-compose",
+    "healthyZeroRestartContainers": [
+      "mysql",
+      "redis",
+      "etcd",
+      "minio",
+      "system-rpc",
+      "core-rpc",
+      "builder-rpc",
+      "admin-api"
+    ]
+  },
+  "artifact": {
+    "id": 9271238546,
+    "name": "hourly-api-soak-31973439491",
+    "sizeBytes": 4877534,
+    "sha256": "61962b2b892d09ae7ad87face65dcb00cfc70bec5d11bd01964ac2aaed0d8670",
+    "createdAt": "2026-08-16T22:34:10Z",
+    "expiresAt": "2026-09-15T22:34:08Z"
+  },
+  "verified": [
+    "native-linux-amd64",
+    "current-source-compose-clean-start",
+    "current-source-local-agent-image",
+    "authenticated-api-hour-soak",
+    "synthetic-apk-build-and-sign-hour-soak",
+    "object-put-stat-get-sha256-delete-not-found-hour-soak",
+    "zero-api-build-and-object-errors",
+    "minimum-operation-counts",
+    "eight-core-containers-zero-restarts",
+    "machine-evidence-uploaded",
+    "synthetic-platform-removed"
+  ],
+  "limitations": [
+    "synthetic-apk-and-test-keystore-only",
+    "temporary-minio-and-current-source-compose-only",
+    "does-not-qualify-day-level-soak",
+    "does-not-represent-customer-peak-or-production-capacity",
+    "not-an-android-authorized-device-test",
+    "does-not-change-v7-six-passed-seven-partial-status"
+  ]
+}
