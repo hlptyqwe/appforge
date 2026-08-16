@@ -1,0 +1,108 @@
+name: formal-kubernetes-upgrade
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_version:
+        description: Base semantic version without v
+        required: true
+        default: 1.2.5
+        type: string
+      target_version:
+        description: Target semantic version without v
+        required: true
+        default: 1.2.6
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: formal-kubernetes-upgrade
+  cancel-in-progress: false
+
+jobs:
+  native-amd64-kind:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.6
+          cache: false
+      - uses: sigstore/cosign-installer@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install pinned kind and Helm clients
+        env:
+          KIND_VERSION: v0.27.0
+          HELM_VERSION: v3.17.3
+        run: |
+          set -euo pipefail
+          curl -fsSLO "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
+          curl -fsSLO "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64.sha256sum"
+          sha256sum -c kind-linux-amd64.sha256sum
+          sudo install -m 0755 kind-linux-amd64 /usr/local/bin/kind
+          curl -fsSLO "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz"
+          curl -fsSLO "https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz.sha256sum"
+          sha256sum -c "helm-${HELM_VERSION}-linux-amd64.tar.gz.sha256sum"
+          tar -xzf "helm-${HELM_VERSION}-linux-amd64.tar.gz"
+          sudo install -m 0755 linux-amd64/helm /usr/local/bin/helm
+          kind version
+          helm version --short
+          kubectl version --client=true
+      - name: Download formal signed release evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BASE_VERSION: ${{ inputs.base_version }}
+          TARGET_VERSION: ${{ inputs.target_version }}
+        run: |
+          set -euo pipefail
+          [[ $BASE_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ $TARGET_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          mkdir -p dist/base dist/target
+          gh release download "v${BASE_VERSION}" --repo "$GH_REPO" \
+            --pattern "appforge-release-security-v${BASE_VERSION}.tar.gz" --dir dist/base
+          gh release download "v${TARGET_VERSION}" --repo "$GH_REPO" \
+            --pattern "appforge-release-security-v${TARGET_VERSION}.tar.gz" --dir dist/target
+          tar -xzf "dist/base/appforge-release-security-v${BASE_VERSION}.tar.gz" -C dist/base
+          tar -xzf "dist/target/appforge-release-security-v${TARGET_VERSION}.tar.gz" -C dist/target
+      - name: Run formal signed Kubernetes upgrade and rollback
+        env:
+          BASE_VERSION: ${{ inputs.base_version }}
+          TARGET_VERSION: ${{ inputs.target_version }}
+          IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}/appforge
+          APPFORGE_RELEASE_OIDC_ISSUER: https://token.actions.githubusercontent.com
+          APPFORGE_V7_KIND_NODE_IMAGE: kindest/node:v1.32.2
+        run: |
+          set -euo pipefail
+          export APPFORGE_COSIGN_BINARY="$(command -v cosign)"
+          export APPFORGE_BASE_RELEASE_CERTIFICATE_IDENTITY="https://github.com/${GITHUB_REPOSITORY}/.github/workflows/release-security.yml@refs/tags/v${BASE_VERSION}"
+          export APPFORGE_TARGET_RELEASE_CERTIFICATE_IDENTITY="https://github.com/${GITHUB_REPOSITORY}/.github/workflows/release-security.yml@refs/tags/v${TARGET_VERSION}"
+          deploy/acceptance/v7-formal-kubernetes-upgrade.sh \
+            "dist/base/release-security-v${BASE_VERSION}" "$BASE_VERSION" \
+            "dist/target/release-security-v${TARGET_VERSION}" "$TARGET_VERSION" \
+            "$IMAGE_REGISTRY" \
+            "dist/v7-formal-kubernetes-upgrade-v${BASE_VERSION}-v${TARGET_VERSION}.json"
+          jq -e '
+            .result == "passed" and
+            .releaseEvidence.aggregateSigstoreVerified == true and
+            .releaseEvidence.liveCosignVerifiedImageCount == 21 and
+            .runtime.formalReleaseImages == true and
+            .runtime.kindNodeArchitecture == "amd64" and
+            .runtime.distinctAppImageCount == 9 and
+            .runtime.failedHealthProbes == 0
+          ' "dist/v7-formal-kubernetes-upgrade-v${BASE_VERSION}-v${TARGET_VERSION}.json" >/dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: formal-kubernetes-upgrade-v${{ inputs.base_version }}-v${{ inputs.target_version }}
+          if-no-files-found: error
+          retention-days: 30
+          path: dist/v7-formal-kubernetes-upgrade-*.json

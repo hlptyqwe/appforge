@@ -165,6 +165,7 @@ fi
 
 bash -n "$repo_root/deploy/production/"*.sh "$repo_root/deploy/local-agent/"*.sh
 bash -n "$repo_root/deploy/acceptance/v7-local-agent-recovery.sh" \
+  "$repo_root/deploy/acceptance/v7-formal-kubernetes-upgrade.sh" \
   "$repo_root/deploy/acceptance/v7-kubernetes-upgrade.sh" \
   "$repo_root/deploy/acceptance/v7-network-policy-runtime.sh"
 docker compose --env-file "$repo_root/deploy/production/.env.example" -f "$repo_root/deploy/production/docker-compose.yml" config --quiet

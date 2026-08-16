@@ -15,15 +15,30 @@ old_version=${APPFORGE_V7_KUBERNETES_OLD_VERSION:-1.2.0}
 new_version=${APPFORGE_V7_KUBERNETES_NEW_VERSION:-1.2.1}
 report_file=${APPFORGE_V7_KUBERNETES_REPORT_FILE:-}
 node_image=${APPFORGE_V7_KIND_NODE_IMAGE:-kindest/node:v1.32.2}
+node_architecture=${APPFORGE_V7_KIND_NODE_ARCHITECTURE:-}
+formal_release=${APPFORGE_V7_KUBERNETES_FORMAL_RELEASE:-0}
 go_cache=${APPFORGE_V7_GO_CACHE:-/private/tmp/appforge-go-build-cache}
 temporary=$(mktemp -d /tmp/appforge-v7-kubernetes.XXXXXX)
 chart_dir="$temporary/appforge-chart"
+image_differences_file="$temporary/image-differences.json"
 created_cluster=false
 probe_started=false
 
 components=(system core builder builder-worker api admin-ui agent-ui etcd-init migrate)
-dependencies=(mysql:8.4 redis:7.4-alpine quay.io/coreos/etcd:v3.6.12 minio/minio:RELEASE.2025-04-22T22-12-26Z alpine:3.22)
 created_old_components=()
+
+case "$formal_release" in 0|1) ;; *) echo "验收失败: APPFORGE_V7_KUBERNETES_FORMAL_RELEASE 只允许 0 或 1" >&2; exit 1;; esac
+if [[ $formal_release == 1 ]]; then
+  [[ $old_version != "$new_version" ]] || { echo "验收失败: 正式 Kubernetes 基础版本和目标版本不能相同" >&2; exit 1; }
+  mysql_image="$registry/mysql:$old_version"
+  etcd_image="$registry/etcd:$old_version"
+  minio_image="$registry/minio:$old_version"
+else
+  mysql_image=mysql:8.4
+  etcd_image=quay.io/coreos/etcd:v3.6.12
+  minio_image=minio/minio:RELEASE.2025-04-22T22-12-26Z
+fi
+dependencies=("$mysql_image" redis:7.4-alpine "$etcd_image" "$minio_image" alpine:3.22)
 
 cleanup() {
   set +e
@@ -32,9 +47,11 @@ cleanup() {
   fi
   "$kubectl_bin" --context "$context" delete namespace "$namespace" --ignore-not-found --wait=false >/dev/null 2>&1 || true
   "$kubectl_bin" --context "$context" delete persistentvolume "$license_pv" --ignore-not-found --wait=false >/dev/null 2>&1 || true
-  for component in "${components[@]}"; do
-    docker image rm "$registry/$component:$new_version" >/dev/null 2>&1 || true
-  done
+  if [[ $formal_release == 0 ]]; then
+    for component in "${components[@]}"; do
+      docker image rm "$registry/$component:$new_version" >/dev/null 2>&1 || true
+    done
+  fi
   for component in "${created_old_components[@]}"; do
     docker image rm "$registry/$component:$old_version" >/dev/null 2>&1 || true
   done
@@ -45,34 +62,82 @@ cleanup() {
 }
 trap cleanup EXIT
 
-for command_path in "$kind_bin" "$helm_bin" "$kubectl_bin" docker openssl htpasswd go; do
+for command_path in "$kind_bin" "$helm_bin" "$kubectl_bin" docker openssl htpasswd go jq; do
   command -v "$command_path" >/dev/null || { echo "验收失败: 缺少命令 $command_path" >&2; exit 1; }
 done
 cp -R "$repo_root/deploy/helm/appforge" "$chart_dir"
 find "$chart_dir/templates" -type f -name '*.yaml' -exec sed -i.bak \
   's/emptyDir: {sizeLimit:/emptyDir: {medium: Memory, sizeLimit:/g' {} +
 find "$chart_dir/templates" -type f -name '*.bak' -delete
-if ! docker image inspect "$registry/migrate:$old_version" >/dev/null 2>&1; then
+if [[ $formal_release == 0 ]] && ! docker image inspect "$registry/migrate:$old_version" >/dev/null 2>&1; then
   docker build --pull=false --build-arg APPFORGE_SCHEMA_TARGET=20260815_113_v7_air_gapped \
     -f "$repo_root/deploy/docker/migrate.Dockerfile" -t "$registry/migrate:$old_version" "$repo_root" >/dev/null
   created_old_components+=("migrate")
 fi
+printf '[]\n' >"$image_differences_file"
+image_differences_tsv="$temporary/image-differences.tsv"
+: >"$image_differences_tsv"
 for component in "${components[@]}"; do
   docker image inspect "$registry/$component:$old_version" >/dev/null 2>&1 || {
     echo "验收失败: 缺少 Kubernetes 验收镜像 $registry/$component:$old_version" >&2
     exit 1
   }
-  docker image tag "$registry/$component:$old_version" "$registry/$component:$new_version"
+  if [[ $formal_release == 1 ]]; then
+    docker image inspect "$registry/$component:$new_version" >/dev/null 2>&1 || {
+      echo "验收失败: 缺少正式 Kubernetes 目标镜像 $registry/$component:$new_version" >&2
+      exit 1
+    }
+    old_image_id=$(docker image inspect "$registry/$component:$old_version" --format '{{.Id}}')
+    new_image_id=$(docker image inspect "$registry/$component:$new_version" --format '{{.Id}}')
+    old_image_architecture=$(docker image inspect "$registry/$component:$old_version" --format '{{.Architecture}}')
+    new_image_architecture=$(docker image inspect "$registry/$component:$new_version" --format '{{.Architecture}}')
+    if [[ -n $node_architecture && ($old_image_architecture != "$node_architecture" || $new_image_architecture != "$node_architecture") ]]; then
+      echo "验收失败: 正式镜像架构与 kind 节点不一致: $component" >&2
+      exit 1
+    fi
+    [[ $old_image_id != "$new_image_id" ]] || {
+      echo "验收失败: 正式 Kubernetes 升级拒绝同镜像 ID: $component" >&2
+      exit 1
+    }
+    printf '%s\t%s\t%s\n' "$component" "$old_image_id" "$new_image_id" >>"$image_differences_tsv"
+  else
+    docker image tag "$registry/$component:$old_version" "$registry/$component:$new_version"
+  fi
 done
+if [[ $formal_release == 1 ]]; then
+  jq -Rn '[inputs | select(length > 0) | split("\t") | {
+    component: .[0], baseImageId: .[1], targetImageId: .[2], different: true
+  }]' <"$image_differences_tsv" >"$image_differences_file"
+fi
 for dependency in "${dependencies[@]}"; do
   docker image inspect "$dependency" >/dev/null 2>&1 || { echo "验收失败: 缺少依赖镜像 $dependency" >&2; exit 1; }
+  if [[ -n $node_architecture ]]; then
+    dependency_architecture=$(docker image inspect "$dependency" --format '{{.Architecture}}')
+    [[ $dependency_architecture == "$node_architecture" ]] || {
+      echo "验收失败: 依赖镜像架构与 kind 节点不一致: $dependency" >&2
+      exit 1
+    }
+  fi
 done
+
+if [[ -n $node_architecture ]]; then
+  node_image_architecture=$(docker image inspect "$node_image" --format '{{.Architecture}}')
+  [[ $node_image_architecture == "$node_architecture" ]] || {
+    echo "验收失败: kind 节点镜像架构不匹配，期望 $node_architecture，实际 $node_image_architecture" >&2
+    exit 1
+  }
+fi
 
 if ! "$kind_bin" get clusters | grep -Fxq "$cluster"; then
   "$kind_bin" create cluster --name "$cluster" --image "$node_image" --wait 120s
   created_cluster=true
 fi
 "$kubectl_bin" --context "$context" wait --for=condition=Ready node --all --timeout=120s >/dev/null
+actual_node_architecture=$("$kubectl_bin" --context "$context" get nodes -o jsonpath='{.items[0].status.nodeInfo.architecture}')
+if [[ -n $node_architecture && $actual_node_architecture != "$node_architecture" ]]; then
+  echo "验收失败: kind 节点架构不匹配，期望 $node_architecture，实际 $actual_node_architecture" >&2
+  exit 1
+fi
 for version in "$old_version" "$new_version"; do
   images=()
   for component in "${components[@]}"; do images+=("$registry/$component:$version"); done
@@ -81,7 +146,7 @@ done
 "$kind_bin" load docker-image --name "$cluster" "${dependencies[@]}" >/dev/null
 
 "$kubectl_bin" --context "$context" create namespace "$namespace" >/dev/null
-"$kubectl_bin" --context "$context" -n "$namespace" apply -f - <<'YAML' >/dev/null
+cat >"$temporary/dependencies.yaml" <<'YAML'
 apiVersion: v1
 kind: Service
 metadata: {name: mysql}
@@ -98,7 +163,7 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: mysql:8.4
+          image: APPFORGE_ACCEPTANCE_MYSQL_IMAGE
           imagePullPolicy: Never
           args: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci"]
           env:
@@ -151,7 +216,7 @@ spec:
     spec:
       containers:
         - name: etcd
-          image: quay.io/coreos/etcd:v3.6.12
+          image: APPFORGE_ACCEPTANCE_ETCD_IMAGE
           imagePullPolicy: Never
           command: ["/usr/local/bin/etcd"]
           args: ["--name=appforge-etcd", "--data-dir=/etcd-data", "--listen-client-urls=http://0.0.0.0:2379", "--advertise-client-urls=http://etcd:2379"]
@@ -176,7 +241,7 @@ spec:
     spec:
       containers:
         - name: minio
-          image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+          image: APPFORGE_ACCEPTANCE_MINIO_IMAGE
           imagePullPolicy: Never
           args: ["server", "/data"]
           env:
@@ -187,6 +252,13 @@ spec:
           volumeMounts: [{name: data, mountPath: /data}]
       volumes: [{name: data, emptyDir: {}}]
 YAML
+sed -i.bak \
+  -e "s#APPFORGE_ACCEPTANCE_MYSQL_IMAGE#$mysql_image#g" \
+  -e "s#APPFORGE_ACCEPTANCE_ETCD_IMAGE#$etcd_image#g" \
+  -e "s#APPFORGE_ACCEPTANCE_MINIO_IMAGE#$minio_image#g" \
+  "$temporary/dependencies.yaml"
+rm -f "$temporary/dependencies.yaml.bak"
+"$kubectl_bin" --context "$context" -n "$namespace" apply -f "$temporary/dependencies.yaml" >/dev/null
 printf '%s\n' \
   'apiVersion: v1' 'kind: PersistentVolume' "metadata: {name: $license_pv}" \
   'spec:' '  capacity: {storage: 64Mi}' '  accessModes: [ReadWriteMany]' '  persistentVolumeReclaimPolicy: Delete' \
@@ -375,17 +447,27 @@ if [[ -n $report_file ]]; then
   APPFORGE_K8S_OLD_VERSION=$old_version \
     APPFORGE_K8S_NEW_VERSION=$new_version \
     APPFORGE_K8S_NODE_IMAGE=$node_image \
+    APPFORGE_K8S_NODE_ARCHITECTURE=$actual_node_architecture \
+    APPFORGE_K8S_FORMAL_RELEASE=$formal_release \
+    APPFORGE_K8S_IMAGE_DIFFERENCES_FILE=$image_differences_file \
     APPFORGE_K8S_UPGRADE_PROBES=$upgrade_probe_count \
     APPFORGE_K8S_ROLLBACK_PROBES=$rollback_probe_count \
     python3 -c '
 import json, os, sys
+formal_release = os.environ["APPFORGE_K8S_FORMAL_RELEASE"] == "1"
+with open(os.environ["APPFORGE_K8S_IMAGE_DIFFERENCES_FILE"], encoding="utf-8") as handle:
+  image_differences = json.load(handle)
 json.dump({
   "schemaVersion": 1,
-  "scenario": "local-kind-rolling-upgrade-and-application-rollback",
+  "scenario": "formal-release-kind-rolling-upgrade-and-application-rollback" if formal_release else "local-kind-rolling-upgrade-and-application-rollback",
   "acceptanceScript": "deploy/acceptance/v7-kubernetes-upgrade.sh",
   "oldVersion": os.environ["APPFORGE_K8S_OLD_VERSION"],
   "newVersion": os.environ["APPFORGE_K8S_NEW_VERSION"],
   "kindNodeImage": os.environ["APPFORGE_K8S_NODE_IMAGE"],
+  "kindNodeArchitecture": os.environ["APPFORGE_K8S_NODE_ARCHITECTURE"],
+  "formalReleaseImages": formal_release,
+  "distinctAppImageCount": len(image_differences),
+  "appImageDifferences": image_differences,
   "targetDatabaseSchema": "20260815_113_v7_air_gapped",
   "upgradeSuccessfulHealthProbes": int(os.environ["APPFORGE_K8S_UPGRADE_PROBES"]),
   "rollbackSuccessfulHealthProbes": int(os.environ["APPFORGE_K8S_ROLLBACK_PROBES"]),
@@ -397,12 +479,16 @@ json.dump({
     "schema-113-retained-after-rollback",
     "air-gapped-table-retained-after-rollback",
     "two-api-replicas-available-after-rollback"
-  ],
+  ] + ([
+    "all-nine-kubernetes-release-images-have-distinct-image-ids",
+    "native-node-architecture-validated"
+  ] if formal_release else []),
   "limitations": [
     "local-kind-not-customer-target-kubernetes",
-    "old-and-new-tags-use-the-same-locally-built-release-image-digest",
     "customer-csi-ingress-and-registry-not-validated"
-  ]
+  ] + ([] if formal_release else [
+    "old-and-new-tags-use-the-same-locally-built-release-image-digest"
+  ])
 }, sys.stdout, ensure_ascii=False, indent=2)
 sys.stdout.write("\n")
 ' >"$report_file"
