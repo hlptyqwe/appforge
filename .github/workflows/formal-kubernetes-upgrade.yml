@@ -92,6 +92,7 @@ jobs:
           IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}/appforge
           APPFORGE_RELEASE_OIDC_ISSUER: https://token.actions.githubusercontent.com
           APPFORGE_V7_KIND_NODE_IMAGE: kindest/node:v1.32.2
+          APPFORGE_V7_KUBERNETES_RELEASE_HOST_IMAGE_CLEANUP: "1"
         run: |
           set -euo pipefail
           export APPFORGE_COSIGN_BINARY="$(command -v cosign)"
@@ -107,7 +108,7 @@ jobs:
           acceptance_status=${PIPESTATUS[0]}
           set -e
           if [[ $acceptance_status -ne 0 ]]; then
-            error_message=$(tail -40 dist/v7-formal-kubernetes-upgrade.log)
+            error_message=$(tail -12 dist/v7-formal-kubernetes-upgrade.log)
             error_message=${error_message//'%'/'%25'}
             error_message=${error_message//$'\r'/'%0D'}
             error_message=${error_message//$'\n'/'%0A'}

@@ -17,6 +17,7 @@ report_file=${APPFORGE_V7_KUBERNETES_REPORT_FILE:-}
 node_image=${APPFORGE_V7_KIND_NODE_IMAGE:-kindest/node:v1.32.2}
 node_architecture=${APPFORGE_V7_KIND_NODE_ARCHITECTURE:-}
 formal_release=${APPFORGE_V7_KUBERNETES_FORMAL_RELEASE:-0}
+release_host_image_cleanup=${APPFORGE_V7_KUBERNETES_RELEASE_HOST_IMAGE_CLEANUP:-0}
 go_cache=${APPFORGE_V7_GO_CACHE:-/tmp/appforge-go-build-cache}
 temporary=$(mktemp -d /tmp/appforge-v7-kubernetes.XXXXXX)
 chart_dir="$temporary/appforge-chart"
@@ -28,6 +29,11 @@ components=(system core builder builder-worker api admin-ui agent-ui etcd-init m
 created_old_components=()
 
 case "$formal_release" in 0|1) ;; *) echo "验收失败: APPFORGE_V7_KUBERNETES_FORMAL_RELEASE 只允许 0 或 1" >&2; exit 1;; esac
+case "$release_host_image_cleanup" in 0|1) ;; *) echo "验收失败: APPFORGE_V7_KUBERNETES_RELEASE_HOST_IMAGE_CLEANUP 只允许 0 或 1" >&2; exit 1;; esac
+if [[ $release_host_image_cleanup == 1 && $formal_release != 1 ]]; then
+  echo "验收失败: 仅正式 Kubernetes 模式允许清理宿主临时发布镜像" >&2
+  exit 1
+fi
 if [[ $formal_release == 1 ]]; then
   [[ $old_version != "$new_version" ]] || { echo "验收失败: 正式 Kubernetes 基础版本和目标版本不能相同" >&2; exit 1; }
   mysql_image="$registry/mysql:$old_version"
@@ -138,11 +144,20 @@ if [[ -n $node_architecture && $actual_node_architecture != "$node_architecture"
   echo "验收失败: kind 节点架构不匹配，期望 $node_architecture，实际 $actual_node_architecture" >&2
   exit 1
 fi
-for version in "$old_version" "$new_version"; do
-  images=()
-  for component in "${components[@]}"; do images+=("$registry/$component:$version"); done
-  "$kind_bin" load docker-image --name "$cluster" "${images[@]}" >/dev/null
-done
+if [[ $release_host_image_cleanup == 1 ]]; then
+  for component in "${components[@]}"; do
+    old_image="$registry/$component:$old_version"
+    new_image="$registry/$component:$new_version"
+    "$kind_bin" load docker-image --name "$cluster" "$old_image" "$new_image" >/dev/null
+    docker image rm "$old_image" "$new_image" >/dev/null
+  done
+else
+  for version in "$old_version" "$new_version"; do
+    images=()
+    for component in "${components[@]}"; do images+=("$registry/$component:$version"); done
+    "$kind_bin" load docker-image --name "$cluster" "${images[@]}" >/dev/null
+  done
+fi
 "$kind_bin" load docker-image --name "$cluster" "${dependencies[@]}" >/dev/null
 
 "$kubectl_bin" --context "$context" create namespace "$namespace" >/dev/null
