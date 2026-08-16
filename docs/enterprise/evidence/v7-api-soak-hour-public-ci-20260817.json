@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-api-soak-hour-public-ci",
+  "acceptedAt": "2026-08-16T21:15:21Z",
+  "result": "passed",
+  "source": {
+    "repository": "hlptyqwe/appforge",
+    "gitCommit": "98e8b5d1ca0976c9bc6fa2e206febc655852a3ee"
+  },
+  "apiSoak": {
+    "runId": 31969588517,
+    "jobId": 95219827640,
+    "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31969588517",
+    "result": "success",
+    "runtime": "linux/amd64",
+    "environmentKind": "fixture",
+    "workflowStartedAt": "2026-08-16T20:06:44Z",
+    "stackReadyAt": "2026-08-16T20:15:07Z",
+    "soakStartedAt": "2026-08-16T20:15:07Z",
+    "soakCompletedAt": "2026-08-16T21:15:07Z",
+    "jobCompletedAt": "2026-08-16T21:15:18Z",
+    "configuredDurationSeconds": 3600,
+    "actualDurationSecondsMinimum": 3600,
+    "runClass": "hour",
+    "qualifiesHourLevel": true,
+    "qualifiesDayLevel": false,
+    "errorBudget": 0,
+    "observedErrors": 0,
+    "maximumConsecutiveErrors": 0,
+    "probes": [
+      {
+        "name": "healthz",
+        "concurrency": 2,
+        "intervalMilliseconds": 500,
+        "minimumRequests": 12960,
+        "observedRequestsAtLeast": 12960,
+        "p99LimitSeconds": 0.5
+      },
+      {
+        "name": "readyz",
+        "concurrency": 2,
+        "intervalMilliseconds": 500,
+        "minimumRequests": 12960,
+        "observedRequestsAtLeast": 12960,
+        "p99LimitSeconds": 0.5
+      },
+      {
+        "name": "authenticated-deployment",
+        "concurrency": 2,
+        "intervalMilliseconds": 1000,
+        "minimumRequests": 6480,
+        "observedRequestsAtLeast": 6480,
+        "p99LimitSeconds": 2.5
+      }
+    ]
+  },
+  "platform": {
+    "deployment": "current-source-compose",
+    "healthyZeroRestartContainers": [
+      "mysql",
+      "redis",
+      "etcd",
+      "minio",
+      "system-rpc",
+      "core-rpc",
+      "builder-rpc",
+      "admin-api"
+    ]
+  },
+  "artifact": {
+    "id": 9270280486,
+    "name": "hourly-api-soak-31969588517",
+    "sizeBytes": 4798115,
+    "sha256": "a73d9fc35b56d0f16fb57c8405ff6e159c5c6b5522cb7283081bc0ed29b082e8",
+    "createdAt": "2026-08-16T21:15:14Z",
+    "expiresAt": "2026-09-15T21:15:12Z"
+  },
+  "verified": [
+    "native-linux-amd64",
+    "current-source-compose-clean-start",
+    "healthz-semantic-status",
+    "readyz-semantic-status",
+    "jwt-rbac-rpc-database-deployment-status",
+    "minimum-request-count-per-probe",
+    "p99-latency-budget-per-probe",
+    "zero-errors",
+    "zero-consecutive-errors",
+    "eight-core-containers-running",
+    "eight-core-containers-zero-restarts",
+    "machine-evidence-uploaded",
+    "synthetic-platform-removed"
+  ],
+  "limitations": [
+    "synthetic-current-source-compose-only",
+    "does-not-cover-apk-build-or-object-storage-throughput",
+    "does-not-qualify-day-level-soak",
+    "does-not-represent-customer-peak-or-production-capacity",
+    "does-not-change-v7-six-passed-seven-partial-status"
+  ]
+}
