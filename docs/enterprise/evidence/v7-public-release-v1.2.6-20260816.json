@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "kind": "appforge-v7-public-release-acceptance",
+  "generatedAt": "2026-08-16T15:57:02Z",
+  "result": "passed",
+  "repository": "hlptyqwe/appforge",
+  "repositoryVisibility": "public",
+  "version": "1.2.6",
+  "tag": "v1.2.6",
+  "gitCommit": "3d1fde742b7cb206b26a24b47b3c27e612c9b34e",
+  "workflow": {
+    "runId": 31956298287,
+    "url": "https://github.com/hlptyqwe/appforge/actions/runs/31956298287",
+    "status": "completed",
+    "conclusion": "success",
+    "jobCount": 22,
+    "successfulJobCount": 22
+  },
+  "release": {
+    "id": 371364358,
+    "url": "https://github.com/hlptyqwe/appforge/releases/tag/v1.2.6",
+    "draft": false,
+    "prerelease": false,
+    "publishedAt": "2026-08-16T15:45:48Z",
+    "assets": [
+      {
+        "name": "appforge-delivery-tools-v1.2.6.tar.gz",
+        "size": 7856535,
+        "digest": "sha256:2dd8072d4e5774417e2c185e06dc5b9ecd435697c5f9f38e7ee391bbd6cbe472"
+      },
+      {
+        "name": "APPFORGE-RELEASE-ASSETS-SHA256SUMS",
+        "size": 210,
+        "digest": "sha256:09f246c01fa52152626a1ac2cb0b114450ce953a84559b9fe7758694917b5872"
+      },
+      {
+        "name": "APPFORGE-RELEASE-ASSETS-SHA256SUMS.sigstore.json",
+        "size": 8725,
+        "digest": "sha256:98e1110f1911f2590bde3ba3c2e973e857587fbadbfef4ae053a96af4cc75e18"
+      },
+      {
+        "name": "appforge-release-security-v1.2.6.tar.gz",
+        "size": 5009893,
+        "digest": "sha256:d379539a6a122ae3a963bb00aeb7ee5def06dccbc77985c8352bb454a2b8756c"
+      }
+    ]
+  },
+  "releaseManifest": {
+    "registry": "ghcr.io/hlptyqwe/appforge",
+    "appforgeImageCount": 16,
+    "thirdPartyImageCount": 2,
+    "sourceDependencyGate": "passed",
+    "sourceDependencyDetailsExported": false
+  },
+  "verification": {
+    "anonymousHttpsDownload": true,
+    "exactOuterAssetSet": true,
+    "outerSha256": true,
+    "outerSigstoreBundle": true,
+    "innerReleaseEvidenceSha256": true,
+    "innerReleaseEvidenceSigstoreBundle": true,
+    "innerDeliveryToolsSha256": true,
+    "innerDeliveryToolsSigstoreBundle": true,
+    "certificateIdentity": "https://github.com/hlptyqwe/appforge/.github/workflows/release-security.yml@refs/tags/v1.2.6",
+    "oidcIssuer": "https://token.actions.githubusercontent.com",
+    "cosignVersion": "v3.1.3",
+    "cosignBinarySha256": "5cf948c2f4dfe59687bdd0b8523709067383e03982cc543475c8a7dc70e92a76",
+    "deliveryToolExecutables": [
+      "appforgectl-linux-amd64",
+      "appforgectl-linux-arm64",
+      "licensectl-linux-amd64",
+      "licensectl-linux-arm64"
+    ]
+  },
+  "formalOfflineMedia": {
+    "evidence": "docs/enterprise/evidence/v7-formal-offline-media-v1.2.6-20260816.json",
+    "platform": "linux/amd64",
+    "sizeBytes": 3324800000,
+    "sha256": "a88b792badcf39bd1522fd1e1923eb8226c0fa8f51e5ebb5cc5e9ecf9f46c306",
+    "imageCount": 18,
+    "localDisconnectedFreshInstall": true
+  },
+  "boundary": "该证据证明 public GitHub 正式 tag 的 22/22 发布任务、匿名 Release 下载、双层哈希和 Sigstore 身份校验、交付工具权限以及由真实签名资产生成的 linux/amd64 正式离线介质通过本地断网全新安装；不替代客户物理断网介质交接、正式版本差异升级、客户 CNI/Ingress/SIEM/HSM、真实 S3/OSS/AWS、生产规模灾备或客户 RPO/RTO 验收。"
+}

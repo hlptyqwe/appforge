@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "kind": "appforge-v7-formal-offline-media-acceptance",
+  "acceptedAt": "2026-08-16T15:55:33Z",
+  "result": "passed",
+  "version": "1.2.6",
+  "registry": "ghcr.io/hlptyqwe/appforge",
+  "platform": "linux/amd64",
+  "bundle": {
+    "sizeBytes": 3324800000,
+    "sha256": "a88b792badcf39bd1522fd1e1923eb8226c0fa8f51e5ebb5cc5e9ecf9f46c306",
+    "imageCount": 18,
+    "platformDigestMappingCount": 18,
+    "checksumVerifiedBeforeLoad": true,
+    "dockerLoadCompleted": true,
+    "selfContainedAdminApiTemplate": true
+  },
+  "releaseEvidence": {
+    "cosignVerified": true,
+    "certificateIdentity": "https://github.com/hlptyqwe/appforge/.github/workflows/release-security.yml@refs/tags/v1.2.6",
+    "certificateIssuer": "https://token.actions.githubusercontent.com"
+  },
+  "runtime": {
+    "schemaVersion": 1,
+    "acceptedAt": "2026-08-16T15:55:24Z",
+    "scope": "synthetic-local-formal-release-media",
+    "acceptanceScript": "deploy/acceptance/v7-private-install.sh",
+    "deploymentMode": "private",
+    "migrateImage": "ghcr.io/hlptyqwe/appforge/migrate:1.2.6",
+    "migrateImageId": "sha256:4965a20737a6991ea465d86443f1b0af3242b37a40974017b9c5842cd332143d",
+    "schemaTarget": "20260815_113_v7_air_gapped",
+    "schema113ProductionTarget": true,
+    "freshVolumes": true,
+    "imagesPreloaded": true,
+    "formalReleaseMedia": true,
+    "formalReleasePlatform": "linux/amd64",
+    "composePullPolicy": "never",
+    "frontendNetworkInternal": true,
+    "backendNetworkInternal": true,
+    "internalApiReachable": true,
+    "externalHttpsRejected": true,
+    "tlsFrontends": [
+      "admin",
+      "agent"
+    ],
+    "verified": [
+      "schema-migration",
+      "fixed-non-root-services",
+      "offline-license",
+      "bootstrap-admin-login",
+      "private-object-storage-bucket",
+      "formal-release-media",
+      "fixed-target-platform",
+      "signed-index-to-platform-digest-map"
+    ],
+    "limitations": [
+      "local-docker-simulation-not-physical-air-gap",
+      "synthetic-temporary-credentials-and-license",
+      "fresh-install-only-not-offline-upgrade"
+    ]
+  },
+  "boundary": "使用正式签名镜像和合成临时凭据在本地 Docker internal 网络完成离线安装；不替代客户物理断网、正式介质交接、客户证书/KMS、生产数据或客户硬件验收。"
+}
