@@ -1,6 +1,14 @@
 name: formal-kubernetes-upgrade
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/formal-kubernetes-upgrade.yml
+      - deploy/acceptance/v7-formal-kubernetes-upgrade.sh
+      - deploy/acceptance/v7-kubernetes-upgrade.sh
+      - deploy/helm/appforge/**
+      - deploy/production/validate-release-evidence.sh
   workflow_dispatch:
     inputs:
       base_version:
@@ -17,6 +25,10 @@ on:
 permissions:
   contents: read
   packages: read
+
+env:
+  APPFORGE_BASE_VERSION: ${{ inputs.base_version || '1.2.5' }}
+  APPFORGE_TARGET_VERSION: ${{ inputs.target_version || '1.2.6' }}
 
 concurrency:
   group: formal-kubernetes-upgrade
@@ -60,8 +72,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          BASE_VERSION: ${{ inputs.base_version }}
-          TARGET_VERSION: ${{ inputs.target_version }}
+          BASE_VERSION: ${{ env.APPFORGE_BASE_VERSION }}
+          TARGET_VERSION: ${{ env.APPFORGE_TARGET_VERSION }}
         run: |
           set -euo pipefail
           [[ $BASE_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
@@ -75,8 +87,8 @@ jobs:
           tar -xzf "dist/target/appforge-release-security-v${TARGET_VERSION}.tar.gz" -C dist/target
       - name: Run formal signed Kubernetes upgrade and rollback
         env:
-          BASE_VERSION: ${{ inputs.base_version }}
-          TARGET_VERSION: ${{ inputs.target_version }}
+          BASE_VERSION: ${{ env.APPFORGE_BASE_VERSION }}
+          TARGET_VERSION: ${{ env.APPFORGE_TARGET_VERSION }}
           IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}/appforge
           APPFORGE_RELEASE_OIDC_ISSUER: https://token.actions.githubusercontent.com
           APPFORGE_V7_KIND_NODE_IMAGE: kindest/node:v1.32.2
@@ -102,7 +114,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: formal-kubernetes-upgrade-v${{ inputs.base_version }}-v${{ inputs.target_version }}
+          name: formal-kubernetes-upgrade-v${{ env.APPFORGE_BASE_VERSION }}-v${{ env.APPFORGE_TARGET_VERSION }}
           if-no-files-found: error
           retention-days: 30
           path: dist/v7-formal-kubernetes-upgrade-*.json
