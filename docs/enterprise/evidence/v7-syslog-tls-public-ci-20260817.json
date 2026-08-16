@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-rfc5424-syslog-tls-public-ci",
+  "acceptedAt": "2026-08-16T18:34:41Z",
+  "result": "passed",
+  "source": {
+    "repository": "hlptyqwe/appforge",
+    "gitCommit": "16213cbebf8ffe2438c1a6404eaa70446db9912b"
+  },
+  "syslogTLS": {
+    "runId": 31964658396,
+    "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31964658396",
+    "result": "success",
+    "runtime": "linux/amd64",
+    "artifactId": 9268176232,
+    "artifactName": "syslog-tls-31964658396",
+    "artifactSizeBytes": 746,
+    "startedAt": "2026-08-16T18:27:45Z",
+    "completedAt": "2026-08-16T18:29:56Z"
+  },
+  "relatedRegressions": [
+    {
+      "name": "customer-storage-probe",
+      "runId": 31964658394,
+      "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31964658394",
+      "result": "success",
+      "completedAt": "2026-08-16T18:30:12Z"
+    },
+    {
+      "name": "formal-kubernetes-upgrade",
+      "runId": 31964658393,
+      "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31964658393",
+      "result": "success",
+      "completedAt": "2026-08-16T18:34:02Z"
+    }
+  ],
+  "verified": [
+    "native-linux-amd64",
+    "rfc5424-message-format",
+    "rfc6587-octet-counting-framing",
+    "tls-1.2-or-newer",
+    "custom-ca-validation",
+    "controlled-http-connect-egress-proxy",
+    "plaintext-and-unsafe-endpoints-rejected",
+    "syslog-mode-without-bearer-token",
+    "compose-production-preflight",
+    "helm-strict-lint",
+    "machine-evidence-uploaded"
+  ],
+  "limitations": [
+    "synthetic-audit-events-only",
+    "does-not-replace-customer-siem-parser-routing-retention-or-alert-validation",
+    "does-not-change-v7-six-passed-seven-partial-status"
+  ]
+}
