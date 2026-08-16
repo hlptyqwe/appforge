@@ -31,9 +31,16 @@ deploy/production/offline-bundle.sh \
 
 deploy/acceptance/v7-formal-offline-media.sh \
   appforge-1.2.6-offline.tar 1.2.6 ghcr.io/OWNER/appforge formal-offline-report.json
+
+export APPFORGE_BASE_RELEASE_CERTIFICATE_IDENTITY=https://github.com/OWNER/REPOSITORY/.github/workflows/release-security.yml@refs/tags/v1.2.5
+export APPFORGE_TARGET_RELEASE_CERTIFICATE_IDENTITY=https://github.com/OWNER/REPOSITORY/.github/workflows/release-security.yml@refs/tags/v1.2.6
+deploy/acceptance/v7-formal-offline-upgrade.sh \
+  appforge-1.2.5-offline.tar 1.2.5 \
+  appforge-1.2.6-offline.tar 1.2.6 \
+  ghcr.io/OWNER/appforge formal-offline-upgrade-report.json
 ```
 
-不得使用本地伪造证据目录替代真实 tag Release 资产。当前正式容器镜像发布平台为 `linux/amd64`；`appforgectl`/`licensectl` 同时提供 AMD64 与 ARM64，但在正式镜像索引增加 ARM64 前，生成 `linux/arm64` 介质会按设计失败。断网安装后，原始证据位于 `security/`，校验器位于 `bin/validate-release-evidence`；介质进入断网区前还应按交付制度校验外部签名和介质哈希。`v1.2.6` 已完成真实 tag、OIDC、Cosign、Trivy、SBOM、许可证、聚合签名和公开 Release 流水线，22 个任务全部成功；四项公开资产已通过匿名下载、外层与内层 SHA/Sigstore 身份和 Linux CLI 权限验证，证据见 `evidence/v7-public-release-v1.2.6-20260816.json`。由这些资产生成的正式介质大小为 3,324,800,000 字节，SHA-256 为 `a88b792badcf39bd1522fd1e1923eb8226c0fa8f51e5ebb5cc5e9ecf9f46c306`，已完成 18 镜像 `linux/amd64` 本地断网全新安装，证据见 `evidence/v7-formal-offline-media-v1.2.6-20260816.json`。客户离线介质仍必须使用真实 tag 资产在联网交付机独立复验，并完成物理介质交接和正式版本差异升级记录。
+不得使用本地伪造证据目录替代真实 tag Release 资产。当前正式容器镜像发布平台为 `linux/amd64`；`appforgectl`/`licensectl` 同时提供 AMD64 与 ARM64，但在正式镜像索引增加 ARM64 前，生成 `linux/arm64` 介质会按设计失败。断网安装后，原始证据位于 `security/`，校验器位于 `bin/validate-release-evidence`；介质进入断网区前还应按交付制度校验外部签名和介质哈希。`v1.2.6` 已完成真实 tag、OIDC、Cosign、Trivy、SBOM、许可证、聚合签名和公开 Release 流水线，22 个任务全部成功；四项公开资产已通过匿名下载、外层与内层 SHA/Sigstore 身份和 Linux CLI 权限验证，证据见 `evidence/v7-public-release-v1.2.6-20260816.json`。由这些资产生成的正式介质大小为 3,324,800,000 字节，SHA-256 为 `a88b792badcf39bd1522fd1e1923eb8226c0fa8f51e5ebb5cc5e9ecf9f46c306`，已完成 18 镜像 `linux/amd64` 本地断网全新安装，证据见 `evidence/v7-formal-offline-media-v1.2.6-20260816.json`。`v1.2.5` 与 `v1.2.6` 两套正式介质还完成了本地 `1.2.5 → 1.2.6 → 1.2.5` 禁拉取升级/回滚，16/16 个 AppForge 平台镜像摘要不同，证据见 `evidence/v7-formal-offline-upgrade-v1.2.5-v1.2.6-20260817.json`。客户离线介质仍必须使用真实 tag 资产在联网交付机独立复验，并完成物理介质交接和客户现场升级记录。
 
 Hybrid/Private 客户构建节点使用 `deploy/local-agent` 交付包。该包提供非 root、只读根文件系统、无入站端口的 Compose，注册码通过标准输入传递，Agent 身份与签名 Secret 分别保存在 Docker 私有卷，并提供健康检查、Drain 后在线/已导入镜像离线升级和失败自动恢复旧镜像。详细步骤见 [Local Agent 客户侧安装与升级](../../deploy/local-agent/README.md)。
 
@@ -78,7 +85,7 @@ PITR 使用随正式发布和离线 OCI 包交付的同版本 `mysql-binlog-tool
 
 ## 当前交付边界
 
-Compose、Helm、配置 Schema、迁移 Job、备份恢复脚本、离线镜像脚本、离线许可证、Local Agent 客户安装/升级包、控制面协议、固定 APK 执行器和企业 Secret Resolver 已实现基础能力；全新 Private 与 Dedicated Compose 空数据卷安装、真实 Agent 临期证书自动轮换与吊销拒绝、Local Agent 真实 APK 执行中断恢复及离线升级回滚、三种 Artifact 模式的合成真实构建 E2E、当前 Schema 113 灾备、kind/Helm 1.2.x 滚动升级与应用回滚已完成本地验收。本地模拟断网已通过预载镜像、禁止拉取、双 internal 网络、内部 TLS/API 登录、外部 HTTPS 拒绝及严格 Schema 113 门禁；Schema 113 的空库安装、112→113 升级、幂等、数据保持和已有角色零自动授权证据见 `evidence/v7-schema113-production-20260816.json`。npm 官方生产及全部依赖审计均为零漏洞，证据见 `evidence/v7-npm-audit-20260816.json`。发布安全证据契约已完成 16 个自建签名加两个原始第三方镜像的合成结构、许可证清单、源码依赖无明细导出门禁、SHA 防篡改与离线介质落盘验收，证据见 `evidence/v7-release-evidence-contract-20260816.json`；`v1.2.6` 的真实远端 tag/OIDC/漏洞库、公开 Release、匿名双层签名验证以及正式介质本地断网全新安装也已通过，证据见 `evidence/v7-public-release-v1.2.6-20260816.json` 与 `evidence/v7-formal-offline-media-v1.2.6-20260816.json`。正式交付前仍必须完成：客户 Linux/物理断网介质及正式版本离线升级复验、生产规模业务备份恢复与客户 RPO/RTO、真实 AWS/S3/OSS、目标网络策略和客户 SIEM 联调。当前状态以 [V7 企业交付验收报告](../../V7企业交付验收报告.md) 为准。
+Compose、Helm、配置 Schema、迁移 Job、备份恢复脚本、离线镜像脚本、离线许可证、Local Agent 客户安装/升级包、控制面协议、固定 APK 执行器和企业 Secret Resolver 已实现基础能力；全新 Private 与 Dedicated Compose 空数据卷安装、真实 Agent 临期证书自动轮换与吊销拒绝、Local Agent 真实 APK 执行中断恢复及离线升级回滚、三种 Artifact 模式的合成真实构建 E2E、当前 Schema 113 灾备、kind/Helm 1.2.x 滚动升级与应用回滚已完成本地验收。本地模拟断网已通过预载镜像、禁止拉取、双 internal 网络、内部 TLS/API 登录、外部 HTTPS 拒绝及严格 Schema 113 门禁；Schema 113 的空库安装、112→113 升级、幂等、数据保持和已有角色零自动授权证据见 `evidence/v7-schema113-production-20260816.json`。npm 官方生产及全部依赖审计均为零漏洞，证据见 `evidence/v7-npm-audit-20260816.json`。发布安全证据契约已完成 16 个自建签名加两个原始第三方镜像的合成结构、许可证清单、源码依赖无明细导出门禁、SHA 防篡改与离线介质落盘验收，证据见 `evidence/v7-release-evidence-contract-20260816.json`；`v1.2.6` 的真实远端 tag/OIDC/漏洞库、公开 Release、匿名双层签名验证、正式介质本地断网全新安装以及 `v1.2.5 → v1.2.6 → v1.2.5` 正式版本差异升级/回滚均已通过，证据见 `evidence/v7-public-release-v1.2.6-20260816.json`、`evidence/v7-formal-offline-media-v1.2.6-20260816.json` 与 `evidence/v7-formal-offline-upgrade-v1.2.5-v1.2.6-20260817.json`。正式交付前仍必须完成：客户 Linux/物理断网介质及现场离线升级复验、生产规模业务备份恢复与客户 RPO/RTO、真实 AWS/S3/OSS、目标网络策略和客户 SIEM 联调。当前状态以 [V7 企业交付验收报告](../../V7企业交付验收报告.md) 为准。
 
 客户 HSM/远程 APK 签名必须遵守 [远程 APK 签名与 HSM 接入契约](./remote-apk-signing-contract.md)。仓库已完成管理 API、Schema 112 兼容持久化、创建时身份验证、Core 任务快照、Builder 远程签名分支、能力调度门禁、最终 APK 证书校验，以及协议级和完整任务级合成 E2E；该证据仍不等于真实 HSM、不可导出密钥、PIN/会话、HA、审计、限流或性能已经验收。
 

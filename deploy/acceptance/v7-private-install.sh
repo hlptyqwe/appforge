@@ -17,30 +17,55 @@ gateway_port=${APPFORGE_PRIVATE_ACCEPTANCE_GATEWAY_PORT:-19444}
 offline_mode=${APPFORGE_PRIVATE_ACCEPTANCE_OFFLINE_MODE:-0}
 formal_release_media=${APPFORGE_PRIVATE_ACCEPTANCE_FORMAL_RELEASE_MEDIA:-0}
 formal_release_platform=${APPFORGE_PRIVATE_ACCEPTANCE_FORMAL_RELEASE_PLATFORM:-linux/amd64}
+formal_release_upgrade=${APPFORGE_PRIVATE_ACCEPTANCE_FORMAL_RELEASE_UPGRADE:-0}
+delivery_source=${APPFORGE_PRIVATE_ACCEPTANCE_DELIVERY_SOURCE:-$repo_root/deploy/production}
+upgrade_delivery_source=${APPFORGE_PRIVATE_ACCEPTANCE_UPGRADE_DELIVERY_SOURCE:-}
+delivery_source_kind=${APPFORGE_PRIVATE_ACCEPTANCE_DELIVERY_SOURCE_KIND:-repository}
 report_file=${APPFORGE_PRIVATE_ACCEPTANCE_REPORT_FILE:-}
 migrate_image=${APPFORGE_PRIVATE_ACCEPTANCE_MIGRATE_IMAGE:-$registry/migrate:$version}
 migrate_image_id=$(docker image inspect -f '{{.Id}}' "$migrate_image" 2>/dev/null || true)
 upgrade_mode=${APPFORGE_PRIVATE_ACCEPTANCE_UPGRADE_MODE:-0}
 upgrade_version=${APPFORGE_PRIVATE_ACCEPTANCE_UPGRADE_VERSION:-1.2.1}
+upgrade_migrate_image=${APPFORGE_PRIVATE_ACCEPTANCE_UPGRADE_MIGRATE_IMAGE:-$registry/migrate:$upgrade_version}
+upgrade_migrate_image_id=''
 upgrade_max_consecutive_failures=${APPFORGE_PRIVATE_ACCEPTANCE_UPGRADE_MAX_CONSECUTIVE_FAILURES:-10}
 admin_password='Acceptance-Private-Password-2026!'
 upgrade_probe_container=''
 upgrade_tagged_components=()
 mc_image=${APPFORGE_PRIVATE_ACCEPTANCE_MC_IMAGE:-minio/mc:RELEASE.2025-04-16T18-13-26Z}
+formal_release_components=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy mysql etcd minio minio-mc etcd-init migrate mysql-binlog-tools)
+formal_upgrade_required_distinct_components=(system core builder builder-worker api admin-ui agent-ui etcd-init migrate)
+formal_upgrade_compared_image_count=0
+formal_upgrade_distinct_image_count=0
 
 case "$offline_mode" in 0|1) ;; *) echo "APPFORGE_PRIVATE_ACCEPTANCE_OFFLINE_MODE 只能是0或1" >&2; exit 2;; esac
 case "$formal_release_media" in 0|1) ;; *) echo "APPFORGE_PRIVATE_ACCEPTANCE_FORMAL_RELEASE_MEDIA 只能是0或1" >&2; exit 2;; esac
+case "$formal_release_upgrade" in 0|1) ;; *) echo "APPFORGE_PRIVATE_ACCEPTANCE_FORMAL_RELEASE_UPGRADE 只能是0或1" >&2; exit 2;; esac
 case "$upgrade_mode" in 0|1) ;; *) echo "APPFORGE_PRIVATE_ACCEPTANCE_UPGRADE_MODE 只能是0或1" >&2; exit 2;; esac
 case "$formal_release_platform" in linux/amd64|linux/arm64) ;; *) echo "正式介质平台不合法" >&2; exit 2;; esac
+case "$delivery_source_kind" in repository|formal-offline-media) ;; *) echo "部署文件来源类型不合法" >&2; exit 2;; esac
 [[ $migrate_image =~ ^[A-Za-z0-9._:/-]+$ ]] || { echo "迁移镜像引用不安全" >&2; exit 2; }
+[[ $upgrade_migrate_image =~ ^[A-Za-z0-9._:/-]+$ ]] || { echo "升级迁移镜像引用不安全" >&2; exit 2; }
 [[ $upgrade_version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "升级版本必须是语义化版本" >&2; exit 2; }
 [[ $upgrade_max_consecutive_failures =~ ^[0-9]+$ ]] || { echo "升级连续失败门禁必须是非负整数" >&2; exit 2; }
+[[ -d $delivery_source && ! -L $delivery_source ]] || { echo "部署文件来源必须是普通目录" >&2; exit 2; }
+if [[ -n $upgrade_delivery_source ]]; then
+  [[ -d $upgrade_delivery_source && ! -L $upgrade_delivery_source ]] || { echo "升级部署文件来源必须是普通目录" >&2; exit 2; }
+fi
 if [[ $upgrade_mode == 1 && $offline_mode != 1 ]]; then
   echo "离线升级验收必须启用断网模式" >&2
   exit 2
 fi
 if [[ $formal_release_media == 1 && $offline_mode != 1 ]]; then
   echo "正式发布介质验收必须启用断网模式" >&2
+  exit 2
+fi
+if [[ $formal_release_upgrade == 1 && ( $formal_release_media != 1 || $upgrade_mode != 1 ) ]]; then
+  echo "正式发布版本升级必须同时启用正式介质和升级模式" >&2
+  exit 2
+fi
+if [[ $formal_release_upgrade == 1 && -z $upgrade_delivery_source ]]; then
+  echo "正式发布版本升级必须提供目标版本部署文件来源" >&2
   exit 2
 fi
 if [[ $formal_release_media == 1 ]]; then
@@ -110,6 +135,19 @@ assert_service_image() {
   }
 }
 
+sync_delivery_files() {
+  local source=$1 file
+  for file in docker-compose.yml .env.example egress-allowlist.example nginx.conf admin-api.yaml.template \
+    preflight.sh render-config.sh backup.sh restore.sh archive-binlogs.sh pitr-restore.sh \
+    configure-object-replication.sh diagnostics.sh; do
+    [[ -f $source/$file && ! -L $source/$file ]] || {
+      echo "升级部署文件缺失或不是普通文件: $source/$file" >&2
+      return 1
+    }
+    cp "$source/$file" "$delivery/$file"
+  done
+}
+
 for component in system core builder builder-worker api admin-ui agent-ui etcd-init; do
   docker image inspect "$registry/$component:$version" >/dev/null || {
     echo "缺少Private验收镜像: $registry/$component:$version" >&2
@@ -123,7 +161,7 @@ docker image inspect "$migrate_image" >/dev/null || {
 if [[ $offline_mode == 1 ]]; then
   offline_images=(redis:7.4-alpine alpine:3.22)
   if [[ $formal_release_media == 1 ]]; then
-    for component in system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy mysql etcd minio minio-mc etcd-init migrate mysql-binlog-tools; do
+    for component in "${formal_release_components[@]}"; do
       offline_images+=("$registry/$component:$version")
     done
   else
@@ -145,15 +183,67 @@ if [[ $offline_mode == 1 ]]; then
   done
 fi
 
+if [[ $formal_release_upgrade == 1 ]]; then
+  upgrade_migrate_image_id=$(docker image inspect -f '{{.Id}}' "$upgrade_migrate_image" 2>/dev/null || true)
+  [[ -n $upgrade_migrate_image_id ]] || {
+    echo "缺少正式升级迁移镜像: $upgrade_migrate_image" >&2
+    exit 1
+  }
+  for component in "${formal_release_components[@]}"; do
+    base_ref="$registry/$component:$version"
+    target_ref="$registry/$component:$upgrade_version"
+    docker image inspect "$target_ref" >/dev/null 2>&1 || {
+      echo "缺少正式升级预载镜像: $target_ref" >&2
+      exit 1
+    }
+    actual_platform=$(docker image inspect -f '{{.Os}}/{{.Architecture}}' "$target_ref")
+    [[ $actual_platform == "$formal_release_platform" ]] || {
+      echo "正式升级镜像平台错误: $target_ref=$actual_platform，期望=$formal_release_platform" >&2
+      exit 1
+    }
+    base_id=$(docker image inspect -f '{{.Id}}' "$base_ref")
+    target_id=$(docker image inspect -f '{{.Id}}' "$target_ref")
+    formal_upgrade_compared_image_count=$((formal_upgrade_compared_image_count + 1))
+    if [[ $base_id != "$target_id" ]]; then
+      formal_upgrade_distinct_image_count=$((formal_upgrade_distinct_image_count + 1))
+    fi
+  done
+  for component in "${formal_upgrade_required_distinct_components[@]}"; do
+    base_id=$(docker image inspect -f '{{.Id}}' "$registry/$component:$version")
+    target_id=$(docker image inspect -f '{{.Id}}' "$registry/$component:$upgrade_version")
+    [[ $base_id != "$target_id" ]] || {
+      echo "正式升级拒绝同摘要组件: $component ($base_id)" >&2
+      exit 1
+    }
+  done
+fi
+
 mkdir -p "$temporary/deploy"
-cp -R "$repo_root/deploy/production" "$delivery"
+cp -R "$delivery_source" "$delivery"
 cp -R "$repo_root/deploy/etcd" "$temporary/deploy/etcd"
 mkdir -p "$delivery/secrets"
-cat >"$delivery/acceptance.override.yml" <<YAML
+if [[ $formal_release_media == 1 ]]; then
+  cat >"$delivery/acceptance.override.yml" <<YAML
 services:
   migrate:
     image: $migrate_image
 YAML
+else
+  cat >"$delivery/acceptance.override.yml" <<YAML
+services:
+  mysql:
+    image: mysql:8.4
+  etcd:
+    image: quay.io/coreos/etcd:v3.6.12
+    entrypoint: ["/usr/local/bin/etcd"]
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+  minio-init:
+    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+  migrate:
+    image: $migrate_image
+YAML
+fi
 if [[ $offline_mode == 1 ]]; then
   cat >"$delivery/offline-network.override.yml" <<YAML
 networks:
@@ -327,14 +417,16 @@ upgrade_probe_failures=0
 upgrade_probe_max_consecutive_failures=0
 if [[ $upgrade_mode == 1 ]]; then
   upgrade_components=(system core builder builder-worker api admin-ui agent-ui etcd-init)
-  for component in "${upgrade_components[@]}"; do
-    if docker image inspect "$registry/$component:$upgrade_version" >/dev/null 2>&1; then
-      echo "验收失败: 升级测试标签已存在，拒绝覆盖 $registry/$component:$upgrade_version" >&2
-      exit 1
-    fi
-    docker image tag "$registry/$component:$version" "$registry/$component:$upgrade_version"
-    upgrade_tagged_components+=("$component")
-  done
+  if [[ $formal_release_upgrade != 1 ]]; then
+    for component in "${upgrade_components[@]}"; do
+      if docker image inspect "$registry/$component:$upgrade_version" >/dev/null 2>&1; then
+        echo "验收失败: 升级测试标签已存在，拒绝覆盖 $registry/$component:$upgrade_version" >&2
+        exit 1
+      fi
+      docker image tag "$registry/$component:$version" "$registry/$component:$upgrade_version"
+      upgrade_tagged_components+=("$component")
+    done
+  fi
 
   "${compose[@]}" exec -T mysql sh -c \
     'MYSQL_PWD="$MYSQL_PASSWORD" mysql -h127.0.0.1 -u"$MYSQL_USER" -D"$MYSQL_DATABASE" -e "CREATE TABLE acceptance_offline_upgrade_marker(id BIGINT PRIMARY KEY,value VARCHAR(64) NOT NULL); INSERT INTO acceptance_offline_upgrade_marker(id,value) VALUES (1,\"database-preserved\");"'
@@ -362,8 +454,17 @@ if [[ $upgrade_mode == 1 ]]; then
   sleep 2
 
   upgrade_started_ns=$(python3 -c 'import time; print(time.time_ns())')
+  if [[ $formal_release_upgrade == 1 ]]; then
+    sync_delivery_files "$upgrade_delivery_source"
+    cat >"$delivery/acceptance.override.yml" <<YAML
+services:
+  migrate:
+    image: $upgrade_migrate_image
+YAML
+  fi
   sed -i.bak "s/^APPFORGE_VERSION=.*/APPFORGE_VERSION=$upgrade_version/" "$delivery/.env"
   rm -f "$delivery/.env.bak"
+  "$delivery/preflight.sh" "$delivery/.env" >/dev/null
   if ! "${compose[@]}" up -d --pull never >"$temporary/upgrade.log" 2>&1; then
     tail -160 "$temporary/upgrade.log" >&2
     exit 1
@@ -377,6 +478,11 @@ if [[ $upgrade_mode == 1 ]]; then
     source-trigger-worker:api admin-web:admin-ui agent-web:agent-ui; do
     assert_service_image "${mapping%%:*}" "$registry/${mapping#*:}:$upgrade_version"
   done
+  if [[ $formal_release_upgrade == 1 ]]; then
+    for mapping in mysql:mysql etcd:etcd minio:minio; do
+      assert_service_image "${mapping%%:*}" "$registry/${mapping#*:}:$upgrade_version"
+    done
+  fi
   upgrade_completed_ns=$(python3 -c 'import time; print(time.time_ns())')
   upgrade_duration_seconds=$(python3 -c \
     'import sys; print(f"{(int(sys.argv[2])-int(sys.argv[1]))/1e9:.6f}")' \
@@ -397,8 +503,17 @@ if [[ $upgrade_mode == 1 ]]; then
   upgrade_completed=true
 
   rollback_started_ns=$(python3 -c 'import time; print(time.time_ns())')
+  if [[ $formal_release_upgrade == 1 ]]; then
+    sync_delivery_files "$delivery_source"
+    cat >"$delivery/acceptance.override.yml" <<YAML
+services:
+  migrate:
+    image: $migrate_image
+YAML
+  fi
   sed -i.bak "s/^APPFORGE_VERSION=.*/APPFORGE_VERSION=$version/" "$delivery/.env"
   rm -f "$delivery/.env.bak"
+  "$delivery/preflight.sh" "$delivery/.env" >/dev/null
   if ! "${compose[@]}" up -d --pull never >"$temporary/rollback.log" 2>&1; then
     tail -160 "$temporary/rollback.log" >&2
     exit 1
@@ -412,6 +527,11 @@ if [[ $upgrade_mode == 1 ]]; then
     source-trigger-worker:api admin-web:admin-ui agent-web:agent-ui; do
     assert_service_image "${mapping%%:*}" "$registry/${mapping#*:}:$version"
   done
+  if [[ $formal_release_upgrade == 1 ]]; then
+    for mapping in mysql:mysql etcd:etcd minio:minio; do
+      assert_service_image "${mapping%%:*}" "$registry/${mapping#*:}:$version"
+    done
+  fi
   rollback_completed_ns=$(python3 -c 'import time; print(time.time_ns())')
   rollback_duration_seconds=$(python3 -c \
     'import sys; print(f"{(int(sys.argv[2])-int(sys.argv[1]))/1e9:.6f}")' \
@@ -468,8 +588,14 @@ if [[ -n $report_file ]]; then
   APPFORGE_OFFLINE_NETWORK_MODE="$offline_mode" \
   APPFORGE_OFFLINE_FORMAL_RELEASE_MEDIA="$formal_release_media" \
   APPFORGE_OFFLINE_FORMAL_RELEASE_PLATFORM="$formal_release_platform" \
+  APPFORGE_OFFLINE_FORMAL_RELEASE_UPGRADE="$formal_release_upgrade" \
+  APPFORGE_OFFLINE_DELIVERY_SOURCE_KIND="$delivery_source_kind" \
   APPFORGE_OFFLINE_MIGRATE_IMAGE="$migrate_image" \
   APPFORGE_OFFLINE_MIGRATE_IMAGE_ID="$migrate_image_id" \
+  APPFORGE_OFFLINE_UPGRADE_MIGRATE_IMAGE="$upgrade_migrate_image" \
+  APPFORGE_OFFLINE_UPGRADE_MIGRATE_IMAGE_ID="$upgrade_migrate_image_id" \
+  APPFORGE_OFFLINE_FORMAL_UPGRADE_COMPARED_IMAGES="$formal_upgrade_compared_image_count" \
+  APPFORGE_OFFLINE_FORMAL_UPGRADE_DISTINCT_IMAGES="$formal_upgrade_distinct_image_count" \
   APPFORGE_OFFLINE_UPGRADE_MODE="$upgrade_mode" \
   APPFORGE_OFFLINE_UPGRADE_FROM="$version" \
   APPFORGE_OFFLINE_UPGRADE_TO="$upgrade_version" \
@@ -488,6 +614,7 @@ import sys
 
 offline = os.environ["APPFORGE_OFFLINE_NETWORK_MODE"] == "1"
 formal_release_media = os.environ["APPFORGE_OFFLINE_FORMAL_RELEASE_MEDIA"] == "1"
+formal_release_upgrade = os.environ["APPFORGE_OFFLINE_FORMAL_RELEASE_UPGRADE"] == "1"
 upgrade_enabled = os.environ["APPFORGE_OFFLINE_UPGRADE_MODE"] == "1"
 verified = [
     "schema-migration",
@@ -507,8 +634,16 @@ else:
 upgrade = None
 if upgrade_enabled:
     verified.extend(["offline-application-upgrade", "application-rollback", "database-and-object-persistence"])
+    if formal_release_upgrade:
+        verified.extend([
+            "formal-release-version-difference",
+            "target-release-migrate-image",
+            "stateful-service-image-upgrade-and-rollback",
+            "release-deployment-files-upgrade-and-rollback",
+        ])
+    else:
+        limitations.append("upgrade-tag-aliases-use-identical-development-image-digests")
     limitations.extend([
-        "upgrade-tag-aliases-use-identical-development-image-digests",
         "single-node-compose-does-not-promise-zero-downtime",
         "schema-remains-at-113-during-application-upgrade",
     ])
@@ -521,6 +656,13 @@ if upgrade_enabled:
         "rollbackDurationSeconds": float(os.environ["APPFORGE_OFFLINE_ROLLBACK_DURATION"]),
         "databaseMarkerPreserved": True,
         "objectMarkerPreserved": True,
+        "formalReleaseVersionDifference": formal_release_upgrade,
+        "comparedImageCount": int(os.environ["APPFORGE_OFFLINE_FORMAL_UPGRADE_COMPARED_IMAGES"]),
+        "distinctImageCount": int(os.environ["APPFORGE_OFFLINE_FORMAL_UPGRADE_DISTINCT_IMAGES"]),
+        "baseMigrateImage": os.environ["APPFORGE_OFFLINE_MIGRATE_IMAGE"],
+        "baseMigrateImageId": os.environ["APPFORGE_OFFLINE_MIGRATE_IMAGE_ID"],
+        "targetMigrateImage": os.environ["APPFORGE_OFFLINE_UPGRADE_MIGRATE_IMAGE"],
+        "targetMigrateImageId": os.environ["APPFORGE_OFFLINE_UPGRADE_MIGRATE_IMAGE_ID"],
         "healthProbe": {
             "requests": int(os.environ["APPFORGE_OFFLINE_PROBE_REQUESTS"]),
             "failures": int(os.environ["APPFORGE_OFFLINE_PROBE_FAILURES"]),
@@ -545,6 +687,8 @@ report = {
     "imagesPreloaded": offline,
     "formalReleaseMedia": formal_release_media,
     "formalReleasePlatform": os.environ["APPFORGE_OFFLINE_FORMAL_RELEASE_PLATFORM"] if formal_release_media else None,
+    "formalReleaseUpgrade": formal_release_upgrade,
+    "deliverySourceKind": os.environ["APPFORGE_OFFLINE_DELIVERY_SOURCE_KIND"],
     "composePullPolicy": "never",
     "frontendNetworkInternal": offline,
     "backendNetworkInternal": True,
@@ -562,7 +706,9 @@ PY
   chmod 0600 "$report_file"
 fi
 
-if [[ $upgrade_mode == 1 ]]; then
+if [[ $formal_release_upgrade == 1 ]]; then
+  echo "通过: 两个正式签名版本在本地模拟断网完成 ${version}->${upgrade_version}->${version}，${formal_upgrade_distinct_image_count}/${formal_upgrade_compared_image_count} 个发布镜像摘要不同，数据库/对象数据保持；探针请求=${upgrade_probe_requests} 失败=${upgrade_probe_failures} 最大连续失败=${upgrade_probe_max_consecutive_failures}"
+elif [[ $upgrade_mode == 1 ]]; then
   echo "通过: 本地模拟断网应用升级 ${version}->${upgrade_version} 并回滚，数据库/对象数据保持；探针请求=${upgrade_probe_requests} 失败=${upgrade_probe_failures} 最大连续失败=${upgrade_probe_max_consecutive_failures}"
 elif [[ $offline_mode == 1 ]]; then
   echo "通过: 本地模拟断网全新${deployment_mode}安装；镜像仅预载、双internal网络、内部API可达、外部HTTPS拒绝、迁移、非root、TLS、许可证、登录和对象存储均通过"

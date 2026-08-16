@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "kind": "appforge-v7-formal-offline-upgrade-acceptance",
+  "acceptedAt": "2026-08-16T16:10:28Z",
+  "result": "passed",
+  "registry": "ghcr.io/hlptyqwe/appforge",
+  "platform": "linux/amd64",
+  "upgradePath": {
+    "baseVersion": "1.2.5",
+    "targetVersion": "1.2.6",
+    "rollbackVersion": "1.2.5",
+    "baseGitCommit": "3f9420b2f53e8fa13651e519bd74aa95dca8ff61",
+    "targetGitCommit": "3d1fde742b7cb206b26a24b47b3c27e612c9b34e",
+    "commitsDifferent": true,
+    "comparedImageCount": 16,
+    "distinctImageCount": 16,
+    "imageDifferences": [
+      {
+        "component": "system",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/system@sha256:63cd130531817ab4ed16d2cf71a67417af95500df672c919739098b986fccfb3",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/system@sha256:19ad87a75ecbcb0167425eb08bad6de42fa347e9728f0f50c73a74545097682d",
+        "different": true
+      },
+      {
+        "component": "core",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/core@sha256:b868c903ea21f4d5ad4bf6273bc3ef6e3c13009001afcfff87274c858515a08a",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/core@sha256:a984f778f20a9f875b660edb5b3abe11cfa7034e2690c4193b73e9bbd91e7424",
+        "different": true
+      },
+      {
+        "component": "builder",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/builder@sha256:e50323815d34b936982fe87459e214585d51d56e4e5f3a921a89cfe5ff18355f",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/builder@sha256:ea7b44180861eaec55d820189325c49ecb963ba39d91eadaccc947a4a3751883",
+        "different": true
+      },
+      {
+        "component": "builder-worker",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/builder-worker@sha256:6a92e30d8201cd83821deef4c67e47ae05d06a3c2b4d653490e2ad5aa47d7764",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/builder-worker@sha256:90dbcdc948524dd34e73cb5d602d8090e21b0ca8b0c6c7123df512f9b787bf68",
+        "different": true
+      },
+      {
+        "component": "api",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/api@sha256:09691db53536bbeb65dfd8a73a92c6dfd2654513f95241f518277eb858d2290b",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/api@sha256:5aaaa695e74180694f9e7d12f86e3555ac8b6de56bcb747cea209e05fd85ad9d",
+        "different": true
+      },
+      {
+        "component": "admin-ui",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/admin-ui@sha256:aa374a7da9aac8fafe97e2041fd345795d5d9d01cae9d8de89c8e31c059044e9",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/admin-ui@sha256:089a12315b03bdad2d31233b8f841c9cbaba6b6570586156d4b2918f01f74fb8",
+        "different": true
+      },
+      {
+        "component": "agent-ui",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/agent-ui@sha256:3b23be3dcb2e7620de09f655c6bc3f9e9112e77bddd8e75cea0e10f9f5097aba",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/agent-ui@sha256:168cf214ca07b06da744fe650a7fc70fd097c1d41f229aefa0609a9133fe8765",
+        "different": true
+      },
+      {
+        "component": "local-agent",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/local-agent@sha256:14ec895895c72487f0f4b512e67eaf5a5ff62be439263b0c14ead793ec409d7a",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/local-agent@sha256:fca7ac7b59ddabe8631b2f8e4c8a31862a0890aaf200f03bad792f78d16420aa",
+        "different": true
+      },
+      {
+        "component": "egress-proxy",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/egress-proxy@sha256:fbaaa03653e951ea0421f215462fd754ba01b48d62a092ff084792e24f2c2b58",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/egress-proxy@sha256:8450075addad679699e1e3de10fe8da086e278ada7931247262fc1634c02140c",
+        "different": true
+      },
+      {
+        "component": "mysql",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/mysql@sha256:604cb473e5835d319e3ba48a77bd83298bc417fb05bd332c73b7a7426e396462",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/mysql@sha256:c24efab51c96bf0a2bfe7ace91c6b700b077776110c8c908a14d70bafb0a8de4",
+        "different": true
+      },
+      {
+        "component": "etcd",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/etcd@sha256:060492f068829df046e72bdf6de8efdf87b439022bcbaea61e47a8c7644f0c46",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/etcd@sha256:bfaa5250243c1d69a546f95cf44e8b1cc7b9dbeeb430ad65b79615a95c6539e3",
+        "different": true
+      },
+      {
+        "component": "minio",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/minio@sha256:d835f4735783c5dd999b12a60d66821e1f2037177b722d1c689168511ab34b86",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/minio@sha256:bac2c775a7d260aa92f3f18e8efe0c4514b987b79c7cff3440d45eb33974cbf7",
+        "different": true
+      },
+      {
+        "component": "minio-mc",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/minio-mc@sha256:3f81c646e27b46af69b5a32ace58c1fabf938a2e5ff45ce486e533a4c139d4b8",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/minio-mc@sha256:ece44beca75e1c0ba442d7da127805530236bac6c243e6c3fe869af670f14d9d",
+        "different": true
+      },
+      {
+        "component": "etcd-init",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/etcd-init@sha256:8f710df1b61d888b913a9816d9b7f62184f4b00234536f5afbbe8bd3a8e21605",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/etcd-init@sha256:edbc2d8f619653c14a3477cc879aad878d9fcde6f4104f48c3147744b3774904",
+        "different": true
+      },
+      {
+        "component": "migrate",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/migrate@sha256:00788b7366672e033e0afa040ff5497d6add2d903dbe298c5cd0addb8a7f01b6",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/migrate@sha256:5b4d7f6de66cbaa3274b4976e80d0376a4e58ac7459bfd02ce6020435363f8b4",
+        "different": true
+      },
+      {
+        "component": "mysql-binlog-tools",
+        "basePlatformRef": "ghcr.io/hlptyqwe/appforge/mysql-binlog-tools@sha256:744e1f1e83aa20412cf2279c04dde851d856beb1b41c01ea1afb6843bed04453",
+        "targetPlatformRef": "ghcr.io/hlptyqwe/appforge/mysql-binlog-tools@sha256:39c1e52a7935ac40a28255312eca5c6b00f070bcd42fcd35d05ee1ebcd6773e0",
+        "different": true
+      }
+    ]
+  },
+  "media": {
+    "base": {
+      "sizeBytes": 3324798464,
+      "sha256": "e262656cdc07b11b8c4bae627c0b871fe6dcd4b5c09059428e995a844684c2b9",
+      "imageCount": 18,
+      "certificateIdentity": "https://github.com/hlptyqwe/appforge/.github/workflows/release-security.yml@refs/tags/v1.2.5"
+    },
+    "target": {
+      "sizeBytes": 3324800000,
+      "sha256": "a88b792badcf39bd1522fd1e1923eb8226c0fa8f51e5ebb5cc5e9ecf9f46c306",
+      "imageCount": 18,
+      "certificateIdentity": "https://github.com/hlptyqwe/appforge/.github/workflows/release-security.yml@refs/tags/v1.2.6"
+    },
+    "certificateIssuer": "https://token.actions.githubusercontent.com",
+    "checksumVerifiedBeforeLoad": true,
+    "cosignVerified": true,
+    "deploymentFilesSwitchedAndRolledBack": true
+  },
+  "runtime": {
+    "schemaVersion": 1,
+    "acceptedAt": "2026-08-16T16:10:17Z",
+    "scope": "synthetic-local-formal-release-media",
+    "acceptanceScript": "deploy/acceptance/v7-private-install.sh",
+    "deploymentMode": "private",
+    "migrateImage": "ghcr.io/hlptyqwe/appforge/migrate:1.2.5",
+    "migrateImageId": "sha256:33fc87484912687a3611d7c37737fb32e95f53df66c3e606ff1d00b8478e9d10",
+    "schemaTarget": "20260815_113_v7_air_gapped",
+    "schema113ProductionTarget": true,
+    "freshVolumes": true,
+    "imagesPreloaded": true,
+    "formalReleaseMedia": true,
+    "formalReleasePlatform": "linux/amd64",
+    "formalReleaseUpgrade": true,
+    "deliverySourceKind": "formal-offline-media",
+    "composePullPolicy": "never",
+    "frontendNetworkInternal": true,
+    "backendNetworkInternal": true,
+    "internalApiReachable": true,
+    "externalHttpsRejected": true,
+    "tlsFrontends": [
+      "admin",
+      "agent"
+    ],
+    "verified": [
+      "schema-migration",
+      "fixed-non-root-services",
+      "offline-license",
+      "bootstrap-admin-login",
+      "private-object-storage-bucket",
+      "formal-release-media",
+      "fixed-target-platform",
+      "signed-index-to-platform-digest-map",
+      "offline-application-upgrade",
+      "application-rollback",
+      "database-and-object-persistence",
+      "formal-release-version-difference",
+      "target-release-migrate-image",
+      "stateful-service-image-upgrade-and-rollback",
+      "release-deployment-files-upgrade-and-rollback"
+    ],
+    "limitations": [
+      "local-docker-simulation-not-physical-air-gap",
+      "synthetic-temporary-credentials-and-license",
+      "single-node-compose-does-not-promise-zero-downtime",
+      "schema-remains-at-113-during-application-upgrade"
+    ],
+    "offlineApplicationUpgrade": {
+      "fromVersion": "1.2.5",
+      "toVersion": "1.2.6",
+      "upgradeCompleted": true,
+      "rollbackCompleted": true,
+      "upgradeDurationSeconds": 43.9195,
+      "rollbackDurationSeconds": 44.062868,
+      "databaseMarkerPreserved": true,
+      "objectMarkerPreserved": true,
+      "formalReleaseVersionDifference": true,
+      "comparedImageCount": 16,
+      "distinctImageCount": 16,
+      "baseMigrateImage": "ghcr.io/hlptyqwe/appforge/migrate:1.2.5",
+      "baseMigrateImageId": "sha256:33fc87484912687a3611d7c37737fb32e95f53df66c3e606ff1d00b8478e9d10",
+      "targetMigrateImage": "ghcr.io/hlptyqwe/appforge/migrate:1.2.6",
+      "targetMigrateImageId": "sha256:4965a20737a6991ea465d86443f1b0af3242b37a40974017b9c5842cd332143d",
+      "healthProbe": {
+        "requests": 261,
+        "failures": 6,
+        "maxConsecutiveFailures": 3,
+        "maxAllowedConsecutiveFailures": 10
+      }
+    }
+  },
+  "boundary": "使用两个公开正式 tag 的签名 linux/amd64 离线介质和不同 Git commit/平台镜像摘要，在本地 Docker internal 网络完成旧版到新版再回旧版；不替代客户物理断网介质交接、客户硬件/证书/KMS、生产数据或客户现场升级验收。"
+}
