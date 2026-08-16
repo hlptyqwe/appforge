@@ -103,6 +103,9 @@ Audit:
     MaxAttempts: 5
     RetryBackoff: 500ms
     AllowHTTP: false
+    SyslogHostname: ""
+    SyslogAppName: appforge
+    MaxMessageBytes: 65536
   Routes:
     - Method: POST
       Path: /admin/system/users
