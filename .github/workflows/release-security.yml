@@ -364,6 +364,18 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist/release-assets
+          tools_directory="dist/delivery-tools-${GITHUB_REF_NAME}"
+          delivery_binaries=(
+            appforgectl-linux-amd64
+            appforgectl-linux-arm64
+            licensectl-linux-amd64
+            licensectl-linux-arm64
+          )
+          for binary in "${delivery_binaries[@]}"; do
+            test -f "$tools_directory/$binary"
+            test ! -L "$tools_directory/$binary"
+            chmod 0755 "$tools_directory/$binary"
+          done
           security_archive="appforge-release-security-${GITHUB_REF_NAME}.tar.gz"
           tools_archive="appforge-delivery-tools-${GITHUB_REF_NAME}.tar.gz"
           tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
