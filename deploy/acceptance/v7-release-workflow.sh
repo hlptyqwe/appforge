@@ -26,7 +26,7 @@ grep -q 'Third-party vulnerability gate' "$workflow"
 grep -q 'release-evidence-third-party-' "$workflow"
 grep -q 'source-dependency-gate:' "$workflow"
 grep -q 'Source dependency vulnerability gate without report export' "$workflow"
-grep -q 'aquasecurity/trivy-action@0.36.0' "$workflow"
+grep -q 'aquasecurity/trivy-action@v0.36.0' "$workflow"
 if rg -q 'source\.(spdx|licenses|trivy)' "$workflow"; then
   echo "验收失败: 源码依赖明细不得导出到工作流 Artifact 或 SARIF" >&2
   exit 1

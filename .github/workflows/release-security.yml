@@ -97,14 +97,14 @@ jobs:
             "${{ matrix.component }}.spdx.json" \
             "${{ matrix.component }}.licenses.json"
       - name: Vulnerability gate
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}@${{ steps.build.outputs.digest }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: "1"
       - name: Generate vulnerability report
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}@${{ steps.build.outputs.digest }}
           format: sarif
@@ -190,14 +190,14 @@ jobs:
             "third-party-${{ matrix.component }}.spdx.json" \
             "third-party-${{ matrix.component }}.licenses.json"
       - name: Third-party vulnerability gate
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.resolve.outputs.digest_ref }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: "1"
       - name: Generate third-party vulnerability report
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.resolve.outputs.digest_ref }}
           format: sarif
@@ -243,7 +243,7 @@ jobs:
           )
           for file in "${inputs[@]}"; do test -s "$file"; done
       - name: Source dependency vulnerability gate without report export
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: .
