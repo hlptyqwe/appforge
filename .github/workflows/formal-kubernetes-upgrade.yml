@@ -97,11 +97,20 @@ jobs:
           export APPFORGE_COSIGN_BINARY="$(command -v cosign)"
           export APPFORGE_BASE_RELEASE_CERTIFICATE_IDENTITY="https://github.com/${GITHUB_REPOSITORY}/.github/workflows/release-security.yml@refs/tags/v${BASE_VERSION}"
           export APPFORGE_TARGET_RELEASE_CERTIFICATE_IDENTITY="https://github.com/${GITHUB_REPOSITORY}/.github/workflows/release-security.yml@refs/tags/v${TARGET_VERSION}"
+          set +e
           deploy/acceptance/v7-formal-kubernetes-upgrade.sh \
             "dist/base/release-security-v${BASE_VERSION}" "$BASE_VERSION" \
             "dist/target/release-security-v${TARGET_VERSION}" "$TARGET_VERSION" \
             "$IMAGE_REGISTRY" \
-            "dist/v7-formal-kubernetes-upgrade-v${BASE_VERSION}-v${TARGET_VERSION}.json"
+            "dist/v7-formal-kubernetes-upgrade-v${BASE_VERSION}-v${TARGET_VERSION}.json" \
+            2>&1 | tee dist/v7-formal-kubernetes-upgrade.log
+          acceptance_status=${PIPESTATUS[0]}
+          set -e
+          if [[ $acceptance_status -ne 0 ]]; then
+            error_message=$(tail -1 dist/v7-formal-kubernetes-upgrade.log | tr '\r\n' ' ')
+            printf '::error title=Formal Kubernetes acceptance failed::%s\n' "$error_message"
+            exit "$acceptance_status"
+          fi
           jq -e '
             .result == "passed" and
             .releaseEvidence.aggregateSigstoreVerified == true and
@@ -115,6 +124,8 @@ jobs:
         if: always()
         with:
           name: formal-kubernetes-upgrade-v${{ env.APPFORGE_BASE_VERSION }}-v${{ env.APPFORGE_TARGET_VERSION }}
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30
-          path: dist/v7-formal-kubernetes-upgrade-*.json
+          path: |
+            dist/v7-formal-kubernetes-upgrade-*.json
+            dist/v7-formal-kubernetes-upgrade.log
