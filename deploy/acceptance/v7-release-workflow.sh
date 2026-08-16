@@ -21,6 +21,13 @@ grep -q 'generate-license-inventory.sh' "$workflow"
 grep -q 'assemble-release-evidence.sh' "$workflow"
 grep -q 'validate-release-evidence.sh' "$workflow"
 grep -q 'release-security-${{ github.ref_name }}' "$workflow"
+grep -q 'publish-release-assets:' "$workflow"
+grep -Fq 'needs: [release-evidence, delivery-tools]' "$workflow"
+grep -q 'contents: write' "$workflow"
+grep -q 'APPFORGE-RELEASE-ASSETS-SHA256SUMS' "$workflow"
+grep -q 'gh release create' "$workflow"
+grep -q -- '--verify-tag' "$workflow"
+grep -q 'public-release-assets-${{ github.ref_name }}' "$workflow"
 grep -q 'third-party-images:' "$workflow"
 grep -q 'Third-party vulnerability gate' "$workflow"
 grep -q 'release-evidence-third-party-' "$workflow"
@@ -128,6 +135,65 @@ if "$repo_root/deploy/production/validate-release-evidence.sh" \
   exit 1
 fi
 rm "$fixture_output/extra.txt"
+
+public_source="$temporary/public-release-source"
+security_root="$public_source/release-security-v1.2.3"
+tools_root="$public_source/delivery-tools-v1.2.3"
+mkdir -p "$security_root" "$tools_root"
+cp -R "$fixture_output/." "$security_root/"
+cp "$temporary"/appforgectl-linux-* "$temporary"/licensectl-linux-* \
+  "$temporary/SHA256SUMS" "$tools_root/"
+printf '{}\n' >"$tools_root/SHA256SUMS.sigstore.json"
+security_archive=appforge-release-security-v1.2.3.tar.gz
+tools_archive=appforge-delivery-tools-v1.2.3.tar.gz
+tar -C "$public_source" -czf "$public_source/$security_archive" release-security-v1.2.3
+tar -C "$public_source" -czf "$public_source/$tools_archive" delivery-tools-v1.2.3
+(
+  cd "$public_source"
+  sha256sum "$security_archive" "$tools_archive" >APPFORGE-RELEASE-ASSETS-SHA256SUMS
+)
+printf '{}\n' >"$public_source/APPFORGE-RELEASE-ASSETS-SHA256SUMS.sigstore.json"
+fake_release_bin="$temporary/fake-release-bin"
+mkdir -p "$fake_release_bin"
+printf '%s\n' \
+  '#!/usr/bin/env bash' \
+  'set -euo pipefail' \
+  'output=' \
+  'url=' \
+  'while [[ $# -gt 0 ]]; do' \
+  '  case "$1" in' \
+  '    --output) output=$2; shift 2 ;;' \
+  '    http*) url=$1; shift ;;' \
+  '    *) shift ;;' \
+  '  esac' \
+  'done' \
+  '[[ -n $output && -n $url ]]' \
+  'cp "$APPFORGE_FAKE_RELEASE_SOURCE/${url##*/}" "$output"' \
+  >"$fake_release_bin/curl"
+printf '%s\n' '#!/usr/bin/env bash' '[[ ${1:-} == verify-blob ]]' >"$fake_release_bin/cosign"
+chmod 0755 "$fake_release_bin/curl" "$fake_release_bin/cosign"
+public_output="$temporary/public-release-output"
+PATH="$fake_release_bin:$PATH" \
+APPFORGE_FAKE_RELEASE_SOURCE="$public_source" \
+APPFORGE_COSIGN_BINARY="$fake_release_bin/cosign" \
+  "$repo_root/deploy/production/download-release-assets.sh" \
+    1.2.3 appforge-acceptance/appforge "$public_output" >/dev/null
+[[ -f $public_output/release-security-v1.2.3/RELEASE-MANIFEST.json ]]
+[[ -x $public_output/delivery-tools-v1.2.3/appforgectl-linux-amd64 ]]
+[[ -f $public_output/release-assets/APPFORGE-RELEASE-ASSETS-SHA256SUMS.sigstore.json ]]
+
+tampered_source="$temporary/tampered-release-source"
+cp -R "$public_source" "$tampered_source"
+printf '%064d  unexpected.tar.gz\n' 0 >>"$tampered_source/APPFORGE-RELEASE-ASSETS-SHA256SUMS"
+if PATH="$fake_release_bin:$PATH" \
+  APPFORGE_FAKE_RELEASE_SOURCE="$tampered_source" \
+  APPFORGE_COSIGN_BINARY="$fake_release_bin/cosign" \
+    "$repo_root/deploy/production/download-release-assets.sh" \
+      1.2.3 appforge-acceptance/appforge "$temporary/rejected-public-output" >/dev/null 2>&1; then
+  echo "验收失败: 发布资产 SHA 清单包含未登记文件时仍被接受" >&2
+  exit 1
+fi
+
 printf '\n' >>"$fixture_output/api.spdx.json"
 if "$repo_root/deploy/production/validate-release-evidence.sh" \
   "$fixture_output" 1.2.3 ghcr.io/appforge-acceptance/appforge >/dev/null 2>&1; then
@@ -160,6 +226,9 @@ jq -n \
       sourceDependencyGateRequired: true,
       sourceDependencyDetailsExported: false,
       tamperRejected: true,
+      publicReleaseAssets: true,
+      anonymousDownloadContract: true,
+      outerSignatureRequired: true,
       dualArchitectureCliBuild: true
     },
     thirdPartyImages: ["redis", "alpine"],
@@ -167,5 +236,5 @@ jq -n \
   }' >"$report_file"
 chmod 0600 "$report_file"
 
-echo "通过: tag限定发布、源码依赖无明细导出门禁、16个自建签名与2个第三方镜像digest扫描、许可证清单、聚合签名契约、防篡改和双架构CLI构建"
+echo "通过: tag限定发布、源码依赖无明细导出门禁、16个自建签名与2个第三方镜像digest扫描、许可证清单、聚合签名契约、公开Release资产、双层校验、防篡改和双架构CLI构建"
 echo "证据: $report_file"

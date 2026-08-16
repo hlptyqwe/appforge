@@ -338,3 +338,69 @@ jobs:
           name: delivery-tools-${{ github.ref_name }}
           if-no-files-found: error
           path: dist/
+
+  publish-release-assets:
+    runs-on: ubuntu-24.04
+    needs: [release-evidence, delivery-tools]
+    permissions:
+      actions: read
+      contents: write
+      id-token: write
+    steps:
+      - name: Download signed release security evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: release-security-${{ github.ref_name }}
+          path: dist/release-security-${{ github.ref_name }}
+      - name: Download signed delivery tools
+        uses: actions/download-artifact@v4
+        with:
+          name: delivery-tools-${{ github.ref_name }}
+          path: dist/delivery-tools-${{ github.ref_name }}
+      - uses: sigstore/cosign-installer@v3
+      - name: Package, sign and verify public release assets
+        env:
+          CERTIFICATE_IDENTITY: https://github.com/${{ github.repository }}/.github/workflows/release-security.yml@${{ github.ref }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist/release-assets
+          security_archive="appforge-release-security-${GITHUB_REF_NAME}.tar.gz"
+          tools_archive="appforge-delivery-tools-${GITHUB_REF_NAME}.tar.gz"
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+            -czf "dist/release-assets/$security_archive" \
+            -C dist "release-security-${GITHUB_REF_NAME}"
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+            -czf "dist/release-assets/$tools_archive" \
+            -C dist "delivery-tools-${GITHUB_REF_NAME}"
+          (
+            cd dist/release-assets
+            sha256sum "$security_archive" "$tools_archive" > APPFORGE-RELEASE-ASSETS-SHA256SUMS
+          )
+          cosign sign-blob --yes \
+            --bundle dist/release-assets/APPFORGE-RELEASE-ASSETS-SHA256SUMS.sigstore.json \
+            dist/release-assets/APPFORGE-RELEASE-ASSETS-SHA256SUMS
+          cosign verify-blob \
+            --bundle dist/release-assets/APPFORGE-RELEASE-ASSETS-SHA256SUMS.sigstore.json \
+            --certificate-identity "$CERTIFICATE_IDENTITY" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            dist/release-assets/APPFORGE-RELEASE-ASSETS-SHA256SUMS
+          (cd dist/release-assets && sha256sum -c APPFORGE-RELEASE-ASSETS-SHA256SUMS)
+      - name: Publish anonymously downloadable GitHub Release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          assets=(dist/release-assets/*)
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "${assets[@]}" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "${assets[@]}" \
+              --verify-tag \
+              --title "AppForge ${GITHUB_REF_NAME}" \
+              --notes "Signed AppForge release security evidence and Linux delivery tools. Verify APPFORGE-RELEASE-ASSETS-SHA256SUMS with the attached Sigstore bundle before extraction."
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: public-release-assets-${{ github.ref_name }}
+          if-no-files-found: error
+          path: dist/release-assets/
