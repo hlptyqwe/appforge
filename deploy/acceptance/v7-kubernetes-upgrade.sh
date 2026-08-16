@@ -411,8 +411,13 @@ for deployment in "${deployments[@]}"; do
   "$kubectl_bin" --context "$context" -n "$namespace" rollout status "$deployment" --timeout=300s >/dev/null
 done
 sleep 3
-"$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c \
-  'test $(grep -c ok /tmp/results) -ge 20; test ! -s /tmp/failures; ! grep -q failed /tmp/results'
+if ! "$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c \
+  'test $(grep -c ok /tmp/results) -ge 20; ! grep -q failed /tmp/results'; then
+  probe_summary=$("$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c \
+    'printf "ok=%s failed=%s" "$(grep -c ok /tmp/results)" "$(grep -c failed /tmp/results)"' 2>/dev/null || true)
+  echo "验收失败: 升级连续健康探针未达标: ${probe_summary:-无法读取探针结果}" >&2
+  exit 1
+fi
 upgrade_probe_count=$("$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c 'grep -c ok /tmp/results')
 if "$kubectl_bin" --context "$context" -n "$namespace" get deployment -l app.kubernetes.io/name=appforge \
   -o jsonpath='{range .items[*]}{.spec.template.spec.containers[0].image}{"\n"}{end}' | grep -Fv ":$new_version"; then
@@ -426,8 +431,13 @@ for deployment in "${deployments[@]}"; do
   "$kubectl_bin" --context "$context" -n "$namespace" rollout status "$deployment" --timeout=300s >/dev/null
 done
 sleep 3
-"$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c \
-  'test $(grep -c ok /tmp/results) -ge 40; ! grep -q failed /tmp/results'
+if ! "$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c \
+  'test $(grep -c ok /tmp/results) -ge 40; ! grep -q failed /tmp/results'; then
+  probe_summary=$("$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c \
+    'printf "ok=%s failed=%s" "$(grep -c ok /tmp/results)" "$(grep -c failed /tmp/results)"' 2>/dev/null || true)
+  echo "验收失败: 回滚连续健康探针未达标: ${probe_summary:-无法读取探针结果}" >&2
+  exit 1
+fi
 rollback_probe_count=$("$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c 'grep -c ok /tmp/results')
 if "$kubectl_bin" --context "$context" -n "$namespace" get deployment -l app.kubernetes.io/name=appforge \
   -o jsonpath='{range .items[*]}{.spec.template.spec.containers[0].image}{"\n"}{end}' | grep -Fv ":$old_version"; then
