@@ -15,6 +15,8 @@ admin_port=${APPFORGE_PRIVATE_ACCEPTANCE_ADMIN_PORT:-18443}
 agent_port=${APPFORGE_PRIVATE_ACCEPTANCE_AGENT_PORT:-19443}
 gateway_port=${APPFORGE_PRIVATE_ACCEPTANCE_GATEWAY_PORT:-19444}
 offline_mode=${APPFORGE_PRIVATE_ACCEPTANCE_OFFLINE_MODE:-0}
+formal_release_media=${APPFORGE_PRIVATE_ACCEPTANCE_FORMAL_RELEASE_MEDIA:-0}
+formal_release_platform=${APPFORGE_PRIVATE_ACCEPTANCE_FORMAL_RELEASE_PLATFORM:-linux/amd64}
 report_file=${APPFORGE_PRIVATE_ACCEPTANCE_REPORT_FILE:-}
 migrate_image=${APPFORGE_PRIVATE_ACCEPTANCE_MIGRATE_IMAGE:-$registry/migrate:$version}
 migrate_image_id=$(docker image inspect -f '{{.Id}}' "$migrate_image" 2>/dev/null || true)
@@ -24,15 +26,26 @@ upgrade_max_consecutive_failures=${APPFORGE_PRIVATE_ACCEPTANCE_UPGRADE_MAX_CONSE
 admin_password='Acceptance-Private-Password-2026!'
 upgrade_probe_container=''
 upgrade_tagged_components=()
+mc_image=${APPFORGE_PRIVATE_ACCEPTANCE_MC_IMAGE:-minio/mc:RELEASE.2025-04-16T18-13-26Z}
 
 case "$offline_mode" in 0|1) ;; *) echo "APPFORGE_PRIVATE_ACCEPTANCE_OFFLINE_MODE 只能是0或1" >&2; exit 2;; esac
+case "$formal_release_media" in 0|1) ;; *) echo "APPFORGE_PRIVATE_ACCEPTANCE_FORMAL_RELEASE_MEDIA 只能是0或1" >&2; exit 2;; esac
 case "$upgrade_mode" in 0|1) ;; *) echo "APPFORGE_PRIVATE_ACCEPTANCE_UPGRADE_MODE 只能是0或1" >&2; exit 2;; esac
+case "$formal_release_platform" in linux/amd64|linux/arm64) ;; *) echo "正式介质平台不合法" >&2; exit 2;; esac
 [[ $migrate_image =~ ^[A-Za-z0-9._:/-]+$ ]] || { echo "迁移镜像引用不安全" >&2; exit 2; }
 [[ $upgrade_version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "升级版本必须是语义化版本" >&2; exit 2; }
 [[ $upgrade_max_consecutive_failures =~ ^[0-9]+$ ]] || { echo "升级连续失败门禁必须是非负整数" >&2; exit 2; }
 if [[ $upgrade_mode == 1 && $offline_mode != 1 ]]; then
   echo "离线升级验收必须启用断网模式" >&2
   exit 2
+fi
+if [[ $formal_release_media == 1 && $offline_mode != 1 ]]; then
+  echo "正式发布介质验收必须启用断网模式" >&2
+  exit 2
+fi
+if [[ $formal_release_media == 1 ]]; then
+  mc_image="$registry/minio-mc:$version"
+  export DOCKER_DEFAULT_PLATFORM="$formal_release_platform"
 fi
 
 compose=(docker compose -p "$project" --env-file "$delivery/.env" -f "$delivery/docker-compose.yml" -f "$delivery/acceptance.override.yml")
@@ -108,12 +121,27 @@ docker image inspect "$migrate_image" >/dev/null || {
   exit 1
 }
 if [[ $offline_mode == 1 ]]; then
-  for image in mysql:8.4 redis:7.4-alpine quay.io/coreos/etcd:v3.6.12 \
-    minio/minio:RELEASE.2025-04-22T22-12-26Z minio/mc:RELEASE.2025-04-16T18-13-26Z alpine:3.22; do
+  offline_images=(redis:7.4-alpine alpine:3.22)
+  if [[ $formal_release_media == 1 ]]; then
+    for component in system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy mysql etcd minio minio-mc etcd-init migrate mysql-binlog-tools; do
+      offline_images+=("$registry/$component:$version")
+    done
+  else
+    offline_images+=(mysql:8.4 quay.io/coreos/etcd:v3.6.12 \
+      minio/minio:RELEASE.2025-04-22T22-12-26Z minio/mc:RELEASE.2025-04-16T18-13-26Z)
+  fi
+  for image in "${offline_images[@]}"; do
     docker image inspect "$image" >/dev/null || {
       echo "缺少离线验收预载镜像: $image" >&2
       exit 1
     }
+    if [[ $formal_release_media == 1 ]]; then
+      actual_platform=$(docker image inspect -f '{{.Os}}/{{.Architecture}}' "$image")
+      [[ $actual_platform == "$formal_release_platform" ]] || {
+        echo "正式介质镜像平台错误: $image=$actual_platform，期望=$formal_release_platform" >&2
+        exit 1
+      }
+    fi
   done
 fi
 
@@ -263,7 +291,9 @@ schema_present=$("${compose[@]}" exec -T mysql sh -c \
 }
 
 network="${project}_appforge-backend"
-docker run --rm --network "$network" --entrypoint /bin/sh minio/mc:RELEASE.2025-04-16T18-13-26Z -c '
+docker run --rm --pull never --network "$network" \
+  --tmpfs /tmp:size=16m,mode=0700,uid=65532,gid=65532 -e MC_CONFIG_DIR=/tmp/mc \
+  --entrypoint /bin/sh "$mc_image" -c '
   mc alias set acceptance http://minio:9000 private_acceptance_minio private_acceptance_minio_secret >/dev/null
   mc stat acceptance/appforge >/dev/null
   version_status=$(mc version info acceptance/appforge)
@@ -308,8 +338,9 @@ if [[ $upgrade_mode == 1 ]]; then
 
   "${compose[@]}" exec -T mysql sh -c \
     'MYSQL_PWD="$MYSQL_PASSWORD" mysql -h127.0.0.1 -u"$MYSQL_USER" -D"$MYSQL_DATABASE" -e "CREATE TABLE acceptance_offline_upgrade_marker(id BIGINT PRIMARY KEY,value VARCHAR(64) NOT NULL); INSERT INTO acceptance_offline_upgrade_marker(id,value) VALUES (1,\"database-preserved\");"'
-  docker run --rm --pull never --network "$network" --entrypoint /bin/sh \
-    minio/mc:RELEASE.2025-04-16T18-13-26Z -ec '
+  docker run --rm --pull never --network "$network" \
+    --tmpfs /tmp:size=16m,mode=0700,uid=65532,gid=65532 -e MC_CONFIG_DIR=/tmp/mc --entrypoint /bin/sh \
+    "$mc_image" -ec '
       mc alias set acceptance http://minio:9000 private_acceptance_minio private_acceptance_minio_secret >/dev/null
       printf "%s" object-preserved | mc pipe acceptance/appforge/acceptance/offline-upgrade-marker.txt >/dev/null
     '
@@ -353,8 +384,9 @@ if [[ $upgrade_mode == 1 ]]; then
 
   database_marker=$("${compose[@]}" exec -T mysql sh -c \
     'MYSQL_PWD="$MYSQL_PASSWORD" mysql -h127.0.0.1 -u"$MYSQL_USER" -D"$MYSQL_DATABASE" -N -e "SELECT value FROM acceptance_offline_upgrade_marker WHERE id=1"')
-  object_marker=$(docker run --rm --pull never --network "$network" --entrypoint /bin/sh \
-    minio/mc:RELEASE.2025-04-16T18-13-26Z -ec '
+  object_marker=$(docker run --rm --pull never --network "$network" \
+    --tmpfs /tmp:size=16m,mode=0700,uid=65532,gid=65532 -e MC_CONFIG_DIR=/tmp/mc --entrypoint /bin/sh \
+    "$mc_image" -ec '
       mc alias set acceptance http://minio:9000 private_acceptance_minio private_acceptance_minio_secret >/dev/null
       mc cat acceptance/appforge/acceptance/offline-upgrade-marker.txt
     ')
@@ -386,8 +418,9 @@ if [[ $upgrade_mode == 1 ]]; then
     "$rollback_started_ns" "$rollback_completed_ns")
   database_marker=$("${compose[@]}" exec -T mysql sh -c \
     'MYSQL_PWD="$MYSQL_PASSWORD" mysql -h127.0.0.1 -u"$MYSQL_USER" -D"$MYSQL_DATABASE" -N -e "SELECT value FROM acceptance_offline_upgrade_marker WHERE id=1"')
-  object_marker=$(docker run --rm --pull never --network "$network" --entrypoint /bin/sh \
-    minio/mc:RELEASE.2025-04-16T18-13-26Z -ec '
+  object_marker=$(docker run --rm --pull never --network "$network" \
+    --tmpfs /tmp:size=16m,mode=0700,uid=65532,gid=65532 -e MC_CONFIG_DIR=/tmp/mc --entrypoint /bin/sh \
+    "$mc_image" -ec '
       mc alias set acceptance http://minio:9000 private_acceptance_minio private_acceptance_minio_secret >/dev/null
       mc cat acceptance/appforge/acceptance/offline-upgrade-marker.txt
     ')
@@ -433,6 +466,8 @@ if [[ -n $report_file ]]; then
   APPFORGE_OFFLINE_ACCEPTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
   APPFORGE_OFFLINE_DEPLOYMENT_MODE="$deployment_mode" \
   APPFORGE_OFFLINE_NETWORK_MODE="$offline_mode" \
+  APPFORGE_OFFLINE_FORMAL_RELEASE_MEDIA="$formal_release_media" \
+  APPFORGE_OFFLINE_FORMAL_RELEASE_PLATFORM="$formal_release_platform" \
   APPFORGE_OFFLINE_MIGRATE_IMAGE="$migrate_image" \
   APPFORGE_OFFLINE_MIGRATE_IMAGE_ID="$migrate_image_id" \
   APPFORGE_OFFLINE_UPGRADE_MODE="$upgrade_mode" \
@@ -452,6 +487,7 @@ import os
 import sys
 
 offline = os.environ["APPFORGE_OFFLINE_NETWORK_MODE"] == "1"
+formal_release_media = os.environ["APPFORGE_OFFLINE_FORMAL_RELEASE_MEDIA"] == "1"
 upgrade_enabled = os.environ["APPFORGE_OFFLINE_UPGRADE_MODE"] == "1"
 verified = [
     "schema-migration",
@@ -462,9 +498,12 @@ verified = [
 ]
 limitations = [
     "local-docker-simulation-not-physical-air-gap",
-    "preloaded-development-images-not-formal-release-media",
     "synthetic-temporary-credentials-and-license",
 ]
+if formal_release_media:
+    verified.extend(["formal-release-media", "fixed-target-platform", "signed-index-to-platform-digest-map"])
+else:
+    limitations.append("preloaded-development-images-not-formal-release-media")
 upgrade = None
 if upgrade_enabled:
     verified.extend(["offline-application-upgrade", "application-rollback", "database-and-object-persistence"])
@@ -495,7 +534,7 @@ else:
 report = {
     "schemaVersion": 1,
     "acceptedAt": os.environ["APPFORGE_OFFLINE_ACCEPTED_AT"],
-    "scope": "synthetic-local",
+    "scope": "synthetic-local-formal-release-media" if formal_release_media else "synthetic-local",
     "acceptanceScript": "deploy/acceptance/v7-private-install.sh",
     "deploymentMode": os.environ["APPFORGE_OFFLINE_DEPLOYMENT_MODE"],
     "migrateImage": os.environ["APPFORGE_OFFLINE_MIGRATE_IMAGE"],
@@ -504,6 +543,8 @@ report = {
     "schema113ProductionTarget": True,
     "freshVolumes": True,
     "imagesPreloaded": offline,
+    "formalReleaseMedia": formal_release_media,
+    "formalReleasePlatform": os.environ["APPFORGE_OFFLINE_FORMAL_RELEASE_PLATFORM"] if formal_release_media else None,
     "composePullPolicy": "never",
     "frontendNetworkInternal": offline,
     "backendNetworkInternal": True,

@@ -23,6 +23,7 @@ mkdir -p "$package_root/docs" "$package_root/bin"
 for file in docker-compose.yml .env.example egress-allowlist.example nginx.conf preflight.sh render-config.sh backup.sh restore.sh archive-binlogs.sh pitr-restore.sh configure-object-replication.sh diagnostics.sh; do
   cp "$repo_root/deploy/production/$file" "$package_root/$file"
 done
+cp "$repo_root/deploy/etcd/admin-api.yaml" "$package_root/admin-api.yaml.template"
 cp -R "$repo_root/deploy/local-agent" "$package_root/local-agent"
 for file in delivery-guide.md local-agent-artifact-protocol.md customer-storage-contract.md air-gapped-artifact-contract.md remote-apk-signing-contract.md restricted-egress-proxy.md secret-providers.md version-compatibility.md; do
   cp "$repo_root/docs/enterprise/$file" "$package_root/docs/$file"
@@ -84,6 +85,10 @@ printf '%s\n' \
   'set -euo pipefail' \
   'case ${1:-} in' \
   '  pull|tag) exit 0 ;;' \
+  '  buildx)' \
+  '    [[ ${2:-} == imagetools && ${3:-} == inspect ]]' \
+  '    printf '\''{"schemaVersion":2,"mediaType":"application/vnd.oci.image.manifest.v1+json"}\n'\''' \
+  '    ;;' \
   '  save)' \
   '    shift' \
   '    output=' \
@@ -112,12 +117,22 @@ tar -tf "$production_bundle" | rg -q '^\./bin/validate-release-evidence$'
   echo "验收失败: 生产离线包镜像清单不是18个固定镜像" >&2
   exit 1
 }
+[[ $(tar -xOf "$production_bundle" ./PLATFORM) == linux/amd64 ]] || {
+  echo "验收失败: 生产离线包没有固定默认目标平台 linux/amd64" >&2
+  exit 1
+}
+[[ $(tar -xOf "$production_bundle" ./PLATFORM-IMAGES | wc -l | tr -d ' ') == 18 ]] || {
+  echo "验收失败: 生产离线包没有18个目标平台与签名索引映射" >&2
+  exit 1
+}
 
 printf '%s\n' "$fixture_image" >"$package_root/IMAGES"
+printf '%s\n' 'linux/amd64' >"$package_root/PLATFORM"
+printf '%s|%s|%s\n' "$fixture_image" "$fixture_image" "$fixture_image" >"$package_root/PLATFORM-IMAGES"
 docker image inspect "$fixture_image" >/dev/null
 docker save "$fixture_image" -o "$package_root/images.tar"
 (cd "$package_root" && {
-  sha256sum images.tar docker-compose.yml .env.example egress-allowlist.example nginx.conf preflight.sh render-config.sh backup.sh restore.sh archive-binlogs.sh pitr-restore.sh configure-object-replication.sh diagnostics.sh IMAGES
+  sha256sum images.tar docker-compose.yml .env.example egress-allowlist.example nginx.conf admin-api.yaml.template preflight.sh render-config.sh backup.sh restore.sh archive-binlogs.sh pitr-restore.sh configure-object-replication.sh diagnostics.sh IMAGES PLATFORM PLATFORM-IMAGES
   find local-agent docs bin security -type f | LC_ALL=C sort | while IFS= read -r file; do sha256sum "$file"; done
 } >SHA256SUMS)
 tar -C "$package_root" -cf "$temporary/offline.tar" .
@@ -128,6 +143,19 @@ for required in diagnostics.sh archive-binlogs.sh pitr-restore.sh configure-obje
   local-agent/upgrade.sh docs/delivery-guide.md docs/air-gapped-artifact-contract.md docs/remote-apk-signing-contract.md docs/restricted-egress-proxy.md docs/version-compatibility.md; do
   [[ -f "$install_root/$required" ]] || { echo "验收失败: 离线安装缺少 $required" >&2; exit 1; }
 done
+[[ -f "$install_root/admin-api.yaml.template" ]] || {
+  echo "验收失败: 离线安装缺少自包含 Admin API 配置模板" >&2
+  exit 1
+}
+[[ $(<"$install_root/PLATFORM") == linux/amd64 ]] || {
+  echo "验收失败: 离线安装未保留目标平台声明" >&2
+  exit 1
+}
+"$install_root/render-config.sh" "$install_root/.env.example" >/dev/null
+[[ -s "$install_root/runtime/admin-api.yaml" ]] || {
+  echo "验收失败: 安装后的离线介质无法独立生成 Admin API 配置" >&2
+  exit 1
+}
 for required in security/RELEASE-MANIFEST.json security/SHA256SUMS security/SHA256SUMS.sigstore.json \
   security/api.spdx.json security/api.licenses.json security/api.trivy.sarif security/api.cosign.json \
   security/mysql.spdx.json security/mysql.licenses.json security/mysql.trivy.sarif security/mysql.cosign.json \

@@ -12,7 +12,7 @@ Compose：复制 `deploy/production/.env.example` 为 `.env`，生成随机 Secr
 
 Kubernetes：预先创建 MySQL、Redis、对象存储、内部 RPC、JWT、主密钥和 Agent CA Secret；已有 RWX 许可证状态 Claim 的根目录必须预置为 UID/GID `65532` 可写且不得向其他主体开放；填写 Helm values 后执行 `helm lint` 和 `helm upgrade --install --atomic`。Schema 会拒绝空镜像仓库、非 HTTPS 入口、单副本控制面和无版本镜像。本地 kind v1.32.2 已验证 `1.2.0 → 1.2.1 → 1.2.0` 滚动升级与应用回滚期间 API 连续可用、Schema 113 和 AIR_GAPPED 表可被回滚应用继续使用，客户交付仍需使用具有真实版本差异的正式镜像在目标 CSI 与 Ingress 上复验。
 
-离线环境使用 `offline-bundle.sh` 在联网交付机导出 OCI 镜像包，在断网环境用 `offline-install.sh` 校验 SHA 后导入。正式 tag 流水线为 16 个 AppForge 发布镜像按 digest 生成 SPDX SBOM、标准化许可证清单、Trivy SARIF 和 Cosign 回验 JSON；其中 MySQL、etcd、MinIO 和 mc 是由工作流固定上游源码提交、升级已知漏洞依赖后构建的可追溯衍生镜像，不改变其上游许可证。随介质交付的 Redis、Alpine 两个原始第三方镜像必须解析为不可变 digest，并生成 SPDX、许可证清单和 Trivy SARIF。另有独立 `trivy fs` 门禁扫描仓库中的 Go module 与前端 manifest/lockfile，发现可修复 High/Critical 依赖漏洞会直接阻断发布；为避免未授权外传，该门禁不上传源码依赖 SBOM、许可证或漏洞明细，只把成功状态写入聚合签名 Manifest。镜像证据统一汇总为 `RELEASE-MANIFEST.json`、`SHA256SUMS`，再由工作流 OIDC 身份签名；Redis、Alpine 不冒充 AppForge 自签镜像，其来源由聚合签名清单锁定。工作流还会把 `release-security-vX.Y.Z` 与 `delivery-tools-vX.Y.Z` 打包为公开 GitHub Release 资产，生成外层 SHA 清单并用同一 OIDC 身份签名。联网打包机使用 `download-release-assets.sh` 匿名下载，先验证外层资产签名和哈希，再验证两个归档内的签名、固定文件集合、版本和仓库身份；`offline-bundle.sh VERSION RELEASE_SECURITY_DIRECTORY OUTPUT.tar` 随后按已签名 digest 拉取并重新标记全部 18 个镜像，把完整安全证据、控制面部署配置、Local Agent 客户安装包、`licensectl`/`appforgectl` 和企业文档一并写入离线介质。缺失、额外、跨版本、跨仓库或 SHA 被篡改的证据均会被拒绝。
+离线环境使用 `offline-bundle.sh` 在联网交付机导出 OCI 镜像包，在断网环境用 `offline-install.sh` 校验 SHA 后导入。正式 tag 流水线为 16 个 AppForge 发布镜像按 digest 生成 SPDX SBOM、标准化许可证清单、Trivy SARIF 和 Cosign 回验 JSON；其中 MySQL、etcd、MinIO 和 mc 是由工作流固定上游源码提交、升级已知漏洞依赖后构建的可追溯衍生镜像，不改变其上游许可证。随介质交付的 Redis、Alpine 两个原始第三方镜像必须解析为不可变 digest，并生成 SPDX、许可证清单和 Trivy SARIF。另有独立 `trivy fs` 门禁扫描仓库中的 Go module 与前端 manifest/lockfile，发现可修复 High/Critical 依赖漏洞会直接阻断发布；为避免未授权外传，该门禁不上传源码依赖 SBOM、许可证或漏洞明细，只把成功状态写入聚合签名 Manifest。镜像证据统一汇总为 `RELEASE-MANIFEST.json`、`SHA256SUMS`，再由工作流 OIDC 身份签名；Redis、Alpine 不冒充 AppForge 自签镜像，其来源由聚合签名清单锁定。工作流还会把 `release-security-vX.Y.Z` 与 `delivery-tools-vX.Y.Z` 打包为公开 GitHub Release 资产，生成外层 SHA 清单并用同一 OIDC 身份签名。联网打包机使用 `download-release-assets.sh` 匿名下载，先验证外层资产签名和哈希，再验证两个归档内的签名、固定文件集合、版本和仓库身份；`offline-bundle.sh VERSION RELEASE_SECURITY_DIRECTORY OUTPUT.tar` 随后从每个已签名索引解析明确目标平台的子 manifest digest，拉取并重新标记全部 18 个镜像，把 `PLATFORM`、`PLATFORM-IMAGES`（部署标签、平台子摘要、签名索引摘要）、完整安全证据、自包含 Admin API 模板、控制面部署配置、Local Agent 客户安装包、`licensectl`/`appforgectl` 和企业文档一并写入离线介质。缺失、额外、跨版本、跨仓库、目标平台不存在或 SHA 被篡改的证据均会被拒绝。
 
 联网打包示例：
 
@@ -22,14 +22,18 @@ deploy/production/download-release-assets.sh \
   1.2.5 OWNER/REPOSITORY release-v1.2.5
 
 export APPFORGE_IMAGE_REGISTRY=ghcr.io/OWNER/appforge
+export APPFORGE_OFFLINE_PLATFORM=linux/amd64
 export APPFORGE_LICENSECTL_BINARY=$PWD/release-v1.2.5/delivery-tools-v1.2.5/licensectl-linux-amd64
 export APPFORGE_APPFORGECTL_BINARY=$PWD/release-v1.2.5/delivery-tools-v1.2.5/appforgectl-linux-amd64
 export APPFORGE_RELEASE_CERTIFICATE_IDENTITY=https://github.com/OWNER/REPOSITORY/.github/workflows/release-security.yml@refs/tags/v1.2.5
 deploy/production/offline-bundle.sh \
   1.2.5 release-v1.2.5/release-security-v1.2.5 appforge-1.2.5-offline.tar
+
+deploy/acceptance/v7-formal-offline-media.sh \
+  appforge-1.2.5-offline.tar 1.2.5 ghcr.io/OWNER/appforge formal-offline-report.json
 ```
 
-不得使用本地伪造证据目录替代真实 tag Release 资产。断网安装后，原始证据位于 `security/`，校验器位于 `bin/validate-release-evidence`；介质进入断网区前还应按交付制度校验外部签名和介质哈希。`v1.2.5` 已完成真实 tag、OIDC、Cosign、Trivy、SBOM、许可证、聚合签名和公开 Release 流水线，22 个任务全部成功；四项公开资产已通过匿名下载、外层与内层 SHA/Sigstore 身份和 Linux CLI 权限验证，证据见 `evidence/v7-public-release-v1.2.5-20260816.json`。客户离线介质仍必须使用真实 tag 资产在联网交付机独立复验。
+不得使用本地伪造证据目录替代真实 tag Release 资产。当前正式容器镜像发布平台为 `linux/amd64`；`appforgectl`/`licensectl` 同时提供 AMD64 与 ARM64，但在正式镜像索引增加 ARM64 前，生成 `linux/arm64` 介质会按设计失败。断网安装后，原始证据位于 `security/`，校验器位于 `bin/validate-release-evidence`；介质进入断网区前还应按交付制度校验外部签名和介质哈希。`v1.2.5` 已完成真实 tag、OIDC、Cosign、Trivy、SBOM、许可证、聚合签名和公开 Release 流水线，22 个任务全部成功；四项公开资产已通过匿名下载、外层与内层 SHA/Sigstore 身份和 Linux CLI 权限验证，证据见 `evidence/v7-public-release-v1.2.5-20260816.json`。客户离线介质仍必须使用真实 tag 资产在联网交付机独立复验。
 
 Hybrid/Private 客户构建节点使用 `deploy/local-agent` 交付包。该包提供非 root、只读根文件系统、无入站端口的 Compose，注册码通过标准输入传递，Agent 身份与签名 Secret 分别保存在 Docker 私有卷，并提供健康检查、Drain 后在线/已导入镜像离线升级和失败自动恢复旧镜像。详细步骤见 [Local Agent 客户侧安装与升级](../../deploy/local-agent/README.md)。
 

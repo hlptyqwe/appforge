@@ -16,7 +16,7 @@ tar -C "$tmp" -xf "$bundle"
 (cd "$tmp" && sha256sum -c SHA256SUMS)
 docker load -i "$tmp/images.tar"
 mkdir -p "$install_dir"
-for file in docker-compose.yml .env.example egress-allowlist.example nginx.conf preflight.sh render-config.sh backup.sh restore.sh archive-binlogs.sh pitr-restore.sh configure-object-replication.sh diagnostics.sh IMAGES SHA256SUMS; do
+for file in docker-compose.yml .env.example egress-allowlist.example nginx.conf admin-api.yaml.template preflight.sh render-config.sh backup.sh restore.sh archive-binlogs.sh pitr-restore.sh configure-object-replication.sh diagnostics.sh IMAGES PLATFORM PLATFORM-IMAGES SHA256SUMS; do
   cp "$tmp/$file" "$install_dir/$file"
 done
 cp -R "$tmp/local-agent" "$install_dir/local-agent"

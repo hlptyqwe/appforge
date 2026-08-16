@@ -5,6 +5,10 @@ set -euo pipefail
 delivery_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 env_file=${1:-$delivery_dir/.env}
 repo_deploy_dir=$(cd "$delivery_dir/.." && pwd)
+admin_api_template="$delivery_dir/admin-api.yaml.template"
+if [[ ! -f $admin_api_template ]]; then
+  admin_api_template="$repo_deploy_dir/etcd/admin-api.yaml"
+fi
 
 [[ -f "$env_file" ]] || { echo "缺少生产配置: $env_file" >&2; exit 1; }
 set -a
@@ -131,7 +135,11 @@ SecretProviders:
     Endpoint: ${APPFORGE_AWS_SECRETS_MANAGER_ENDPOINT:-}
 EOF
 
-cp "$repo_deploy_dir/etcd/admin-api.yaml" "$runtime_dir/admin-api.yaml"
+[[ -f $admin_api_template && ! -L $admin_api_template ]] || {
+  echo "缺少 Admin API 配置模板: $admin_api_template" >&2
+  exit 1
+}
+cp "$admin_api_template" "$runtime_dir/admin-api.yaml"
 public_origin=${APPFORGE_PUBLIC_ORIGIN//\//\\/}
 jwt_secret=${APPFORGE_JWT_ACCESS_SECRET//\//\\/}
 master_key=${APPFORGE_SECRET_MASTER_KEY_BASE64//\//\\/}
