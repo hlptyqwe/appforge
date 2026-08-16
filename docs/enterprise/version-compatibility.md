@@ -18,6 +18,6 @@
 
 `113_v7_air_gapped` 已提升为 1.2.x 生产目标。生产 Compose、Helm、迁移镜像、API 部署状态和 Release Workflow 均固定为该目标，并增加 1.2.x/Schema 113 不匹配拒绝门禁。隔离验收通过空库安装、112→113 升级、重复执行、升级前标记保持、六条平台/租户细粒度权限及已有角色零自动授权；证据见 `evidence/v7-schema113-production-20260816.json`。历史候选证据 `evidence/v7-schema113-candidate-20260816.json` 仅保留为提升前记录。
 
-本地 kind v1.32.2/Helm 3.17.3 已验证应用镜像 `1.1.0 → 1.1.1` 滚动升级后回滚到 revision 1，回滚期间不回退数据库，`1.1.0` 可继续使用 `110` expand Schema。该证据不替代客户目标 Kubernetes、CSI 和 Ingress 的交付复验。
+本地 kind v1.32.2 已验证应用镜像 `1.2.0 → 1.2.1` 滚动升级后回滚到 revision 1，回滚期间不回退数据库；累计 350 次集群内 API 健康探测零失败，回滚后 `1.2.0` 双副本继续使用 Schema 113，AIR_GAPPED 表保留。机器证据见 `evidence/v7-kubernetes-upgrade-20260816.json`。本地新旧标签使用同一发布镜像摘要，因此该证据验证 Helm 编排、可用性和 Schema 兼容边界，不证明真实版本二进制差异，也不替代客户目标 Kubernetes、CSI 和 Ingress 的交付复验。
 
 本地 Compose 双 internal 网络已使用预载同摘要开发镜像完成 `1.2.0 → 1.2.1 → 1.2.0` 离线应用升级与回滚，数据库和对象标记保持，Schema 始终为 113；单节点连续探针允许并记录短暂中断。112→113 Schema 跨版本升级另由生产迁移验收覆盖。该证据只验证离线切换机制，不证明正式版本二进制差异或客户物理断网环境。

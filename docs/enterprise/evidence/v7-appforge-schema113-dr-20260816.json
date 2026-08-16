@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 3,
+  "scenario": "isolated-synthetic-appforge-schema113",
+  "acceptanceScript": "deploy/acceptance/v7-appforge-schema113-dr.sh",
+  "targetDatabaseSchema": "20260815_113_v7_air_gapped",
+  "candidateSchema113Excluded": false,
+  "productionSchema113Included": true,
+  "recoveryPointMarkerAt": 1786877896811,
+  "backupCompletedAt": 1786877898562,
+  "restoreStartedAt": 1786877898597,
+  "recoveryVerifiedAt": 1786877909184,
+  "rpoSeconds": 2,
+  "rpoTargetSeconds": 900,
+  "rtoSeconds": 11,
+  "rtoTargetSeconds": 7200,
+  "appforgeTableCount": 58,
+  "businessSummarySha256": "d3134870cbe9f46ea98c7149d403059decf2ca455888942e4b22eb9ddbf135f1",
+  "objectManifestSha256": "2d2e512496008b9fa2b90b26e31270fff8e7b2a799afb143df66775ecf470fa1",
+  "verifiedData": [
+    "appforge-schema-113",
+    "synthetic-tenant-and-operation-audit",
+    "synthetic-application-version-channel-signing-config",
+    "synthetic-successful-build-task-reference-chain",
+    "six-storage-object-metadata-and-bytes-with-air-gapped-packages",
+    "air-gapped-package-task-attempt-and-object-reference-chain",
+    "synthetic-etcd-config"
+  ],
+  "limitations": [
+    "representative-synthetic-dataset-not-production-volume",
+    "not-customer-target-environment",
+    "not-pitr-or-cross-region"
+  ]
+}

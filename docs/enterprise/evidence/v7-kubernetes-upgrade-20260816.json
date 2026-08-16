@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "scenario": "local-kind-rolling-upgrade-and-application-rollback",
+  "acceptanceScript": "deploy/acceptance/v7-kubernetes-upgrade.sh",
+  "oldVersion": "1.2.0",
+  "newVersion": "1.2.1",
+  "kindNodeImage": "kindest/node:v1.32.2",
+  "targetDatabaseSchema": "20260815_113_v7_air_gapped",
+  "upgradeSuccessfulHealthProbes": 202,
+  "rollbackSuccessfulHealthProbes": 350,
+  "failedHealthProbes": 0,
+  "verified": [
+    "atomic-helm-install",
+    "rolling-update-with-continuous-api-health",
+    "helm-application-rollback",
+    "schema-113-retained-after-rollback",
+    "air-gapped-table-retained-after-rollback",
+    "two-api-replicas-available-after-rollback"
+  ],
+  "limitations": [
+    "local-kind-not-customer-target-kubernetes",
+    "old-and-new-tags-use-the-same-locally-built-release-image-digest",
+    "customer-csi-ingress-and-registry-not-validated"
+  ]
+}

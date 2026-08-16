@@ -68,16 +68,19 @@ run_migration "$schema113_image" upgrade113 20260815_113_v7_air_gapped
 
 validate_database() {
   local database=$1 expect_marker=$2 state
-  state=$(docker exec -e MYSQL_PWD="$root_password" "$mysql_container" mysql -h127.0.0.1 -uroot "$database" -N -B -e \
+  state=$(docker exec -e MYSQL_PWD="$root_password" "$mysql_container" mysql --default-character-set=utf8mb4 -h127.0.0.1 -uroot "$database" -N -B -e \
     "SELECT CONCAT(
       (SELECT COUNT(*) FROM sys_schema_migration WHERE version='20260815_112_v7_customer_storage'),':',
       (SELECT COUNT(*) FROM sys_schema_migration WHERE version='20260815_113_v7_air_gapped'),':',
       (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='t_air_gapped_package'),':',
       (SELECT COUNT(*) FROM sys_menu WHERE id IN (4515,4516,4517,4615,4616,4617) AND perms LIKE 'enterprise:air-gapped:%'),':',
       (SELECT COUNT(*) FROM sys_role_menu WHERE menu_id IN (4515,4516,4517,4615,4616,4617)),':',
-      (SELECT COUNT(*) FROM sys_schema_migration WHERE version='schema113_acceptance_preupgrade_marker'))")
-  [[ $state == "1:1:1:6:0:$expect_marker" ]] || {
+      (SELECT COUNT(*) FROM sys_schema_migration WHERE version='schema113_acceptance_preupgrade_marker'),':',
+      (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='t_storage_object' AND column_name='object_type' AND column_comment LIKE '%10离线结果包%'))")
+  [[ $state == "1:1:1:6:0:$expect_marker:1" ]] || {
     echo "Schema 113生产迁移状态异常: database=$database state=$state" >&2
+    docker exec -e MYSQL_PWD="$root_password" "$mysql_container" mysql --default-character-set=utf8mb4 -h127.0.0.1 -uroot "$database" -N -B -e \
+      "SELECT CONCAT('object_type_comment=',column_comment) FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name='t_storage_object' AND column_name='object_type'" >&2
     exit 1
   }
 }
@@ -127,6 +130,7 @@ json.dump({
         "preUpgradeMarkerPreserved": "passed",
         "sixPermanentRbacEntries": "passed",
         "existingRolesNotAutoGranted": "passed",
+        "storageObjectTypeCommentCoversOneThroughTen": "passed",
     },
     "cleanup": {
         "remainingDockerContainers": integer("APPFORGE_SCHEMA113_REMAINING_CONTAINERS"),

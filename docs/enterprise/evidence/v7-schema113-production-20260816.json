@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "acceptedAt": "2026-08-16T10:11:47Z",
+  "acceptedAt": "2026-08-16T11:01:22Z",
   "scope": "isolated-synthetic-schema113-production-promotion",
   "acceptanceScript": "deploy/acceptance/v7-schema113-candidate.sh",
   "productionDeploymentDefaultsChanged": true,
@@ -14,7 +14,8 @@
     "migrationIdempotence": "passed",
     "preUpgradeMarkerPreserved": "passed",
     "sixPermanentRbacEntries": "passed",
-    "existingRolesNotAutoGranted": "passed"
+    "existingRolesNotAutoGranted": "passed",
+    "storageObjectTypeCommentCoversOneThroughTen": "passed"
   },
   "cleanup": {
     "remainingDockerContainers": 0,

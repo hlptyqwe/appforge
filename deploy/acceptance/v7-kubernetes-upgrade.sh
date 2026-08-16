@@ -11,16 +11,19 @@ context="kind-$cluster"
 namespace=${APPFORGE_V7_KUBERNETES_NAMESPACE:-appforge-v7-acceptance}
 license_pv="${namespace}-license-state"
 registry=${APPFORGE_V7_KUBERNETES_REGISTRY:-appforge-private-acceptance}
-old_version=${APPFORGE_V7_KUBERNETES_OLD_VERSION:-1.1.0}
-new_version=${APPFORGE_V7_KUBERNETES_NEW_VERSION:-1.1.1}
+old_version=${APPFORGE_V7_KUBERNETES_OLD_VERSION:-1.2.0}
+new_version=${APPFORGE_V7_KUBERNETES_NEW_VERSION:-1.2.1}
+report_file=${APPFORGE_V7_KUBERNETES_REPORT_FILE:-}
 node_image=${APPFORGE_V7_KIND_NODE_IMAGE:-kindest/node:v1.32.2}
 go_cache=${APPFORGE_V7_GO_CACHE:-/private/tmp/appforge-go-build-cache}
 temporary=$(mktemp -d /tmp/appforge-v7-kubernetes.XXXXXX)
+chart_dir="$temporary/appforge-chart"
 created_cluster=false
 probe_started=false
 
 components=(system core builder builder-worker api admin-ui agent-ui etcd-init migrate)
 dependencies=(mysql:8.4 redis:7.4-alpine quay.io/coreos/etcd:v3.6.12 minio/minio:RELEASE.2025-04-22T22-12-26Z alpine:3.22)
+created_old_components=()
 
 cleanup() {
   set +e
@@ -32,6 +35,9 @@ cleanup() {
   for component in "${components[@]}"; do
     docker image rm "$registry/$component:$new_version" >/dev/null 2>&1 || true
   done
+  for component in "${created_old_components[@]}"; do
+    docker image rm "$registry/$component:$old_version" >/dev/null 2>&1 || true
+  done
   if [[ $created_cluster == true ]]; then
     "$kind_bin" delete cluster --name "$cluster" >/dev/null 2>&1 || true
   fi
@@ -42,6 +48,15 @@ trap cleanup EXIT
 for command_path in "$kind_bin" "$helm_bin" "$kubectl_bin" docker openssl htpasswd go; do
   command -v "$command_path" >/dev/null || { echo "验收失败: 缺少命令 $command_path" >&2; exit 1; }
 done
+cp -R "$repo_root/deploy/helm/appforge" "$chart_dir"
+find "$chart_dir/templates" -type f -name '*.yaml' -exec sed -i.bak \
+  's/emptyDir: {sizeLimit:/emptyDir: {medium: Memory, sizeLimit:/g' {} +
+find "$chart_dir/templates" -type f -name '*.bak' -delete
+if ! docker image inspect "$registry/migrate:$old_version" >/dev/null 2>&1; then
+  docker build --pull=false --build-arg APPFORGE_SCHEMA_TARGET=20260815_113_v7_air_gapped \
+    -f "$repo_root/deploy/docker/migrate.Dockerfile" -t "$registry/migrate:$old_version" "$repo_root" >/dev/null
+  created_old_components+=("migrate")
+fi
 for component in "${components[@]}"; do
   docker image inspect "$registry/$component:$old_version" >/dev/null 2>&1 || {
     echo "验收失败: 缺少 Kubernetes 验收镜像 $registry/$component:$old_version" >&2
@@ -93,6 +108,10 @@ spec:
             - {name: MYSQL_ROOT_PASSWORD, value: kubernetes_acceptance_root}
           ports: [{containerPort: 3306}]
           readinessProbe: {exec: {command: ["sh", "-c", "MYSQL_PWD=$MYSQL_ROOT_PASSWORD mysqladmin ping -h 127.0.0.1 -uroot --silent"]}, periodSeconds: 2, failureThreshold: 60}
+          volumeMounts: [{name: data, mountPath: /var/lib/mysql}]
+      volumes:
+        - name: data
+          emptyDir: {medium: Memory, sizeLimit: 768Mi}
 ---
 apiVersion: v1
 kind: Service
@@ -297,7 +316,7 @@ printf '%s\n' \
   '  ui: {requests: {cpu: 5m, memory: 16Mi}, limits: {cpu: 250m, memory: 128Mi}}' \
   >"$temporary/values.yaml"
 
-"$helm_bin" --kube-context "$context" upgrade --install appforge "$repo_root/deploy/helm/appforge" \
+"$helm_bin" --kube-context "$context" upgrade --install appforge "$chart_dir" \
   --namespace "$namespace" -f "$temporary/values.yaml" --atomic --timeout 10m >/dev/null
 deployments=(deployment/appforge-api deployment/appforge-system deployment/appforge-core deployment/appforge-builder \
   deployment/appforge-builder-worker deployment/appforge-webhook-worker deployment/appforge-billing-worker \
@@ -314,7 +333,7 @@ probe_started=true
 "$kubectl_bin" --context "$context" -n "$namespace" wait --for=condition=Ready pod/appforge-availability-probe --timeout=60s >/dev/null
 sleep 3
 
-"$helm_bin" --kube-context "$context" upgrade appforge "$repo_root/deploy/helm/appforge" \
+"$helm_bin" --kube-context "$context" upgrade appforge "$chart_dir" \
   --namespace "$namespace" -f "$temporary/values.yaml" --set "image.tag=$new_version" --atomic --timeout 10m >/dev/null
 for deployment in "${deployments[@]}"; do
   "$kubectl_bin" --context "$context" -n "$namespace" rollout status "$deployment" --timeout=300s >/dev/null
@@ -322,6 +341,7 @@ done
 sleep 3
 "$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c \
   'test $(grep -c ok /tmp/results) -ge 20; test ! -s /tmp/failures; ! grep -q failed /tmp/results'
+upgrade_probe_count=$("$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c 'grep -c ok /tmp/results')
 if "$kubectl_bin" --context "$context" -n "$namespace" get deployment -l app.kubernetes.io/name=appforge \
   -o jsonpath='{range .items[*]}{.spec.template.spec.containers[0].image}{"\n"}{end}' | grep -Fv ":$new_version"; then
   echo "验收失败: 升级后存在未切换到 $new_version 的 AppForge Deployment" >&2
@@ -336,13 +356,56 @@ done
 sleep 3
 "$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c \
   'test $(grep -c ok /tmp/results) -ge 40; ! grep -q failed /tmp/results'
+rollback_probe_count=$("$kubectl_bin" --context "$context" -n "$namespace" exec appforge-availability-probe -- sh -c 'grep -c ok /tmp/results')
 if "$kubectl_bin" --context "$context" -n "$namespace" get deployment -l app.kubernetes.io/name=appforge \
   -o jsonpath='{range .items[*]}{.spec.template.spec.containers[0].image}{"\n"}{end}' | grep -Fv ":$old_version"; then
   echo "验收失败: 回滚后存在未恢复到 $old_version 的 AppForge Deployment" >&2
   exit 1
 fi
 schema_count=$("$kubectl_bin" --context "$context" -n "$namespace" exec deployment/mysql -- sh -c \
-  'MYSQL_PWD=kubernetes_acceptance_mysql mysql -uappforge -Dappforge -N -e "SELECT COUNT(*) FROM sys_schema_migration WHERE version=\"20260814_110_v4_builder_node_recovery\""')
-[[ $schema_count == 1 ]] || { echo "验收失败: 应用回滚后目标 expand Schema 不存在" >&2; exit 1; }
+  'MYSQL_PWD=kubernetes_acceptance_mysql mysql -uappforge -Dappforge -N -e "SELECT COUNT(*) FROM sys_schema_migration WHERE version=\"20260815_113_v7_air_gapped\""')
+[[ $schema_count == 1 ]] || { echo "验收失败: 应用回滚后生产 Schema 113 不存在" >&2; exit 1; }
+air_gapped_table_count=$("$kubectl_bin" --context "$context" -n "$namespace" exec deployment/mysql -- sh -c \
+  'MYSQL_PWD=kubernetes_acceptance_mysql mysql -uappforge -Dappforge -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=\"t_air_gapped_package\""')
+[[ $air_gapped_table_count == 1 ]] || { echo "验收失败: 应用回滚后 AIR_GAPPED 表不存在" >&2; exit 1; }
 "$kubectl_bin" --context "$context" -n "$namespace" get deployment appforge-api -o jsonpath='{.status.availableReplicas}' | grep -Fxq '2'
-echo "通过: Helm 应用回滚恢复 ${old_version} 双副本，110 expand Schema 保留且旧应用持续健康"
+if [[ -n $report_file ]]; then
+  mkdir -p "$(dirname "$report_file")"
+  umask 077
+  APPFORGE_K8S_OLD_VERSION=$old_version \
+    APPFORGE_K8S_NEW_VERSION=$new_version \
+    APPFORGE_K8S_NODE_IMAGE=$node_image \
+    APPFORGE_K8S_UPGRADE_PROBES=$upgrade_probe_count \
+    APPFORGE_K8S_ROLLBACK_PROBES=$rollback_probe_count \
+    python3 -c '
+import json, os, sys
+json.dump({
+  "schemaVersion": 1,
+  "scenario": "local-kind-rolling-upgrade-and-application-rollback",
+  "acceptanceScript": "deploy/acceptance/v7-kubernetes-upgrade.sh",
+  "oldVersion": os.environ["APPFORGE_K8S_OLD_VERSION"],
+  "newVersion": os.environ["APPFORGE_K8S_NEW_VERSION"],
+  "kindNodeImage": os.environ["APPFORGE_K8S_NODE_IMAGE"],
+  "targetDatabaseSchema": "20260815_113_v7_air_gapped",
+  "upgradeSuccessfulHealthProbes": int(os.environ["APPFORGE_K8S_UPGRADE_PROBES"]),
+  "rollbackSuccessfulHealthProbes": int(os.environ["APPFORGE_K8S_ROLLBACK_PROBES"]),
+  "failedHealthProbes": 0,
+  "verified": [
+    "atomic-helm-install",
+    "rolling-update-with-continuous-api-health",
+    "helm-application-rollback",
+    "schema-113-retained-after-rollback",
+    "air-gapped-table-retained-after-rollback",
+    "two-api-replicas-available-after-rollback"
+  ],
+  "limitations": [
+    "local-kind-not-customer-target-kubernetes",
+    "old-and-new-tags-use-the-same-locally-built-release-image-digest",
+    "customer-csi-ingress-and-registry-not-validated"
+  ]
+}, sys.stdout, ensure_ascii=False, indent=2)
+sys.stdout.write("\n")
+' >"$report_file"
+  chmod 0600 "$report_file"
+fi
+echo "通过: Helm 应用回滚恢复 ${old_version} 双副本，Schema 113 与 AIR_GAPPED 表保留且旧应用持续健康"

@@ -33,7 +33,7 @@ CREATE TABLE t_app_application (
 
 -- =============================
 -- 对象存储元数据
--- 对象类型：1原始APK 2签名文件 3构建APK 4构建日志 5品牌Logo 6品牌启动图
+-- 对象类型：1原始APK 2签名文件 3构建APK 4构建日志 5品牌Logo 6品牌启动图 7模板文件 8构建缓存 9离线任务包 10离线结果包
 -- 状态：1上传中 2已就绪 3已绑定 4已删除 5失败
 -- 存储模式：1控制面存储 2客户存储
 -- =============================
@@ -42,7 +42,7 @@ CREATE TABLE t_storage_object (
   id BIGINT NOT NULL AUTO_INCREMENT COMMENT '存储对象ID',
   tenant_id BIGINT NOT NULL COMMENT '所属租户ID',
   app_id BIGINT NOT NULL DEFAULT 0 COMMENT '关联应用ID，上传时允许为0',
-  object_type TINYINT NOT NULL COMMENT '对象类型：1原始APK 2签名文件 3构建APK 4构建日志 5品牌Logo 6品牌启动图',
+  object_type TINYINT NOT NULL COMMENT '对象类型：1原始APK 2签名文件 3构建APK 4构建日志 5品牌Logo 6品牌启动图 7模板文件 8构建缓存 9离线任务包 10离线结果包',
   object_key VARCHAR(500) NOT NULL COMMENT '私有对象存储Key',
   original_name VARCHAR(255) NOT NULL COMMENT '用户上传时的原始文件名',
   content_type VARCHAR(128) NOT NULL DEFAULT 'application/octet-stream' COMMENT '对象内容类型',

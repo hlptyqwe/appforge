@@ -153,9 +153,14 @@ APPFORGE_REMOTE_SIGNER_EVIDENCE_PATH="$license_tmp/v7-remote-apk-signing.json" \
 "$repo_root/deploy/acceptance/v7-egress-proxy.sh"
 "$repo_root/deploy/acceptance/v7-backup-restore.sh"
 APPFORGE_DR_FIXTURE_ONLY=true "$repo_root/deploy/acceptance/v7-appforge-schema112-dr.sh"
+APPFORGE_DR_FIXTURE_ONLY=true "$repo_root/deploy/acceptance/v7-appforge-schema113-dr.sh"
 if [[ ${APPFORGE_RUN_SCHEMA112_DR_E2E:-false} == true ]]; then
   APPFORGE_DR_REPORT_FILE="$license_tmp/v7-appforge-schema112-dr.json" \
     "$repo_root/deploy/acceptance/v7-appforge-schema112-dr.sh"
+fi
+if [[ ${APPFORGE_RUN_SCHEMA113_DR_E2E:-false} == true ]]; then
+  APPFORGE_DR_REPORT_FILE="$license_tmp/v7-appforge-schema113-dr.json" \
+    "$repo_root/deploy/acceptance/v7-appforge-schema113-dr.sh"
 fi
 
 bash -n "$repo_root/deploy/production/"*.sh "$repo_root/deploy/local-agent/"*.sh
@@ -174,4 +179,4 @@ docker run --rm -v "$repo_root/deploy/helm:/charts" alpine/helm:3.17.3 lint /cha
   --set observability.siemWebhook=https://siem.example.com/appforge/audit >/dev/null
 echo "通过: Compose、离线脚本、Helm values schema和严格lint"
 
-echo "V7 企业交付基础验收通过；三种Artifact端到端构建、真实AWS、完整业务灾备和正式发布证据仍需独立运行。"
+echo "V7 企业交付基础验收通过；三种Artifact端到端构建、真实AWS、生产规模业务灾备和正式发布证据仍需独立运行。"

@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS t_air_gapped_package (
   KEY idx_air_gapped_task_status (tenant_id,task_id,status) COMMENT '任务离线包状态查询索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='V7 AIR_GAPPED离线任务与结果双向签名状态';
 
+ALTER TABLE t_storage_object
+  MODIFY COLUMN object_type TINYINT NOT NULL COMMENT '对象类型：1原始APK 2签名文件 3构建APK 4构建日志 5品牌Logo 6品牌启动图 7模板文件 8构建缓存 9离线任务包 10离线结果包';
+
 -- AIR_GAPPED任务包包含源APK与签名材料，导出、导入和查询必须分别授权。
 -- 本迁移只登记权限目录，不向任何已有角色写入sys_role_menu，避免升级时扩大权限。
 INSERT INTO sys_menu (
