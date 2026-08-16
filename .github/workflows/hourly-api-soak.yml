@@ -7,6 +7,7 @@ on:
       - .github/workflows/hourly-api-soak.yml
       - deploy/acceptance/v7-api-soak.sh
       - deploy/acceptance/v7-artifact-soak.sh
+      - deploy/acceptance/local-agent-executor.sh
       - deploy/acceptance/fixtures/soak-api.go
       - deploy/docker-compose.dev.yml
       - deploy/docker/**
@@ -91,6 +92,13 @@ jobs:
             exit 1
           fi
           grep -q '不能向 group/others 开放' "${{ runner.temp }}/soak-insecure-password.log"
+          if APPFORGE_LOCAL_AGENT_SYNTHETIC_PAYLOAD_MIB=257 \
+            deploy/acceptance/local-agent-executor.sh \
+              >"${{ runner.temp }}/invalid-apk-payload.log" 2>&1; then
+            echo "oversized synthetic APK payload was unexpectedly accepted" >&2
+            exit 1
+          fi
+          grep -q '必须是 0 到 256 的整数' "${{ runner.temp }}/invalid-apk-payload.log"
       - name: Build and start current-source platform
         run: |
           set -euo pipefail
@@ -128,6 +136,11 @@ jobs:
           diagnostic_payload=$(gzip -c "${{ runner.temp }}/startup-admin-api-diagnostics.txt" | base64 -w0)
           printf '::error title=Admin API startup diagnostics (gzip+base64)::%s\n' "$diagnostic_payload"
           exit 1
+      - name: Validate representative APK payload preservation
+        env:
+          APPFORGE_LOCAL_AGENT_IMAGE: appforge-local-agent:soak
+          APPFORGE_LOCAL_AGENT_SYNTHETIC_PAYLOAD_MIB: "1"
+        run: deploy/acceptance/local-agent-executor.sh
       - name: Run one-hour API and artifact mixed soak
         env:
           APPFORGE_SOAK_API_URL: http://127.0.0.1:8888
@@ -147,10 +160,11 @@ jobs:
           APPFORGE_ARTIFACT_SOAK_DURATION_SECONDS: "3600"
           APPFORGE_ARTIFACT_SOAK_BUILD_CONCURRENCY: "1"
           APPFORGE_ARTIFACT_SOAK_BUILD_INTERVAL_SECONDS: "10"
-          APPFORGE_ARTIFACT_SOAK_MIN_BUILDS: "120"
+          APPFORGE_ARTIFACT_SOAK_MIN_BUILDS: "100"
+          APPFORGE_ARTIFACT_SOAK_APK_PAYLOAD_MIB: "32"
           APPFORGE_ARTIFACT_SOAK_OBJECT_CONCURRENCY: "1"
           APPFORGE_ARTIFACT_SOAK_OBJECT_INTERVAL_SECONDS: "1"
-          APPFORGE_ARTIFACT_SOAK_OBJECT_MIB: "1"
+          APPFORGE_ARTIFACT_SOAK_OBJECT_MIB: "8"
           APPFORGE_ARTIFACT_SOAK_MIN_OBJECT_ROUND_TRIPS: "600"
           APPFORGE_ARTIFACT_SOAK_AGENT_IMAGE: appforge-local-agent:soak
           APPFORGE_ARTIFACT_SOAK_MINIO_ACCESS_KEY_FILE: ${{ runner.temp }}/soak-minio-access-key
@@ -205,8 +219,14 @@ jobs:
             .actualDurationSeconds >= 3600 and
             .apkBuild.failed == 0 and
             .apkBuild.completed >= .apkBuild.minimumCompleted and
+            .apkBuild.syntheticPayloadMiB == 32 and
+            .apkBuild.sourcePayloadBytesProcessed >= 3355443200 and
+            (.apkBuild.validation | index("synthetic-payload-sha256-preserved") != null) and
             .objectStorage.failed == 0 and
             .objectStorage.roundTrips >= .objectStorage.minimumRoundTrips and
+            .objectStorage.objectMiB == 8 and
+            .objectStorage.bytesUploaded >= 5033164800 and
+            .objectStorage.bytesDownloaded >= 5033164800 and
             .objectStorage.sha256Verified == true and
             .objectStorage.deleteNotFoundVerified == true and
             .objectStorage.temporaryPrefixRemoved == true

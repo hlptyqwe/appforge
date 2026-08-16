@@ -7,6 +7,7 @@ duration_seconds=${APPFORGE_ARTIFACT_SOAK_DURATION_SECONDS:-3600}
 build_concurrency=${APPFORGE_ARTIFACT_SOAK_BUILD_CONCURRENCY:-1}
 build_interval_seconds=${APPFORGE_ARTIFACT_SOAK_BUILD_INTERVAL_SECONDS:-10}
 minimum_builds=${APPFORGE_ARTIFACT_SOAK_MIN_BUILDS:-0}
+apk_payload_mib=${APPFORGE_ARTIFACT_SOAK_APK_PAYLOAD_MIB:-0}
 object_concurrency=${APPFORGE_ARTIFACT_SOAK_OBJECT_CONCURRENCY:-1}
 object_interval_seconds=${APPFORGE_ARTIFACT_SOAK_OBJECT_INTERVAL_SECONDS:-1}
 object_mib=${APPFORGE_ARTIFACT_SOAK_OBJECT_MIB:-1}
@@ -47,6 +48,7 @@ require_integer APPFORGE_ARTIFACT_SOAK_DURATION_SECONDS "$duration_seconds" 10 8
 require_integer APPFORGE_ARTIFACT_SOAK_BUILD_CONCURRENCY "$build_concurrency" 1 8
 require_integer APPFORGE_ARTIFACT_SOAK_BUILD_INTERVAL_SECONDS "$build_interval_seconds" 0 3600
 require_integer APPFORGE_ARTIFACT_SOAK_MIN_BUILDS "$minimum_builds" 0 1000000
+require_integer APPFORGE_ARTIFACT_SOAK_APK_PAYLOAD_MIB "$apk_payload_mib" 0 256
 require_integer APPFORGE_ARTIFACT_SOAK_OBJECT_CONCURRENCY "$object_concurrency" 1 16
 require_integer APPFORGE_ARTIFACT_SOAK_OBJECT_INTERVAL_SECONDS "$object_interval_seconds" 0 3600
 require_integer APPFORGE_ARTIFACT_SOAK_OBJECT_MIB "$object_mib" 1 256
@@ -155,6 +157,7 @@ build_worker() {
   while (( $(now_ns) < worker_deadline_ns )); do
     cycle_started_ns=$(now_ns)
     if APPFORGE_LOCAL_AGENT_IMAGE="$agent_image" \
+      APPFORGE_LOCAL_AGENT_SYNTHETIC_PAYLOAD_MIB="$apk_payload_mib" \
       "$repo_root/deploy/acceptance/local-agent-executor.sh" >>"$log_file" 2>&1; then
       cycle_completed_ns=$(now_ns)
       printf 'OK %s\n' "$((cycle_completed_ns - cycle_started_ns))" >>"$result_file"
@@ -281,6 +284,7 @@ APPFORGE_ARTIFACT_SOAK_DURATION_SECONDS="$duration_seconds" \
 APPFORGE_ARTIFACT_SOAK_ACTUAL_DURATION_SECONDS="$actual_duration_seconds" \
 APPFORGE_ARTIFACT_SOAK_AGENT_IMAGE="$agent_image" \
 APPFORGE_ARTIFACT_SOAK_BUILD_CONCURRENCY="$build_concurrency" \
+APPFORGE_ARTIFACT_SOAK_APK_PAYLOAD_MIB="$apk_payload_mib" \
 APPFORGE_ARTIFACT_SOAK_BUILDS_COMPLETED="$builds_completed" \
 APPFORGE_ARTIFACT_SOAK_BUILD_FAILURES="$build_failures" \
 APPFORGE_ARTIFACT_SOAK_MIN_BUILDS="$minimum_builds" \
@@ -320,12 +324,17 @@ json.dump({
     "apkBuild": {
         "image": os.environ["APPFORGE_ARTIFACT_SOAK_AGENT_IMAGE"],
         "concurrency": integer("APPFORGE_ARTIFACT_SOAK_BUILD_CONCURRENCY"),
+        "syntheticPayloadMiB": integer("APPFORGE_ARTIFACT_SOAK_APK_PAYLOAD_MIB"),
+        "sourcePayloadBytesProcessed": builds * integer("APPFORGE_ARTIFACT_SOAK_APK_PAYLOAD_MIB") * 1024 * 1024,
         "completed": builds,
         "failed": integer("APPFORGE_ARTIFACT_SOAK_BUILD_FAILURES"),
         "minimumCompleted": integer("APPFORGE_ARTIFACT_SOAK_MIN_BUILDS"),
         "averageBuildSeconds": build_total_seconds / builds if builds else 0,
         "buildsPerMinute": builds * 60 / actual_duration if actual_duration else 0,
-        "validation": ["apk-signature", "package-name", "result-sha256"],
+        "validation": ["apk-signature", "package-name", "result-sha256"] + (
+            ["synthetic-payload-sha256-preserved"]
+            if integer("APPFORGE_ARTIFACT_SOAK_APK_PAYLOAD_MIB") > 0 else []
+        ),
     },
     "objectStorage": {
         "provider": "minio",
@@ -352,6 +361,7 @@ json.dump({
     ],
     "limitations": [
         "synthetic-apk-and-test-keystore-only",
+        "synthetic-apk-payload-is-random-test-data-not-a-customer-application",
         "does-not-use-customer-or-production-data",
         "does-not-represent-customer-peak-or-production-capacity",
         "does-not-replace-day-level-soak-unless-explicitly-qualified",
