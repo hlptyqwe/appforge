@@ -26,3 +26,20 @@ func TestAdminConfigLoadsAuditRoutes(t *testing.T) {
 		t.Fatalf("invalid first audit route: %+v", first)
 	}
 }
+
+func TestApplySIEMEnvironmentSupportsRFC5424TLS(t *testing.T) {
+	t.Setenv("APPFORGE_SIEM_ENDPOINT", "syslog+tls://siem.customer.test:6514")
+	t.Setenv("APPFORGE_SIEM_TOKEN_FILE", "/etc/appforge/siem/token")
+	t.Setenv("APPFORGE_SIEM_CA_FILE", "/etc/appforge/siem/ca.crt")
+	t.Setenv("APPFORGE_SIEM_SYSLOG_HOSTNAME", "api-0")
+	t.Setenv("APPFORGE_SIEM_SYSLOG_APP_NAME", "appforge-admin")
+	var cfg Config
+	ApplySIEMEnvironment(&cfg)
+	if !cfg.Audit.SIEM.Enabled || cfg.Audit.SIEM.Endpoint != "syslog+tls://siem.customer.test:6514" {
+		t.Fatalf("SIEM environment was not applied: %+v", cfg.Audit.SIEM)
+	}
+	if cfg.Audit.SIEM.CACertificate != "/etc/appforge/siem/ca.crt" ||
+		cfg.Audit.SIEM.SyslogHostname != "api-0" || cfg.Audit.SIEM.SyslogAppName != "appforge-admin" {
+		t.Fatalf("SIEM TLS metadata was not applied: %+v", cfg.Audit.SIEM)
+	}
+}

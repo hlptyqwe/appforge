@@ -24,7 +24,7 @@ required=(APPFORGE_DEPLOYMENT_MODE APPFORGE_VERSION APPFORGE_SCHEMA_VERSION APPF
   APPFORGE_JWT_ACCESS_SECRET APPFORGE_SECRET_MASTER_KEY_BASE64 APPFORGE_TLS_CERT_FILE APPFORGE_TLS_KEY_FILE
   APPFORGE_LOCAL_AGENT_CA_CERT_FILE APPFORGE_LOCAL_AGENT_CA_KEY_FILE APPFORGE_BOOTSTRAP_ADMIN_USERNAME
   APPFORGE_BOOTSTRAP_PASSWORD_BCRYPT_BASE64 APPFORGE_LICENSE_FILE APPFORGE_LICENSE_PUBLIC_KEY_FILE
-  APPFORGE_DEPLOYMENT_ID APPFORGE_SIEM_ENDPOINT APPFORGE_SIEM_TOKEN_FILE APPFORGE_SIEM_CA_FILE)
+  APPFORGE_DEPLOYMENT_ID APPFORGE_SIEM_ENDPOINT APPFORGE_SIEM_CA_FILE)
 
 for name in "${required[@]}"; do
   value=${!name:-}
@@ -52,7 +52,23 @@ esac
   exit 1
 }
 [[ "$APPFORGE_PUBLIC_ORIGIN" =~ ^https://[A-Za-z0-9.-]+(:[0-9]{1,5})?$ ]] || { echo "生产入口必须是无路径和查询参数的 https Origin" >&2; exit 1; }
-[[ "$APPFORGE_SIEM_ENDPOINT" =~ ^https://[A-Za-z0-9._~:/?=+-]+$ ]] || { echo "SIEM Endpoint必须是安全字符组成的HTTPS URL" >&2; exit 1; }
+if [[ $APPFORGE_SIEM_ENDPOINT == https://* ]]; then
+  [[ "$APPFORGE_SIEM_ENDPOINT" =~ ^https://[A-Za-z0-9._~:/?=+-]+$ ]] || { echo "SIEM HTTPS Endpoint包含不安全字符" >&2; exit 1; }
+  [[ -n ${APPFORGE_SIEM_TOKEN_FILE:-} && ${APPFORGE_SIEM_TOKEN_FILE:-} != *CHANGE_ME* ]] || {
+    echo "SIEM HTTPS Webhook必须配置Bearer Token文件" >&2
+    exit 1
+  }
+elif [[ $APPFORGE_SIEM_ENDPOINT == syslog+tls://* ]]; then
+  [[ "$APPFORGE_SIEM_ENDPOINT" =~ ^syslog\+tls://([A-Za-z0-9.-]+|\[[0-9A-Fa-f:]+\]):[0-9]{1,5}$ ]] || {
+    echo "SIEM Syslog Endpoint必须是无凭据、路径和查询的syslog+tls://host:port" >&2
+    exit 1
+  }
+  siem_port=${APPFORGE_SIEM_ENDPOINT##*:}
+  (( siem_port >= 1 && siem_port <= 65535 )) || { echo "SIEM Syslog端口无效" >&2; exit 1; }
+else
+  echo "SIEM Endpoint必须使用https://或syslog+tls://" >&2
+  exit 1
+fi
 [[ ${APPFORGE_PROMETHEUS_ENABLED:-true} == true || ${APPFORGE_PROMETHEUS_ENABLED:-true} == false ]] || { echo "APPFORGE_PROMETHEUS_ENABLED 只能为 true 或 false" >&2; exit 1; }
 prometheus_port=${APPFORGE_PROMETHEUS_PORT:-9101}
 [[ $prometheus_port =~ ^[0-9]+$ ]] && (( prometheus_port >= 1 && prometheus_port <= 65535 )) || { echo "APPFORGE_PROMETHEUS_PORT 必须为有效端口" >&2; exit 1; }
@@ -136,11 +152,14 @@ for name in APPFORGE_MYSQL_PASSWORD APPFORGE_MYSQL_ROOT_PASSWORD APPFORGE_REDIS_
   [[ ${#value} -ge 24 ]] || { echo "$name 至少需要 24 个字符" >&2; exit 1; }
 done
 
-for path in "$APPFORGE_TLS_CERT_FILE" "$APPFORGE_TLS_KEY_FILE" "$APPFORGE_LOCAL_AGENT_CA_CERT_FILE" "$APPFORGE_LOCAL_AGENT_CA_KEY_FILE" "$APPFORGE_LICENSE_FILE" "$APPFORGE_LICENSE_PUBLIC_KEY_FILE" "$APPFORGE_SIEM_TOKEN_FILE" "$APPFORGE_SIEM_CA_FILE"; do
+readable_paths=("$APPFORGE_TLS_CERT_FILE" "$APPFORGE_TLS_KEY_FILE" "$APPFORGE_LOCAL_AGENT_CA_CERT_FILE" "$APPFORGE_LOCAL_AGENT_CA_KEY_FILE" "$APPFORGE_LICENSE_FILE" "$APPFORGE_LICENSE_PUBLIC_KEY_FILE" "$APPFORGE_SIEM_CA_FILE")
+[[ -z ${APPFORGE_SIEM_TOKEN_FILE:-} ]] || readable_paths+=("$APPFORGE_SIEM_TOKEN_FILE")
+for path in "${readable_paths[@]}"; do
   [[ -r $(resolve_delivery_path "$path") ]] || { echo "证书文件不可读: $path" >&2; exit 1; }
 done
 
-private_paths=("$env_file" "$APPFORGE_TLS_KEY_FILE" "$APPFORGE_LOCAL_AGENT_CA_KEY_FILE" "$APPFORGE_SIEM_TOKEN_FILE")
+private_paths=("$env_file" "$APPFORGE_TLS_KEY_FILE" "$APPFORGE_LOCAL_AGENT_CA_KEY_FILE")
+[[ -z ${APPFORGE_SIEM_TOKEN_FILE:-} ]] || private_paths+=("$APPFORGE_SIEM_TOKEN_FILE")
 [[ -z ${APPFORGE_VAULT_TOKEN_FILE:-} ]] || private_paths+=("$APPFORGE_VAULT_TOKEN_FILE")
 for configured_path in "${private_paths[@]}"; do
   private_path=$configured_path

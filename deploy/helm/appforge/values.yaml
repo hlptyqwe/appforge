@@ -90,6 +90,7 @@ observability:
     kubernetes.io/metadata.name: monitoring
   otlpEndpoint: ""
   otlpSampler: 0.1
+  # 兼容字段名；支持 https:// Webhook 或 syslog+tls://host:6514。
   siemWebhook: ""
 
 upgrade:

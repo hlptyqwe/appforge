@@ -285,6 +285,8 @@ services:
       APPFORGE_SIEM_ENDPOINT: ${APPFORGE_SIEM_ENDPOINT:?required}
       APPFORGE_SIEM_TOKEN_FILE: /etc/appforge/siem/token
       APPFORGE_SIEM_CA_FILE: /etc/appforge/siem/ca.crt
+      APPFORGE_SIEM_SYSLOG_HOSTNAME: ${APPFORGE_SIEM_SYSLOG_HOSTNAME:-}
+      APPFORGE_SIEM_SYSLOG_APP_NAME: ${APPFORGE_SIEM_SYSLOG_APP_NAME:-appforge}
       APPFORGE_DEPLOYMENT_ID: ${APPFORGE_DEPLOYMENT_ID:?required}
       APPFORGE_DEPLOYMENT_MODE: ${APPFORGE_DEPLOYMENT_MODE:?required}
       APPFORGE_VERSION: ${APPFORGE_VERSION:?required}
@@ -298,7 +300,7 @@ services:
       - ${APPFORGE_LICENSE_FILE:?required}:/etc/appforge/license/license.json:ro
       - ${APPFORGE_LICENSE_PUBLIC_KEY_FILE:?required}:/etc/appforge/license/vendor-public.pem:ro
       - license-state:/var/lib/appforge-license
-      - ${APPFORGE_SIEM_TOKEN_FILE:?required}:/etc/appforge/siem/token:ro
+      - ${APPFORGE_SIEM_TOKEN_FILE:-/dev/null}:/etc/appforge/siem/token:ro
       - ${APPFORGE_SIEM_CA_FILE:?required}:/etc/appforge/siem/ca.crt:ro
     depends_on:
       system-rpc: {condition: service_started}

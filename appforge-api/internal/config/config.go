@@ -107,6 +107,22 @@ func ApplyDeploymentEnvironment(c *Config) error {
 	return nil
 }
 
+// ApplySIEMEnvironment applies the customer-selected HTTPS or RFC5424/TLS
+// audit export endpoint without exposing any secret value in process flags.
+func ApplySIEMEnvironment(c *Config) {
+	if c == nil {
+		return
+	}
+	if endpoint := strings.TrimSpace(os.Getenv("APPFORGE_SIEM_ENDPOINT")); endpoint != "" {
+		c.Audit.SIEM.Enabled = true
+		c.Audit.SIEM.Endpoint = endpoint
+		c.Audit.SIEM.BearerTokenFile = strings.TrimSpace(os.Getenv("APPFORGE_SIEM_TOKEN_FILE"))
+		c.Audit.SIEM.CACertificate = strings.TrimSpace(os.Getenv("APPFORGE_SIEM_CA_FILE"))
+		c.Audit.SIEM.SyslogHostname = strings.TrimSpace(os.Getenv("APPFORGE_SIEM_SYSLOG_HOSTNAME"))
+		c.Audit.SIEM.SyslogAppName = strings.TrimSpace(os.Getenv("APPFORGE_SIEM_SYSLOG_APP_NAME"))
+	}
+}
+
 func overrideString(target *string, environmentKey string) {
 	if value := strings.TrimSpace(os.Getenv(environmentKey)); value != "" {
 		*target = value

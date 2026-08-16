@@ -59,6 +59,39 @@ chmod 0644 "$production/secrets/"*.crt "$production/secrets/"*.pem "$production/
 
 "$production/preflight.sh" "$production/.env" >/dev/null
 
+cp "$production/.env" "$temporary/https-siem.env"
+sed -i.bak 's#APPFORGE_SIEM_ENDPOINT=https://siem.example.com/appforge/audit#APPFORGE_SIEM_ENDPOINT=syslog+tls://siem.customer.test:6514#' "$production/.env"
+sed -i.bak '/^APPFORGE_SIEM_TOKEN_FILE=/d' "$production/.env"
+printf '%s\n' 'APPFORGE_SIEM_SYSLOG_HOSTNAME=api-acceptance' 'APPFORGE_SIEM_SYSLOG_APP_NAME=appforge-admin' >>"$production/.env"
+"$production/preflight.sh" "$production/.env" >/dev/null
+docker compose --env-file "$production/.env" -f "$production/docker-compose.yml" config --format json |
+  python3 -c '
+import json, sys
+environment = json.load(sys.stdin)["services"]["api"]["environment"]
+if environment.get("APPFORGE_SIEM_ENDPOINT") != "syslog+tls://siem.customer.test:6514":
+    raise SystemExit("API未接入RFC5424/TLS SIEM Endpoint")
+if environment.get("APPFORGE_SIEM_SYSLOG_HOSTNAME") != "api-acceptance":
+    raise SystemExit("API未接入Syslog hostname")
+if environment.get("APPFORGE_SIEM_SYSLOG_APP_NAME") != "appforge-admin":
+    raise SystemExit("API未接入Syslog app-name")
+if environment.get("APPFORGE_SIEM_TOKEN_FILE") != "/etc/appforge/siem/token":
+    raise SystemExit("Compose未提供安全的无Token占位挂载路径")
+'
+cp "$production/.env" "$temporary/syslog-valid.env"
+sed -i.bak 's#syslog+tls://siem.customer.test:6514#syslog+tls://siem.customer.test:6514/events#' "$production/.env"
+if "$production/preflight.sh" "$production/.env" >/dev/null 2>&1; then
+  echo "验收失败: preflight接受了带路径的Syslog TLS Endpoint" >&2
+  exit 1
+fi
+cp "$temporary/syslog-valid.env" "$production/.env"
+sed -i.bak 's#syslog+tls://siem.customer.test:6514#syslog://siem.customer.test:514#' "$production/.env"
+if "$production/preflight.sh" "$production/.env" >/dev/null 2>&1; then
+  echo "验收失败: preflight接受了明文Syslog Endpoint" >&2
+  exit 1
+fi
+cp "$temporary/https-siem.env" "$production/.env"
+chmod 0600 "$production/.env"
+
 cp "$production/.env" "$temporary/schema-valid.env"
 sed -i.bak 's/APPFORGE_SCHEMA_VERSION=20260815_113_v7_air_gapped/APPFORGE_SCHEMA_VERSION=20260815_112_v7_customer_storage/' "$production/.env"
 if "$production/preflight.sh" "$production/.env" >/dev/null 2>&1; then

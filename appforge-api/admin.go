@@ -8,7 +8,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -57,12 +56,7 @@ func main() {
 	if err := observability.ApplyEnvironment(&c.RestConf.ServiceConf); err != nil {
 		panic(fmt.Sprintf("load observability configuration: %v", err))
 	}
-	if endpoint := strings.TrimSpace(os.Getenv("APPFORGE_SIEM_ENDPOINT")); endpoint != "" {
-		c.Audit.SIEM.Enabled = true
-		c.Audit.SIEM.Endpoint = endpoint
-		c.Audit.SIEM.BearerTokenFile = strings.TrimSpace(os.Getenv("APPFORGE_SIEM_TOKEN_FILE"))
-		c.Audit.SIEM.CACertificate = strings.TrimSpace(os.Getenv("APPFORGE_SIEM_CA_FILE"))
-	}
+	config.ApplySIEMEnvironment(&c)
 	c.Middlewares.Log = false
 	svcCtx := svc.NewServiceContext(c)
 	workerCtx, stopWorker := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)

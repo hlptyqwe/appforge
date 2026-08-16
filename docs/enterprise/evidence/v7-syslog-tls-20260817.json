@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-rfc5424-syslog-tls",
+  "acceptedAt": "2026-08-16T18:26:26Z",
+  "result": "passed",
+  "runtime": {
+    "goos": "darwin",
+    "goarch": "arm64"
+  },
+  "protocol": {
+    "messageFormat": "RFC5424",
+    "framing": "RFC6587-octet-counting",
+    "transport": "TLS",
+    "minimumTLSVersion": "1.2",
+    "priority": 134,
+    "facility": "local0",
+    "severity": "informational"
+  },
+  "verified": [
+    "real-loopback-tls-receiver",
+    "custom-ca-validation",
+    "two-events-two-tls-connections",
+    "controlled-http-connect-egress-proxy",
+    "rfc5424-header-and-structured-data",
+    "rfc6587-byte-length-framing",
+    "structured-data-escaping",
+    "redacted-json-audit-payload",
+    "bounded-message-size",
+    "plaintext-syslog-rejected",
+    "userinfo-path-query-and-missing-port-rejected",
+    "syslog-mode-does-not-require-bearer-token",
+    "compose-production-preflight",
+    "helm-values-schema-and-strict-lint"
+  ],
+  "limitations": [
+    "synthetic-audit-events-only",
+    "syslog-has-no-application-level-acknowledgement",
+    "does-not-replace-customer-siem-parser-routing-retention-or-alert-validation"
+  ]
+}

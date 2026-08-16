@@ -150,6 +150,7 @@ APPFORGE_REMOTE_SIGNER_EVIDENCE_PATH="$license_tmp/v7-remote-apk-signing.json" \
 "$repo_root/deploy/acceptance/v7-release-workflow.sh"
 "$repo_root/deploy/acceptance/v7-network-policy.sh"
 "$repo_root/deploy/acceptance/v7-observability.sh"
+"$repo_root/deploy/acceptance/v7-syslog-tls.sh"
 "$repo_root/deploy/acceptance/v7-egress-proxy.sh"
 "$repo_root/deploy/acceptance/v7-backup-restore.sh"
 APPFORGE_DR_FIXTURE_ONLY=true "$repo_root/deploy/acceptance/v7-appforge-schema112-dr.sh"
@@ -166,6 +167,7 @@ fi
 bash -n "$repo_root/deploy/production/"*.sh "$repo_root/deploy/local-agent/"*.sh
 bash -n "$repo_root/deploy/acceptance/v7-local-agent-recovery.sh" \
 	"$repo_root/deploy/acceptance/v7-customer-storage-site-probe.sh" \
+  "$repo_root/deploy/acceptance/v7-syslog-tls.sh" \
   "$repo_root/deploy/acceptance/v7-formal-kubernetes-upgrade.sh" \
   "$repo_root/deploy/acceptance/v7-kubernetes-upgrade.sh" \
   "$repo_root/deploy/acceptance/v7-network-policy-runtime.sh"

@@ -8,7 +8,7 @@
 
 ## 安装
 
-Compose：复制 `deploy/production/.env.example` 为 `.env`，生成随机 Secret、TLS 证书和 P-256 ECDSA Agent CA，将 `.env`、TLS 私钥、Agent CA 私钥和 SIEM Token 权限设为仅所有者可读写，再运行 `preflight.sh`；门禁会拒绝占位凭据、非 HTTPS、符号链接、证书/私钥不匹配、非 ECDSA Agent CA、即将过期的证书以及向 group/others 开放的私有文件。通过后再启动 `docker compose up -d`。生产镜像必须固定语义化标签和发布清单中的 digest。
+Compose：复制 `deploy/production/.env.example` 为 `.env`，生成随机 Secret、TLS 证书和 P-256 ECDSA Agent CA，将 `.env`、TLS 私钥、Agent CA 私钥和 SIEM Token 权限设为仅所有者可读写，再运行 `preflight.sh`；门禁会拒绝占位凭据、不安全的 SIEM 协议、符号链接、证书/私钥不匹配、非 ECDSA Agent CA、即将过期的证书以及向 group/others 开放的私有文件。通过后再启动 `docker compose up -d`。生产镜像必须固定语义化标签和发布清单中的 digest。
 
 Kubernetes：预先创建 MySQL、Redis、对象存储、内部 RPC、JWT、主密钥和 Agent CA Secret；已有 RWX 许可证状态 Claim 的根目录必须预置为 UID/GID `65532` 可写且不得向其他主体开放；填写 Helm values 后执行 `helm lint` 和 `helm upgrade --install --atomic`。Schema 会拒绝空镜像仓库、非 HTTPS 入口、单副本控制面和无版本镜像。本地 kind v1.32.2 的同摘要 `1.2.0 → 1.2.1 → 1.2.0` 用作快速编排回归；原生 `linux/amd64` 正式门禁进一步验证双版本聚合 Sigstore、21 个镜像实时 Cosign、9/9 个应用镜像摘要不同，并以 `v1.2.5 → v1.2.6 → v1.2.5` 完成零失败探测升级/回滚，回滚后 Schema 113、AIR_GAPPED 表和双 API 副本保持。客户交付仍需在目标 CSI、Ingress 和私有仓库上复验。
 
@@ -76,7 +76,7 @@ PITR 使用随正式发布和离线 OCI 包交付的同版本 `mysql-binlog-tool
 - NetworkPolicy 默认拒绝，仅放行组件间、DNS、入口 Namespace 和明确外部依赖出站。新交付必须使用 `networkPolicy.externalEgressRules`，同时指定调用组件、目标 CIDR、协议和端口；`egressCIDRs` 仅为旧配置兼容字段，会放行目标 CIDR 的全部端口，新部署禁止使用。Calico v3.32.1/Kind v1.32.2 已真实验证允许端口可达、同 CIDR 未授权端口与未授权组件不可达、入口 Namespace 隔离，证据见 `evidence/v7-network-policy-20260815.json`；客户目标 CNI 和最终 allowlist 仍需现场复验。
 - 受限网络环境可启用内置 `egress-proxy`。它仅接受 Allowlist 中的 HTTPS CONNECT，拒绝普通 HTTP 和未登记目标；Compose 只有代理连接非 internal 出口网络，Helm 要求代理专属 CIDR/端口 NetworkPolicy。远程 APK 签名和 Webhook 为保护 APK 与 SSRF 边界而显式不继承通用代理，详细配置和直连要求见 [受限网络出口与企业代理契约](./restricted-egress-proxy.md)。本地合成 TLS E2E 证据见 `evidence/v7-egress-proxy-20260816.json`，客户最终域名/IP、CNI、DNS、防火墙和容量仍需现场联调。
 - 发布流水线对 16 个 AppForge 发布镜像和两个原始第三方运行镜像生成 SPDX SBOM、独立许可证清单，并以 Trivy 阻断可修复 High/Critical 漏洞；16 个 AppForge 发布镜像另用 Cosign OIDC 逐镜像签名和回验。仓库源码依赖再由 Trivy 文件系统模式独立阻断，且不导出依赖明细。全部 18 个 digest、镜像证据和源码门禁成功状态由同一工作流身份签署聚合清单，离线包生成器必须先验证该聚合签名并按清单 digest 拉取镜像。
-- 日志使用 JSON；当前审计导出实现为带界限队列的 SIEM HTTPS JSON Webhook，支持 TLS、自定义 CA、从文件轮换 Bearer Token、有限指数退避重试以及丢弃/最终失败计数，尚未实现 syslog。自动验收使用真实临时 TLS 端点验证自定义 CA 握手、Token 热轮换和 HTTP 503 恢复；客户 SIEM 仍须现场联调。
+- 日志使用 JSON；审计导出支持带界限队列的 SIEM HTTPS JSON Webhook，以及 `syslog+tls://host:port` 的 RFC5424 + RFC6587 八位计数帧。两种模式均强制 TLS、自定义 CA、超时、有限指数退避重试以及丢弃/最终失败计数；HTTPS 模式必须提供可从文件热轮换的 Bearer Token，Syslog TLS 模式不需要 Token，支持固定 `local0.info`、结构化审计字段、每次重试重新建立连接，并在启用 `HTTPS_PROXY` 时使用无凭据 HTTP CONNECT 隧道。明文 Syslog、URL 凭据、路径/查询、缺失端口和超过 64 KiB 的消息会被拒绝。机器证据见 `evidence/v7-syslog-tls-20260817.json`；Syslog 没有应用层确认，客户仍须现场验证解析、路由、留存和告警。
 - API、RPC 和纯 Worker 统一通过 `APPFORGE_PROMETHEUS_*` 暴露独立指标端口，并通过 `APPFORGE_OTLP_ENDPOINT`/`APPFORGE_OTLP_SAMPLER` 导出 OTLP/HTTP Trace。生产 Compose 仅在后端网络暴露指标；Helm 默认只允许 `monitoring` Namespace 抓取，可通过 `observability.prometheusNamespaceLabels` 精确替换。生产 OTLP 必须使用无凭据的 HTTPS URL，认证 Header 只允许从受保护运行配置注入；本地合成验收证据见 `evidence/v7-observability-20260815.json`，客户 Collector、证书和容量仍需现场联调。
 - `deploy/production/diagnostics.sh` 提供最小脱敏诊断包：只收集组件镜像/状态、健康探针、迁移版本、Local Agent 聚合状态和部署文件哈希，不收集日志、`.env`、数据库业务内容、私钥、Keystore 或令牌；输出权限为 `0600`，包含 SHA 清单并执行敏感值扫描。仅系统管理员可见的“部署与升级”页面通过只读受 RBAC 和服务端用户类型双重保护的接口展示 API/System/Core/Builder gRPC 健康、数据库实际迁移、产品版本、部署模式和许可证公开状态；页面只复制诊断命令，不允许浏览器执行服务器 Shell。
 - Local Agent 不接收入站连接，也不提供 shell/任意命令 RPC；任务协议只有注册、心跳、领取、续租、进度、完成/失败、轮换和 Drain。

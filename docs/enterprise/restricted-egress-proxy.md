@@ -8,7 +8,7 @@ AppForge 的 Private/Hybrid 控制面默认不应具有无限制互联网出口�
 
 ## 2. 调用边界
 
-通用代理环境只供明确允许继承系统代理的 HTTPS 客户端使用，包括代码平台 OAuth/API、支付、Vault/AWS、客户对象存储、OTLP 和 SIEM。SIEM exporter 已显式接入环境代理。
+通用代理环境只供明确允许继承系统代理的 TLS 客户端使用，包括代码平台 OAuth/API、支付、Vault/AWS、客户对象存储、OTLP 和 SIEM。SIEM HTTPS exporter 继承标准环境代理；RFC5424 Syslog TLS 使用同一 `HTTPS_PROXY` 建立无凭据 HTTP CONNECT 隧道，不允许绕过受限出口。
 
 以下两类流量必须绕过通用代理：
 
@@ -23,6 +23,7 @@ Kubernetes 中如需这两类直连，必须为对应 `builder`/`builder-worker`
 
 ```text
 siem.customer.example:443
+syslog.customer.example:6514
 collector.customer.example:4318
 *.s3.customer.example:443
 [2001:db8::20]:443
@@ -52,4 +53,4 @@ collector.customer.example:4318
 
 ## 6. 验收边界
 
-`deploy/acceptance/v7-egress-proxy.sh` 使用临时本机 TLS 端点验证允许目标可达、未登记 CONNECT 返回 403、普通 HTTP 返回 405、SIEM 可继承代理以及远程 APK 签名仍不继承代理，并生成 0600 机器证据。该测试不访问客户数据、生产凭据或真实外部域名，也不替代客户最终域名/IP、代理容量、DNS、CNI 和防火墙联调。
+`deploy/acceptance/v7-egress-proxy.sh` 使用临时本机 TLS 端点验证允许目标可达、未登记 CONNECT 返回 403、普通 HTTP 返回 405、SIEM 可继承代理以及远程 APK 签名仍不继承代理，并生成 0600 机器证据。`deploy/acceptance/v7-syslog-tls.sh` 进一步验证 RFC5424 Syslog TLS 的真实 CONNECT 隧道、两次独立 TLS 连接和凭据型代理拒绝。测试不访问客户数据、生产凭据或真实外部域名，也不替代客户最终域名/IP、代理容量、DNS、CNI 和防火墙联调。

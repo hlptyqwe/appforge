@@ -1,0 +1,60 @@
+name: syslog-tls
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/syslog-tls.yml
+      - common/siem/**
+      - appforge-api/admin.go
+      - appforge-api/internal/config/**
+      - appforge-api/etc/admin.yaml
+      - deploy/production/**
+      - deploy/helm/**
+      - deploy/acceptance/v7-production-preflight.sh
+      - deploy/acceptance/v7-syslog-tls.sh
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: syslog-tls-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-amd64-rfc5424-tls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.6
+          cache-dependency-path: |
+            common/go.sum
+            appforge-api/go.sum
+      - name: Run RFC5424 TLS acceptance
+        env:
+          APPFORGE_SYSLOG_TLS_REPORT_FILE: ${{ runner.temp }}/v7-syslog-tls.json
+        run: deploy/acceptance/v7-syslog-tls.sh
+      - name: Verify machine evidence
+        env:
+          REPORT: ${{ runner.temp }}/v7-syslog-tls.json
+        run: |
+          jq -e '
+            .result == "passed" and
+            .runtime.goos == "linux" and
+            .runtime.goarch == "amd64" and
+            .protocol.messageFormat == "RFC5424" and
+            .protocol.framing == "RFC6587-octet-counting" and
+            .protocol.minimumTLSVersion == "1.2" and
+            (.verified | index("plaintext-syslog-rejected")) != null
+          ' "$REPORT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: syslog-tls-${{ github.run_id }}
+          path: ${{ runner.temp }}/v7-syslog-tls.json
+          if-no-files-found: ignore
+          retention-days: 30

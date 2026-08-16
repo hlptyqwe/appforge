@@ -154,7 +154,7 @@
         },
         "otlpEndpoint": {"type": "string", "pattern": "^$|^https://[^@/?#]+(?::[0-9]+)?(?:/[^?#]*)?$"},
         "otlpSampler": {"type": "number", "minimum": 0, "maximum": 1},
-        "siemWebhook": {"type": "string", "pattern": "^https://", "minLength": 9}
+        "siemWebhook": {"type": "string", "pattern": "^(|https://.+|syslog\\+tls://(\\[[0-9A-Fa-f:]+\\]|[A-Za-z0-9.-]+):[0-9]{1,5})$"}
       }
     }
   }
