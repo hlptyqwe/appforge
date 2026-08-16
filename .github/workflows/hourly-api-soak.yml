@@ -98,7 +98,12 @@ jobs:
             2>&1 | tee "${{ runner.temp }}/compose-build.log"
           docker builder prune --all --force | tee "${{ runner.temp }}/builder-prune.log"
           docker image prune --force | tee "${{ runner.temp }}/image-prune.log"
-          df --block-size=1 --output=avail / | tail -1 | awk '$1 >= 3221225472 { exit 0 } { print "less than 3 GiB available after build-cache cleanup" > "/dev/stderr"; exit 1 }'
+          available_bytes=$(df --block-size=1 --output=avail / | tail -1 | tr -d ' ')
+          printf '::notice title=Compose startup disk::availableBytes=%s\n' "$available_bytes"
+          if (( available_bytes < 3221225472 )); then
+            printf '::error title=Compose startup disk::less than 3 GiB available after build-cache cleanup; availableBytes=%s\n' "$available_bytes"
+            exit 1
+          fi
           docker compose -f deploy/docker-compose.dev.yml up -d --no-build admin-api builder-rpc
           for ((attempt = 1; attempt <= 180; attempt++)); do
             if curl -fsS --connect-timeout 2 --max-time 5 http://127.0.0.1:8888/healthz >/dev/null; then
@@ -108,6 +113,14 @@ jobs:
           done
           docker compose -f deploy/docker-compose.dev.yml ps
           docker compose -f deploy/docker-compose.dev.yml logs --tail 200
+          {
+            docker compose -f deploy/docker-compose.dev.yml ps --format json || true
+            docker compose -f deploy/docker-compose.dev.yml logs --no-color --tail 200 || true
+            docker system df || true
+            df -h || true
+          } >"${{ runner.temp }}/startup-failure-diagnostics.txt" 2>&1
+          diagnostic_payload=$(gzip -c "${{ runner.temp }}/startup-failure-diagnostics.txt" | base64 -w0)
+          printf '::error title=Compose startup diagnostics (gzip+base64)::%s\n' "$diagnostic_payload"
           exit 1
       - name: Run authenticated one-hour API soak
         env:
@@ -173,6 +186,7 @@ jobs:
             ${{ runner.temp }}/image-prune.log
             ${{ runner.temp }}/docker-system-df.txt
             ${{ runner.temp }}/filesystem-df.txt
+            ${{ runner.temp }}/startup-failure-diagnostics.txt
           if-no-files-found: ignore
           retention-days: 30
       - name: Remove synthetic platform
