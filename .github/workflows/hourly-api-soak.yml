@@ -114,13 +114,13 @@ jobs:
           docker compose -f deploy/docker-compose.dev.yml ps
           docker compose -f deploy/docker-compose.dev.yml logs --tail 200
           {
-            docker compose -f deploy/docker-compose.dev.yml ps --format json || true
-            docker compose -f deploy/docker-compose.dev.yml logs --no-color --tail 200 || true
-            docker system df || true
-            df -h || true
-          } >"${{ runner.temp }}/startup-failure-diagnostics.txt" 2>&1
-          diagnostic_payload=$(gzip -c "${{ runner.temp }}/startup-failure-diagnostics.txt" | base64 -w0)
-          printf '::error title=Compose startup diagnostics (gzip+base64)::%s\n' "$diagnostic_payload"
+            for container in appforge-admin-api appforge-system-rpc appforge-core-rpc appforge-builder-rpc; do
+              docker inspect --format '{{.Name}} state={{.State.Status}} exit={{.State.ExitCode}} restart={{.RestartCount}} error={{json .State.Error}}' "$container" || true
+            done
+            docker logs --tail 120 appforge-admin-api || true
+          } >"${{ runner.temp }}/startup-admin-api-diagnostics.txt" 2>&1
+          diagnostic_payload=$(gzip -c "${{ runner.temp }}/startup-admin-api-diagnostics.txt" | base64 -w0)
+          printf '::error title=Admin API startup diagnostics (gzip+base64)::%s\n' "$diagnostic_payload"
           exit 1
       - name: Run authenticated one-hour API soak
         env:
@@ -186,7 +186,7 @@ jobs:
             ${{ runner.temp }}/image-prune.log
             ${{ runner.temp }}/docker-system-df.txt
             ${{ runner.temp }}/filesystem-df.txt
-            ${{ runner.temp }}/startup-failure-diagnostics.txt
+            ${{ runner.temp }}/startup-admin-api-diagnostics.txt
           if-no-files-found: ignore
           retention-days: 30
       - name: Remove synthetic platform
