@@ -6,7 +6,9 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 image=${APPFORGE_LOCAL_AGENT_IMAGE:-appforge-local-agent:dev}
 compose_dir="$repo_root/deploy/local-agent"
 
-APPFORGE_LOCAL_AGENT_IMAGE="$image" docker compose --env-file "$compose_dir/.env.example" \
+APPFORGE_LOCAL_AGENT_IMAGE="$image" APPFORGE_CUSTOMER_APP_ID=1 \
+  APPFORGE_CUSTOMER_OBJECT_TYPE=source-apk APPFORGE_CUSTOMER_INPUT_FILE=/dev/null \
+  docker compose --env-file "$compose_dir/.env.example" \
   -f "$compose_dir/docker-compose.yml" --profile registration --profile maintenance config --format json |
   python3 -c '
 import json, sys
@@ -18,6 +20,18 @@ assert agent.get("user") == "65532:65532"
 assert "ALL" in agent.get("cap_drop", [])
 assert "no-new-privileges:true" in agent.get("security_opt", [])
 assert agent.get("healthcheck", {}).get("test")
+probe = config["services"]["customer-storage-probe"]
+assert not probe.get("ports"), "customer storage probe must not publish inbound ports"
+assert probe.get("read_only") is True
+assert probe.get("user") == "65532:65532"
+assert "ALL" in probe.get("cap_drop", [])
+assert "no-new-privileges:true" in probe.get("security_opt", [])
+command = probe.get("command", [])
+assert "customer-storage-probe" in command
+assert "customer-test" in command
+assert "SYNTHETIC_WRITE_READ_DELETE" in command
+volumes = probe.get("volumes", [])
+assert all(item.get("read_only") is True for item in volumes)
 '
 
 docker run --rm --entrypoint sh "$image" -c '
@@ -25,6 +39,7 @@ test "$(id -u)" = 65532
 test "$(id -g)" = 65532
 appforge-local-agent version | grep -Eq "protocol=3$"
 command -v appforge-local-build >/dev/null
+appforge-local-agent 2>&1 | grep -q customer-storage-probe
 '
 
 secret_volume=$(docker volume create --label appforge.acceptance=local-agent-secret)

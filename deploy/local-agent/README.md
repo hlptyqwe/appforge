@@ -34,6 +34,15 @@
 
 导入命令只接受固定对象类型和普通文件，不接受远程 URL、脚本或自定义命令；不会创建 bucket、修改 bucket policy，也不会访问登记前缀之外的对象。
 
+正式接入 S3、MinIO 或阿里云 OSS 后，先运行受限现场探针：
+
+```bash
+mkdir -m 700 -p /secure/appforge-evidence
+./customer-storage-probe.sh /secure/appforge-evidence/customer-storage.json
+```
+
+探针复用 Local Agent 的真实 Provider 与已登记 `local-file://` Secret，只在登记前缀下创建一个随机合成对象，执行上传、Stat、完整回读 SHA-256、精确删除和删除确认。它不列举、不读取已有对象，不创建 bucket、不修改 policy，证据只保存 endpoint、bucket、prefix 的 SHA-256 指纹，不保存原值或凭据，并把环境明确记录为客户声明的 `customer-test`，避免与仓库临时 `fixture` 混淆。测试权限必须对登记前缀允许 Put/Get/Head/Delete；脚本拒绝覆盖已有证据，输出权限固定为 `0600`。该探针证明客户网络、TLS、凭据和对象读写删除链路，不替代控制面登记、真实 APK 构建或客户数据验收。
+
 ## AIR_GAPPED
 
 完全断网构建不启动在线 `run` 循环。把控制面生成的签名任务 ZIP、已注册 Agent 的 `agent-state` 卷和本地签名 Secret 卷带入隔离节点，然后以无网络容器运行固定命令：

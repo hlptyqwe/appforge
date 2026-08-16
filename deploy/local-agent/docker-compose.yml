@@ -109,6 +109,30 @@ services:
       - agent-secrets:/etc/appforge/local-secrets:ro
       - ${APPFORGE_CUSTOMER_INPUT_FILE:?required}:/import/input:ro
 
+  customer-storage-probe:
+    <<: *agent-security
+    profiles: [maintenance]
+    restart: "no"
+    command:
+      - customer-storage-probe
+      - --state-dir
+      - /var/lib/appforge-agent
+      - --secret-root
+      - /etc/appforge/local-secrets
+      - --report
+      - "-"
+      - --environment-kind
+      - customer-test
+      - --size-bytes
+      - ${APPFORGE_CUSTOMER_STORAGE_PROBE_SIZE_BYTES:-1048576}
+      - --timeout
+      - ${APPFORGE_CUSTOMER_STORAGE_PROBE_TIMEOUT:-2m}
+      - --confirm-synthetic-only
+      - SYNTHETIC_WRITE_READ_DELETE
+    volumes:
+      - agent-state:/var/lib/appforge-agent:ro
+      - agent-secrets:/etc/appforge/local-secrets:ro
+
 volumes:
   agent-state:
   agent-secrets:

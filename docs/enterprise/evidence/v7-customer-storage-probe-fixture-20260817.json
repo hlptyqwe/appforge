@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-customer-object-storage-site-probe",
+  "acceptedAt": "2026-08-16T18:01:29Z",
+  "result": "passed",
+  "environmentKind": "fixture",
+  "provider": "minio",
+  "runtime": {
+    "agentVersion": "1.2.7-dev",
+    "goarch": "arm64",
+    "goos": "linux",
+    "protocolVersion": 3
+  },
+  "target": {
+    "bucketSha256": "2b8f4492061802c50358cb613df8d84189e4b7cc1b54c89f05de8f9422442ebb",
+    "endpointOriginSha256": "edfb4fde7b98a0f6178385ac214846c08ca1792e9a2ae70c3820bd7b81b7cf79",
+    "registeredPrefixSha256": "648be40a474f02f0b1c2323c8a2675c850d9af3f19afeb73816d0c5b340925d2"
+  },
+  "probe": {
+    "objectSizeBytes": 1048576,
+    "objectSha256": "fad3c61306cc34b63aea9f48180520e32041a168d41999fe10aa88e77d29aa58",
+    "objectKeyFingerprintSha256": "38eaa92bf5b2b79c8db6ff8d02f878bff1c5b7a6a84ae2004a1a4b28f2f9868f",
+    "uploadMilliseconds": 8,
+    "statMilliseconds": 0,
+    "downloadMilliseconds": 2,
+    "deleteMilliseconds": 0,
+    "deleteConfirmed": true,
+    "existingObjectsRead": 0,
+    "bucketOrPolicyMutationRun": false
+  },
+  "verified": [
+    "registered-local-file-secret-resolved",
+    "synthetic-object-uploaded-inside-registered-prefix",
+    "object-stat-size-verified",
+    "full-object-sha256-verified-after-reopen",
+    "exact-synthetic-object-deleted-and-absence-confirmed",
+    "no-existing-object-list-or-read",
+    "no-bucket-or-policy-mutation"
+  ],
+  "limitations": [
+    "synthetic-object-only",
+    "does-not-validate-control-plane-registration-or-full-apk-build",
+    "does-not-access-existing-customer-data",
+    "temporary-provider-fixture-not-customer-environment"
+  ]
+}

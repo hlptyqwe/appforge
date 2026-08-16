@@ -31,7 +31,7 @@ import (
 	"time"
 )
 
-const version = "1.1.0"
+var version = "0.0.0-dev"
 
 const protocolVersion int32 = 3
 
@@ -180,6 +180,10 @@ func main() {
 		if err := customerStorageImportCommand(os.Args[2:]); err != nil {
 			log.Fatal(err)
 		}
+	case "customer-storage-probe":
+		if err := customerStorageProbeCommand(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
 	case "air-gapped-build":
 		if err := airGappedBuildCommand(os.Args[2:]); err != nil {
 			log.Fatal(err)
@@ -198,7 +202,7 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: appforge-local-agent register|run|health|version|secret-import|customer-storage-secret-import|customer-storage-import|air-gapped-build|offline-sign|offline-verify")
+	fmt.Fprintln(os.Stderr, "usage: appforge-local-agent register|run|health|version|secret-import|customer-storage-secret-import|customer-storage-import|customer-storage-probe|air-gapped-build|offline-sign|offline-verify")
 	os.Exit(2)
 }
 

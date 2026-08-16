@@ -12,6 +12,10 @@ trap cleanup EXIT
 ruby -e 'require "yaml"; YAML.load_file(ARGV.fetch(0))' "$workflow" 2>/dev/null
 grep -q 'docker/metadata-action@v5' "$workflow"
 grep -q 'type=semver,pattern={{version}}' "$workflow"
+grep -Fq 'APPFORGE_VERSION=${{ steps.meta.outputs.version }}' "$workflow"
+grep -Fq -- '-X=main.version=${APPFORGE_VERSION}' "$repo_root/deploy/docker/local-agent.Dockerfile"
+grep -q 'Verify Local Agent embedded semantic version' "$workflow"
+grep -Fq 'appforge-local-agent $EXPECTED_VERSION protocol=3' "$workflow"
 grep -q 'APPFORGE_SCHEMA_TARGET=20260815_113_v7_air_gapped' "$workflow"
 grep -q 'steps.build.outputs.digest' "$workflow"
 grep -q 'format: sarif' "$workflow"

@@ -9,12 +9,14 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 type memoryCustomerStore struct {
 	objects      map[string][]byte
 	contentTypes map[string]string
 	tamperOpen   bool
+	lastPutKey   string
 }
 
 func newMemoryCustomerStore() *memoryCustomerStore {
@@ -31,6 +33,16 @@ func (s *memoryCustomerStore) Put(_ context.Context, key string, reader io.Reade
 	}
 	s.objects[key] = append([]byte(nil), value...)
 	s.contentTypes[key] = contentType
+	s.lastPutKey = key
+	return nil
+}
+
+func (s *memoryCustomerStore) Delete(_ context.Context, key string) error {
+	if _, ok := s.objects[key]; !ok {
+		return os.ErrNotExist
+	}
+	delete(s.objects, key)
+	delete(s.contentTypes, key)
 	return nil
 }
 
@@ -174,6 +186,43 @@ func TestCustomerObjectTransferReopensAndVerifiesBytes(t *testing.T) {
 	store.tamperOpen = true
 	if _, err := uploadAndVerifyCustomerObject(ctx, store, outputKey, output, "application/vnd.android.package-archive"); err == nil {
 		t.Fatal("upload whose reopened bytes were tampered was accepted")
+	}
+}
+
+func TestCustomerStorageProbeWritesVerifiesAndDeletesOnlySyntheticObject(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	store := newMemoryCustomerStore()
+	store.objects["tenants/7/agents/build-a/existing/customer.apk"] = []byte("must-not-be-read")
+	metrics, err := executeCustomerStorageProbe(ctx, store, "tenants/7/agents/build-a", 4096)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !metrics.DeleteConfirmed || metrics.ExistingObjectsRead != 0 || metrics.BucketOrPolicyMutationRun {
+		t.Fatalf("unsafe metrics: %#v", metrics)
+	}
+	if !strings.HasPrefix(store.lastPutKey, "tenants/7/agents/build-a/acceptance/storage-probe/") {
+		t.Fatalf("probe key escaped registered prefix: %q", store.lastPutKey)
+	}
+	if len(store.objects) != 1 || string(store.objects["tenants/7/agents/build-a/existing/customer.apk"]) != "must-not-be-read" {
+		t.Fatalf("probe modified existing objects: %#v", store.objects)
+	}
+
+	store.tamperOpen = true
+	if _, err := executeCustomerStorageProbe(ctx, store, "tenants/7/agents/build-a", 4096); err == nil {
+		t.Fatal("tampered probe download was accepted")
+	}
+	if len(store.objects) != 1 {
+		t.Fatalf("failed probe did not clean its synthetic object: %#v", store.objects)
+	}
+}
+
+func TestCustomerObjectNotFoundClassificationRejectsTransientErrors(t *testing.T) {
+	if !isCustomerObjectNotFound(os.ErrNotExist) {
+		t.Fatal("os.ErrNotExist was not classified as authoritative absence")
+	}
+	if isCustomerObjectNotFound(errors.New("temporary network failure")) {
+		t.Fatal("transient error was incorrectly classified as object absence")
 	}
 }
 

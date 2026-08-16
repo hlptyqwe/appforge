@@ -90,12 +90,25 @@ jobs:
         with:
           context: .
           file: ${{ matrix.dockerfile }}
-          build-args: ${{ matrix.build_args }}
+          build-args: |
+            ${{ matrix.build_args }}
+            APPFORGE_VERSION=${{ steps.meta.outputs.version }}
           push: true
           provenance: mode=max
           sbom: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Verify Local Agent embedded semantic version
+        if: matrix.component == 'local-agent'
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/appforge/local-agent
+          DIGEST: ${{ steps.build.outputs.digest }}
+          EXPECTED_VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          set -euo pipefail
+          docker pull "$IMAGE@$DIGEST"
+          actual=$(docker run --rm "$IMAGE@$DIGEST" version)
+          [[ $actual == "appforge-local-agent $EXPECTED_VERSION protocol=3" ]]
       - name: Generate SPDX SBOM
         uses: anchore/sbom-action@v0
         with:

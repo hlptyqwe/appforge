@@ -116,6 +116,8 @@ Local Agent 提供固定 `customer-storage-import` 命令，不接受脚本或�
 
 真实 S3、阿里云 OSS 和客户工作负载身份需要各自环境验收；临时 MinIO 只证明 S3 兼容基础链路，不能替代所有 Provider 的正式证据。
 
+客户现场先用 `deploy/local-agent/customer-storage-probe.sh ABSOLUTE_REPORT.json` 验证真实 Provider。探针必须复用已注册 Agent 状态和受限 `local-file://` Secret，只能在登记前缀的 `acceptance/storage-probe/<random>.bin` 写入一个合成对象，并完成 Put、Stat、完整 Get/SHA-256、Delete 和权威 NotFound 删除确认。它不得 List、读取既有 Key、创建 bucket 或修改 policy；证据不得包含 endpoint、bucket、prefix 原值和任何凭据，只记录这些目标的 SHA-256 指纹、耗时、合成对象摘要及删除状态。正式客户脚本把证据标记为 `environmentKind=customer-test`，仓库临时 Provider 夹具只能标记为 `fixture`，两者不得混用。客户测试策略因此需在登记前缀额外允许精确 DeleteObject。现场探针通过仍不等于控制面登记与完整 APK 构建已经通过，后者必须继续执行本节完整 E2E。
+
 ## 10. 实施授权边界
 
 本功能的实现与测试仅在明确授权下读取受限 `local-file://` 测试 Secret，并只访问临时 MinIO 的登记前缀、合成 APK、合成 Keystore、构建产物和日志。该授权不覆盖真实客户数据、生产凭据、登记前缀外对象、bucket 创建或 policy 修改；真实 S3/OSS 上线仍需客户环境单独验收和授权。

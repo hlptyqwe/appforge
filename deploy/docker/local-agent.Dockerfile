@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1.7
 ARG GO_VERSION=1.26.6
+ARG APPFORGE_VERSION=0.0.0-dev
 FROM golang:${GO_VERSION}-bookworm AS builder
+ARG APPFORGE_VERSION
 WORKDIR /src
 COPY common ./common
 COPY proto ./proto
@@ -8,8 +10,9 @@ COPY services ./services
 COPY local-agent ./local-agent
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    cd /src/local-agent \
-    && CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/appforge-local-agent . \
+    printf '%s' "${APPFORGE_VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$' \
+    && cd /src/local-agent \
+    && CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X=main.version=${APPFORGE_VERSION}" -o /out/appforge-local-agent . \
     && cd /src/services/builder \
     && CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/appforge-local-build ./cmd/local-build
 

@@ -1,0 +1,85 @@
+name: customer-storage-probe
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/customer-storage-probe.yml
+      - local-agent/**
+      - common/**
+      - services/builder/**
+      - deploy/docker/local-agent.Dockerfile
+      - deploy/local-agent/**
+      - deploy/acceptance/local-agent-delivery.sh
+      - deploy/acceptance/v7-customer-storage-site-probe.sh
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: customer-storage-probe-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-amd64-provider-e2e:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.6
+          cache-dependency-path: |
+            local-agent/go.sum
+            common/go.sum
+            services/builder/go.sum
+      - name: Test Local Agent
+        working-directory: local-agent
+        run: go test ./... -count=1
+      - name: Validate delivery shell and Compose
+        env:
+          APPFORGE_LOCAL_AGENT_IMAGE: appforge-local-agent:dev
+          APPFORGE_CUSTOMER_APP_ID: "1"
+          APPFORGE_CUSTOMER_OBJECT_TYPE: source-apk
+          APPFORGE_CUSTOMER_INPUT_FILE: /dev/null
+        run: |
+          set -euo pipefail
+          bash -n deploy/local-agent/*.sh deploy/acceptance/local-agent-delivery.sh deploy/acceptance/v7-customer-storage-site-probe.sh
+          docker compose --env-file deploy/local-agent/.env.example -f deploy/local-agent/docker-compose.yml \
+            --profile registration --profile maintenance config --quiet
+      - name: Build Local Agent image
+        run: docker build --build-arg APPFORGE_VERSION=1.2.7-ci -f deploy/docker/local-agent.Dockerfile -t appforge-local-agent:dev .
+      - name: Pull pinned provider fixtures
+        run: |
+          docker pull minio/minio:RELEASE.2025-04-22T22-12-26Z
+          docker pull minio/mc:RELEASE.2025-04-16T18-13-26Z
+      - name: Run synthetic customer storage provider E2E
+        env:
+          APPFORGE_CUSTOMER_PROBE_REPORT_FILE: ${{ runner.temp }}/v7-customer-storage-probe-fixture.json
+          APPFORGE_EXPECTED_LOCAL_AGENT_VERSION: 1.2.7-ci
+        run: deploy/acceptance/v7-customer-storage-site-probe.sh
+      - name: Verify machine evidence
+        env:
+          REPORT: ${{ runner.temp }}/v7-customer-storage-probe-fixture.json
+        run: |
+          jq -e '
+            .result == "passed" and
+            .environmentKind == "fixture" and
+            .runtime.goos == "linux" and
+            .runtime.goarch == "amd64" and
+            .runtime.agentVersion == "1.2.7-ci" and
+            .probe.deleteConfirmed == true and
+            .probe.existingObjectsRead == 0 and
+            .probe.bucketOrPolicyMutationRun == false
+          ' "$REPORT"
+          [[ -z $(docker ps -a --filter label=appforge.acceptance=v7-customer-storage-probe --format '{{.Names}}') ]]
+          [[ -z $(docker network ls --filter label=appforge.acceptance=v7-customer-storage-probe --format '{{.Name}}') ]]
+          [[ -z $(docker volume ls --filter label=appforge.acceptance=v7-customer-storage-probe --format '{{.Name}}') ]]
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: customer-storage-probe-${{ github.run_id }}
+          path: ${{ runner.temp }}/v7-customer-storage-probe-fixture.json
+          if-no-files-found: ignore
+          retention-days: 30

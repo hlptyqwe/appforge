@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"crypto/tls"
@@ -16,8 +17,10 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/minio/minio-go/v7"
@@ -61,6 +64,7 @@ type customerObjectStore interface {
 	Put(context.Context, string, io.Reader, int64, string) error
 	Open(context.Context, string) (io.ReadCloser, error)
 	Stat(context.Context, string) (customerObjectInfo, error)
+	Delete(context.Context, string) error
 }
 
 type minioCustomerStore struct {
@@ -281,6 +285,13 @@ func (s *minioCustomerStore) Stat(ctx context.Context, key string) (customerObje
 	return customerObjectInfo{Size: info.Size, ContentType: info.ContentType}, err
 }
 
+func (s *minioCustomerStore) Delete(ctx context.Context, key string) error {
+	if err := validateCustomerStoreKey(key); err != nil {
+		return err
+	}
+	return s.client.RemoveObject(ctx, s.bucket, key, minio.RemoveObjectOptions{})
+}
+
 func (s *aliyunCustomerStore) Put(ctx context.Context, key string, reader io.Reader, _ int64, contentType string) error {
 	if err := validateCustomerStoreKey(key); err != nil {
 		return err
@@ -308,6 +319,252 @@ func (s *aliyunCustomerStore) Stat(ctx context.Context, key string) (customerObj
 		return customerObjectInfo{}, errors.New("customer object Content-Length is invalid")
 	}
 	return customerObjectInfo{Size: size, ContentType: metadata.Get("Content-Type")}, nil
+}
+
+func (s *aliyunCustomerStore) Delete(ctx context.Context, key string) error {
+	if err := validateCustomerStoreKey(key); err != nil {
+		return err
+	}
+	return s.bucket.DeleteObject(key, oss.WithContext(ctx))
+}
+
+func isCustomerObjectNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	if errors.Is(err, os.ErrNotExist) {
+		return true
+	}
+	minioError := minio.ToErrorResponse(err)
+	if minioError.StatusCode == http.StatusNotFound || minioError.Code == "NoSuchKey" || minioError.Code == "NoSuchObject" {
+		return true
+	}
+	var ossError oss.ServiceError
+	return errors.As(err, &ossError) && ossError.StatusCode == http.StatusNotFound
+}
+
+const customerStorageProbeConfirmation = "SYNTHETIC_WRITE_READ_DELETE"
+
+type customerStorageProbeMetrics struct {
+	ObjectSizeBytes           int64  `json:"objectSizeBytes"`
+	ObjectSHA256              string `json:"objectSha256"`
+	ObjectKeyFingerprint      string `json:"objectKeyFingerprintSha256"`
+	UploadMilliseconds        int64  `json:"uploadMilliseconds"`
+	StatMilliseconds          int64  `json:"statMilliseconds"`
+	DownloadMilliseconds      int64  `json:"downloadMilliseconds"`
+	DeleteMilliseconds        int64  `json:"deleteMilliseconds"`
+	DeleteConfirmed           bool   `json:"deleteConfirmed"`
+	ExistingObjectsRead       int    `json:"existingObjectsRead"`
+	BucketOrPolicyMutationRun bool   `json:"bucketOrPolicyMutationRun"`
+}
+
+type customerStorageProbeEvidence struct {
+	SchemaVersion   int                         `json:"schemaVersion"`
+	EvidenceType    string                      `json:"evidenceType"`
+	AcceptedAt      string                      `json:"acceptedAt"`
+	Result          string                      `json:"result"`
+	EnvironmentKind string                      `json:"environmentKind"`
+	Provider        string                      `json:"provider"`
+	Runtime         map[string]any              `json:"runtime"`
+	Target          map[string]string           `json:"target"`
+	Probe           customerStorageProbeMetrics `json:"probe"`
+	Verified        []string                    `json:"verified"`
+	Limitations     []string                    `json:"limitations"`
+}
+
+func customerStorageProbeCommand(args []string) error {
+	flags := flag.NewFlagSet("customer-storage-probe", flag.ContinueOnError)
+	stateDir := flags.String("state-dir", defaultStateDir(), "Agent local state directory")
+	secretRoot := flags.String("secret-root", "/etc/appforge/local-secrets", "absolute Local Agent Secret root")
+	report := flags.String("report", "-", "absolute JSON evidence path or - for stdout")
+	environmentKind := flags.String("environment-kind", "", "fixture or customer-test")
+	sizeBytes := flags.Int64("size-bytes", 1<<20, "synthetic probe object size in bytes")
+	timeout := flags.Duration("timeout", 2*time.Minute, "total object storage probe timeout")
+	confirmation := flags.String("confirm-synthetic-only", "", "required synthetic write/read/delete confirmation")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	if *confirmation != customerStorageProbeConfirmation {
+		return errors.New("confirm-synthetic-only must explicitly authorize the synthetic write/read/delete probe")
+	}
+	if *environmentKind != "fixture" && *environmentKind != "customer-test" {
+		return errors.New("environment-kind must be fixture or customer-test")
+	}
+	if *sizeBytes < 1024 || *sizeBytes > 64<<20 {
+		return errors.New("size-bytes must be between 1024 and 67108864")
+	}
+	if *timeout < 10*time.Second || *timeout > 30*time.Minute {
+		return errors.New("timeout must be between 10s and 30m")
+	}
+	absoluteStateDir, err := filepath.Abs(*stateDir)
+	if err != nil {
+		return err
+	}
+	current, err := loadState(absoluteStateDir)
+	if err != nil {
+		return err
+	}
+	if err := validateLocalState(absoluteStateDir, &current); err != nil {
+		return err
+	}
+	if strings.TrimSpace(current.CustomerStorageRef) == "" {
+		return errors.New("Agent is not registered for customer storage")
+	}
+	secret, store, err := resolveCustomerStorage(*secretRoot, current.CustomerStorageRef)
+	if err != nil {
+		return err
+	}
+	defer secret.erase()
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
+	metrics, err := executeCustomerStorageProbe(ctx, store, secret.Prefix, *sizeBytes)
+	if err != nil {
+		return fmt.Errorf("customer storage synthetic probe failed: %w", err)
+	}
+	environmentLimitation := "customer-declared-test-environment"
+	if *environmentKind == "fixture" {
+		environmentLimitation = "temporary-provider-fixture-not-customer-environment"
+	}
+	evidence := customerStorageProbeEvidence{
+		SchemaVersion:   1,
+		EvidenceType:    "v7-customer-object-storage-site-probe",
+		AcceptedAt:      time.Now().UTC().Format(time.RFC3339),
+		Result:          "passed",
+		EnvironmentKind: *environmentKind,
+		Provider:        secret.Provider,
+		Runtime: map[string]any{
+			"goos":            runtime.GOOS,
+			"goarch":          runtime.GOARCH,
+			"agentVersion":    version,
+			"protocolVersion": protocolVersion,
+		},
+		Target: map[string]string{
+			"endpointOriginSha256":   digestBytes([]byte(strings.ToLower(secret.Endpoint))),
+			"bucketSha256":           digestBytes([]byte(secret.Bucket)),
+			"registeredPrefixSha256": digestBytes([]byte(secret.Prefix)),
+		},
+		Probe: metrics,
+		Verified: []string{
+			"registered-local-file-secret-resolved",
+			"synthetic-object-uploaded-inside-registered-prefix",
+			"object-stat-size-verified",
+			"full-object-sha256-verified-after-reopen",
+			"exact-synthetic-object-deleted-and-absence-confirmed",
+			"no-existing-object-list-or-read",
+			"no-bucket-or-policy-mutation",
+		},
+		Limitations: []string{
+			"synthetic-object-only",
+			"does-not-validate-control-plane-registration-or-full-apk-build",
+			"does-not-access-existing-customer-data",
+			environmentLimitation,
+		},
+	}
+	encoded, err := json.MarshalIndent(evidence, "", "  ")
+	if err != nil {
+		return err
+	}
+	encoded = append(encoded, '\n')
+	if *report == "-" {
+		_, err = os.Stdout.Write(encoded)
+		return err
+	}
+	if !filepath.IsAbs(*report) {
+		return errors.New("report must be an absolute path or -")
+	}
+	file, err := os.OpenFile(*report, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if err != nil {
+		return err
+	}
+	if _, err = file.Write(encoded); err != nil {
+		_ = file.Close()
+		_ = os.Remove(*report)
+		return err
+	}
+	if err = file.Close(); err != nil {
+		_ = os.Remove(*report)
+		return err
+	}
+	return os.Chmod(*report, 0o600)
+}
+
+func executeCustomerStorageProbe(ctx context.Context, store customerObjectStore, prefix string, sizeBytes int64) (
+	metrics customerStorageProbeMetrics, returnErr error) {
+	if store == nil || !validCustomerObjectKey(prefix) || sizeBytes < 1024 || sizeBytes > 64<<20 {
+		return metrics, errors.New("customer storage probe configuration is invalid")
+	}
+	nonce := newNonce()
+	key := path.Join(prefix, "acceptance", "storage-probe", nonce+".bin")
+	seed := []byte("appforge-v7-customer-storage-synthetic-probe-" + nonce + "\n")
+	payload := bytes.Repeat(seed, int(sizeBytes)/len(seed)+1)[:int(sizeBytes)]
+	digest := digestBytes(payload)
+	metrics.ObjectSizeBytes = sizeBytes
+	metrics.ObjectSHA256 = digest
+	metrics.ObjectKeyFingerprint = digestBytes([]byte(key))
+	metrics.ExistingObjectsRead = 0
+	metrics.BucketOrPolicyMutationRun = false
+	uploaded := false
+	defer func() {
+		if !uploaded {
+			return
+		}
+		cleanupCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		if cleanupErr := store.Delete(cleanupCtx, key); cleanupErr != nil {
+			if returnErr == nil {
+				returnErr = errors.New("cleanup synthetic customer object failed")
+			} else {
+				returnErr = fmt.Errorf("%w; cleanup synthetic customer object failed", returnErr)
+			}
+		}
+	}()
+
+	started := time.Now()
+	uploaded = true
+	if err := store.Put(ctx, key, bytes.NewReader(payload), sizeBytes, "application/octet-stream"); err != nil {
+		return metrics, errors.New("upload synthetic customer object")
+	}
+	metrics.UploadMilliseconds = time.Since(started).Milliseconds()
+
+	started = time.Now()
+	info, err := store.Stat(ctx, key)
+	if err != nil || info.Size != sizeBytes {
+		return metrics, errors.New("stat synthetic customer object size")
+	}
+	metrics.StatMilliseconds = time.Since(started).Milliseconds()
+
+	started = time.Now()
+	reader, err := store.Open(ctx, key)
+	if err != nil {
+		return metrics, errors.New("open synthetic customer object")
+	}
+	hasher := sha256.New()
+	written, readErr := io.Copy(hasher, io.LimitReader(reader, sizeBytes+1))
+	closeErr := reader.Close()
+	if readErr != nil || closeErr != nil || written != sizeBytes || hex.EncodeToString(hasher.Sum(nil)) != digest {
+		return metrics, errors.New("verify synthetic customer object bytes")
+	}
+	metrics.DownloadMilliseconds = time.Since(started).Milliseconds()
+
+	started = time.Now()
+	if err := store.Delete(ctx, key); err != nil {
+		return metrics, errors.New("delete synthetic customer object")
+	}
+	for {
+		if _, err := store.Stat(ctx, key); err != nil {
+			if !isCustomerObjectNotFound(err) {
+				return metrics, errors.New("confirm synthetic customer object deletion with authoritative not-found")
+			}
+			metrics.DeleteConfirmed = true
+			metrics.DeleteMilliseconds = time.Since(started).Milliseconds()
+			uploaded = false
+			return metrics, nil
+		}
+		if !wait(ctx, 250*time.Millisecond) {
+			return metrics, errors.New("confirm synthetic customer object deletion")
+		}
+	}
 }
 
 func customerInputObjectKey(prefix string, appID int64, objectType int32, digest, filename string) (string, error) {
