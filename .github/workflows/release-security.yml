@@ -45,11 +45,18 @@ jobs:
           - component: local-agent
             dockerfile: deploy/docker/local-agent.Dockerfile
             build_args: ""
+          - component: egress-proxy
+            dockerfile: deploy/docker/go.Dockerfile
+            build_args: MODULE_DIR=common/cmd/egress-proxy
           - component: etcd-init
             dockerfile: deploy/docker/etcd-init.Dockerfile
             build_args: ""
           - component: migrate
             dockerfile: deploy/docker/migrate.Dockerfile
+            build_args: |
+              APPFORGE_SCHEMA_TARGET=20260815_113_v7_air_gapped
+          - component: mysql-binlog-tools
+            dockerfile: deploy/docker/mysql-binlog-tools.Dockerfile
             build_args: ""
     steps:
       - uses: actions/checkout@v4
@@ -83,15 +90,21 @@ jobs:
           image: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}@${{ steps.build.outputs.digest }}
           format: spdx-json
           output-file: ${{ matrix.component }}.spdx.json
+      - name: Generate normalized license inventory
+        run: |
+          deploy/production/generate-license-inventory.sh \
+            "${{ matrix.component }}" \
+            "${{ matrix.component }}.spdx.json" \
+            "${{ matrix.component }}.licenses.json"
       - name: Vulnerability gate
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}@${{ steps.build.outputs.digest }}
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: "1"
       - name: Generate vulnerability report
-        uses: aquasecurity/trivy-action@0.30.0
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/appforge/${{ matrix.component }}@${{ steps.build.outputs.digest }}
           format: sarif
@@ -116,7 +129,9 @@ jobs:
           cosign sign --yes "$image_ref"
           cosign verify "$image_ref" \
             --certificate-identity "$CERTIFICATE_IDENTITY" \
-            --certificate-oidc-issuer https://token.actions.githubusercontent.com
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --output json > "${{ matrix.component }}.cosign.json"
+          jq -e 'type == "array" and length > 0' "${{ matrix.component }}.cosign.json" >/dev/null
           printf '%s\n' "$image_ref" > ${{ matrix.component }}.image.txt
       - uses: actions/upload-artifact@v4
         with:
@@ -124,8 +139,164 @@ jobs:
           if-no-files-found: error
           path: |
             ${{ matrix.component }}.spdx.json
+            ${{ matrix.component }}.licenses.json
             ${{ matrix.component }}.trivy.sarif
+            ${{ matrix.component }}.cosign.json
             ${{ matrix.component }}.image.txt
+
+  third-party-images:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - component: mysql
+            image: mysql:8.4
+          - component: redis
+            image: redis:7.4-alpine
+          - component: etcd
+            image: quay.io/coreos/etcd:v3.6.12
+          - component: minio
+            image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+          - component: minio-mc
+            image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+          - component: alpine
+            image: alpine:3.22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resolve immutable upstream digest
+        id: resolve
+        env:
+          UPSTREAM_IMAGE: ${{ matrix.image }}
+        run: |
+          set -euo pipefail
+          docker pull "$UPSTREAM_IMAGE"
+          repository="${UPSTREAM_IMAGE%:*}"
+          digest=$(docker image inspect "$UPSTREAM_IMAGE" --format '{{json .RepoDigests}}' | jq -r '.[0] | split("@")[1]')
+          [[ $digest =~ ^sha256:[0-9a-f]{64}$ ]]
+          digest_ref="$repository@$digest"
+          printf '%s\n' "$digest_ref" > "third-party-${{ matrix.component }}.image.txt"
+          printf 'digest_ref=%s\n' "$digest_ref" >> "$GITHUB_OUTPUT"
+      - name: Generate third-party SPDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ steps.resolve.outputs.digest_ref }}
+          format: spdx-json
+          output-file: third-party-${{ matrix.component }}.spdx.json
+      - name: Generate third-party license inventory
+        run: |
+          deploy/production/generate-license-inventory.sh \
+            "third-party-${{ matrix.component }}" \
+            "third-party-${{ matrix.component }}.spdx.json" \
+            "third-party-${{ matrix.component }}.licenses.json"
+      - name: Third-party vulnerability gate
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          image-ref: ${{ steps.resolve.outputs.digest_ref }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: Generate third-party vulnerability report
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          image-ref: ${{ steps.resolve.outputs.digest_ref }}
+          format: sarif
+          output: third-party-${{ matrix.component }}.trivy.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "0"
+      - name: Upload third-party vulnerability report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: third-party-${{ matrix.component }}.trivy.sarif
+          category: appforge-third-party-${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-evidence-third-party-${{ matrix.component }}
+          if-no-files-found: error
+          path: |
+            third-party-${{ matrix.component }}.spdx.json
+            third-party-${{ matrix.component }}.licenses.json
+            third-party-${{ matrix.component }}.trivy.sarif
+            third-party-${{ matrix.component }}.image.txt
+
+  source-dependency-gate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify fixed dependency manifest and lockfile inputs
+        run: |
+          set -euo pipefail
+          inputs=(
+            appforge-api/go.mod appforge-api/go.sum
+            appforgectl/go.mod
+            appforge-ui/package.json appforge-ui/package-lock.json
+            common/go.mod common/go.sum
+            local-agent/go.mod local-agent/go.sum
+            proto/builder/go.mod proto/builder/go.sum
+            proto/common/go.mod proto/common/go.sum
+            proto/core/go.mod proto/core/go.sum
+            proto/system/go.mod proto/system/go.sum
+            services/builder/go.mod services/builder/go.sum
+            services/core/go.mod services/core/go.sum
+            services/system/go.mod services/system/go.sum
+          )
+          for file in "${inputs[@]}"; do test -s "$file"; done
+      - name: Source dependency vulnerability gate without report export
+        uses: aquasecurity/trivy-action@0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+  release-evidence:
+    runs-on: ubuntu-24.04
+    needs: [images, third-party-images, source-dependency-gate]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-evidence-*
+          path: dist/release-input
+          merge-multiple: true
+      - uses: sigstore/cosign-installer@v3
+      - name: Assemble, sign and verify release evidence manifest
+        env:
+          CERTIFICATE_IDENTITY: https://github.com/${{ github.repository }}/.github/workflows/release-security.yml@${{ github.ref }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          APPFORGE_SOURCE_DEPENDENCY_GATE="${{ needs.source-dependency-gate.result }}" \
+            deploy/production/assemble-release-evidence.sh \
+            dist/release-input \
+            dist/release-security \
+            "$version" \
+            "$GITHUB_REPOSITORY" \
+            "$GITHUB_REF" \
+            "$GITHUB_SHA"
+          cosign sign-blob --yes \
+            --bundle dist/release-security/SHA256SUMS.sigstore.json \
+            dist/release-security/SHA256SUMS
+          cosign verify-blob \
+            --bundle dist/release-security/SHA256SUMS.sigstore.json \
+            --certificate-identity "$CERTIFICATE_IDENTITY" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            dist/release-security/SHA256SUMS
+          APPFORGE_REQUIRE_COSIGN_VERIFY=1 \
+          APPFORGE_COSIGN_BINARY="$(command -v cosign)" \
+          APPFORGE_RELEASE_CERTIFICATE_IDENTITY="$CERTIFICATE_IDENTITY" \
+            deploy/production/validate-release-evidence.sh \
+              dist/release-security \
+              "$version" \
+              "ghcr.io/${GITHUB_REPOSITORY_OWNER}/appforge"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-security-${{ github.ref_name }}
+          if-no-files-found: error
+          path: dist/release-security/
 
   delivery-tools:
     runs-on: ubuntu-24.04

@@ -9,6 +9,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"image/png"
 	"io"
 	"os"
@@ -34,6 +35,9 @@ const (
 	maxBrandLogoBytes    = int64(5 * 1024 * 1024)
 	maxBrandSplashBytes  = int64(10 * 1024 * 1024)
 	maxTemplateFileBytes = int64(2 * 1024 * 1024)
+	maxBuiltAPKBytes     = int64(2 * 1024 * 1024 * 1024)
+	maxBuildLogBytes     = int64(100 * 1024 * 1024)
+	maxOfflinePackBytes  = int64(3 * 1024 * 1024 * 1024)
 )
 
 // LoadObjectStore loads system-level storage credentials for internal use only.
@@ -88,6 +92,14 @@ func GenerateStorageObjectKey(ctx context.Context, objectType core.StorageObject
 		prefix = "brand-splash"
 	case core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE:
 		prefix = "template-file"
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK:
+		prefix = "built-apk"
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG:
+		prefix = "build-log"
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_TASK_PACKAGE:
+		prefix = "offline-task"
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_RESULT_PACKAGE:
+		prefix = "offline-result"
 	default:
 		return "", status.Error(codes.InvalidArgument, "upload object type is not supported")
 	}
@@ -125,6 +137,16 @@ func VerifyStorageObject(ctx context.Context, store storage.ObjectStore, item *c
 	}
 	if item.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE && info.Size > maxTemplateFileBytes {
 		return 0, "", status.Error(codes.InvalidArgument, "template file exceeds 2 MiB")
+	}
+	if item.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK && info.Size > maxBuiltAPKBytes {
+		return 0, "", status.Error(codes.InvalidArgument, "built APK exceeds 2 GiB")
+	}
+	if item.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG && info.Size > maxBuildLogBytes {
+		return 0, "", status.Error(codes.InvalidArgument, "build log exceeds 100 MiB")
+	}
+	if (item.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_TASK_PACKAGE ||
+		item.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_RESULT_PACKAGE) && info.Size > maxOfflinePackBytes {
+		return 0, "", status.Error(codes.InvalidArgument, "AIR_GAPPED package exceeds 3 GiB")
 	}
 
 	reader, err := store.OpenObject(ctx, item.ObjectKey)
@@ -171,6 +193,25 @@ func VerifyStorageObject(ctx context.Context, store storage.ObjectStore, item *c
 		if err := verifyTemplateFile(tempPath, item.OriginalName); err != nil {
 			return 0, "", err
 		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK:
+		if err := verifyAPK(tempPath); err != nil {
+			return 0, "", err
+		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG:
+		data, err := os.ReadFile(tempPath)
+		if err != nil || !utf8.Valid(data) || bytes.IndexByte(data, 0) >= 0 {
+			return 0, "", status.Error(codes.InvalidArgument, "build log must be NUL-free UTF-8")
+		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_TASK_PACKAGE,
+		core.StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_RESULT_PACKAGE:
+		archive, err := zip.OpenReader(tempPath)
+		if err != nil || len(archive.File) == 0 || len(archive.File) > 260 {
+			if archive != nil {
+				_ = archive.Close()
+			}
+			return 0, "", status.Error(codes.InvalidArgument, "AIR_GAPPED package is not a bounded ZIP")
+		}
+		_ = archive.Close()
 	default:
 		return 0, "", status.Error(codes.InvalidArgument, "upload object type is not supported")
 	}
@@ -377,13 +418,17 @@ func MapPlatformStorageObject(item *core.StorageObject) types.PlatformStorageObj
 	return types.PlatformStorageObject{
 		ObjectId: item.Id, AppId: item.AppId, ObjectType: int32(item.ObjectType),
 		OriginalName: item.OriginalName, SizeBytes: item.SizeBytes, Sha256: item.Sha256,
-		Status: int32(item.Status),
+		Status: int32(item.Status), StorageMode: int32(item.StorageMode), OwnerAgentId: item.OwnerAgentId,
 	}
 }
 
 // CleanupFailedUpload removes the physical object and marks metadata failed.
 func CleanupFailedUpload(ctx context.Context, svcCtx *svc.ServiceContext, store storage.ObjectStore, item *core.StorageObject) {
 	if item == nil {
+		return
+	}
+	if item.StorageMode != core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE || item.OwnerAgentId != 0 {
+		logStorageCleanupError(ctx, item.Id, errors.New("refusing to delete non-control-plane storage object"))
 		return
 	}
 	if err := store.DeleteObject(ctx, item.ObjectKey); err != nil {

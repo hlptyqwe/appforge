@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-15",
+  "mode": "isolated-compose-synthetic-remote-signing-task-e2e",
+  "inputs": {
+    "syntheticApkOnly": true,
+    "testKeystoreOnly": true,
+    "temporaryCertificatesOnly": true,
+    "realCustomerDataAccessed": false,
+    "productionCredentialsAccessed": false,
+    "sharedDevelopmentDatabaseMutated": false
+  },
+  "isolatedComposeProject": "appforge-v7-remote-task-1786801449-49184",
+  "temporaryIdentity": {
+    "tenantId": 1,
+    "appId": 1,
+    "signingConfigId": 1,
+    "taskId": 1
+  },
+  "result": {
+    "builderAttempt": 1,
+    "apkObjectId": 2,
+    "certificateSha256": "6182d559a9c41cf12f9cb7c2ad35345d22e27923348f6e99097a2dc1566fca27"
+  },
+  "checks": {
+    "publicManagementApiCreatedRemoteSigningConfig": "passed",
+    "remoteSignerIdentityValidatedAtCreation": "passed",
+    "signingModePersistedWithoutKeystore": "passed",
+    "realBuilderRemoteSigningTaskSucceeded": "passed",
+    "nonCapableBuilderCouldNotClaimRemoteTask": "passed",
+    "finalAPKCertificateAndPackageValidated": "passed",
+    "channelAssetValidated": "passed",
+    "secretLogLeakScan": "passed",
+    "isolatedComposeDestroyed": "passed"
+  },
+  "limitations": [
+    "The remote signer is a local apksigner-backed fixture, not a real HSM."
+  ],
+  "cleanup": {
+    "isolatedContainersRemaining": 0,
+    "isolatedVolumesRemaining": 0,
+    "isolatedNetworksRemaining": 0
+  }
+}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, useSlots } from 'vue'
+import { computed, onMounted, reactive, ref, useSlots } from 'vue'
 import { ElMessage, type FormInstance, type UploadFile, type UploadFiles } from 'element-plus'
 import CursorPagination from '@/components/common/CursorPagination.vue'
 import { usePagination } from '@/composables/usePagination'
@@ -14,13 +14,17 @@ import { buildApiUrl } from '@/utils/file-url'
 export type ResourceField = {
   prop: string
   label: string
-  type?: 'text' | 'number' | 'textarea' | 'password' | 'file'
+  type?: 'text' | 'number' | 'textarea' | 'password' | 'file' | 'select'
   required?: boolean
   accept?: string
   objectType?: 1 | 2 | 5 | 6
   maxBytes?: number
   downloadObject?: boolean
   publicDownload?: boolean
+  defaultValue?: string | number
+  options?: Array<{ label: string; value: string | number }>
+  visibleWhen?: { prop: string; equals: string | number }
+  valueLabels?: Record<string, string>
 }
 
 const props = defineProps<{
@@ -45,8 +49,14 @@ const uploadFiles = ref<Record<string, File | undefined>>({})
 const uploadProgress = ref<Record<string, number>>({})
 const { pagination, updateFromResponse, resetAndLoad, nextAndLoad, prevAndLoad } =
   usePagination<number>(20)
+const visibleFields = computed(() =>
+  props.fields.filter(
+    (field) => !field.visibleWhen || form[field.visibleWhen.prop] === field.visibleWhen.equals,
+  ),
+)
 
 function defaultValue(field: ResourceField) {
+  if (field.defaultValue !== undefined) return field.defaultValue
   return field.type === 'number' ? 0 : ''
 }
 
@@ -119,7 +129,7 @@ async function submit() {
   submitting.value = true
   try {
     const payload = { ...form }
-    for (const field of props.fields.filter((item) => item.type === 'file')) {
+    for (const field of visibleFields.value.filter((item) => item.type === 'file')) {
       const file = uploadFiles.value[field.prop]
       if (!file || !field.objectType) throw new Error(`请选择${field.label}`)
       const upload = await platformService.uploadObject(
@@ -163,12 +173,8 @@ defineExpose({ loadData })
           <el-input v-else v-model="query[field.prop]" clearable />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="resetAndLoad(loadData)">
-            查询
-          </el-button>
-          <el-button v-perm="`${permissionPrefix}:add`" @click="openCreate">
-            新增
-          </el-button>
+          <el-button type="primary" @click="resetAndLoad(loadData)"> 查询 </el-button>
+          <el-button v-perm="`${permissionPrefix}:add`" @click="openCreate"> 新增 </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -202,15 +208,12 @@ defineExpose({ loadData })
             >
               推广下载
             </a>
-            <span v-else>{{ scope.row[column.prop] ?? '' }}</span>
+            <span v-else>{{
+              column.valueLabels?.[String(scope.row[column.prop])] ?? scope.row[column.prop] ?? ''
+            }}</span>
           </template>
         </el-table-column>
-        <el-table-column
-          v-if="slots.actions"
-          label="操作"
-          min-width="150"
-          fixed="right"
-        >
+        <el-table-column v-if="slots.actions" label="操作" min-width="150" fixed="right">
           <template #default="scope">
             <slot name="actions" :row="scope.row" />
           </template>
@@ -230,7 +233,7 @@ defineExpose({ loadData })
     <el-dialog v-model="dialogVisible" :title="`新增${title}`" width="620px">
       <el-form ref="formRef" :model="form" label-width="140px">
         <el-form-item
-          v-for="field in fields"
+          v-for="field in visibleFields"
           :key="field.prop"
           :label="field.label"
           :prop="field.prop"
@@ -253,9 +256,7 @@ defineExpose({ loadData })
           >
             <el-button>选择文件</el-button>
             <template #tip>
-              <div class="el-upload__tip">
-                选择后将在创建时上传并校验
-              </div>
+              <div class="el-upload__tip">选择后将在创建时上传并校验</div>
               <el-progress
                 v-if="uploadProgress[field.prop] > 0"
                 :percentage="uploadProgress[field.prop]"
@@ -263,6 +264,18 @@ defineExpose({ loadData })
               />
             </template>
           </el-upload>
+          <el-select
+            v-else-if="field.type === 'select'"
+            v-model="form[field.prop]"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="option in field.options || []"
+              :key="String(option.value)"
+              :label="option.label"
+              :value="option.value"
+            />
+          </el-select>
           <el-input
             v-else
             v-model="form[field.prop]"
@@ -279,12 +292,8 @@ defineExpose({ loadData })
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">
-          取消
-        </el-button>
-        <el-button type="primary" :loading="submitting" @click="submit">
-          创建
-        </el-button>
+        <el-button @click="dialogVisible = false"> 取消 </el-button>
+        <el-button type="primary" :loading="submitting" @click="submit"> 创建 </el-button>
       </template>
     </el-dialog>
   </div>

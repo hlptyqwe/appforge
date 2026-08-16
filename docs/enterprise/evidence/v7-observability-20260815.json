@@ -1,0 +1,23 @@
+{
+  "acceptance": "V7_OBSERVABILITY",
+  "fixture": "synthetic-local-only",
+  "startedAt": "2026-08-16T10:26:31Z",
+  "finishedAt": "2026-08-16T10:26:36Z",
+  "prometheus": {
+    "endpoint": "127.0.0.1:19101/metrics",
+    "verifiedMetrics": [
+      "http_server_requests_code_total",
+      "http_server_requests_duration_ms"
+    ]
+  },
+  "otlpHttp": {
+    "endpoint": "127.0.0.1:14318/v1/traces",
+    "receivedBatches": 1,
+    "productionRequiresTLS": true,
+    "plaintextRejectedWithoutAcceptanceOverride": true
+  },
+  "realCustomerDataAccessed": false,
+  "productionCredentialsAccessed": false,
+  "residualTemporaryResources": 0,
+  "result": "passed"
+}

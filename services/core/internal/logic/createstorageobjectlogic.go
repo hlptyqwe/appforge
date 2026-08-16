@@ -57,7 +57,8 @@ func (l *CreateStorageObjectLogic) CreateStorageObject(in *core.CreateStorageObj
 		TenantId: tenant, AppId: in.AppId, ObjectType: int64(in.ObjectType),
 		ObjectKey: strings.TrimSpace(in.ObjectKey), OriginalName: strings.TrimSpace(in.OriginalName),
 		ContentType: strings.TrimSpace(in.ContentType), SizeBytes: in.SizeBytes,
-		Status: storageStatusUploading, CreateBy: actorID(l.ctx),
+		Status: storageStatusUploading, StorageMode: int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE),
+		OwnerAgentId: 0, CreateBy: actorID(l.ctx),
 	}
 	var item models.TStorageObject
 	err = l.svcCtx.DB.TransactCtx(l.ctx, func(txCtx context.Context, session sqlx.Session) error {
@@ -92,7 +93,9 @@ func validateStorageObjectInput(in *core.CreateStorageObjectReq, tenant int64) e
 		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO &&
 		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH &&
 		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE &&
-		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_CACHE {
+		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_CACHE &&
+		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_TASK_PACKAGE &&
+		in.ObjectType != core.StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_RESULT_PACKAGE {
 		return status.Error(codes.InvalidArgument, "invalid storage object type")
 	}
 	if err := requireText(in.ObjectKey, "object_key", 500); err != nil {
@@ -117,6 +120,17 @@ func validateStorageObjectInput(in *core.CreateStorageObjectReq, tenant int64) e
 	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_CACHE:
 		if ext != ".apk" || in.SizeBytes > 2*1024*1024*1024 {
 			return status.Error(codes.InvalidArgument, "build cache must be an .apk file no larger than 2 GiB")
+		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK:
+		if ext != ".apk" || in.SizeBytes > 2*1024*1024*1024 {
+			return status.Error(codes.InvalidArgument, "built APK must be an .apk file no larger than 2 GiB")
+		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG:
+		if ext != ".log" && ext != ".txt" {
+			return status.Error(codes.InvalidArgument, "build log must use .log or .txt")
+		}
+		if in.SizeBytes > 100*1024*1024 {
+			return status.Error(codes.InvalidArgument, "build log must not exceed 100 MiB")
 		}
 	case core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE:
 		if ext != ".jks" && ext != ".keystore" && ext != ".p12" && ext != ".pfx" {
@@ -143,6 +157,11 @@ func validateStorageObjectInput(in *core.CreateStorageObjectReq, tenant int64) e
 		}
 		if in.SizeBytes > 2*1024*1024 {
 			return status.Error(codes.InvalidArgument, "template file must not exceed 2 MiB")
+		}
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_TASK_PACKAGE,
+		core.StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_RESULT_PACKAGE:
+		if ext != ".zip" || in.SizeBytes > 3*1024*1024*1024 {
+			return status.Error(codes.InvalidArgument, "AIR_GAPPED package must be a .zip file no larger than 3 GiB")
 		}
 	}
 	if strings.TrimSpace(in.ContentType) == "" {

@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "scenario": "isolated-synthetic-mysql-pitr",
+  "acceptanceScript": "deploy/acceptance/v7-mysql-pitr.sh",
+  "stopDatetimeUtc": "2026-08-15 13:14:07",
+  "baseBinaryLogFile": "mysql-bin.000003",
+  "baseBinaryLogPosition": 1500,
+  "binlogToolsImageDigest": "sha256:ccb1dc1b64701cb7c7e5e06aaade7716f52dbfe738a207e9c59a5968897b1c0f",
+  "mysqlbinlogVersion": "mysqlbinlog  Ver 8.4.11 for Linux on aarch64 (MySQL Community Server - GPL)",
+  "verifiedRows": [
+    "baseline",
+    "before-cutoff"
+  ],
+  "excludedRows": [
+    "after-cutoff"
+  ],
+  "verifiedData": [
+    "synthetic-mysql",
+    "synthetic-etcd",
+    "synthetic-object"
+  ],
+  "rtoSeconds": 7,
+  "rtoTargetSeconds": 7200,
+  "residualResources": {
+    "containers": 0,
+    "volumes": 0,
+    "networks": 0
+  },
+  "dataPolicy": "synthetic-only",
+  "limitations": [
+    "not-customer-target-environment",
+    "not-cross-region-object-replication"
+  ]
+}

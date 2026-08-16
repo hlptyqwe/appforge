@@ -527,6 +527,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: platform_private.TestPlatformWebhookEndpointHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPost,
+				Path:    "/enterprise/air-gapped/exports",
+				Handler: platform_private.PreparePlatformAirGappedExportHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/enterprise/air-gapped/imports",
+				Handler: platform_private.ImportPlatformAirGappedResultHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/enterprise/air-gapped/packages/:packageCode",
+				Handler: platform_private.GetPlatformAirGappedPackageHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/enterprise/deployment",
 				Handler: platform_private.GetPlatformDeploymentStatusHandler(serverCtx),

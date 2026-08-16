@@ -39,7 +39,7 @@ services:
     command:
       - sh
       - -c
-      - for file in /migrations/*.sql; do mysql -h mysql -uappforge appforge < "$$file" || exit 1; done
+      - for file in $$(find /migrations -maxdepth 1 -type f -name '*.sql' | sort -V); do mysql -h mysql -uappforge appforge < "$$file" || exit 1; done
     depends_on:
       mysql:
         condition: service_healthy

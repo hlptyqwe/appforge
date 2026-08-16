@@ -50,6 +50,48 @@ func TestReadLocalExecutorTaskAndVerifyInputs(t *testing.T) {
 	}
 }
 
+func TestReadLocalExecutorTaskAcceptsCustomerStorageMode(t *testing.T) {
+	root := t.TempDir()
+	taskPath := filepath.Join(root, "task.json")
+	resultPath := filepath.Join(root, "result.json")
+	task := &localExecutorTask{ID: 1, TenantID: 2, AppID: 3, BuilderAttempt: 4}
+	envelope := localExecutorEnvelope{Task: task, ArtifactMode: 2, Bundle: &localExecutorBundle{
+		SchemaVersion: localExecutorSchemaVersion, Task: task, PackageName: "com.example.app", KeyAlias: "release",
+		SignerCertificateSHA256: strings.Repeat("a", 64),
+	}}
+	raw, err := json.Marshal(envelope)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(taskPath, raw, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := readLocalExecutorTask(taskPath, resultPath); err != nil {
+		t.Fatalf("customer storage task rejected: %v", err)
+	}
+}
+
+func TestReadLocalExecutorTaskAcceptsAirGappedMode(t *testing.T) {
+	root := t.TempDir()
+	taskPath := filepath.Join(root, "task.json")
+	resultPath := filepath.Join(root, "result.json")
+	task := &localExecutorTask{ID: 1, TenantID: 2, AppID: 3, BuilderAttempt: 4}
+	envelope := localExecutorEnvelope{Task: task, ArtifactMode: 3, Bundle: &localExecutorBundle{
+		SchemaVersion: localExecutorSchemaVersion, Task: task, PackageName: "com.example.app", KeyAlias: "release",
+		SignerCertificateSHA256: strings.Repeat("a", 64),
+	}}
+	raw, err := json.Marshal(envelope)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(taskPath, raw, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := readLocalExecutorTask(taskPath, resultPath); err != nil {
+		t.Fatalf("AIR_GAPPED task rejected: %v", err)
+	}
+}
+
 func TestLocalExecutorRejectsPathsAndUnknownTaskFields(t *testing.T) {
 	root := t.TempDir()
 	outside := writeLocalExecutorFixture(t, t.TempDir(), "outside.apk", []byte("outside"))
@@ -115,6 +157,31 @@ func TestExecuteLocalTaskRejectsUnsafeResultPathWithoutWriting(t *testing.T) {
 	}
 	if err := ExecuteLocalTask(context.Background(), taskPath, symlinkResult); err == nil {
 		t.Fatal("symlink result path was accepted")
+	}
+}
+
+func TestSecureLocalExecutorOutputMakesFilePrivateAndRejectsSymlink(t *testing.T) {
+	root := t.TempDir()
+	output := filepath.Join(root, "channel.apk")
+	if err := os.WriteFile(output, []byte("apk"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := secureLocalExecutorOutput(output); err != nil {
+		t.Fatal(err)
+	}
+	info, err := os.Stat(output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if info.Mode().Perm() != 0o600 {
+		t.Fatalf("output mode=%o", info.Mode().Perm())
+	}
+	linked := filepath.Join(root, "linked.apk")
+	if err := os.Symlink(output, linked); err != nil {
+		t.Fatal(err)
+	}
+	if err := secureLocalExecutorOutput(linked); err == nil {
+		t.Fatal("symlinked executor output was accepted")
 	}
 }
 

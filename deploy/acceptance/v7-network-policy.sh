@@ -56,6 +56,55 @@ if grep -Fq '0.0.0.0/0' <<<"$policy" || grep -Fq '::/0' <<<"$policy"; then
   exit 1
 fi
 
+default_policy=$(awk '
+  /^  name: appforge-default-deny$/ {capture=1}
+  capture {print}
+  capture && /^---$/ {exit}
+' "$rendered")
+grep -Fq 'kubernetes.io/metadata.name: monitoring' <<<"$default_policy" || {
+  echo "验收失败: Prometheus 抓取来源未限定 monitoring Namespace" >&2
+  exit 1
+}
+grep -Fq 'protocol: TCP, port: 9101' <<<"$default_policy" || {
+  echo "验收失败: Prometheus 指标端口未加入入站策略" >&2
+  exit 1
+}
+grep -Fq 'prometheus.io/port: "9101"' "$rendered"
+grep -Fq 'prometheus.io/path: "/metrics"' "$rendered"
+grep -Fq 'name: APPFORGE_OTLP_ENDPOINT' "$rendered"
+grep -Fq 'value: ""' "$rendered"
+
+printf '%s\n' \
+  'egressProxy:' \
+  '  enabled: true' \
+  '  allowlist: [siem.customer.test:443]' \
+  'networkPolicy:' \
+  '  externalEgressRules:' \
+  '    - name: proxy-https' \
+  '      component: egress-proxy' \
+  '      cidrs: [203.0.113.10/32]' \
+  '      ports:' \
+  '        - {protocol: TCP, port: 443}' >"$temporary/proxy.yaml"
+helm_container "${render_args[@]}" -f /work/proxy.yaml >"$temporary/proxy-rendered.yaml"
+grep -Fq 'name: appforge-egress-proxy' "$temporary/proxy-rendered.yaml"
+grep -Fq 'name: HTTPS_PROXY, value: "http://appforge-egress-proxy:3128"' "$temporary/proxy-rendered.yaml"
+grep -Fq 'app.kubernetes.io/component: egress-proxy' "$temporary/proxy-rendered.yaml"
+grep -Fq 'cidr: "203.0.113.10/32"' "$temporary/proxy-rendered.yaml"
+if helm_container template appforge /charts/appforge \
+  --set global.imageRegistry=registry.example.com/appforge \
+  --set global.publicOrigin=https://appforge.example.com \
+  --set image.tag=1.0.0 \
+  --set ingress.host=appforge.example.com \
+  --set ingress.adminHost=admin.appforge.example.com \
+  --set offlineLicense.deploymentId=network-policy-acceptance \
+  --set offlineLicense.existingStateClaim=appforge-license-state \
+  --set observability.siemWebhook=https://siem.example.com/appforge/audit \
+  --set egressProxy.enabled=true \
+  --set 'egressProxy.allowlist[0]=siem.customer.test:443' >/dev/null 2>&1; then
+  echo "验收失败: 启用出口代理但缺少代理专属出口规则未被拒绝" >&2
+  exit 1
+fi
+
 printf '%s\n' \
   'networkPolicy:' \
   '  externalEgressRules:' \
@@ -81,4 +130,4 @@ if grep -Fq 'kind: NetworkPolicy' "$temporary/disabled.yaml"; then
   exit 1
 fi
 
-echo "通过: Helm 出口规则按组件、CIDR、协议和端口精确渲染，缺少端口被 Schema 拒绝，关闭开关时不残留策略"
+echo "通过: Helm 出口规则精确渲染，受限CONNECT代理仅有专属CIDR/端口出口，Prometheus与OTLP接线受控"

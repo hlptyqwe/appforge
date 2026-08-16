@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "acceptedAt": "2026-08-16T06:32:54Z",
+  "scope": "isolated-synthetic-schema113-candidate",
+  "acceptanceScript": "deploy/acceptance/v7-schema113-candidate.sh",
+  "productionDeploymentDefaultsChanged": false,
+  "productionCredentialsUsed": false,
+  "realCustomerDataUsed": false,
+  "checks": {
+    "schema112ImageExcludes113": "passed",
+    "schema113ImageIncludesMigration": "passed",
+    "freshSchema113Install": "passed",
+    "schema112To113Upgrade": "passed",
+    "migrationIdempotence": "passed",
+    "preUpgradeMarkerPreserved": "passed",
+    "sixPermanentRbacEntries": "passed",
+    "existingRolesNotAutoGranted": "passed"
+  },
+  "cleanup": {
+    "remainingDockerContainers": 0,
+    "remainingDockerNetworks": 0,
+    "remainingDockerImages": 0
+  },
+  "limitations": [
+    "candidate-migration-only-not-production-default-promotion",
+    "synthetic-empty-and-schema112-databases-only",
+    "not-customer-physical-air-gap"
+  ]
+}

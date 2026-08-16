@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "kind": "appforge-v7-npm-official-audit",
+  "auditedAt": "2026-08-16T10:21:49Z",
+  "registry": "npm-official-configured-registry",
+  "nodeVersion": "v20.20.2",
+  "npmVersion": "10.8.2",
+  "viteVersion": "8.2.1",
+  "pluginVueVersion": "6.0.8",
+  "productionDependencies": {
+    "vulnerabilities": 0,
+    "result": "passed"
+  },
+  "allDependencies": {
+    "vulnerabilities": 0,
+    "result": "passed"
+  },
+  "dependencyDetailsExported": false
+}

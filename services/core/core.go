@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"appforge/common/etcd"
+	"appforge/common/observability"
 	"appforge/common/rpcauth"
 	pb "appforge/proto/core"
 	"appforge/services/core/internal/config"
@@ -37,6 +38,9 @@ func main() {
 	if err := etcd.LoadFromEtcdAndMerge(strings.Split(*endpoints, ","), []string{*commonKey, *configKey}, &c); err != nil {
 		log.Fatal(err)
 	}
+	if err := observability.ApplyEnvironment(&c.RpcServerConf.ServiceConf); err != nil {
+		log.Fatal(err)
+	}
 
 	ctx := svc.NewServiceContext(c)
 	workerCtx, stopWorkers := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -44,16 +48,19 @@ func main() {
 
 	switch *processRole {
 	case "webhook-worker":
+		c.ServiceConf.MustSetUp()
 		logic.NewWebhookWorker(ctx).Start(workerCtx)
 		fmt.Println("Starting core webhook worker...")
 		<-workerCtx.Done()
 		return
 	case "billing-worker":
+		c.ServiceConf.MustSetUp()
 		logic.NewBillingWorker(ctx).Start(workerCtx)
 		fmt.Println("Starting core billing worker...")
 		<-workerCtx.Done()
 		return
 	case "enterprise-worker":
+		c.ServiceConf.MustSetUp()
 		logic.NewEnterpriseWorker(ctx).Start(workerCtx)
 		fmt.Println("Starting core enterprise worker...")
 		<-workerCtx.Done()

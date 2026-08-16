@@ -23,6 +23,8 @@ import type {
   PlatformBuildSchedulerEvent,
   PlatformLocalAgent,
   PlatformLocalAgentRegistration,
+  PlatformAirGappedPackage,
+  PlatformAirGappedExport,
   PlatformDeploymentStatus,
   PlatformChannel,
   PlatformChannelStats,
@@ -53,6 +55,8 @@ export type PlatformStorageObject = {
   sizeBytes: number
   sha256: string
   status: number
+  storageMode: number
+  ownerAgentId: number
 }
 
 type PlatformUploadTicket = {
@@ -71,7 +75,7 @@ export const getStorageDownload = (objectId: number) =>
 
 export async function uploadObject(
   file: File,
-  objectType: 1 | 2 | 5 | 6 | 7,
+  objectType: 1 | 2 | 5 | 6 | 7 | 10,
   appId: number,
   onProgress?: (percent: number) => void,
 ): Promise<RespBase<PlatformStorageObject>> {
@@ -286,6 +290,20 @@ export const drainLocalAgent = (id: number, drainStatus: number, tenantId = 0) =
   })
 export const revokeLocalAgent = (id: number, reason: string, tenantId = 0) =>
   post<PlatformLocalAgent>(`${base}/enterprise/local-agents/${id}/revoke`, { reason, tenantId })
+export const prepareAirGappedExport = (data: {
+  agentId: number
+  taskId: number
+  expiresSeconds?: number
+}) => post<PlatformAirGappedExport>(`${base}/enterprise/air-gapped/exports`, data)
+export const getAirGappedPackage = (packageCode: string) =>
+  get<PlatformAirGappedPackage>(
+    `${base}/enterprise/air-gapped/packages/${encodeURIComponent(packageCode)}`,
+  )
+export const importAirGappedResult = (packageCode: string, resultObjectId: number) =>
+  post<PlatformAirGappedPackage>(`${base}/enterprise/air-gapped/imports`, {
+    packageCode,
+    resultObjectId,
+  })
 export const getDeploymentStatus = () =>
   get<PlatformDeploymentStatus>(`${base}/enterprise/deployment`)
 

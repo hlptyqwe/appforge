@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "acceptedAt": "2026-08-16T10:16:01Z",
+  "scope": "synthetic-local",
+  "acceptanceScript": "deploy/acceptance/v7-private-install.sh",
+  "deploymentMode": "private",
+  "migrateImage": "appforge-private-acceptance/migrate:1.2.0-v113-offline-1119",
+  "migrateImageId": "sha256:090a73ac3307477d96c2c3a6d600dd259e335e0bb86ed89f80ee70329095469d",
+  "schemaTarget": "20260815_113_v7_air_gapped",
+  "schema113ProductionTarget": true,
+  "freshVolumes": true,
+  "imagesPreloaded": true,
+  "composePullPolicy": "never",
+  "frontendNetworkInternal": true,
+  "backendNetworkInternal": true,
+  "internalApiReachable": true,
+  "externalHttpsRejected": true,
+  "tlsFrontends": [
+    "admin",
+    "agent"
+  ],
+  "verified": [
+    "schema-migration",
+    "fixed-non-root-services",
+    "offline-license",
+    "bootstrap-admin-login",
+    "private-object-storage-bucket"
+  ],
+  "limitations": [
+    "local-docker-simulation-not-physical-air-gap",
+    "preloaded-development-images-not-formal-release-media",
+    "synthetic-temporary-credentials-and-license",
+    "fresh-install-only-not-offline-upgrade"
+  ]
+}

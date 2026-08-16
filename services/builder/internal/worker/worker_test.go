@@ -4,9 +4,40 @@ import (
 	"errors"
 	"testing"
 
+	"appforge/services/builder/internal/config"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+func TestValidateRemoteSigningCapability(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		capability string
+		localRoot  string
+		wantErr    bool
+	}{
+		{name: "not declared", capability: `{"apk":true}`},
+		{name: "explicitly disabled", capability: `{"remoteSigning":false}`},
+		{name: "enabled with provider", capability: `{"remoteSigning":true}`, localRoot: "/run/secrets"},
+		{name: "enabled without provider", capability: `{"remoteSigning":true}`, wantErr: true},
+		{name: "non boolean", capability: `{"remoteSigning":"true"}`, localRoot: "/run/secrets", wantErr: true},
+		{name: "invalid object", capability: `[]`, wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			var cfg config.Config
+			cfg.Builder.CapabilityJson = tt.capability
+			cfg.SecretProviders.LocalRoot = tt.localRoot
+			if err := validateRemoteSigningCapability(cfg); (err != nil) != tt.wantErr {
+				t.Fatalf("validateRemoteSigningCapability() error = %v, wantErr %t", err, tt.wantErr)
+			}
+		})
+	}
+}
 
 func TestIsDefinitiveOwnershipError(t *testing.T) {
 	t.Parallel()

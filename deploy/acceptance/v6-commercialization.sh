@@ -11,6 +11,10 @@ admin_ui_url=${APPFORGE_V6_ADMIN_UI_URL:-http://127.0.0.1:5173}
 agent_ui_url=${APPFORGE_V6_AGENT_UI_URL:-http://127.0.0.1:5174}
 api_url=${APPFORGE_V6_API_URL:-http://127.0.0.1:8888}
 go_cache=${APPFORGE_V6_GO_CACHE:-/private/tmp/appforge-go-build-cache}
+read_only=${APPFORGE_V6_READ_ONLY:-false}
+evidence=${APPFORGE_V6_EVIDENCE_PATH:-$repo_root/docs/enterprise/evidence/v6-commercialization-readonly-20260815.json}
+
+[[ $read_only == true || $read_only == false ]] || { echo 'APPFORGE_V6_READ_ONLY 只能是 true 或 false' >&2; exit 1; }
 
 mysql_scalar() {
   docker exec -e MYSQL_PWD="$mysql_password" "$mysql_container" \
@@ -87,11 +91,82 @@ assert_zero "账单金额字段没有浮点类型" \
   cd "$repo_root/appforge-api"
   GOCACHE="$go_cache" go test ./internal/handler -run 'Test(VerifyStripeSignature|NormalizeStripeSubscriptionEvent)' -count=1
 )
-(
-  cd "$repo_root/services/core"
-  APPFORGE_BILLING_TEST_DSN="${mysql_user}:${mysql_password}@tcp(127.0.0.1:3306)/${mysql_database}?charset=utf8mb4&parseTime=true&loc=Asia%2FHong_Kong" \
-    GOCACHE="$go_cache" go test ./internal/logic -run TestBillingRuntimeAcceptance -count=1
-)
-echo "通过: Stripe 验签、并发额度、重复/乱序事件、退款与争议运行时验收"
+if [[ $read_only == false ]]; then
+  (
+    cd "$repo_root/services/core"
+    APPFORGE_BILLING_TEST_DSN="${mysql_user}:${mysql_password}@tcp(127.0.0.1:3306)/${mysql_database}?charset=utf8mb4&parseTime=true&loc=Asia%2FHong_Kong" \
+      GOCACHE="$go_cache" go test ./internal/logic -run TestBillingRuntimeAcceptance -count=1
+  )
+  echo "通过: Stripe 验签、并发额度、重复/乱序事件、退款与争议运行时验收"
+else
+  echo "只读模式: Stripe 验签测试通过；未创建临时租户，未重跑并发额度与支付事件数据库 E2E"
+fi
+
+plan_count=$(mysql_scalar "SELECT COUNT(DISTINCT plan_code) FROM t_billing_plan WHERE status=1 AND plan_code IN ('free','pro','business')")
+tenant_count=$(mysql_scalar "SELECT COUNT(*) FROM sys_tenant")
+subscription_count=$(mysql_scalar "SELECT COUNT(*) FROM t_tenant_subscription")
+entitlement_count=$(mysql_scalar "SELECT COUNT(*) FROM t_tenant_entitlement")
+usage_ledger_count=$(mysql_scalar "SELECT COUNT(*) FROM t_usage_ledger")
+quota_reservation_count=$(mysql_scalar "SELECT COUNT(*) FROM t_quota_reservation")
+threshold_notification_count=$(mysql_scalar "SELECT COUNT(*) FROM t_usage_threshold_notification")
+invoice_count=$(mysql_scalar "SELECT COUNT(*) FROM t_invoice")
+payment_transaction_count=$(mysql_scalar "SELECT COUNT(*) FROM t_payment_transaction")
+billing_webhook_count=$(mysql_scalar "SELECT COUNT(*) FROM t_billing_webhook_event")
+
+mkdir -p "$(dirname "$evidence")"
+umask 077
+EVIDENCE_PATH="$evidence" READ_ONLY="$read_only" PLAN_COUNT="$plan_count" TENANT_COUNT="$tenant_count" \
+SUBSCRIPTION_COUNT="$subscription_count" ENTITLEMENT_COUNT="$entitlement_count" USAGE_LEDGER_COUNT="$usage_ledger_count" \
+QUOTA_RESERVATION_COUNT="$quota_reservation_count" THRESHOLD_NOTIFICATION_COUNT="$threshold_notification_count" \
+INVOICE_COUNT="$invoice_count" PAYMENT_TRANSACTION_COUNT="$payment_transaction_count" BILLING_WEBHOOK_COUNT="$billing_webhook_count" \
+python3 - <<'PY'
+import json, os, pathlib
+
+integer = lambda key: int(os.environ[key])
+read_only = os.environ['READ_ONLY'] == 'true'
+payload = {
+  'schemaVersion': 1,
+  'date': '2026-08-15',
+  'mode': 'read-only-existing-v6-evidence' if read_only else 'synthetic-runtime-v6-evidence',
+  'databaseMutated': not read_only,
+  'counts': {
+    'activeDefaultPlans': integer('PLAN_COUNT'),
+    'tenants': integer('TENANT_COUNT'),
+    'subscriptions': integer('SUBSCRIPTION_COUNT'),
+    'entitlements': integer('ENTITLEMENT_COUNT'),
+    'usageLedgerEntries': integer('USAGE_LEDGER_COUNT'),
+    'quotaReservations': integer('QUOTA_RESERVATION_COUNT'),
+    'thresholdNotifications': integer('THRESHOLD_NOTIFICATION_COUNT'),
+    'invoices': integer('INVOICE_COUNT'),
+    'paymentTransactions': integer('PAYMENT_TRANSACTION_COUNT'),
+    'billingWebhookEvents': integer('BILLING_WEBHOOK_COUNT'),
+  },
+  'checks': {
+    'requiredContainersAndHealthRoutes': 'passed',
+    'schemaMigrationsAndTables': 'passed',
+    'defaultPlans': 'passed',
+    'tenantSubscriptionAndEntitlementCoverage': 'passed',
+    'singleCurrentSubscription': 'passed',
+    'usageLedgerIdempotency': 'passed',
+    'quotaReservationIdempotency': 'passed',
+    'encryptedWebhookPayloadSchema': 'passed',
+    'integerMoneySchema': 'passed',
+    'stripeSignatureAndNormalizationUnitTests': 'passed',
+    'concurrentQuotaAndPaymentRuntimeE2E': 'not-run-read-only' if read_only else 'passed',
+  },
+  'limitations': ([
+    'This run is read-only and does not create the temporary billing acceptance tenant.',
+    'Concurrent quota oversell, duplicate/out-of-order events, refund and dispute E2E remain the recorded historical runtime evidence plus current code tests.',
+  ] if read_only else [
+    'The runtime test uses a temporary synthetic tenant and cleans it after completion.',
+  ]) + [
+    'No real Stripe charge is initiated and no production payment credential is accessed.',
+  ],
+}
+path = pathlib.Path(os.environ['EVIDENCE_PATH'])
+path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n')
+PY
+chmod 0600 "$evidence"
 
 echo "V6 商业化验收检查通过"
+echo "证据: $evidence"

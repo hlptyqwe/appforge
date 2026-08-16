@@ -8,6 +8,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -45,8 +48,9 @@ const (
 )
 
 var (
-	localAgentCodePattern = regexp.MustCompile(`^[a-z][a-z0-9_-]{1,63}$`)
-	sha256Pattern         = regexp.MustCompile(`^[0-9a-f]{64}$`)
+	localAgentCodePattern    = regexp.MustCompile(`^[a-z][a-z0-9_-]{1,63}$`)
+	sha256Pattern            = regexp.MustCompile(`^[0-9a-f]{64}$`)
+	customerObjectKeyPattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._/-]*$`)
 )
 
 const localAgentSelect = `SELECT id,tenant_id,agent_code,agent_name,pool_code,status,drain_status,
@@ -84,6 +88,11 @@ func createLocalAgentRegistration(ctx context.Context, svcCtx *svc.ServiceContex
 	}
 	if err := requireOptionalText(in.CustomerStorageRef, "customer_storage_ref", 500); err != nil {
 		return nil, err
+	}
+	if in.ArtifactMode == core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE {
+		if _, _, err := parseCustomerStorageDescriptor(in.CustomerStorageRef, tenant, code); err != nil {
+			return nil, err
+		}
 	}
 	appIDs, appJSON, err := normalizeAgentApps(ctx, svcCtx.DB, tenant, in.AllowedAppIds)
 	if err != nil {
@@ -406,10 +415,10 @@ func claimLocalAgentBuildTask(ctx context.Context, svcCtx *svc.ServiceContext, i
 		return nil, err
 	}
 	if agent.Status != localAgentOnline || agent.DrainStatus != localAgentAccepting {
-		return &core.LocalAgentBuildTaskResp{Base: okBase(), ArtifactMode: core.HybridArtifactMode(agent.ArtifactMode)}, nil
+		return &core.LocalAgentBuildTaskResp{Base: okBase(), ArtifactMode: core.HybridArtifactMode(agent.ArtifactMode), CustomerStorageRef: stringValue(agent.CustomerStorageRef)}, nil
 	}
 	if agent.ProtocolVersion < localTaskBundleProtocol {
-		return &core.LocalAgentBuildTaskResp{Base: okBase(), ArtifactMode: core.HybridArtifactMode(agent.ArtifactMode)}, nil
+		return &core.LocalAgentBuildTaskResp{Base: okBase(), ArtifactMode: core.HybridArtifactMode(agent.ArtifactMode), CustomerStorageRef: stringValue(agent.CustomerStorageRef)}, nil
 	}
 	apps := parseAppIDs(agent.AllowedAppIds)
 	if len(apps) == 0 {
@@ -504,7 +513,95 @@ VALUES (?,?,?,?,?,?,?,DATE_ADD(CURRENT_TIMESTAMP(3),INTERVAL ? SECOND))`, task.I
 	if err != nil {
 		return nil, err
 	}
-	return &core.LocalAgentBuildTaskResp{Base: okBase(), Task: mapBuildTask(claimed), ArtifactMode: core.HybridArtifactMode(agent.ArtifactMode)}, nil
+	return &core.LocalAgentBuildTaskResp{Base: okBase(), Task: mapBuildTask(claimed), ArtifactMode: core.HybridArtifactMode(agent.ArtifactMode), CustomerStorageRef: stringValue(agent.CustomerStorageRef)}, nil
+}
+
+func registerCustomerStorageInput(ctx context.Context, svcCtx *svc.ServiceContext, in *core.RegisterCustomerStorageInputReq) (*core.StorageObjectResp, error) {
+	if in == nil {
+		return nil, status.Error(codes.InvalidArgument, "request is required")
+	}
+	agent, err := authenticateLocalAgent(ctx, svcCtx, in.Auth)
+	if err != nil {
+		return nil, err
+	}
+	if agent.ArtifactMode != int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE) {
+		return nil, status.Error(codes.PermissionDenied, "Local Agent is not authorized for customer storage")
+	}
+	if in.AppId <= 0 || !containsAgentApp(parseAppIDs(agent.AllowedAppIds), in.AppId) {
+		return nil, status.Error(codes.PermissionDenied, "application is not authorized for Local Agent")
+	}
+	switch in.ObjectType {
+	case core.StorageObjectType_STORAGE_OBJECT_TYPE_SOURCE_APK,
+		core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE,
+		core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO,
+		core.StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH,
+		core.StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE:
+	default:
+		return nil, status.Error(codes.InvalidArgument, "customer storage input object type is not supported")
+	}
+	_, prefix, err := parseCustomerStorageDescriptor(stringValue(agent.CustomerStorageRef), agent.TenantId, agent.AgentCode)
+	if err != nil {
+		return nil, status.Error(codes.FailedPrecondition, "Local Agent customer storage configuration is invalid")
+	}
+	objectKey, err := parseCustomerObjectReference(in.ObjectReference, agent.Id, prefix)
+	if err != nil {
+		return nil, err
+	}
+	digest := strings.ToLower(strings.TrimSpace(in.Sha256))
+	if !sha256Pattern.MatchString(digest) {
+		return nil, status.Error(codes.InvalidArgument, "sha256 must be 64 lowercase hexadecimal characters")
+	}
+	validation := &core.CreateStorageObjectReq{AppId: in.AppId, ObjectType: in.ObjectType, ObjectKey: objectKey,
+		OriginalName: in.OriginalName, ContentType: in.ContentType, SizeBytes: in.SizeBytes}
+	if err := validateStorageObjectInput(validation, agent.TenantId); err != nil {
+		return nil, err
+	}
+	expectedKey := customerInputObjectKey(prefix, in.AppId, in.ObjectType, digest, strings.TrimSpace(in.OriginalName))
+	if expectedKey == "" || objectKey != expectedKey {
+		return nil, status.Error(codes.PermissionDenied, "customer input object reference does not match application, type and digest")
+	}
+	var item models.TStorageObject
+	err = svcCtx.DB.TransactCtx(ctx, func(txCtx context.Context, session sqlx.Session) error {
+		err := session.QueryRowCtx(txCtx, &item, storageObjectSelect+` WHERE tenant_id=? AND object_key=? FOR UPDATE`, agent.TenantId, objectKey)
+		if err == nil {
+			if item.AppId != in.AppId || item.ObjectType != int64(in.ObjectType) || item.OriginalName != strings.TrimSpace(in.OriginalName) ||
+				item.SizeBytes != in.SizeBytes || !item.Sha256.Valid || item.Sha256.String != digest ||
+				item.StorageMode != int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE) || item.OwnerAgentId != agent.Id ||
+				(item.Status != storageStatusReady && item.Status != storageStatusBound) {
+				return status.Error(codes.AlreadyExists, "customer object reference is already registered with different metadata")
+			}
+			return nil
+		}
+		if err != sqlx.ErrNotFound && err != sql.ErrNoRows {
+			return err
+		}
+		created := &models.TStorageObject{TenantId: agent.TenantId, AppId: in.AppId, ObjectType: int64(in.ObjectType),
+			ObjectKey: objectKey, OriginalName: strings.TrimSpace(in.OriginalName), ContentType: strings.TrimSpace(validation.ContentType),
+			SizeBytes: in.SizeBytes, Sha256: nullString(digest), Status: storageStatusReady,
+			StorageMode: int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE), OwnerAgentId: agent.Id, CreateBy: 0}
+		result, err := svcCtx.StorageObjectModel.WithSession(session).Insert(txCtx, created)
+		if err != nil {
+			return status.Errorf(codes.Internal, "register customer storage object: %v", err)
+		}
+		created.Id, err = result.LastInsertId()
+		if err != nil {
+			return status.Errorf(codes.Internal, "read customer storage object id: %v", err)
+		}
+		if _, err := reserveQuotaInSession(txCtx, session, agent.TenantId, "storage.bytes", in.SizeBytes,
+			"storage", created.Id, storageQuotaKey(objectKey), 24*time.Hour); err != nil {
+			return err
+		}
+		usageMetric, _ := mapUsageMetric(storageUsageMetric(created.ObjectType))
+		if err := confirmQuotaInSession(txCtx, session, agent.TenantId, "storage.bytes", storageQuotaKey(objectKey),
+			usageMetric, created.Id, billingUsageMetadata(map[string]any{"objectType": created.ObjectType, "customerStorage": true, "localAgentId": agent.Id})); err != nil {
+			return err
+		}
+		return session.QueryRowCtx(txCtx, &item, storageObjectSelect+` WHERE id=?`, created.Id)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &core.StorageObjectResp{Base: okBase(), Data: mapStorageObject(&item)}, nil
 }
 
 func renewLocalAgentTaskLease(ctx context.Context, svcCtx *svc.ServiceContext, in *core.RenewLocalAgentTaskLeaseReq) (*core.RespBase, error) {
@@ -545,21 +642,26 @@ func completeLocalAgentBuildTask(ctx context.Context, svcCtx *svc.ServiceContext
 			return nil, err
 		}
 	}
+	var apkObjectID, logObjectID int64
 	builderID := fmt.Sprintf("local-%d", agent.Id)
 	err = svcCtx.DB.TransactCtx(ctx, func(txCtx context.Context, session sqlx.Session) error {
 		var task models.TBuildTask
 		if err := session.QueryRowCtx(txCtx, &task, buildTaskSelect+` WHERE id=? AND tenant_id=? AND builder_id=? AND builder_attempt=? AND status IN (?,?,?) AND lease_until>CURRENT_TIMESTAMP(3) FOR UPDATE`, in.TaskId, agent.TenantId, builderID, in.BuilderAttempt, buildStatusBuilding, buildStatusSigning, buildStatusUploading); err != nil {
 			return status.Error(codes.NotFound, "build task is not owned by Local Agent or lease expired")
 		}
-		if err := upsertHybridArtifact(txCtx, session, agent, &task, in.BuilderAttempt, core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK, in.ApkReference, in.ApkSha256, in.ApkSize); err != nil {
+		apkObjectID, err = upsertHybridArtifact(txCtx, session, svcCtx, agent, &task, in.BuilderAttempt,
+			core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK, in.ApkReference, in.ApkSha256, in.ApkSize)
+		if err != nil {
 			return err
 		}
 		if strings.TrimSpace(in.LogReference) != "" {
-			if err := upsertHybridArtifact(txCtx, session, agent, &task, in.BuilderAttempt, core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG, in.LogReference, in.LogSha256, in.LogSize); err != nil {
+			logObjectID, err = upsertHybridArtifact(txCtx, session, svcCtx, agent, &task, in.BuilderAttempt,
+				core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG, in.LogReference, in.LogSha256, in.LogSize)
+			if err != nil {
 				return err
 			}
 		}
-		result, err := session.ExecCtx(txCtx, `UPDATE t_build_task SET status=?,apk_url=?,apk_sha256=?,apk_size=?,log_url=NULLIF(?,''),error_message=NULL,finish_time=CURRENT_TIMESTAMP(3),lease_until=NULL WHERE id=? AND builder_id=? AND builder_attempt=?`, buildStatusSuccess, in.ApkReference, in.ApkSha256, in.ApkSize, in.LogReference, task.Id, builderID, in.BuilderAttempt)
+		result, err := session.ExecCtx(txCtx, `UPDATE t_build_task SET status=?,apk_url=?,apk_object_id=?,apk_sha256=?,apk_size=?,log_url=NULLIF(?,''),log_object_id=?,error_message=NULL,finish_time=CURRENT_TIMESTAMP(3),lease_until=NULL WHERE id=? AND builder_id=? AND builder_attempt=?`, buildStatusSuccess, in.ApkReference, apkObjectID, in.ApkSha256, in.ApkSize, in.LogReference, logObjectID, task.Id, builderID, in.BuilderAttempt)
 		if err != nil {
 			return err
 		}
@@ -601,6 +703,7 @@ func failLocalAgentBuildTask(ctx context.Context, svcCtx *svc.ServiceContext, in
 			return nil, err
 		}
 	}
+	var logObjectID int64
 	builderID := fmt.Sprintf("local-%d", agent.Id)
 	err = svcCtx.DB.TransactCtx(ctx, func(txCtx context.Context, session sqlx.Session) error {
 		var task models.TBuildTask
@@ -608,11 +711,13 @@ func failLocalAgentBuildTask(ctx context.Context, svcCtx *svc.ServiceContext, in
 			return status.Error(codes.NotFound, "build task is not owned by Local Agent or lease expired")
 		}
 		if strings.TrimSpace(in.LogReference) != "" {
-			if err := upsertHybridArtifact(txCtx, session, agent, &task, in.BuilderAttempt, core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG, in.LogReference, in.LogSha256, in.LogSize); err != nil {
+			logObjectID, err = upsertHybridArtifact(txCtx, session, svcCtx, agent, &task, in.BuilderAttempt,
+				core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG, in.LogReference, in.LogSha256, in.LogSize)
+			if err != nil {
 				return err
 			}
 		}
-		result, err := session.ExecCtx(txCtx, `UPDATE t_build_task SET status=?,error_message=?,log_url=NULLIF(?,''),finish_time=CURRENT_TIMESTAMP(3),lease_until=NULL WHERE id=? AND builder_id=? AND builder_attempt=?`, buildStatusFailed, strings.TrimSpace(in.ErrorMessage), in.LogReference, task.Id, builderID, in.BuilderAttempt)
+		result, err := session.ExecCtx(txCtx, `UPDATE t_build_task SET status=?,error_message=?,log_url=NULLIF(?,''),log_object_id=?,finish_time=CURRENT_TIMESTAMP(3),lease_until=NULL WHERE id=? AND builder_id=? AND builder_attempt=?`, buildStatusFailed, strings.TrimSpace(in.ErrorMessage), in.LogReference, logObjectID, task.Id, builderID, in.BuilderAttempt)
 		if err != nil {
 			return err
 		}
@@ -657,7 +762,8 @@ func verifyHybridArtifact(ctx context.Context, svcCtx *svc.ServiceContext, in *c
 		if err := session.QueryRowCtx(txCtx, &task, buildTaskSelect+` WHERE id=? AND tenant_id=? AND builder_id=? AND builder_attempt=? FOR UPDATE`, in.TaskId, agent.TenantId, fmt.Sprintf("local-%d", agent.Id), in.BuilderAttempt); err != nil {
 			return status.Error(codes.NotFound, "build task is not owned by Local Agent")
 		}
-		return upsertHybridArtifact(txCtx, session, agent, &task, in.BuilderAttempt, in.ArtifactType, in.ObjectReference, in.Sha256, in.SizeBytes)
+		_, err := upsertHybridArtifact(txCtx, session, svcCtx, agent, &task, in.BuilderAttempt, in.ArtifactType, in.ObjectReference, in.Sha256, in.SizeBytes)
+		return err
 	})
 	if err != nil {
 		return nil, err
@@ -878,30 +984,202 @@ func validateHybridArtifactInput(reference, digest string, size int64) error {
 	}
 	return nil
 }
-func upsertHybridArtifact(ctx context.Context, session sqlx.Session, agent *models.TLocalAgent, task *models.TBuildTask, attempt int32, artifactType core.HybridArtifactType, reference, digest string, size int64) error {
+
+func parseCustomerStorageDescriptor(reference string, tenantID int64, agentCode string) (string, string, error) {
+	value := strings.TrimSpace(reference)
+	parsed, err := url.Parse(value)
+	if err != nil || strings.ToLower(parsed.Scheme) != "local-file" || parsed.User != nil ||
+		(parsed.Host != "" && parsed.Host != "localhost") || parsed.RawQuery != "" || parsed.Fragment == "" ||
+		strings.Contains(value, "%") || strings.ContainsAny(value, "\r\n@") {
+		return "", "", status.Error(codes.InvalidArgument, "customer_storage_ref must be local-file:///name.json#registered/prefix")
+	}
+	secretPath := path.Clean("/" + strings.TrimSpace(parsed.Path))
+	if secretPath == "/" || !strings.HasSuffix(strings.ToLower(secretPath), ".json") || strings.Contains(secretPath, "..") {
+		return "", "", status.Error(codes.InvalidArgument, "customer storage Secret path is invalid")
+	}
+	prefix := strings.Trim(strings.TrimSpace(parsed.Fragment), "/")
+	if prefix == "" || len(prefix) > 300 || path.Clean(prefix) != prefix || strings.Contains(prefix, "..") || !customerObjectKeyPattern.MatchString(prefix) {
+		return "", "", status.Error(codes.InvalidArgument, "customer storage prefix is invalid")
+	}
+	required := fmt.Sprintf("tenants/%d/agents/%s", tenantID, strings.TrimSpace(agentCode))
+	if prefix != required && !strings.HasPrefix(prefix, required+"/") {
+		return "", "", status.Error(codes.PermissionDenied, "customer storage prefix must belong to the tenant and Agent code")
+	}
+	canonical := "local-file://" + secretPath + "#" + prefix
+	if parsed.Host == "localhost" {
+		canonical = "local-file://localhost" + secretPath + "#" + prefix
+	}
+	if value != canonical {
+		return "", "", status.Error(codes.InvalidArgument, "customer_storage_ref is not canonical")
+	}
+	return secretPath, prefix, nil
+}
+
+func customerObjectReference(agentID int64, objectKey string) string {
+	return fmt.Sprintf("customer-object://%d/%s", agentID, objectKey)
+}
+
+func parseCustomerObjectReference(reference string, agentID int64, registeredPrefix string) (string, error) {
+	value := strings.TrimSpace(reference)
+	parsed, err := url.Parse(value)
+	if err != nil || strings.ToLower(parsed.Scheme) != "customer-object" || parsed.User != nil || parsed.RawQuery != "" ||
+		parsed.Fragment != "" || strings.Contains(value, "%") || strings.ContainsAny(value, "\r\n@") || parsed.Host != strconv.FormatInt(agentID, 10) {
+		return "", status.Error(codes.InvalidArgument, "customer object reference is invalid")
+	}
+	key := strings.TrimPrefix(parsed.Path, "/")
+	if key == "" || len(key) > 480 || path.Clean(key) != key || strings.Contains(key, "..") || !customerObjectKeyPattern.MatchString(key) {
+		return "", status.Error(codes.InvalidArgument, "customer object key is invalid")
+	}
+	if key != registeredPrefix && !strings.HasPrefix(key, registeredPrefix+"/") {
+		return "", status.Error(codes.PermissionDenied, "customer object is outside the registered prefix")
+	}
+	if value != customerObjectReference(agentID, key) {
+		return "", status.Error(codes.InvalidArgument, "customer object reference is not canonical")
+	}
+	return key, nil
+}
+
+func customerInputObjectKey(prefix string, appID int64, objectType core.StorageObjectType, digest, originalName string) string {
+	if appID <= 0 || objectType <= core.StorageObjectType_STORAGE_OBJECT_TYPE_UNKNOWN || !sha256Pattern.MatchString(digest) {
+		return ""
+	}
+	extension := strings.ToLower(filepath.Ext(strings.TrimSpace(originalName)))
+	if extension == "" || len(extension) > 16 {
+		return ""
+	}
+	return path.Join(prefix, "inputs", "apps", strconv.FormatInt(appID, 10), strconv.FormatInt(int64(objectType), 10), digest+extension)
+}
+
+func customerTaskObjectKey(prefix string, taskID int64, attempt int32, artifactType core.HybridArtifactType) string {
+	name := ""
+	switch artifactType {
+	case core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK:
+		name = "built.apk"
+	case core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG:
+		name = "build.log"
+	default:
+		return ""
+	}
+	return path.Join(prefix, "tasks", strconv.FormatInt(taskID, 10), "attempts", strconv.FormatInt(int64(attempt), 10), name)
+}
+
+func containsAgentApp(apps []int64, appID int64) bool {
+	for _, current := range apps {
+		if current == appID {
+			return true
+		}
+	}
+	return false
+}
+
+func upsertHybridArtifact(ctx context.Context, session sqlx.Session, svcCtx *svc.ServiceContext, agent *models.TLocalAgent, task *models.TBuildTask, attempt int32, artifactType core.HybridArtifactType, reference, digest string, size int64) (int64, error) {
 	if task.TenantId != agent.TenantId || task.BuilderAttempt != int64(attempt) {
-		return status.Error(codes.PermissionDenied, "Artifact tenant or task attempt mismatch")
+		return 0, status.Error(codes.PermissionDenied, "Artifact tenant or task attempt mismatch")
 	}
-	if artifactType < core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_SOURCE_APK || artifactType > core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE {
-		return status.Error(codes.InvalidArgument, "artifact_type is invalid")
+	if artifactType < core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_SOURCE_APK || artifactType > core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG {
+		return 0, status.Error(codes.InvalidArgument, "artifact_type is invalid")
 	}
+	objectID := int64(0)
 	if agent.ArtifactMode == int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE) {
-		objectID, err := parseControlPlaneStorageReference(reference)
+		parsedObjectID, err := parseControlPlaneStorageReference(reference)
 		if err != nil {
-			return err
+			return 0, err
 		}
 		var object models.TStorageObject
-		if err := session.QueryRowCtx(ctx, &object, storageObjectSelect+` WHERE id=? FOR UPDATE`, objectID); err != nil {
-			return status.Error(codes.NotFound, "control-plane Artifact object was not found")
+		if err := session.QueryRowCtx(ctx, &object, storageObjectSelect+` WHERE id=? FOR UPDATE`, parsedObjectID); err != nil {
+			return 0, notFoundOrInternal(err, "control-plane Artifact object")
 		}
 		if err := validateControlPlaneStorageObject(&object, task, artifactType, digest, size); err != nil {
-			return err
+			return 0, err
 		}
-		if object.Status == storageStatusReady {
-			if _, err := session.ExecCtx(ctx, `UPDATE t_storage_object SET status=? WHERE id=? AND status=?`, storageStatusBound, object.Id, storageStatusReady); err != nil {
-				return status.Errorf(codes.Internal, "bind control-plane Artifact object: %v", err)
+		var conflicts int64
+		if err := session.QueryRowCtx(ctx, &conflicts, `SELECT COUNT(*) FROM t_hybrid_artifact_reference
+WHERE object_reference=? AND (tenant_id<>? OR task_id<>? OR builder_attempt<>? OR artifact_type<>?)`,
+			strings.TrimSpace(reference), task.TenantId, task.Id, attempt, int64(artifactType)); err != nil {
+			return 0, status.Errorf(codes.Internal, "check control-plane Artifact binding: %v", err)
+		}
+		if conflicts != 0 {
+			return 0, status.Error(codes.AlreadyExists, "control-plane Artifact object is already bound to another task attempt")
+		}
+		if artifactType == core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK || artifactType == core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG {
+			if err := session.QueryRowCtx(ctx, &conflicts, `SELECT COUNT(*) FROM t_build_task
+WHERE id<>? AND (apk_object_id=? OR log_object_id=?)`, task.Id, object.Id, object.Id); err != nil {
+				return 0, status.Errorf(codes.Internal, "check build Artifact object binding: %v", err)
+			}
+			if conflicts != 0 {
+				return 0, status.Error(codes.AlreadyExists, "control-plane Artifact object is already bound to another build task")
 			}
 		}
+		if object.Status == storageStatusReady {
+			object.Status = storageStatusBound
+			if err := svcCtx.StorageObjectModel.WithSession(session).Update(ctx, &object); err != nil {
+				return 0, status.Errorf(codes.Internal, "bind control-plane Artifact object: %v", err)
+			}
+		}
+		objectID = object.Id
+	} else if agent.ArtifactMode == int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE) {
+		_, prefix, err := parseCustomerStorageDescriptor(stringValue(agent.CustomerStorageRef), agent.TenantId, agent.AgentCode)
+		if err != nil {
+			return 0, status.Error(codes.FailedPrecondition, "Local Agent customer storage configuration is invalid")
+		}
+		objectKey, err := parseCustomerObjectReference(reference, agent.Id, prefix)
+		if err != nil {
+			return 0, err
+		}
+		expectedKey := customerTaskObjectKey(prefix, task.Id, attempt, artifactType)
+		if expectedKey == "" || objectKey != expectedKey {
+			return 0, status.Error(codes.PermissionDenied, "customer Artifact reference does not match task, attempt and type")
+		}
+		objectType, originalName, contentType := customerOutputMetadata(artifactType)
+		if objectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_UNKNOWN {
+			return 0, status.Error(codes.InvalidArgument, "customer storage does not support this Artifact type")
+		}
+		var object models.TStorageObject
+		findErr := session.QueryRowCtx(ctx, &object, storageObjectSelect+` WHERE tenant_id=? AND object_key=? FOR UPDATE`, task.TenantId, objectKey)
+		if findErr == nil {
+			if object.AppId != task.AppId || object.ObjectType != int64(objectType) || object.SizeBytes != size ||
+				!object.Sha256.Valid || object.Sha256.String != strings.ToLower(strings.TrimSpace(digest)) ||
+				object.StorageMode != int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE) || object.OwnerAgentId != agent.Id ||
+				(object.Status != storageStatusReady && object.Status != storageStatusBound) {
+				return 0, status.Error(codes.AlreadyExists, "customer Artifact object is already registered with different metadata")
+			}
+			objectID = object.Id
+		} else if findErr != sqlx.ErrNotFound && findErr != sql.ErrNoRows {
+			return 0, findErr
+		} else {
+			created := &models.TStorageObject{TenantId: task.TenantId, AppId: task.AppId, ObjectType: int64(objectType),
+				ObjectKey: objectKey, OriginalName: originalName, ContentType: contentType, SizeBytes: size,
+				Sha256: nullString(strings.ToLower(strings.TrimSpace(digest))), Status: storageStatusBound,
+				StorageMode: int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE), OwnerAgentId: agent.Id, CreateBy: 0}
+			result, err := svcCtx.StorageObjectModel.WithSession(session).Insert(ctx, created)
+			if err != nil {
+				return 0, status.Errorf(codes.Internal, "register customer Artifact object: %v", err)
+			}
+			objectID, err = result.LastInsertId()
+			if err != nil {
+				return 0, status.Errorf(codes.Internal, "read customer Artifact object id: %v", err)
+			}
+			if _, err := reserveQuotaInSession(ctx, session, task.TenantId, "storage.bytes", size,
+				"storage", objectID, storageQuotaKey(objectKey), 24*time.Hour); err != nil {
+				return 0, err
+			}
+			usageMetric, _ := mapUsageMetric(storageUsageMetric(int64(objectType)))
+			if err := confirmQuotaInSession(ctx, session, task.TenantId, "storage.bytes", storageQuotaKey(objectKey),
+				usageMetric, objectID, billingUsageMetadata(map[string]any{"objectType": objectType, "customerStorage": true, "localAgentId": agent.Id})); err != nil {
+				return 0, err
+			}
+		}
+		var conflicts int64
+		if err := session.QueryRowCtx(ctx, &conflicts, `SELECT COUNT(*) FROM t_hybrid_artifact_reference
+WHERE object_reference=? AND (tenant_id<>? OR agent_id<>? OR task_id<>? OR builder_attempt<>? OR artifact_type<>?)`,
+			strings.TrimSpace(reference), task.TenantId, agent.Id, task.Id, attempt, int64(artifactType)); err != nil {
+			return 0, status.Errorf(codes.Internal, "check customer Artifact binding: %v", err)
+		}
+		if conflicts != 0 {
+			return 0, status.Error(codes.AlreadyExists, "customer Artifact object is already bound to another task attempt")
+		}
+	} else {
+		return 0, status.Error(codes.FailedPrecondition, "AIR_GAPPED Artifacts must use signed package import/export RPCs")
 	}
 	_, err := session.ExecCtx(ctx, `INSERT INTO t_hybrid_artifact_reference
 (tenant_id,agent_id,task_id,builder_attempt,artifact_type,storage_mode,object_reference,sha256,size_bytes,status,verified_at)
@@ -909,16 +1187,27 @@ VALUES (?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP(3)) ON DUPLICATE KEY UPDATE
 object_reference=IF(object_reference=VALUES(object_reference) AND sha256=VALUES(sha256) AND size_bytes=VALUES(size_bytes),object_reference,object_reference),
 status=IF(object_reference=VALUES(object_reference) AND sha256=VALUES(sha256) AND size_bytes=VALUES(size_bytes),VALUES(status),status)`, task.TenantId, agent.Id, task.Id, attempt, int64(artifactType), agent.ArtifactMode, strings.TrimSpace(reference), strings.ToLower(strings.TrimSpace(digest)), size, hybridArtifactVerified)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	var matches int64
 	if err := session.QueryRowCtx(ctx, &matches, `SELECT COUNT(*) FROM t_hybrid_artifact_reference WHERE tenant_id=? AND task_id=? AND builder_attempt=? AND artifact_type=? AND agent_id=? AND storage_mode=? AND object_reference=? AND sha256=? AND size_bytes=?`, task.TenantId, task.Id, attempt, int64(artifactType), agent.Id, agent.ArtifactMode, strings.TrimSpace(reference), strings.ToLower(strings.TrimSpace(digest)), size); err != nil {
-		return err
+		return 0, err
 	}
 	if matches != 1 {
-		return status.Error(codes.AlreadyExists, "Artifact idempotency key is already used with different integrity data")
+		return 0, status.Error(codes.AlreadyExists, "Artifact idempotency key is already used with different integrity data")
 	}
-	return nil
+	return objectID, nil
+}
+
+func customerOutputMetadata(artifactType core.HybridArtifactType) (core.StorageObjectType, string, string) {
+	switch artifactType {
+	case core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK:
+		return core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK, "built.apk", "application/vnd.android.package-archive"
+	case core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG:
+		return core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG, "build.log", "text/plain"
+	default:
+		return core.StorageObjectType_STORAGE_OBJECT_TYPE_UNKNOWN, "", ""
+	}
 }
 
 func parseControlPlaneStorageReference(reference string) (int64, error) {
@@ -956,6 +1245,9 @@ func validateControlPlaneStorageObject(object *models.TStorageObject, task *mode
 	}
 	if object.ObjectType != expectedObjectType {
 		return status.Error(codes.FailedPrecondition, "control-plane Artifact object type mismatch")
+	}
+	if object.StorageMode != int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE) || object.OwnerAgentId != 0 {
+		return status.Error(codes.FailedPrecondition, "control-plane Artifact storage ownership mismatch")
 	}
 	if object.Status != storageStatusReady && object.Status != storageStatusBound {
 		return status.Error(codes.FailedPrecondition, "control-plane Artifact object is not verified")

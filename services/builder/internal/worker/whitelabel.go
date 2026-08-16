@@ -607,3 +607,26 @@ func verifyKeystoreCertificate(ctx context.Context, keystorePath, alias, passwor
 	}
 	return nil
 }
+
+func verifySignedAPKCertificate(ctx context.Context, apkPath, expected string) error {
+	expected = strings.ToLower(strings.TrimSpace(expected))
+	if len(expected) != 64 {
+		return fmt.Errorf("expected signed APK certificate fingerprint is invalid")
+	}
+	output, err := exec.CommandContext(ctx, "apksigner", "verify", "--print-certs", apkPath).Output()
+	if err != nil {
+		return fmt.Errorf("read signed APK certificate failed")
+	}
+	const prefix = "Signer #1 certificate SHA-256 digest:"
+	var fingerprints []string
+	for _, line := range strings.Split(string(output), "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, prefix) {
+			fingerprints = append(fingerprints, strings.ToLower(strings.TrimSpace(strings.TrimPrefix(line, prefix))))
+		}
+	}
+	if len(fingerprints) != 1 || fingerprints[0] != expected {
+		return fmt.Errorf("signed APK certificate fingerprint mismatch")
+	}
+	return nil
+}

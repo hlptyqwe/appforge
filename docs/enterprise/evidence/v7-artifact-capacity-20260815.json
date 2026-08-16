@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "acceptedAt": "2026-08-15T08:52:23Z",
+  "scope": "synthetic-local",
+  "acceptanceScript": "deploy/acceptance/v7-artifact-capacity.sh",
+  "notCustomerCapacity": true,
+  "apkBuild": {
+    "image": "appforge-local-agent:dev",
+    "concurrency": 4,
+    "completed": 4,
+    "failed": 0,
+    "durationSeconds": 2.762087,
+    "buildsPerMinute": 86.891,
+    "validation": [
+      "apk-signature",
+      "package-name",
+      "result-sha256"
+    ]
+  },
+  "localObjectStorage": {
+    "provider": "temporary-prefix-on-development-minio",
+    "objectMiB": 32,
+    "copies": 4,
+    "totalMiBPerDirection": 128,
+    "uploadDurationSeconds": 1.359398,
+    "uploadMiBPerSecond": 94.159,
+    "downloadDurationSeconds": 0.91559,
+    "downloadMiBPerSecond": 139.801,
+    "minimumMiBPerSecond": 1.0,
+    "sha256Verified": true,
+    "temporaryPrefixRemoved": true
+  },
+  "apiStability": {
+    "durationSeconds": 120,
+    "concurrency": 8,
+    "requests": 448739,
+    "successes": 448739,
+    "errors": 0,
+    "averageSeconds": 0.0021378492051596053,
+    "p50Seconds": 0.0019187909783795476,
+    "p95Seconds": 0.0033255000598728657,
+    "p99Seconds": 0.005958499968983233,
+    "maxSeconds": 0.09881799994036555,
+    "p99LimitSeconds": 2.0
+  },
+  "limitations": [
+    "synthetic-apk-and-test-keystore-only",
+    "single-developer-workstation",
+    "local-docker-network-and-development-minio",
+    "short-stability-run-not-production-soak",
+    "not-an-android-authorized-device-test",
+    "not-a-customer-capacity-or-peak-commitment"
+  ]
+}

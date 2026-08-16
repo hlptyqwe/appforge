@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -8,13 +10,112 @@ import (
 	"crypto/x509/pkix"
 	"encoding/json"
 	"encoding/pem"
+	"io"
 	"math/big"
+	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 )
+
+func TestExecutorBundleOmitsControlPlaneSigningSecretReference(t *testing.T) {
+	bundle := buildManifest{SigningSecretRef: ""}
+	encoded, err := json.Marshal(&bundle)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(encoded), "signing_secret_ref") {
+		t.Fatalf("control-plane Secret reference field leaked into strict executor bundle: %s", encoded)
+	}
+}
+
+func TestDownloadArtifactInputsVerifiesBytesAndUsesPrivateFiles(t *testing.T) {
+	payload := []byte("private-keystore-fixture")
+	digest := digestBytes(payload)
+	client := &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+		if r.URL.Path != "/v1/artifacts/download/token" {
+			t.Fatalf("unexpected path %q", r.URL.Path)
+		}
+		return &http.Response{StatusCode: http.StatusOK, Status: "200 OK", Body: io.NopCloser(bytes.NewReader(payload)),
+			ContentLength: int64(len(payload)), Header: http.Header{"X-AppForge-Sha256": []string{digest}}}, nil
+	})}
+	bundle := &buildManifest{Inputs: []buildInput{{Role: "keystore", ObjectID: 9, OriginalName: "release.jks",
+		SizeBytes: int64(len(payload)), SHA256: digest, DownloadPath: "/v1/artifacts/download/token"}}}
+	workDir := t.TempDir()
+	if err := downloadArtifactInputs(context.Background(), client, "https://gateway.example:9443", workDir, bundle); err != nil {
+		t.Fatal(err)
+	}
+	info, err := os.Stat(bundle.Inputs[0].LocalPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if info.Mode().Perm() != 0o600 {
+		t.Fatalf("download mode=%o", info.Mode().Perm())
+	}
+	actual, err := os.ReadFile(bundle.Inputs[0].LocalPath)
+	if err != nil || !bytes.Equal(actual, payload) {
+		t.Fatalf("downloaded bytes=%q err=%v", actual, err)
+	}
+
+	bundle.Inputs[0].SHA256 = digestBytes([]byte("tampered"))
+	if err := downloadArtifactInputs(context.Background(), client, "https://gateway.example:9443", workDir, bundle); err == nil {
+		t.Fatal("tampered input digest was accepted")
+	}
+}
+
+func TestUploadArtifactOutputHashesPrivateTaskFile(t *testing.T) {
+	payload := []byte("signed-apk-fixture")
+	digest := digestBytes(payload)
+	client := &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+		if r.Method != http.MethodPut || r.URL.Path != "/v1/artifacts/upload/token" {
+			t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
+		}
+		if r.Header.Get("X-AppForge-Sha256") != digest || r.ContentLength != int64(len(payload)) {
+			t.Fatalf("unexpected integrity headers")
+		}
+		actual, _ := io.ReadAll(r.Body)
+		if !bytes.Equal(actual, payload) {
+			t.Fatalf("uploaded bytes=%q", actual)
+		}
+		encoded, _ := json.Marshal(artifactUploadResponse{Reference: "storage-object://91", SHA256: digest, SizeBytes: int64(len(payload))})
+		return &http.Response{StatusCode: http.StatusOK, Status: "200 OK", Body: io.NopCloser(bytes.NewReader(encoded)), Header: make(http.Header)}, nil
+	})}
+	workDir := t.TempDir()
+	artifact := filepath.Join(workDir, "channel.apk")
+	if err := os.WriteFile(artifact, payload, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	bundle := &buildManifest{Outputs: []buildOutput{{Role: "built_apk", UploadPath: "/v1/artifacts/upload/token"}}}
+	result, err := uploadArtifactOutput(context.Background(), client, "https://gateway.example:9443", workDir, bundle, "built_apk", artifact)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Reference != "storage-object://91" || result.SHA256 != digest || result.SizeBytes != int64(len(payload)) {
+		t.Fatalf("unexpected upload result: %#v", result)
+	}
+	outside := filepath.Join(t.TempDir(), "outside.apk")
+	if err := os.WriteFile(outside, payload, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := uploadArtifactOutput(context.Background(), client, "https://gateway.example:9443", workDir, bundle, "built_apk", outside); err == nil {
+		t.Fatal("output path outside task directory was accepted")
+	}
+}
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(request *http.Request) (*http.Response, error) { return f(request) }
+
+func TestGatewayArtifactURLRejectsHostAndQueryInjection(t *testing.T) {
+	for _, value := range []string{"https://evil.example/v1/artifacts/download/token", "/v1/artifacts/download/token?secret=1", "/v1/artifacts/download/a/b"} {
+		if _, err := gatewayArtifactURL("https://gateway.example:9443", value, "/v1/artifacts/download/"); err == nil {
+			t.Fatalf("unsafe transfer path %q was accepted", value)
+		}
+	}
+}
 
 func TestNextAuthIsStrictlyMonotonicUnderConcurrency(t *testing.T) {
 	dir := t.TempDir()
@@ -54,6 +155,47 @@ func TestNextAuthIsStrictlyMonotonicUnderConcurrency(t *testing.T) {
 	}
 	if persisted.LastTimestamp != current.LastTimestamp {
 		t.Fatalf("persisted timestamp %d differs from memory %d", persisted.LastTimestamp, current.LastTimestamp)
+	}
+}
+
+func TestAuthenticatedRequestsArriveInTimestampOrder(t *testing.T) {
+	dir := t.TempDir()
+	current := state{AgentID: 42}
+	var mu sync.Mutex
+	var arrived []int64
+	client := &http.Client{Transport: roundTripFunc(func(request *http.Request) (*http.Response, error) {
+		var payload struct {
+			Auth struct {
+				Timestamp int64 `json:"timestamp"`
+			} `json:"auth"`
+		}
+		if err := json.NewDecoder(request.Body).Decode(&payload); err != nil {
+			return nil, err
+		}
+		mu.Lock()
+		arrived = append(arrived, payload.Auth.Timestamp)
+		mu.Unlock()
+		return &http.Response{StatusCode: http.StatusOK, Status: "200 OK", Body: io.NopCloser(bytes.NewReader([]byte(`{}`))), Header: make(http.Header)}, nil
+	})}
+	const calls = 32
+	var workers sync.WaitGroup
+	for index := 0; index < calls; index++ {
+		workers.Add(1)
+		go func() {
+			defer workers.Done()
+			if err := postAuthenticatedJSON(context.Background(), client, &current, dir, "https://gateway.example/v1/heartbeat", map[string]any{}, nil); err != nil {
+				t.Errorf("authenticated request: %v", err)
+			}
+		}()
+	}
+	workers.Wait()
+	if len(arrived) != calls {
+		t.Fatalf("arrived=%d want=%d", len(arrived), calls)
+	}
+	for index := 1; index < len(arrived); index++ {
+		if arrived[index] <= arrived[index-1] {
+			t.Fatalf("timestamps arrived out of order at %d: %v", index, arrived)
+		}
 	}
 }
 

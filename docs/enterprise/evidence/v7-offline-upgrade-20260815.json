@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "acceptedAt": "2026-08-16T10:17:48Z",
+  "scope": "synthetic-local",
+  "acceptanceScript": "deploy/acceptance/v7-private-install.sh",
+  "deploymentMode": "private",
+  "migrateImage": "appforge-private-acceptance/migrate:1.2.0-v113-offline-1747",
+  "migrateImageId": "sha256:090a73ac3307477d96c2c3a6d600dd259e335e0bb86ed89f80ee70329095469d",
+  "schemaTarget": "20260815_113_v7_air_gapped",
+  "schema113ProductionTarget": true,
+  "freshVolumes": true,
+  "imagesPreloaded": true,
+  "composePullPolicy": "never",
+  "frontendNetworkInternal": true,
+  "backendNetworkInternal": true,
+  "internalApiReachable": true,
+  "externalHttpsRejected": true,
+  "tlsFrontends": [
+    "admin",
+    "agent"
+  ],
+  "verified": [
+    "schema-migration",
+    "fixed-non-root-services",
+    "offline-license",
+    "bootstrap-admin-login",
+    "private-object-storage-bucket",
+    "offline-application-upgrade",
+    "application-rollback",
+    "database-and-object-persistence"
+  ],
+  "limitations": [
+    "local-docker-simulation-not-physical-air-gap",
+    "preloaded-development-images-not-formal-release-media",
+    "synthetic-temporary-credentials-and-license",
+    "upgrade-tag-aliases-use-identical-development-image-digests",
+    "single-node-compose-does-not-promise-zero-downtime",
+    "schema-remains-at-113-during-application-upgrade"
+  ],
+  "offlineApplicationUpgrade": {
+    "fromVersion": "1.2.0",
+    "toVersion": "1.2.1",
+    "upgradeCompleted": true,
+    "rollbackCompleted": true,
+    "upgradeDurationSeconds": 27.249701,
+    "rollbackDurationSeconds": 27.564391,
+    "databaseMarkerPreserved": true,
+    "objectMarkerPreserved": true,
+    "healthProbe": {
+      "requests": 243,
+      "failures": 2,
+      "maxConsecutiveFailures": 1,
+      "maxAllowedConsecutiveFailures": 10
+    }
+  }
+}

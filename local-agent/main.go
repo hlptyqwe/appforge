@@ -36,18 +36,22 @@ const version = "1.1.0"
 const protocolVersion int32 = 3
 
 type state struct {
-	AgentID       int64  `json:"agentId"`
-	GatewayURL    string `json:"gatewayUrl"`
-	Certificate   string `json:"certificate"`
-	PrivateKey    string `json:"privateKey"`
-	ClientCA      string `json:"clientCa"`
-	GatewayCA     string `json:"gatewayCa,omitempty"`
-	Protocol      int32  `json:"protocol"`
-	AgentVersion  string `json:"agentVersion"`
-	LastTimestamp int64  `json:"lastTimestamp"`
+	AgentID            int64  `json:"agentId"`
+	GatewayURL         string `json:"gatewayUrl"`
+	Certificate        string `json:"certificate"`
+	PrivateKey         string `json:"privateKey"`
+	ClientCA           string `json:"clientCa"`
+	GatewayCA          string `json:"gatewayCa,omitempty"`
+	CustomerStorageRef string `json:"customerStorageRef,omitempty"`
+	Protocol           int32  `json:"protocol"`
+	AgentVersion       string `json:"agentVersion"`
+	LastTimestamp      int64  `json:"lastTimestamp"`
 }
 
-var authStateMu sync.Mutex
+var (
+	authStateMu          sync.Mutex
+	authenticatedRequest sync.Mutex
+)
 
 type task struct {
 	ID             int64  `json:"id"`
@@ -61,36 +65,48 @@ type task struct {
 }
 
 type claimResponse struct {
-	Task         *task          `json:"task"`
-	ArtifactMode int32          `json:"artifact_mode"`
-	Bundle       *buildManifest `json:"bundle"`
+	Task               *task          `json:"task"`
+	ArtifactMode       int32          `json:"artifact_mode"`
+	CustomerStorageRef string         `json:"customer_storage_ref,omitempty"`
+	Bundle             *buildManifest `json:"bundle"`
 }
 
 type buildManifest struct {
-	SchemaVersion           int32        `json:"schema_version"`
-	Task                    *task        `json:"task"`
-	PackageName             string       `json:"package_name"`
-	APIHost                 string       `json:"api_host"`
-	ChannelName             string       `json:"channel_name"`
-	LandingURL              string       `json:"landing_url"`
-	KeyAlias                string       `json:"key_alias"`
-	SigningSecretRef        string       `json:"signing_secret_ref"`
-	SignerCertificateSHA256 string       `json:"signer_certificate_sha256"`
-	BrandingSnapshotJSON    string       `json:"branding_snapshot_json"`
-	TemplateSnapshotJSON    string       `json:"template_snapshot_json"`
-	Inputs                  []buildInput `json:"inputs"`
-	BlockedReason           string       `json:"blocked_reason"`
+	SchemaVersion           int32         `json:"schema_version"`
+	Task                    *task         `json:"task"`
+	PackageName             string        `json:"package_name"`
+	APIHost                 string        `json:"api_host"`
+	ChannelName             string        `json:"channel_name"`
+	LandingURL              string        `json:"landing_url"`
+	KeyAlias                string        `json:"key_alias"`
+	SigningSecretRef        string        `json:"signing_secret_ref,omitempty"`
+	SignerCertificateSHA256 string        `json:"signer_certificate_sha256"`
+	BrandingSnapshotJSON    string        `json:"branding_snapshot_json"`
+	TemplateSnapshotJSON    string        `json:"template_snapshot_json"`
+	Inputs                  []buildInput  `json:"inputs"`
+	Outputs                 []buildOutput `json:"outputs,omitempty"`
+	BlockedReason           string        `json:"blocked_reason"`
 }
 
 type buildInput struct {
-	Role         string `json:"role"`
-	ObjectID     int64  `json:"object_id"`
-	ObjectType   int32  `json:"object_type"`
-	OriginalName string `json:"original_name"`
-	ContentType  string `json:"content_type"`
-	SizeBytes    int64  `json:"size_bytes"`
-	SHA256       string `json:"sha256"`
-	LocalPath    string `json:"local_path,omitempty"`
+	Role              string `json:"role"`
+	ObjectID          int64  `json:"object_id"`
+	ObjectType        int32  `json:"object_type"`
+	OriginalName      string `json:"original_name"`
+	ContentType       string `json:"content_type"`
+	SizeBytes         int64  `json:"size_bytes"`
+	SHA256            string `json:"sha256"`
+	StorageMode       int32  `json:"storage_mode,omitempty"`
+	OwnerAgentID      int64  `json:"owner_agent_id,omitempty"`
+	LocalPath         string `json:"local_path,omitempty"`
+	DownloadPath      string `json:"download_path,omitempty"`
+	CustomerReference string `json:"customer_reference,omitempty"`
+}
+
+type buildOutput struct {
+	Role       string `json:"role"`
+	UploadPath string `json:"upload_path"`
+	ExpiresAt  int64  `json:"expires_at"`
 }
 
 type buildResult struct {
@@ -112,7 +128,8 @@ type localSigningSecret struct {
 
 type certificateResponse struct {
 	Data struct {
-		ID int64 `json:"id"`
+		ID                 int64  `json:"id"`
+		CustomerStorageRef string `json:"customer_storage_ref"`
 	} `json:"data"`
 	Certificate struct {
 		SerialNumber   string `json:"serial_number"`
@@ -120,6 +137,16 @@ type certificateResponse struct {
 		NotAfter       int64  `json:"not_after"`
 	} `json:"certificate"`
 	CAPEM string `json:"ca_certificate_pem"`
+}
+
+type artifactRefreshResponse struct {
+	Bundle *buildManifest `json:"bundle"`
+}
+
+type artifactUploadResponse struct {
+	Reference string `json:"reference"`
+	SHA256    string `json:"sha256"`
+	SizeBytes int64  `json:"size_bytes"`
 }
 
 func main() {
@@ -145,6 +172,18 @@ func main() {
 		if err := secretImportCommand(os.Args[2:]); err != nil {
 			log.Fatal(err)
 		}
+	case "customer-storage-secret-import":
+		if err := customerStorageSecretImportCommand(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
+	case "customer-storage-import":
+		if err := customerStorageImportCommand(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
+	case "air-gapped-build":
+		if err := airGappedBuildCommand(os.Args[2:]); err != nil {
+			log.Fatal(err)
+		}
 	case "offline-sign":
 		if err := offlineSignCommand(os.Args[2:]); err != nil {
 			log.Fatal(err)
@@ -159,7 +198,7 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: appforge-local-agent register|run|health|version|secret-import|offline-sign|offline-verify")
+	fmt.Fprintln(os.Stderr, "usage: appforge-local-agent register|run|health|version|secret-import|customer-storage-secret-import|customer-storage-import|air-gapped-build|offline-sign|offline-verify")
 	os.Exit(2)
 }
 
@@ -263,7 +302,9 @@ func registerCommand(args []string) error {
 	if err := writePrivateFile(gatewayCAPath, gatewayCAPEM); err != nil {
 		return err
 	}
-	current := state{AgentID: response.Data.ID, GatewayURL: strings.TrimRight(*gatewayURL, "/"), Certificate: certPath, PrivateKey: keyPath, ClientCA: caPath, GatewayCA: gatewayCAPath, Protocol: protocolVersion, AgentVersion: version}
+	current := state{AgentID: response.Data.ID, GatewayURL: strings.TrimRight(*gatewayURL, "/"), Certificate: certPath,
+		PrivateKey: keyPath, ClientCA: caPath, GatewayCA: gatewayCAPath, CustomerStorageRef: response.Data.CustomerStorageRef,
+		Protocol: protocolVersion, AgentVersion: version}
 	encoded, _ := json.MarshalIndent(current, "", "  ")
 	if err := writePrivateFile(filepath.Join(*stateDir, "state.json"), encoded); err != nil {
 		return err
@@ -426,8 +467,7 @@ func runCommand(args []string) error {
 			continue
 		}
 		var claim claimResponse
-		auth := nextAuth(&current, *stateDir)
-		err := postJSON(ctx, client, current.GatewayURL+"/v1/claim", map[string]any{"auth": auth, "lease_seconds": *lease}, &claim)
+		err := postAuthenticatedJSON(ctx, client, &current, *stateDir, current.GatewayURL+"/v1/claim", map[string]any{"lease_seconds": *lease}, &claim)
 		if err != nil {
 			<-slots
 			log.Printf("claim failed: %v", err)
@@ -444,30 +484,30 @@ func runCommand(args []string) error {
 			continue
 		}
 		active.Add(1)
-		go func(item *task, mode int32, bundle *buildManifest) {
+		go func(item *task, mode int32, customerStorageRef string, bundle *buildManifest) {
 			defer active.Done()
 			defer func() { <-slots }()
-			if err := executeTask(ctx, client, &current, *stateDir, *executor, *secretRoot, *lease, item, mode, bundle); err != nil {
+			if err := executeTask(ctx, client, &current, *stateDir, *executor, *secretRoot, *lease, item, mode, customerStorageRef, bundle); err != nil {
 				log.Printf("task %d failed: %v", item.ID, err)
 			}
-		}(claim.Task, claim.ArtifactMode, claim.Bundle)
+		}(claim.Task, claim.ArtifactMode, claim.CustomerStorageRef, claim.Bundle)
 	}
 }
 
-func executeTask(parent context.Context, client *http.Client, current *state, stateDir, executor, secretRoot string, lease int, item *task, mode int32, bundle *buildManifest) error {
+func executeTask(parent context.Context, client *http.Client, current *state, stateDir, executor, secretRoot string, lease int, item *task, mode int32, customerStorageRef string, bundle *buildManifest) error {
 	if bundle == nil || bundle.SchemaVersion != protocolVersion {
 		message := "LOCAL_TASK_BUNDLE_REQUIRED"
-		_ = postJSON(parent, client, current.GatewayURL+"/v1/tasks/fail", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": message}, nil)
+		_ = postAuthenticatedJSON(parent, client, current, stateDir, current.GatewayURL+"/v1/tasks/fail", map[string]any{"task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": message}, nil)
 		return errors.New(message)
 	}
 	if bundle.BlockedReason != "" {
-		_ = postJSON(parent, client, current.GatewayURL+"/v1/tasks/fail", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": bundle.BlockedReason}, nil)
+		_ = postAuthenticatedJSON(parent, client, current, stateDir, current.GatewayURL+"/v1/tasks/fail", map[string]any{"task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": bundle.BlockedReason}, nil)
 		return errors.New(bundle.BlockedReason)
 	}
 	secret, err := resolveLocalSigningSecret(secretRoot, bundle.SigningSecretRef)
 	if err != nil {
 		message := "LOCAL_SIGNING_SECRET_RESOLUTION_FAILED"
-		_ = postJSON(parent, client, current.GatewayURL+"/v1/tasks/fail", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": message}, nil)
+		_ = postAuthenticatedJSON(parent, client, current, stateDir, current.GatewayURL+"/v1/tasks/fail", map[string]any{"task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": message}, nil)
 		return fmt.Errorf("%s: %w", message, err)
 	}
 	defer secret.erase()
@@ -476,16 +516,7 @@ func executeTask(parent context.Context, client *http.Client, current *state, st
 		return err
 	}
 	defer os.RemoveAll(workDir)
-	taskFile := filepath.Join(workDir, "task.json")
-	resultFile := filepath.Join(workDir, "result.json")
-	executorBundle := *bundle
-	executorBundle.SigningSecretRef = ""
-	encoded, _ := json.MarshalIndent(map[string]any{"task": item, "artifactMode": mode, "bundle": &executorBundle}, "", "  ")
-	if err := os.WriteFile(taskFile, encoded, 0o600); err != nil {
-		return err
-	}
 	ctx, cancel := context.WithCancel(parent)
-	defer cancel()
 	renewDone := make(chan struct{})
 	go func() {
 		ticker := time.NewTicker(time.Duration(lease/3) * time.Second)
@@ -496,8 +527,7 @@ func executeTask(parent context.Context, client *http.Client, current *state, st
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				auth := nextAuth(current, stateDir)
-				if err := postJSON(ctx, client, current.GatewayURL+"/v1/tasks/renew", map[string]any{"auth": auth, "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "lease_seconds": lease}, nil); err != nil {
+				if err := postAuthenticatedJSON(ctx, client, current, stateDir, current.GatewayURL+"/v1/tasks/renew", map[string]any{"task_id": item.ID, "builder_attempt": item.BuilderAttempt, "lease_seconds": lease}, nil); err != nil {
 					log.Printf("renew task %d failed: %v", item.ID, err)
 					cancel()
 					return
@@ -505,19 +535,91 @@ func executeTask(parent context.Context, client *http.Client, current *state, st
 			}
 		}
 	}()
-	_ = postJSON(ctx, client, current.GatewayURL+"/v1/tasks/progress", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "status": 2, "progress": 5, "message": "local executor started"}, nil)
+	defer func() {
+		cancel()
+		<-renewDone
+	}()
+	var customerSecret *customerStorageSecret
+	var customerStore customerObjectStore
+	if mode == 1 {
+		if err := downloadArtifactInputs(ctx, client, current.GatewayURL, workDir, bundle); err != nil {
+			refreshed, refreshErr := refreshArtifactBundle(ctx, client, current, stateDir, item)
+			if refreshErr != nil {
+				message := "LOCAL_ARTIFACT_INPUT_DOWNLOAD_FAILED"
+				_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+				return fmt.Errorf("%s: %w", message, err)
+			}
+			bundle.Outputs = refreshed.Outputs
+			bundle.Inputs = refreshed.Inputs
+			if err := downloadArtifactInputs(ctx, client, current.GatewayURL, workDir, bundle); err != nil {
+				message := "LOCAL_ARTIFACT_INPUT_INTEGRITY_FAILED"
+				_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+				return fmt.Errorf("%s: %w", message, err)
+			}
+		}
+	} else if mode == 2 {
+		if strings.TrimSpace(customerStorageRef) == "" || customerStorageRef != current.CustomerStorageRef {
+			message := "LOCAL_CUSTOMER_STORAGE_REFERENCE_MISMATCH"
+			_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+			return errors.New(message)
+		}
+		customerSecret, customerStore, err = resolveCustomerStorage(secretRoot, customerStorageRef)
+		if err != nil {
+			message := "LOCAL_CUSTOMER_STORAGE_SECRET_RESOLUTION_FAILED"
+			_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+			return fmt.Errorf("%s: %w", message, err)
+		}
+		defer customerSecret.erase()
+		if err := downloadCustomerArtifactInputs(ctx, customerStore, current.AgentID, customerSecret.Prefix, workDir, bundle); err != nil {
+			message := "LOCAL_CUSTOMER_STORAGE_INPUT_INTEGRITY_FAILED"
+			_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+			return fmt.Errorf("%s: %w", message, err)
+		}
+	} else {
+		message := "LOCAL_ARTIFACT_MODE_UNSUPPORTED"
+		_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+		return errors.New(message)
+	}
+	taskFile := filepath.Join(workDir, "task.json")
+	resultFile := filepath.Join(workDir, "result.json")
+	executorBundle := *bundle
+	executorBundle.SigningSecretRef = ""
+	executorBundle.Outputs = nil
+	executorBundle.Inputs = append([]buildInput(nil), bundle.Inputs...)
+	for index := range executorBundle.Inputs {
+		executorBundle.Inputs[index].DownloadPath = ""
+		executorBundle.Inputs[index].CustomerReference = ""
+		executorBundle.Inputs[index].StorageMode = 0
+		executorBundle.Inputs[index].OwnerAgentID = 0
+	}
+	encoded, _ := json.MarshalIndent(map[string]any{"task": item, "artifactMode": mode, "bundle": &executorBundle}, "", "  ")
+	if err := os.WriteFile(taskFile, encoded, 0o600); err != nil {
+		return err
+	}
+	_ = postAuthenticatedJSON(ctx, client, current, stateDir, current.GatewayURL+"/v1/tasks/progress", map[string]any{"task_id": item.ID, "builder_attempt": item.BuilderAttempt, "status": 2, "progress": 5, "message": "local executor started"}, nil)
 	command := exec.CommandContext(ctx, executor, "--task", taskFile, "--result", resultFile)
 	command.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + workDir, "TMPDIR=" + workDir,
 		"APPFORGE_TASK_ID=" + fmt.Sprint(item.ID), "APPFORGE_ARTIFACT_MODE=" + fmt.Sprint(mode),
 		"APPFORGE_KEYSTORE_PASSWORD=" + secret.KeystorePassword, "APPFORGE_KEY_PASSWORD=" + secret.KeyPassword}
 	output, runErr := command.CombinedOutput()
-	cancel()
-	<-renewDone
 	var result buildResult
 	if data, err := os.ReadFile(resultFile); err == nil {
 		_ = json.Unmarshal(data, &result)
 	}
 	if runErr != nil || result.Error != "" {
+		if mode == 1 && strings.TrimSpace(result.LogPath) != "" {
+			if refreshed, refreshErr := refreshArtifactBundle(parent, client, current, stateDir, item); refreshErr == nil {
+				bundle.Outputs = refreshed.Outputs
+				if uploaded, uploadErr := uploadArtifactOutputWithRefresh(parent, client, current, stateDir, item, workDir, bundle, "build_log", result.LogPath); uploadErr == nil {
+					result.LogReference, result.LogSHA256, result.LogSize = uploaded.Reference, uploaded.SHA256, uploaded.SizeBytes
+				}
+			}
+		} else if mode == 2 && strings.TrimSpace(result.LogPath) != "" {
+			if uploaded, uploadErr := uploadCustomerArtifactOutput(parent, customerStore, current.AgentID, customerSecret.Prefix,
+				item, workDir, "build_log", result.LogPath); uploadErr == nil {
+				result.LogReference, result.LogSHA256, result.LogSize = uploaded.Reference, uploaded.SHA256, uploaded.SizeBytes
+			}
+		}
 		message := result.Error
 		if message == "" {
 			message = runErr.Error()
@@ -525,25 +627,312 @@ func executeTask(parent context.Context, client *http.Client, current *state, st
 		if len(output) > 0 {
 			message += "; executor output sha256=" + digestBytes(output)
 		}
-		failErr := postJSON(parent, client, current.GatewayURL+"/v1/tasks/fail", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": message, "log_reference": result.LogReference, "log_sha256": result.LogSHA256, "log_size": result.LogSize}, nil)
-		if failErr != nil {
-			return failErr
-		}
-		return runErr
-	}
-	if strings.TrimSpace(result.APKReference) == "" {
-		message := "LOCAL_ARTIFACT_UPLOAD_REQUIRED"
-		failErr := postJSON(parent, client, current.GatewayURL+"/v1/tasks/fail", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": message}, nil)
+		failErr := postTaskFailure(parent, client, current, stateDir, item, message, &result)
 		if failErr != nil {
 			return failErr
 		}
 		return errors.New(message)
 	}
-	return postJSON(parent, client, current.GatewayURL+"/v1/tasks/complete", map[string]any{"auth": nextAuth(current, stateDir), "task_id": item.ID, "builder_attempt": item.BuilderAttempt, "apk_reference": result.APKReference, "apk_sha256": result.APKSHA256, "apk_size": result.APKSize, "log_reference": result.LogReference, "log_sha256": result.LogSHA256, "log_size": result.LogSize}, nil)
+	if mode == 1 {
+		refreshed, err := refreshArtifactBundle(parent, client, current, stateDir, item)
+		if err != nil {
+			message := "LOCAL_ARTIFACT_TICKET_REFRESH_FAILED"
+			_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+			return fmt.Errorf("%s: %w", message, err)
+		}
+		bundle.Outputs = refreshed.Outputs
+		if strings.TrimSpace(result.APKPath) == "" {
+			message := "LOCAL_ARTIFACT_OUTPUT_PATH_REQUIRED"
+			_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+			return errors.New(message)
+		}
+		uploadedAPK, err := uploadArtifactOutputWithRefresh(parent, client, current, stateDir, item, workDir, bundle, "built_apk", result.APKPath)
+		if err != nil {
+			message := "LOCAL_ARTIFACT_APK_UPLOAD_FAILED"
+			_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+			return fmt.Errorf("%s: %w", message, err)
+		}
+		result.APKReference, result.APKSHA256, result.APKSize = uploadedAPK.Reference, uploadedAPK.SHA256, uploadedAPK.SizeBytes
+		if strings.TrimSpace(result.LogPath) != "" {
+			uploadedLog, err := uploadArtifactOutputWithRefresh(parent, client, current, stateDir, item, workDir, bundle, "build_log", result.LogPath)
+			if err != nil {
+				message := "LOCAL_ARTIFACT_LOG_UPLOAD_FAILED"
+				_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+				return fmt.Errorf("%s: %w", message, err)
+			}
+			result.LogReference, result.LogSHA256, result.LogSize = uploadedLog.Reference, uploadedLog.SHA256, uploadedLog.SizeBytes
+		}
+	} else if mode == 2 {
+		if strings.TrimSpace(result.APKPath) == "" {
+			message := "LOCAL_CUSTOMER_STORAGE_OUTPUT_PATH_REQUIRED"
+			_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+			return errors.New(message)
+		}
+		uploadedAPK, err := uploadCustomerArtifactOutput(parent, customerStore, current.AgentID, customerSecret.Prefix,
+			item, workDir, "built_apk", result.APKPath)
+		if err != nil {
+			message := "LOCAL_CUSTOMER_STORAGE_APK_UPLOAD_FAILED"
+			_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+			return fmt.Errorf("%s: %w", message, err)
+		}
+		result.APKReference, result.APKSHA256, result.APKSize = uploadedAPK.Reference, uploadedAPK.SHA256, uploadedAPK.SizeBytes
+		if strings.TrimSpace(result.LogPath) != "" {
+			uploadedLog, err := uploadCustomerArtifactOutput(parent, customerStore, current.AgentID, customerSecret.Prefix,
+				item, workDir, "build_log", result.LogPath)
+			if err != nil {
+				message := "LOCAL_CUSTOMER_STORAGE_LOG_UPLOAD_FAILED"
+				_ = postTaskFailure(parent, client, current, stateDir, item, message, nil)
+				return fmt.Errorf("%s: %w", message, err)
+			}
+			result.LogReference, result.LogSHA256, result.LogSize = uploadedLog.Reference, uploadedLog.SHA256, uploadedLog.SizeBytes
+		}
+	}
+	if strings.TrimSpace(result.APKReference) == "" {
+		message := "LOCAL_ARTIFACT_UPLOAD_REQUIRED"
+		failErr := postAuthenticatedJSON(parent, client, current, stateDir, current.GatewayURL+"/v1/tasks/fail", map[string]any{"task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": message}, nil)
+		if failErr != nil {
+			return failErr
+		}
+		return errors.New(message)
+	}
+	return postAuthenticatedJSON(parent, client, current, stateDir, current.GatewayURL+"/v1/tasks/complete", map[string]any{"task_id": item.ID, "builder_attempt": item.BuilderAttempt, "apk_reference": result.APKReference, "apk_sha256": result.APKSHA256, "apk_size": result.APKSize, "log_reference": result.LogReference, "log_sha256": result.LogSHA256, "log_size": result.LogSize}, nil)
+}
+
+func postTaskFailure(ctx context.Context, client *http.Client, current *state, stateDir string, item *task, message string, result *buildResult) error {
+	payload := map[string]any{"task_id": item.ID, "builder_attempt": item.BuilderAttempt, "error_message": truncateAgentMessage(message)}
+	if result != nil {
+		payload["log_reference"], payload["log_sha256"], payload["log_size"] = result.LogReference, result.LogSHA256, result.LogSize
+	}
+	return postAuthenticatedJSON(ctx, client, current, stateDir, current.GatewayURL+"/v1/tasks/fail", payload, nil)
+}
+
+func truncateAgentMessage(value string) string {
+	value = strings.TrimSpace(value)
+	if len(value) > 1900 {
+		return value[:1900]
+	}
+	if value == "" {
+		return "LOCAL_EXECUTOR_FAILED"
+	}
+	return value
+}
+
+func refreshArtifactBundle(ctx context.Context, client *http.Client, current *state, stateDir string, item *task) (*buildManifest, error) {
+	var response artifactRefreshResponse
+	err := postAuthenticatedJSON(ctx, client, current, stateDir, current.GatewayURL+"/v1/artifacts/refresh", map[string]any{
+		"task_id": item.ID, "builder_attempt": item.BuilderAttempt,
+	}, &response)
+	if err != nil {
+		return nil, err
+	}
+	if response.Bundle == nil || response.Bundle.SchemaVersion != protocolVersion {
+		return nil, errors.New("Artifact ticket refresh response is incomplete")
+	}
+	return response.Bundle, nil
+}
+
+func downloadArtifactInputs(ctx context.Context, client *http.Client, gatewayURL, workDir string, bundle *buildManifest) error {
+	if bundle == nil || len(bundle.Inputs) == 0 {
+		return errors.New("Artifact input manifest is empty")
+	}
+	inputDir := filepath.Join(workDir, "inputs")
+	if err := os.RemoveAll(inputDir); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(inputDir, 0o700); err != nil {
+		return err
+	}
+	for index := range bundle.Inputs {
+		input := &bundle.Inputs[index]
+		transferURL, err := gatewayArtifactURL(gatewayURL, input.DownloadPath, "/v1/artifacts/download/")
+		if err != nil {
+			return fmt.Errorf("%s download ticket: %w", input.Role, err)
+		}
+		extension := strings.ToLower(filepath.Ext(strings.TrimSpace(input.OriginalName)))
+		if len(extension) > 16 {
+			extension = ""
+		}
+		role := safeFileSuffix(input.Role)
+		if role == "" {
+			role = "input"
+		}
+		target := filepath.Join(inputDir, fmt.Sprintf("%02d-%s-%d%s", index, role, input.ObjectID, extension))
+		if err := downloadArtifactFile(ctx, client, transferURL, target, input.SizeBytes, input.SHA256); err != nil {
+			return fmt.Errorf("%s input: %w", input.Role, err)
+		}
+		input.LocalPath = target
+	}
+	return nil
+}
+
+func downloadArtifactFile(ctx context.Context, client *http.Client, transferURL, target string, expectedSize int64, expectedDigest string) error {
+	if expectedSize <= 0 || !validAgentSHA256(expectedDigest) {
+		return errors.New("input integrity metadata is invalid")
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, transferURL, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := artifactHTTPClient(client).Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		data, _ := io.ReadAll(io.LimitReader(resp.Body, 64<<10))
+		return fmt.Errorf("control plane returned %s: %s", resp.Status, strings.TrimSpace(string(data)))
+	}
+	if resp.ContentLength >= 0 && resp.ContentLength != expectedSize {
+		return errors.New("download response Content-Length mismatch")
+	}
+	if headerDigest := strings.ToLower(strings.TrimSpace(resp.Header.Get("X-AppForge-Sha256"))); headerDigest != "" && headerDigest != strings.ToLower(strings.TrimSpace(expectedDigest)) {
+		return errors.New("download response SHA-256 header mismatch")
+	}
+	file, err := os.OpenFile(target, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
+	if err != nil {
+		return err
+	}
+	hasher := sha256.New()
+	written, copyErr := io.Copy(io.MultiWriter(file, hasher), io.LimitReader(resp.Body, expectedSize+1))
+	closeErr := file.Close()
+	if copyErr != nil || closeErr != nil || written != expectedSize ||
+		hex.EncodeToString(hasher.Sum(nil)) != strings.ToLower(strings.TrimSpace(expectedDigest)) {
+		_ = os.Remove(target)
+		return errors.New("downloaded input size or SHA-256 mismatch")
+	}
+	return nil
+}
+
+func uploadArtifactOutputWithRefresh(ctx context.Context, client *http.Client, current *state, stateDir string, item *task, workDir string, bundle *buildManifest, role, path string) (*artifactUploadResponse, error) {
+	result, err := uploadArtifactOutput(ctx, client, current.GatewayURL, workDir, bundle, role, path)
+	if err == nil {
+		return result, nil
+	}
+	refreshed, refreshErr := refreshArtifactBundle(ctx, client, current, stateDir, item)
+	if refreshErr != nil {
+		return nil, fmt.Errorf("upload failed and ticket refresh failed: %w", err)
+	}
+	bundle.Outputs = refreshed.Outputs
+	return uploadArtifactOutput(ctx, client, current.GatewayURL, workDir, bundle, role, path)
+}
+
+func uploadArtifactOutput(ctx context.Context, client *http.Client, gatewayURL, workDir string, bundle *buildManifest, role, path string) (*artifactUploadResponse, error) {
+	var output *buildOutput
+	for index := range bundle.Outputs {
+		if bundle.Outputs[index].Role == role {
+			output = &bundle.Outputs[index]
+			break
+		}
+	}
+	if output == nil {
+		return nil, errors.New("Artifact upload ticket is missing")
+	}
+	transferURL, err := gatewayArtifactURL(gatewayURL, output.UploadPath, "/v1/artifacts/upload/")
+	if err != nil {
+		return nil, err
+	}
+	absolute, err := privateArtifactOutputPath(workDir, path)
+	if err != nil {
+		return nil, err
+	}
+	size, digest, err := localAgentFileDigest(absolute)
+	if err != nil {
+		return nil, err
+	}
+	file, err := os.Open(absolute)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, transferURL, file)
+	if err != nil {
+		return nil, err
+	}
+	req.ContentLength = size
+	req.Header.Set("Content-Type", "application/octet-stream")
+	req.Header.Set("X-AppForge-Sha256", digest)
+	resp, err := artifactHTTPClient(client).Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	data, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("control plane returned %s: %s", resp.Status, strings.TrimSpace(string(data)))
+	}
+	var result artifactUploadResponse
+	if err := json.Unmarshal(data, &result); err != nil || result.Reference == "" || result.SizeBytes != size || result.SHA256 != digest {
+		return nil, errors.New("control-plane Artifact upload response is invalid")
+	}
+	return &result, nil
+}
+
+func privateArtifactOutputPath(workDir, artifactPath string) (string, error) {
+	absolute, err := filepath.Abs(artifactPath)
+	if err != nil {
+		return "", err
+	}
+	root, err := filepath.EvalSymlinks(workDir)
+	if err != nil {
+		return "", err
+	}
+	resolved, err := filepath.EvalSymlinks(absolute)
+	if err != nil || (resolved != root && !strings.HasPrefix(resolved, root+string(filepath.Separator))) {
+		return "", errors.New("Artifact output path escapes task directory")
+	}
+	info, err := os.Lstat(absolute)
+	if err != nil || info.Mode()&os.ModeSymlink != 0 || !info.Mode().IsRegular() || info.Mode().Perm()&0o077 != 0 || info.Size() <= 0 {
+		return "", errors.New("Artifact output must be a private regular file")
+	}
+	return absolute, nil
+}
+
+func gatewayArtifactURL(gatewayURL, transferPath, requiredPrefix string) (string, error) {
+	if !strings.HasPrefix(transferPath, requiredPrefix) || strings.Contains(strings.TrimPrefix(transferPath, requiredPrefix), "/") {
+		return "", errors.New("transfer path is outside the fixed Gateway route")
+	}
+	base, err := url.Parse(gatewayURL)
+	if err != nil || base.Scheme != "https" || base.Host == "" {
+		return "", errors.New("Gateway URL is invalid")
+	}
+	relative, err := url.Parse(transferPath)
+	if err != nil || relative.IsAbs() || relative.Host != "" || relative.RawQuery != "" || relative.Fragment != "" {
+		return "", errors.New("transfer path is invalid")
+	}
+	return base.ResolveReference(relative).String(), nil
+}
+
+func localAgentFileDigest(path string) (int64, string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return 0, "", err
+	}
+	defer file.Close()
+	hasher := sha256.New()
+	size, err := io.Copy(hasher, file)
+	if err != nil {
+		return 0, "", err
+	}
+	return size, hex.EncodeToString(hasher.Sum(nil)), nil
+}
+
+func validAgentSHA256(value string) bool {
+	value = strings.ToLower(strings.TrimSpace(value))
+	decoded, err := hex.DecodeString(value)
+	return err == nil && len(decoded) == sha256.Size
+}
+
+func artifactHTTPClient(client *http.Client) *http.Client {
+	copy := *client
+	copy.Timeout = 30 * time.Minute
+	return &copy
 }
 
 func sendHeartbeat(ctx context.Context, client *http.Client, current *state, stateDir string, maxConcurrency int) error {
-	return postJSON(ctx, client, current.GatewayURL+"/v1/heartbeat", map[string]any{"auth": nextAuth(current, stateDir), "agent_version": version, "protocol_version": protocolVersion, "capabilities": []map[string]string{{"capability_key": "apk", "capability_value": "true"}, {"capability_key": "max_concurrency", "capability_value": fmt.Sprint(maxConcurrency)}}, "running_task_ids": []int64{}}, nil)
+	return postAuthenticatedJSON(ctx, client, current, stateDir, current.GatewayURL+"/v1/heartbeat", map[string]any{"agent_version": version, "protocol_version": protocolVersion, "capabilities": []map[string]string{{"capability_key": "apk", "capability_value": "true"}, {"capability_key": "max_concurrency", "capability_value": fmt.Sprint(maxConcurrency)}}, "running_task_ids": []int64{}}, nil)
 }
 
 func rotateCertificateIfDue(ctx context.Context, client *http.Client, current *state, stateDir string, rotateBefore time.Duration) (*http.Client, bool, error) {
@@ -556,8 +945,8 @@ func rotateCertificateIfDue(ctx context.Context, client *http.Client, current *s
 		return client, false, err
 	}
 	var response certificateResponse
-	payload := map[string]any{"auth": nextAuth(current, stateDir), "csr_pem": string(csrPEM)}
-	if err := postJSON(ctx, client, current.GatewayURL+"/v1/certificates/rotate", payload, &response); err != nil {
+	payload := map[string]any{"csr_pem": string(csrPEM)}
+	if err := postAuthenticatedJSON(ctx, client, current, stateDir, current.GatewayURL+"/v1/certificates/rotate", payload, &response); err != nil {
 		return client, false, err
 	}
 	if response.Certificate.CertificatePEM == "" {
@@ -882,6 +1271,17 @@ func postJSON(ctx context.Context, client *http.Client, url string, input any, o
 	}
 	return nil
 }
+
+func postAuthenticatedJSON(ctx context.Context, client *http.Client, current *state, stateDir, endpoint string, payload map[string]any, output any) error {
+	authenticatedRequest.Lock()
+	defer authenticatedRequest.Unlock()
+	if payload == nil {
+		payload = map[string]any{}
+	}
+	payload["auth"] = nextAuth(current, stateDir)
+	return postJSON(ctx, client, endpoint, payload, output)
+}
+
 func writePrivateFile(path string, data []byte) error {
 	temporary := path + ".tmp"
 	if err := os.WriteFile(temporary, data, 0o600); err != nil {

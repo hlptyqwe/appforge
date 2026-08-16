@@ -74,6 +74,41 @@ services:
     volumes:
       - agent-secrets:/etc/appforge/local-secrets
 
+  customer-storage-secret-import:
+    <<: *agent-security
+    profiles: [maintenance]
+    restart: "no"
+    command:
+      - customer-storage-secret-import
+      - --secret-root
+      - /etc/appforge/local-secrets
+      - --name
+      - ${APPFORGE_CUSTOMER_STORAGE_SECRET_NAME:-customer-storage.json}
+      - --input-stdin
+    volumes:
+      - agent-secrets:/etc/appforge/local-secrets
+
+  customer-storage-import:
+    <<: *agent-security
+    profiles: [maintenance]
+    restart: "no"
+    command:
+      - customer-storage-import
+      - --state-dir
+      - /var/lib/appforge-agent
+      - --secret-root
+      - /etc/appforge/local-secrets
+      - --app-id
+      - ${APPFORGE_CUSTOMER_APP_ID:?required}
+      - --object-type
+      - ${APPFORGE_CUSTOMER_OBJECT_TYPE:?required}
+      - --input
+      - /import/input
+    volumes:
+      - agent-state:/var/lib/appforge-agent
+      - agent-secrets:/etc/appforge/local-secrets:ro
+      - ${APPFORGE_CUSTOMER_INPUT_FILE:?required}:/import/input:ro
+
 volumes:
   agent-state:
   agent-secrets:

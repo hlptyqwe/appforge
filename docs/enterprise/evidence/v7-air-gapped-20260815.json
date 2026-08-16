@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "acceptedAt": "2026-08-16T06:29:30Z",
+  "scope": "synthetic-local-air-gapped",
+  "acceptanceScript": "deploy/acceptance/v7-air-gapped.sh",
+  "packageCode": "agp_0f7aef390c624692d3a2ac9d2958aa13f73554a8f82a5891",
+  "productionCredentialsUsed": false,
+  "realCustomerDataUsed": false,
+  "artifacts": {
+    "taskPackageSha256": "364ea8fb9b3dbaea7af82fd473da90154c3469a0264652afa08179bd26ef1de6",
+    "resultPackageSha256": "ab900cb3bc1625e584eb938616d0e256922dfbb5ea244f19ee78a92764200707",
+    "resultPackageSizeBytes": 12343,
+    "finalApkSha256": "fb9a3b415dd41e112551ed8848ecf525c9cdf1a4d49ccd74aa99aa97a68d2904",
+    "certificateSha256": "8d3a83e25f200be3ff11050c46bacd1d6e6231740959cea893d59835cdaffb85",
+    "importedOutputObjectCount": 2
+  },
+  "checks": {
+    "taskAndQuotaLocked": "passed",
+    "controlPlaneSignatureVerified": "passed",
+    "wrongAgentRejected": "passed",
+    "taskTamperRejected": "passed",
+    "networkModeNone": "passed",
+    "realApkBuildAndSignature": "passed",
+    "localReplayRejected": "passed",
+    "agentResultSignatureVerified": "passed",
+    "resultTamperRejected": "passed",
+    "transactionalImport": "passed",
+    "idempotentReimport": "passed",
+    "secretLeakScan": "passed",
+    "tenantPortalRoutes": "passed",
+    "minimumRbacCatalogIdempotent": "passed",
+    "defaultDenyBeforeExplicitGrant": "passed"
+  },
+  "cleanup": {
+    "remainingTenantRows": 0,
+    "permanentRbacMenuRows": 6,
+    "remainingTemporaryRoleGrants": 0,
+    "remainingObjectPrefixEntries": 0,
+    "remainingDockerVolumes": 0,
+    "remainingDockerContainers": 0,
+    "temporaryHostDirectoryRemoved": true
+  },
+  "limitations": [
+    "synthetic-apk-test-keystore-and-temporary-certificates-only",
+    "local-docker-network-none-simulation-not-customer-physical-air-gap",
+    "development-schema-113-not-production-schema-promotion"
+  ]
+}

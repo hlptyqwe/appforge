@@ -82,6 +82,34 @@ func validateCapabilityJSON(value string) (string, error) {
 	return string(normalized), nil
 }
 
+func builderNodeSupportsRemoteSigning(node *models.TBuilderNode) bool {
+	if node == nil {
+		return false
+	}
+	var capabilities map[string]any
+	if err := json.Unmarshal([]byte(stringValue(node.CapabilityJson)), &capabilities); err != nil {
+		return false
+	}
+	enabled, ok := capabilities["remoteSigning"].(bool)
+	return ok && enabled
+}
+
+func taskRequiresRemoteSigning(ctx context.Context, session sqlx.Session, task *models.TBuildTask) (bool, error) {
+	if task == nil || task.SigningConfigId <= 0 {
+		return false, nil
+	}
+	var signing struct {
+		KeystoreObjectID int64          `db:"keystore_object_id"`
+		SecretRef        sql.NullString `db:"secret_ref"`
+	}
+	if err := session.QueryRowCtx(ctx, &signing, `SELECT keystore_object_id, secret_ref
+FROM t_app_signing_config WHERE id = ? AND tenant_id = ? AND app_id = ? LIMIT 1`,
+		task.SigningConfigId, task.TenantId, task.AppId); err != nil {
+		return false, err
+	}
+	return signing.KeystoreObjectID == 0 && strings.TrimSpace(stringValue(signing.SecretRef)) != "", nil
+}
+
 func mapBuilderNode(item *models.TBuilderNode) *core.BuilderNode {
 	if item == nil {
 		return nil
@@ -590,6 +618,7 @@ func claimScheduledTask(ctx context.Context, svcCtx *svc.ServiceContext, in *cor
 		if node.BuildProtocolVersion < 1 || strings.TrimSpace(node.ToolchainVersion) == "" {
 			return status.Error(codes.FailedPrecondition, "builder node capability is incomplete")
 		}
+		supportsRemoteSigning := builderNodeSupportsRemoteSigning(&node)
 		_, _ = session.ExecCtx(txCtx, `UPDATE t_build_slot_lease SET status = ?, released_at = CURRENT_TIMESTAMP(3),
 update_time = CURRENT_TIMESTAMP(3) WHERE status = ? AND lease_until <= CURRENT_TIMESTAMP(3)`, buildSlotExpired, buildSlotActive)
 		nodeCount, err := activeSlotCount(txCtx, session, node.PoolCode, 0, 0)
@@ -659,6 +688,13 @@ ORDER BY priority DESC, queued_at ASC, id ASC LIMIT 32 FOR UPDATE SKIP LOCKED`, 
 			}
 			for index := range tasks {
 				task := &tasks[index]
+				requiresRemoteSigning, capabilityErr := taskRequiresRemoteSigning(txCtx, session, task)
+				if capabilityErr != nil {
+					return capabilityErr
+				}
+				if requiresRemoteSigning && !supportsRemoteSigning {
+					continue
+				}
 				appMax, _, _, policyErr := schedulerPolicy(txCtx, session, task.TenantId, task.AppId, node.PoolCode)
 				if policyErr != nil {
 					return policyErr

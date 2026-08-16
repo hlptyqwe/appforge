@@ -63,18 +63,20 @@ assert sum(1 for node in walk(payload.get("menus", [])) if node.get("path")=="/p
 assert "enterprise:deployment:view" in payload.get("perms", [])
 '
 deployment_response=$(curl -fsS -H "Authorization: Bearer $admin_token" "$api_url/admin/core/enterprise/deployment")
-printf '%s' "$deployment_response" | python3 -c '
+python3 -c '
 import json,sys
-payload=json.load(sys.stdin)
+payload=json.loads(sys.argv[1])
 data=payload["data"]
 assert payload["code"]==200
-assert data["actualSchemaVersion"]=="20260815_111_v7_deployment_console"
+target="20260815_113_v7_air_gapped"
+assert data["targetSchemaVersion"]==target
+assert data["actualSchemaVersion"]==target
 assert data["schemaCompatible"] is True and data["upgradeReady"] is True
 assert len(data["components"])==5 and all(item["status"]=="healthy" for item in data["components"])
-assert "20260815_111_v7_deployment_console" in [item["version"] for item in data["recentMigrations"]]
-'
+assert "20260815_113_v7_air_gapped" in [item["version"] for item in data["recentMigrations"]]
+' "$deployment_response"
 unset admin_token login_response profile_response deployment_response
-echo "通过: 企业部署页面真实认证、RBAC、组件健康、许可证、Schema和升级前置状态"
+echo "通过: 企业部署页面真实认证、RBAC、组件健康、许可证、正式Schema目标和升级前置状态"
 
 local_agent_view="$repo_root/appforge-ui/src/views/platform/local-agents.vue"
 rg -q -- '--token-stdin' "$local_agent_view"
@@ -83,10 +85,17 @@ if rg -q -- '--token[[:space:]]' "$local_agent_view"; then
   exit 1
 fi
 rg -q '24小时内到期' "$local_agent_view"
-echo "通过: Local Agent 注册码仅从标准输入传递，管理页包含证书临期告警"
+rg -q 'prepareAirGappedExport' "$local_agent_view"
+rg -q 'getAirGappedPackage' "$local_agent_view"
+rg -q 'importAirGappedResult' "$local_agent_view"
+rg -Fq "uploadObject(file, 10" "$local_agent_view"
+rg -q "enterprise:air-gapped:export" "$local_agent_view"
+rg -q "enterprise:air-gapped:import" "$local_agent_view"
+rg -q "enterprise:air-gapped:view" "$local_agent_view"
+echo "通过: Local Agent 注册码仅从标准输入传递，管理页包含证书临期告警和AIR_GAPPED权限化导出/查询/上传导入闭环"
 
-assert_equal "V7数据库迁移及管理权限完整" 4 \
-  "SELECT COUNT(*) FROM sys_schema_migration WHERE version IN ('20260814_108_v7_enterprise','20260814_109_v7_enterprise_menu','20260814_110_v4_builder_node_recovery','20260815_111_v7_deployment_console');"
+assert_equal "V7数据库迁移及管理权限完整" 6 \
+  "SELECT COUNT(*) FROM sys_schema_migration WHERE version IN ('20260814_108_v7_enterprise','20260814_109_v7_enterprise_menu','20260814_110_v4_builder_node_recovery','20260815_111_v7_deployment_console','20260815_112_v7_customer_storage','20260815_113_v7_air_gapped');"
 assert_equal "V7企业部署页面及只读接口权限完整" 2 \
   "SELECT COUNT(*) FROM sys_menu WHERE id IN (4700,4710) AND enabled=1;"
 assert_zero "V7企业部署信息未授予业务租户用户" \
@@ -109,7 +118,7 @@ assert_zero "Hybrid Artifact引用不包含常见URL凭证" \
 (
   cd "$repo_root/common"
   GOMODCACHE="$go_mod_cache" GOCACHE="$go_cache" go test ./secretprovider ./offlinelicense -count=1
-  GOMODCACHE="$go_mod_cache" GOCACHE="$go_cache" go test -race ./siem -count=1
+  GOMODCACHE="$go_mod_cache" GOCACHE="$go_cache" go test -race ./siem ./remotesigner -count=1
 )
 (
   cd "$repo_root/local-agent"
@@ -136,15 +145,25 @@ echo "通过: 断网许可证密钥生成、签发、部署绑定和持久状态
 APPFORGE_DIAGNOSTIC_API_URL="$api_url" "$repo_root/deploy/acceptance/v7-diagnostics.sh"
 "$repo_root/deploy/acceptance/v7-production-preflight.sh"
 "$repo_root/deploy/acceptance/v7-offline-layout.sh"
+APPFORGE_REMOTE_SIGNER_EVIDENCE_PATH="$license_tmp/v7-remote-apk-signing.json" \
+  "$repo_root/deploy/acceptance/v7-remote-apk-signing.sh"
 "$repo_root/deploy/acceptance/v7-release-workflow.sh"
 "$repo_root/deploy/acceptance/v7-network-policy.sh"
+"$repo_root/deploy/acceptance/v7-observability.sh"
+"$repo_root/deploy/acceptance/v7-egress-proxy.sh"
 "$repo_root/deploy/acceptance/v7-backup-restore.sh"
+APPFORGE_DR_FIXTURE_ONLY=true "$repo_root/deploy/acceptance/v7-appforge-schema112-dr.sh"
+if [[ ${APPFORGE_RUN_SCHEMA112_DR_E2E:-false} == true ]]; then
+  APPFORGE_DR_REPORT_FILE="$license_tmp/v7-appforge-schema112-dr.json" \
+    "$repo_root/deploy/acceptance/v7-appforge-schema112-dr.sh"
+fi
 
 bash -n "$repo_root/deploy/production/"*.sh "$repo_root/deploy/local-agent/"*.sh
 bash -n "$repo_root/deploy/acceptance/v7-local-agent-recovery.sh" \
   "$repo_root/deploy/acceptance/v7-kubernetes-upgrade.sh" \
   "$repo_root/deploy/acceptance/v7-network-policy-runtime.sh"
 docker compose --env-file "$repo_root/deploy/production/.env.example" -f "$repo_root/deploy/production/docker-compose.yml" config --quiet
+APPFORGE_CUSTOMER_APP_ID=1 APPFORGE_CUSTOMER_OBJECT_TYPE=source-apk APPFORGE_CUSTOMER_INPUT_FILE=/dev/null \
 docker compose --env-file "$repo_root/deploy/local-agent/.env.example" -f "$repo_root/deploy/local-agent/docker-compose.yml" \
   --profile registration --profile maintenance config --quiet
 python3 -m json.tool "$repo_root/deploy/helm/appforge/values.schema.json" >/dev/null

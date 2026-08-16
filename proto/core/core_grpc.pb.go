@@ -144,11 +144,18 @@ const (
 	Core_RevokeLocalAgent_FullMethodName                 = "/core.Core/RevokeLocalAgent"
 	Core_RotateLocalAgentCertificate_FullMethodName      = "/core.Core/RotateLocalAgentCertificate"
 	Core_ClaimLocalAgentBuildTask_FullMethodName         = "/core.Core/ClaimLocalAgentBuildTask"
+	Core_RegisterCustomerStorageInput_FullMethodName     = "/core.Core/RegisterCustomerStorageInput"
 	Core_RenewLocalAgentTaskLease_FullMethodName         = "/core.Core/RenewLocalAgentTaskLease"
 	Core_ReportLocalAgentBuildProgress_FullMethodName    = "/core.Core/ReportLocalAgentBuildProgress"
 	Core_CompleteLocalAgentBuildTask_FullMethodName      = "/core.Core/CompleteLocalAgentBuildTask"
 	Core_FailLocalAgentBuildTask_FullMethodName          = "/core.Core/FailLocalAgentBuildTask"
 	Core_VerifyHybridArtifact_FullMethodName             = "/core.Core/VerifyHybridArtifact"
+	Core_PrepareAirGappedExport_FullMethodName           = "/core.Core/PrepareAirGappedExport"
+	Core_SignAirGappedManifest_FullMethodName            = "/core.Core/SignAirGappedManifest"
+	Core_FinalizeAirGappedExport_FullMethodName          = "/core.Core/FinalizeAirGappedExport"
+	Core_AbortAirGappedExport_FullMethodName             = "/core.Core/AbortAirGappedExport"
+	Core_GetAirGappedPackage_FullMethodName              = "/core.Core/GetAirGappedPackage"
+	Core_ImportAirGappedResult_FullMethodName            = "/core.Core/ImportAirGappedResult"
 	Core_ReportInstall_FullMethodName                    = "/core.Core/ReportInstall"
 	Core_ReportChannelEvent_FullMethodName               = "/core.Core/ReportChannelEvent"
 	Core_GetChannelStats_FullMethodName                  = "/core.Core/GetChannelStats"
@@ -406,6 +413,8 @@ type CoreClient interface {
 	RotateLocalAgentCertificate(ctx context.Context, in *RotateLocalAgentCertificateReq, opts ...grpc.CallOption) (*RegisterLocalAgentResp, error)
 	// Agent领取经过租户、应用、能力和协议范围校验的构建任务。
 	ClaimLocalAgentBuildTask(ctx context.Context, in *ClaimLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*LocalAgentBuildTaskResp, error)
+	// Agent登记已上传并重新校验的客户存储输入对象。
+	RegisterCustomerStorageInput(ctx context.Context, in *RegisterCustomerStorageInputReq, opts ...grpc.CallOption) (*StorageObjectResp, error)
 	// Agent按任务attempt续租，旧进程不能回写。
 	RenewLocalAgentTaskLease(ctx context.Context, in *RenewLocalAgentTaskLeaseReq, opts ...grpc.CallOption) (*RespBase, error)
 	// Agent回报预定义构建阶段，不支持任意命令。
@@ -416,6 +425,18 @@ type CoreClient interface {
 	FailLocalAgentBuildTask(ctx context.Context, in *FailLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
 	// 校验并登记三种存储模式下的Artifact引用。
 	VerifyHybridArtifact(ctx context.Context, in *VerifyHybridArtifactReq, opts ...grpc.CallOption) (*RespBase, error)
+	// 管理端锁定指定任务并准备AIR_GAPPED离线任务包。
+	PrepareAirGappedExport(ctx context.Context, in *PrepareAirGappedExportReq, opts ...grpc.CallOption) (*PrepareAirGappedExportResp, error)
+	// 使用控制面Agent CA签署严格规范化任务Manifest。
+	SignAirGappedManifest(ctx context.Context, in *SignAirGappedManifestReq, opts ...grpc.CallOption) (*SignAirGappedManifestResp, error)
+	// 绑定已复验的离线任务ZIP并开放结果导入。
+	FinalizeAirGappedExport(ctx context.Context, in *FinalizeAirGappedExportReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error)
+	// 撤销离线包并以失败状态关闭当前任务attempt。
+	AbortAirGappedExport(ctx context.Context, in *AbortAirGappedExportReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error)
+	// 查询当前租户AIR_GAPPED离线包状态。
+	GetAirGappedPackage(ctx context.Context, in *AirGappedPackageReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error)
+	// 校验Agent证书、签名、Nonce和attempt后导入离线结果。
+	ImportAirGappedResult(ctx context.Context, in *ImportAirGappedResultReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error)
 	ReportInstall(ctx context.Context, in *InstallReportReq, opts ...grpc.CallOption) (*RespBase, error)
 	ReportChannelEvent(ctx context.Context, in *ReportChannelEventReq, opts ...grpc.CallOption) (*RespBase, error)
 	GetChannelStats(ctx context.Context, in *ChannelStatsReq, opts ...grpc.CallOption) (*ChannelStatsResp, error)
@@ -1700,6 +1721,16 @@ func (c *coreClient) ClaimLocalAgentBuildTask(ctx context.Context, in *ClaimLoca
 	return out, nil
 }
 
+func (c *coreClient) RegisterCustomerStorageInput(ctx context.Context, in *RegisterCustomerStorageInputReq, opts ...grpc.CallOption) (*StorageObjectResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StorageObjectResp)
+	err := c.cc.Invoke(ctx, Core_RegisterCustomerStorageInput_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *coreClient) RenewLocalAgentTaskLease(ctx context.Context, in *RenewLocalAgentTaskLeaseReq, opts ...grpc.CallOption) (*RespBase, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RespBase)
@@ -1744,6 +1775,66 @@ func (c *coreClient) VerifyHybridArtifact(ctx context.Context, in *VerifyHybridA
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RespBase)
 	err := c.cc.Invoke(ctx, Core_VerifyHybridArtifact_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) PrepareAirGappedExport(ctx context.Context, in *PrepareAirGappedExportReq, opts ...grpc.CallOption) (*PrepareAirGappedExportResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PrepareAirGappedExportResp)
+	err := c.cc.Invoke(ctx, Core_PrepareAirGappedExport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) SignAirGappedManifest(ctx context.Context, in *SignAirGappedManifestReq, opts ...grpc.CallOption) (*SignAirGappedManifestResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SignAirGappedManifestResp)
+	err := c.cc.Invoke(ctx, Core_SignAirGappedManifest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) FinalizeAirGappedExport(ctx context.Context, in *FinalizeAirGappedExportReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AirGappedPackageResp)
+	err := c.cc.Invoke(ctx, Core_FinalizeAirGappedExport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) AbortAirGappedExport(ctx context.Context, in *AbortAirGappedExportReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AirGappedPackageResp)
+	err := c.cc.Invoke(ctx, Core_AbortAirGappedExport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) GetAirGappedPackage(ctx context.Context, in *AirGappedPackageReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AirGappedPackageResp)
+	err := c.cc.Invoke(ctx, Core_GetAirGappedPackage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *coreClient) ImportAirGappedResult(ctx context.Context, in *ImportAirGappedResultReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AirGappedPackageResp)
+	err := c.cc.Invoke(ctx, Core_ImportAirGappedResult_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2149,6 +2240,8 @@ type CoreServer interface {
 	RotateLocalAgentCertificate(context.Context, *RotateLocalAgentCertificateReq) (*RegisterLocalAgentResp, error)
 	// Agent领取经过租户、应用、能力和协议范围校验的构建任务。
 	ClaimLocalAgentBuildTask(context.Context, *ClaimLocalAgentBuildTaskReq) (*LocalAgentBuildTaskResp, error)
+	// Agent登记已上传并重新校验的客户存储输入对象。
+	RegisterCustomerStorageInput(context.Context, *RegisterCustomerStorageInputReq) (*StorageObjectResp, error)
 	// Agent按任务attempt续租，旧进程不能回写。
 	RenewLocalAgentTaskLease(context.Context, *RenewLocalAgentTaskLeaseReq) (*RespBase, error)
 	// Agent回报预定义构建阶段，不支持任意命令。
@@ -2159,6 +2252,18 @@ type CoreServer interface {
 	FailLocalAgentBuildTask(context.Context, *FailLocalAgentBuildTaskReq) (*RespBase, error)
 	// 校验并登记三种存储模式下的Artifact引用。
 	VerifyHybridArtifact(context.Context, *VerifyHybridArtifactReq) (*RespBase, error)
+	// 管理端锁定指定任务并准备AIR_GAPPED离线任务包。
+	PrepareAirGappedExport(context.Context, *PrepareAirGappedExportReq) (*PrepareAirGappedExportResp, error)
+	// 使用控制面Agent CA签署严格规范化任务Manifest。
+	SignAirGappedManifest(context.Context, *SignAirGappedManifestReq) (*SignAirGappedManifestResp, error)
+	// 绑定已复验的离线任务ZIP并开放结果导入。
+	FinalizeAirGappedExport(context.Context, *FinalizeAirGappedExportReq) (*AirGappedPackageResp, error)
+	// 撤销离线包并以失败状态关闭当前任务attempt。
+	AbortAirGappedExport(context.Context, *AbortAirGappedExportReq) (*AirGappedPackageResp, error)
+	// 查询当前租户AIR_GAPPED离线包状态。
+	GetAirGappedPackage(context.Context, *AirGappedPackageReq) (*AirGappedPackageResp, error)
+	// 校验Agent证书、签名、Nonce和attempt后导入离线结果。
+	ImportAirGappedResult(context.Context, *ImportAirGappedResultReq) (*AirGappedPackageResp, error)
 	ReportInstall(context.Context, *InstallReportReq) (*RespBase, error)
 	ReportChannelEvent(context.Context, *ReportChannelEventReq) (*RespBase, error)
 	GetChannelStats(context.Context, *ChannelStatsReq) (*ChannelStatsResp, error)
@@ -2568,6 +2673,9 @@ func (UnimplementedCoreServer) RotateLocalAgentCertificate(context.Context, *Rot
 func (UnimplementedCoreServer) ClaimLocalAgentBuildTask(context.Context, *ClaimLocalAgentBuildTaskReq) (*LocalAgentBuildTaskResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method ClaimLocalAgentBuildTask not implemented")
 }
+func (UnimplementedCoreServer) RegisterCustomerStorageInput(context.Context, *RegisterCustomerStorageInputReq) (*StorageObjectResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegisterCustomerStorageInput not implemented")
+}
 func (UnimplementedCoreServer) RenewLocalAgentTaskLease(context.Context, *RenewLocalAgentTaskLeaseReq) (*RespBase, error) {
 	return nil, status.Error(codes.Unimplemented, "method RenewLocalAgentTaskLease not implemented")
 }
@@ -2582,6 +2690,24 @@ func (UnimplementedCoreServer) FailLocalAgentBuildTask(context.Context, *FailLoc
 }
 func (UnimplementedCoreServer) VerifyHybridArtifact(context.Context, *VerifyHybridArtifactReq) (*RespBase, error) {
 	return nil, status.Error(codes.Unimplemented, "method VerifyHybridArtifact not implemented")
+}
+func (UnimplementedCoreServer) PrepareAirGappedExport(context.Context, *PrepareAirGappedExportReq) (*PrepareAirGappedExportResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method PrepareAirGappedExport not implemented")
+}
+func (UnimplementedCoreServer) SignAirGappedManifest(context.Context, *SignAirGappedManifestReq) (*SignAirGappedManifestResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method SignAirGappedManifest not implemented")
+}
+func (UnimplementedCoreServer) FinalizeAirGappedExport(context.Context, *FinalizeAirGappedExportReq) (*AirGappedPackageResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method FinalizeAirGappedExport not implemented")
+}
+func (UnimplementedCoreServer) AbortAirGappedExport(context.Context, *AbortAirGappedExportReq) (*AirGappedPackageResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method AbortAirGappedExport not implemented")
+}
+func (UnimplementedCoreServer) GetAirGappedPackage(context.Context, *AirGappedPackageReq) (*AirGappedPackageResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAirGappedPackage not implemented")
+}
+func (UnimplementedCoreServer) ImportAirGappedResult(context.Context, *ImportAirGappedResultReq) (*AirGappedPackageResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ImportAirGappedResult not implemented")
 }
 func (UnimplementedCoreServer) ReportInstall(context.Context, *InstallReportReq) (*RespBase, error) {
 	return nil, status.Error(codes.Unimplemented, "method ReportInstall not implemented")
@@ -4902,6 +5028,24 @@ func _Core_ClaimLocalAgentBuildTask_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Core_RegisterCustomerStorageInput_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterCustomerStorageInputReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).RegisterCustomerStorageInput(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_RegisterCustomerStorageInput_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).RegisterCustomerStorageInput(ctx, req.(*RegisterCustomerStorageInputReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Core_RenewLocalAgentTaskLease_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RenewLocalAgentTaskLeaseReq)
 	if err := dec(in); err != nil {
@@ -4988,6 +5132,114 @@ func _Core_VerifyHybridArtifact_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CoreServer).VerifyHybridArtifact(ctx, req.(*VerifyHybridArtifactReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_PrepareAirGappedExport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PrepareAirGappedExportReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).PrepareAirGappedExport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_PrepareAirGappedExport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).PrepareAirGappedExport(ctx, req.(*PrepareAirGappedExportReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_SignAirGappedManifest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SignAirGappedManifestReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).SignAirGappedManifest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_SignAirGappedManifest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).SignAirGappedManifest(ctx, req.(*SignAirGappedManifestReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_FinalizeAirGappedExport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FinalizeAirGappedExportReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).FinalizeAirGappedExport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_FinalizeAirGappedExport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).FinalizeAirGappedExport(ctx, req.(*FinalizeAirGappedExportReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_AbortAirGappedExport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AbortAirGappedExportReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).AbortAirGappedExport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_AbortAirGappedExport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).AbortAirGappedExport(ctx, req.(*AbortAirGappedExportReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_GetAirGappedPackage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AirGappedPackageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).GetAirGappedPackage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_GetAirGappedPackage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).GetAirGappedPackage(ctx, req.(*AirGappedPackageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Core_ImportAirGappedResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImportAirGappedResultReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CoreServer).ImportAirGappedResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Core_ImportAirGappedResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CoreServer).ImportAirGappedResult(ctx, req.(*ImportAirGappedResultReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -5788,6 +6040,10 @@ var Core_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Core_ClaimLocalAgentBuildTask_Handler,
 		},
 		{
+			MethodName: "RegisterCustomerStorageInput",
+			Handler:    _Core_RegisterCustomerStorageInput_Handler,
+		},
+		{
 			MethodName: "RenewLocalAgentTaskLease",
 			Handler:    _Core_RenewLocalAgentTaskLease_Handler,
 		},
@@ -5806,6 +6062,30 @@ var Core_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VerifyHybridArtifact",
 			Handler:    _Core_VerifyHybridArtifact_Handler,
+		},
+		{
+			MethodName: "PrepareAirGappedExport",
+			Handler:    _Core_PrepareAirGappedExport_Handler,
+		},
+		{
+			MethodName: "SignAirGappedManifest",
+			Handler:    _Core_SignAirGappedManifest_Handler,
+		},
+		{
+			MethodName: "FinalizeAirGappedExport",
+			Handler:    _Core_FinalizeAirGappedExport_Handler,
+		},
+		{
+			MethodName: "AbortAirGappedExport",
+			Handler:    _Core_AbortAirGappedExport_Handler,
+		},
+		{
+			MethodName: "GetAirGappedPackage",
+			Handler:    _Core_GetAirGappedPackage_Handler,
+		},
+		{
+			MethodName: "ImportAirGappedResult",
+			Handler:    _Core_ImportAirGappedResult_Handler,
 		},
 		{
 			MethodName: "ReportInstall",

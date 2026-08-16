@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"appforge/common/observability"
 	"appforge/common/rpcauth"
 	pb "appforge/proto/system"
 	"appforge/services/system/internal/config"
@@ -36,6 +37,9 @@ func main() {
 
 	// 用 etcd 配置中心
 	if err := etcd.LoadFromEtcdAndMerge(strings.Split(*endpoints, ","), []string{*commonKey, *configKey}, &c); err != nil {
+		panic(err)
+	}
+	if err := observability.ApplyEnvironment(&c.RpcServerConf.ServiceConf); err != nil {
 		panic(err)
 	}
 

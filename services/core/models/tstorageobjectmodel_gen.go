@@ -43,19 +43,21 @@ type (
 	}
 
 	TStorageObject struct {
-		Id           int64          `db:"id"`            // 存储对象ID
-		TenantId     int64          `db:"tenant_id"`     // 所属租户ID
-		AppId        int64          `db:"app_id"`        // 关联应用ID，上传时允许为0
-		ObjectType   int64          `db:"object_type"`   // 对象类型：1原始APK 2签名文件 3构建APK 4构建日志 5品牌Logo 6品牌启动图
-		ObjectKey    string         `db:"object_key"`    // 私有对象存储Key
-		OriginalName string         `db:"original_name"` // 用户上传时的原始文件名
-		ContentType  string         `db:"content_type"`  // 对象内容类型
-		SizeBytes    int64          `db:"size_bytes"`    // 对象大小，单位字节
-		Sha256       sql.NullString `db:"sha256"`        // 对象SHA-256，小写十六进制
-		Status       int64          `db:"status"`        // 状态：1上传中 2已就绪 3已绑定 4已删除 5失败
-		CreateBy     int64          `db:"create_by"`     // 创建人ID
-		CreateTime   time.Time      `db:"create_time"`   // 创建时间
-		UpdateTime   time.Time      `db:"update_time"`   // 更新时间
+		Id           int64          `db:"id"`             // 存储对象ID
+		TenantId     int64          `db:"tenant_id"`      // 所属租户ID
+		AppId        int64          `db:"app_id"`         // 关联应用ID，上传时允许为0
+		ObjectType   int64          `db:"object_type"`    // 对象类型：1原始APK 2签名文件 3构建APK 4构建日志 5品牌Logo 6品牌启动图
+		ObjectKey    string         `db:"object_key"`     // 私有对象存储Key
+		OriginalName string         `db:"original_name"`  // 用户上传时的原始文件名
+		ContentType  string         `db:"content_type"`   // 对象内容类型
+		SizeBytes    int64          `db:"size_bytes"`     // 对象大小，单位字节
+		Sha256       sql.NullString `db:"sha256"`         // 对象SHA-256，小写十六进制
+		Status       int64          `db:"status"`         // 状态：1上传中 2已就绪 3已绑定 4已删除 5失败
+		StorageMode  int64          `db:"storage_mode"`   // 存储模式：1控制面存储 2客户存储
+		OwnerAgentId int64          `db:"owner_agent_id"` // 客户存储所属Local Agent ID，控制面存储为0
+		CreateBy     int64          `db:"create_by"`      // 创建人ID
+		CreateTime   time.Time      `db:"create_time"`    // 创建时间
+		UpdateTime   time.Time      `db:"update_time"`    // 更新时间
 	}
 )
 
@@ -122,8 +124,8 @@ func (m *defaultTStorageObjectModel) Insert(ctx context.Context, data *TStorageO
 	tStorageObjectIdKey := fmt.Sprintf("%s%v", cacheTStorageObjectIdPrefix, data.Id)
 	tStorageObjectObjectKeyKey := fmt.Sprintf("%s%v", cacheTStorageObjectObjectKeyPrefix, data.ObjectKey)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, tStorageObjectRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.TenantId, data.AppId, data.ObjectType, data.ObjectKey, data.OriginalName, data.ContentType, data.SizeBytes, data.Sha256, data.Status, data.CreateBy)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, tStorageObjectRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.TenantId, data.AppId, data.ObjectType, data.ObjectKey, data.OriginalName, data.ContentType, data.SizeBytes, data.Sha256, data.Status, data.StorageMode, data.OwnerAgentId, data.CreateBy)
 	}, tStorageObjectIdKey, tStorageObjectObjectKeyKey)
 	return ret, err
 }
@@ -138,7 +140,7 @@ func (m *defaultTStorageObjectModel) Update(ctx context.Context, newData *TStora
 	tStorageObjectObjectKeyKey := fmt.Sprintf("%s%v", cacheTStorageObjectObjectKeyPrefix, data.ObjectKey)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, tStorageObjectRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, newData.TenantId, newData.AppId, newData.ObjectType, newData.ObjectKey, newData.OriginalName, newData.ContentType, newData.SizeBytes, newData.Sha256, newData.Status, newData.CreateBy, newData.Id)
+		return conn.ExecCtx(ctx, query, newData.TenantId, newData.AppId, newData.ObjectType, newData.ObjectKey, newData.OriginalName, newData.ContentType, newData.SizeBytes, newData.Sha256, newData.Status, newData.StorageMode, newData.OwnerAgentId, newData.CreateBy, newData.Id)
 	}, tStorageObjectIdKey, tStorageObjectObjectKeyKey)
 	return err
 }

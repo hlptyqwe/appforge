@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-15",
+  "mode": "read-only-existing-synthetic-v2-evidence",
+  "databaseMutated": false,
+  "taskId": 4,
+  "outputSha256": "f76f8448b7960bbfb5e7c818ada3886aaef82e9de8915ebb30ffd7653becefe1",
+  "packageName": "com.appforge.acceptance",
+  "appName": "AppForge 白标验收",
+  "certificateSha256": "3ffec9f29b572cdac5bb08be608d10d158177262815a297e76331bb651620e78",
+  "recoveredBrandingTaskCount": 2,
+  "eligibleBrandingBuilderCountAtReview": 3,
+  "checks": {
+    "tenantAndAppReferenceIntegrity": "passed",
+    "compatiblePreflightReport": "passed",
+    "successfulBuild": "passed",
+    "packageNameUnchanged": "passed",
+    "applicationLabel": "passed",
+    "logoAndSplashResourcesChanged": "passed",
+    "brandingSnapshotAsset": "passed",
+    "apiHostAndRevision": "passed",
+    "apkSignature": "passed",
+    "imageAndMetadataNegativeUnitTests": "passed",
+    "locatablePreflightFailureUnitTest": "passed",
+    "recoveredBrandingTaskEvidence": "passed",
+    "preflightBuilderSchedulingGateUnitTest": "passed"
+  },
+  "limitations": [
+    "This verifier is read-only and relies on the existing synthetic V2 task selected by APPFORGE_V2_ACCEPTANCE_TASK_ID.",
+    "It does not create an incompatible APK through the public API and therefore does not close V2 criterion 3 by itself.",
+    "Android installation/start evidence remains the previously recorded V3 API 29 emulator run."
+  ]
+}

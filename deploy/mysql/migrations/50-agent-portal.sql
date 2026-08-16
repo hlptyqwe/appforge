@@ -77,7 +77,8 @@ INSERT INTO sys_user (
 
 INSERT IGNORE INTO sys_user_role (tenant_id, user_id, role_id) VALUES (1, 1001, 1001);
 INSERT IGNORE INTO sys_role_menu (tenant_id, role_id, menu_id)
-SELECT 1, 1001, id FROM sys_menu WHERE app_scope = 2;
+-- 仅授予本迁移定义的V1代理端权限，禁止迁移重放时自动吸收后续敏感权限。
+SELECT 1, 1001, id FROM sys_menu WHERE app_scope = 2 AND id BETWEEN 3000 AND 3318;
 
 INSERT INTO sys_schema_migration (version, description)
 VALUES ('20260813_50_agent_portal', 'V1代理端身份域、菜单权限和本地验收账号')

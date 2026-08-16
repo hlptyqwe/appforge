@@ -24,6 +24,7 @@ import (
 
 	"appforge/common/etcd"
 	um "appforge/common/middleware"
+	"appforge/common/observability"
 	"appforge/common/siem"
 	"appforge/common/utils"
 	"appforge/common/validation"
@@ -53,6 +54,9 @@ func main() {
 	if err := config.ApplyDeploymentEnvironment(&c); err != nil {
 		panic(fmt.Sprintf("load deployment metadata: %v", err))
 	}
+	if err := observability.ApplyEnvironment(&c.RestConf.ServiceConf); err != nil {
+		panic(fmt.Sprintf("load observability configuration: %v", err))
+	}
 	if endpoint := strings.TrimSpace(os.Getenv("APPFORGE_SIEM_ENDPOINT")); endpoint != "" {
 		c.Audit.SIEM.Enabled = true
 		c.Audit.SIEM.Endpoint = endpoint
@@ -65,6 +69,7 @@ func main() {
 	defer stopWorker()
 	switch *processRole {
 	case "source-trigger-worker":
+		c.ServiceConf.MustSetUp()
 		sourceworker.New(svcCtx).Start(workerCtx)
 		fmt.Println("Starting source trigger worker...")
 		<-workerCtx.Done()

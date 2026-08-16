@@ -55,6 +55,8 @@ enum StorageObjectType {
   STORAGE_OBJECT_TYPE_BRAND_SPLASH = 6; // 品牌启动图图片
   STORAGE_OBJECT_TYPE_TEMPLATE_FILE = 7; // V3模板声明式补丁引用的受控文件
   STORAGE_OBJECT_TYPE_BUILD_CACHE = 8; // V4独立构建缓存产物
+  STORAGE_OBJECT_TYPE_OFFLINE_TASK_PACKAGE = 9; // V7控制面签名的离线任务包
+  STORAGE_OBJECT_TYPE_OFFLINE_RESULT_PACKAGE = 10; // V7 Local Agent签名的离线结果包
 }
 
 // V4 Builder节点状态。
@@ -372,6 +374,17 @@ enum HybridArtifactType {
   HYBRID_ARTIFACT_TYPE_BUILT_APK = 2; // 构建APK
   HYBRID_ARTIFACT_TYPE_BUILD_LOG = 3; // 构建日志
   HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE = 4; // 受签名离线任务包
+  HYBRID_ARTIFACT_TYPE_OFFLINE_RESULT_PACKAGE = 5; // 受签名离线结果包
+}
+
+// V7 AIR_GAPPED离线包生命周期状态。
+enum AirGappedPackageStatus {
+  AIR_GAPPED_PACKAGE_STATUS_UNKNOWN = 0; // 未知状态
+  AIR_GAPPED_PACKAGE_STATUS_PREPARING = 1; // 已锁定任务，正在生成并签名任务包
+  AIR_GAPPED_PACKAGE_STATUS_EXPORTED = 2; // 任务包已导出，等待导入结果包
+  AIR_GAPPED_PACKAGE_STATUS_IMPORTED = 3; // 结果包已校验并完成任务
+  AIR_GAPPED_PACKAGE_STATUS_EXPIRED = 4; // 离线包或任务租约已过期
+  AIR_GAPPED_PACKAGE_STATUS_REVOKED = 5; // 离线包已人工撤销
 }
 
 // 存储对象生命周期状态。
@@ -479,6 +492,13 @@ message Channel {
   int64 update_time = 11;
 }
 
+// APK签名模式。
+enum SigningMode {
+  SIGNING_MODE_UNSPECIFIED = 0; // 未指定，创建接口按本地Keystore兼容处理
+  SIGNING_MODE_LOCAL_KEYSTORE = 1; // Builder读取受控Keystore并在本地签名
+  SIGNING_MODE_REMOTE_APK_SIGNER = 2; // Builder通过固定mTLS协议请求客户远程签名服务
+}
+
 // APK签名配置。
 // 密码密文只允许写入，不通过查询接口返回。
 message SigningConfig {
@@ -496,6 +516,7 @@ message SigningConfig {
   int64 update_time = 12;
   int64 keystore_object_id = 13; // 签名文件存储对象ID
   string certificate_sha256 = 14; // 签名证书SHA-256指纹
+  SigningMode signing_mode = 15; // 持久化签名模式
 }
 
 message BuildTask {
@@ -559,6 +580,8 @@ message StorageObject {
   int64 create_by = 11; // 创建人ID
   int64 create_time = 12; // 创建时间，Unix毫秒
   int64 update_time = 13; // 更新时间，Unix毫秒
+  HybridArtifactMode storage_mode = 14; // 物理存储归属：控制面存储或客户存储
+  int64 owner_agent_id = 15; // 客户存储所属Local Agent ID，控制面存储为0
 }
 
 // 应用品牌白标配置。
@@ -1753,6 +1776,7 @@ message CreateSigningConfigReq {
   string secret_ref = 7;
   int64 keystore_object_id = 8; // 已校验的签名文件对象ID
   string certificate_sha256 = 9; // Builder校验得到的签名证书SHA-256指纹
+  SigningMode signing_mode = 10; // 签名模式，未指定时兼容为本地Keystore
 }
 
 // 创建待上传对象元数据请求。
@@ -2271,6 +2295,7 @@ message BuildExecutionContext {
   string template_snapshot_json = 15; // V3模板和产品不可变构建快照JSON
   string signer_certificate_sha256 = 16; // 构建应使用的签名证书SHA-256指纹
   repeated StorageObject template_files = 17; // V3模板修订绑定的受控私有文件
+  SigningMode signing_mode = 18; // 本次任务执行使用的签名模式
 }
 
 // Builder内部执行上下文响应。
@@ -2731,6 +2756,19 @@ message LocalAgentBuildTaskResp {
   common.RespBase base = 1; // 通用响应
   BuildTask task = 2; // 已领取且经过租户、应用、能力检查的任务
   HybridArtifactMode artifact_mode = 3; // 本任务Artifact模式
+  string customer_storage_ref = 4; // 客户侧本地Secret引用和已登记对象前缀，不包含访问凭据
+}
+
+// V7 Agent把客户网络内对象登记为可供应用使用的输入对象请求。
+message RegisterCustomerStorageInputReq {
+  LocalAgentAuth auth = 1; // mTLS认证上下文
+  int64 app_id = 2; // 已授权应用ID
+  StorageObjectType object_type = 3; // 输入对象类型
+  string object_reference = 4; // 已登记前缀内的客户对象引用，不包含凭据
+  string original_name = 5; // 原始文件名
+  string content_type = 6; // 内容类型
+  int64 size_bytes = 7; // Agent重新读取后确认的字节数
+  string sha256 = 8; // Agent重新读取后计算的SHA-256
 }
 
 // V7 Agent任务续租请求。
@@ -2785,6 +2823,104 @@ message VerifyHybridArtifactReq {
   string object_reference = 6; // 对象引用或离线包ID
   string sha256 = 7; // 内容SHA-256
   int64 size_bytes = 8; // 内容大小字节数
+}
+
+// V7 AIR_GAPPED离线任务包状态记录。
+message AirGappedPackage {
+  int64 id = 1; // 离线包记录ID
+  int64 tenant_id = 2; // 所属租户ID
+  int64 app_id = 3; // 关联应用ID
+  string package_code = 4; // 离线包全局唯一编码
+  int64 agent_id = 5; // 目标Local Agent ID
+  int64 task_id = 6; // 构建任务ID
+  int32 builder_attempt = 7; // 构建任务fencing尝试次数
+  string agent_certificate_serial = 8; // 导出时绑定的Agent客户端证书序列号
+  AirGappedPackageStatus status = 9; // 离线包生命周期状态
+  int64 export_object_id = 10; // 控制面离线任务ZIP对象ID
+  string export_sha256 = 11; // 离线任务ZIP内容SHA-256
+  int64 export_size_bytes = 12; // 离线任务ZIP大小字节数
+  int64 result_object_id = 13; // Agent离线结果ZIP对象ID
+  string result_sha256 = 14; // 离线结果ZIP内容SHA-256
+  int64 result_size_bytes = 15; // 离线结果ZIP大小字节数
+  int64 issued_at = 16; // 任务包签发时间，Unix毫秒
+  int64 expires_at = 17; // 任务包过期时间，Unix毫秒
+  int64 imported_at = 18; // 结果包导入时间，Unix毫秒
+  int64 create_time = 19; // 创建时间，Unix毫秒
+  int64 update_time = 20; // 更新时间，Unix毫秒
+}
+
+// V7 管理端准备AIR_GAPPED任务包请求。
+message PrepareAirGappedExportReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  int64 agent_id = 2; // 目标AIR_GAPPED Local Agent ID
+  int64 task_id = 3; // 待离线构建任务ID
+  int64 expires_seconds = 4; // 离线任务包有效秒数
+}
+
+// V7 AIR_GAPPED任务包准备响应，Nonce仅返回给可信API一次。
+message PrepareAirGappedExportResp {
+  common.RespBase base = 1; // 通用响应
+  AirGappedPackage package = 2; // 已锁定的离线包状态
+  BuildExecutionContext execution = 3; // 生成任务包所需的内部执行上下文
+  string nonce = 4; // 防重放随机Nonce明文
+}
+
+// V7 请求控制面CA签署规范化任务Manifest。
+message SignAirGappedManifestReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  string package_code = 2; // 离线包编码
+  string manifest_json = 3; // 严格规范化任务Manifest JSON
+}
+
+// V7 控制面任务Manifest签名响应。
+message SignAirGappedManifestResp {
+  common.RespBase base = 1; // 通用响应
+  string algorithm = 2; // 签名算法，固定为ECDSA_P256_SHA256
+  string signature_base64 = 3; // ASN.1 DER ECDSA签名Base64
+  string signer_certificate_pem = 4; // 控制面Agent CA公开证书PEM
+}
+
+// V7 完成AIR_GAPPED任务包导出请求。
+message FinalizeAirGappedExportReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  string package_code = 2; // 离线包编码
+  int64 export_object_id = 3; // 已上传并复验的任务ZIP对象ID
+  string export_sha256 = 4; // 任务ZIP内容SHA-256
+  int64 export_size_bytes = 5; // 任务ZIP大小字节数
+}
+
+// V7 撤销尚未导入的AIR_GAPPED包并结束当前任务attempt。
+message AbortAirGappedExportReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  string package_code = 2; // 离线包编码
+  string reason = 3; // 脱敏撤销原因
+}
+
+// V7 AIR_GAPPED离线包查询请求。
+message AirGappedPackageReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  string package_code = 2; // 离线包编码
+}
+
+// V7 AIR_GAPPED离线包响应。
+message AirGappedPackageResp {
+  common.RespBase base = 1; // 通用响应
+  AirGappedPackage data = 2; // 离线包状态
+}
+
+// V7 导入并校验AIR_GAPPED结果包请求。
+message ImportAirGappedResultReq {
+  int64 tenant_id = 1; // 目标租户ID，0表示当前租户
+  string package_code = 2; // 离线包编码
+  int64 result_object_id = 3; // 已上传并复验的结果ZIP对象ID
+  string result_sha256 = 4; // 结果ZIP内容SHA-256
+  int64 result_size_bytes = 5; // 结果ZIP大小字节数
+  string result_manifest_json = 6; // 严格规范化结果Manifest JSON
+  string agent_certificate_pem = 7; // Agent公开客户端证书PEM
+  string signature_algorithm = 8; // Agent签名算法
+  string signature_base64 = 9; // Agent结果Manifest签名Base64
+  int64 apk_object_id = 10; // 已提取、上传并复验的构建APK对象ID，失败时为0
+  int64 log_object_id = 11; // 已提取、上传并复验的日志对象ID，可为0
 }
 
 service Core {
@@ -3034,6 +3170,8 @@ service Core {
   rpc RotateLocalAgentCertificate(RotateLocalAgentCertificateReq) returns (RegisterLocalAgentResp);
   // Agent领取经过租户、应用、能力和协议范围校验的构建任务。
   rpc ClaimLocalAgentBuildTask(ClaimLocalAgentBuildTaskReq) returns (LocalAgentBuildTaskResp);
+  // Agent登记已上传并重新校验的客户存储输入对象。
+  rpc RegisterCustomerStorageInput(RegisterCustomerStorageInputReq) returns (StorageObjectResp);
   // Agent按任务attempt续租，旧进程不能回写。
   rpc RenewLocalAgentTaskLease(RenewLocalAgentTaskLeaseReq) returns (RespBase);
   // Agent回报预定义构建阶段，不支持任意命令。
@@ -3044,6 +3182,18 @@ service Core {
   rpc FailLocalAgentBuildTask(FailLocalAgentBuildTaskReq) returns (RespBase);
   // 校验并登记三种存储模式下的Artifact引用。
   rpc VerifyHybridArtifact(VerifyHybridArtifactReq) returns (RespBase);
+  // 管理端锁定指定任务并准备AIR_GAPPED离线任务包。
+  rpc PrepareAirGappedExport(PrepareAirGappedExportReq) returns (PrepareAirGappedExportResp);
+  // 使用控制面Agent CA签署严格规范化任务Manifest。
+  rpc SignAirGappedManifest(SignAirGappedManifestReq) returns (SignAirGappedManifestResp);
+  // 绑定已复验的离线任务ZIP并开放结果导入。
+  rpc FinalizeAirGappedExport(FinalizeAirGappedExportReq) returns (AirGappedPackageResp);
+  // 撤销离线包并以失败状态关闭当前任务attempt。
+  rpc AbortAirGappedExport(AbortAirGappedExportReq) returns (AirGappedPackageResp);
+  // 查询当前租户AIR_GAPPED离线包状态。
+  rpc GetAirGappedPackage(AirGappedPackageReq) returns (AirGappedPackageResp);
+  // 校验Agent证书、签名、Nonce和attempt后导入离线结果。
+  rpc ImportAirGappedResult(ImportAirGappedResultReq) returns (AirGappedPackageResp);
 
   rpc ReportInstall(InstallReportReq) returns (RespBase);
   rpc ReportChannelEvent(ReportChannelEventReq) returns (RespBase);

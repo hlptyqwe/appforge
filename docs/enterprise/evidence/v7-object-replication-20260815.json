@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "scenario": "isolated-synthetic-object-replication-recovery",
+  "acceptanceScript": "deploy/acceptance/v7-object-replication.sh",
+  "replicationMode": "server-side-sync",
+  "versioning": true,
+  "replicatedVersionCount": 2,
+  "firstReplicationSeconds": 1,
+  "secondReplicationSeconds": 1,
+  "sourceDestroyed": true,
+  "deleteMarkerReplayed": true,
+  "recoverySeconds": 1,
+  "verifiedSha256": [
+    "5b0d069c46601d4a8f08c217de905042483384aea6b36d74a2d504c89b044ee8",
+    "e8a8f95f46854aa042ca78907767d58fed9179f2279b409b1797ef667f664bec"
+  ],
+  "residualResources": {
+    "containers": 0,
+    "volumes": 0,
+    "networks": 0
+  },
+  "dataPolicy": "synthetic-only",
+  "limitations": [
+    "same-docker-host",
+    "not-customer-cross-region-network",
+    "not-production-object-volume"
+  ]
+}

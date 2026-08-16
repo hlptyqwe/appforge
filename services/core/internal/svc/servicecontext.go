@@ -60,6 +60,7 @@ type ServiceContext struct {
 	LocalAgentCertificate   models.TLocalAgentCertificateModel
 	LocalAgentCapability    models.TLocalAgentCapabilityModel
 	HybridArtifactModel     models.THybridArtifactReferenceModel
+	AirGappedPackageModel   models.TAirGappedPackageModel
 	AgentPKI                *agentpki.Signer
 	Secrets                 *secretbox.Box
 }
@@ -123,6 +124,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		LocalAgentCertificate:   models.NewTLocalAgentCertificateModel(conn, c.CacheRedis),
 		LocalAgentCapability:    models.NewTLocalAgentCapabilityModel(conn, c.CacheRedis),
 		HybridArtifactModel:     models.NewTHybridArtifactReferenceModel(conn, c.CacheRedis),
+		AirGappedPackageModel:   models.NewTAirGappedPackageModel(conn, c.CacheRedis),
 		AgentPKI:                agentSigner,
 		Secrets:                 secrets,
 	}

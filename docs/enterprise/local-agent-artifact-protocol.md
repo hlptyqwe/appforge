@@ -44,9 +44,13 @@ Agent 不把签名密码写入 `task.json`。密码只通过受限子进程环�
 
 控制面保存客户存储连接的 Secret 引用，不保存长期访问凭据。Agent 通过本地 Provider 获取客户 S3/MinIO/OSS 凭据，输入输出引用必须位于租户和 Agent 注册时绑定的前缀。完成时至少校验对象元数据、大小、SHA、task/attempt 和所有权；可访问部署应由 Gateway 或客户侧校验服务重新读取字节。
 
+客户源 APK/Keystore 不通过控制面浏览器上传链路中转。客户侧导入、显式存储归属字段、规范对象引用、mTLS 元数据登记、输出绑定和负向验收的实施级约束见 [CUSTOMER_STORAGE 实施契约](./customer-storage-contract.md)。该链路已完成临时 MinIO 合成数据 E2E；真实 S3/阿里云 OSS 仍需客户环境复验。
+
 ### 4.3 AIR_GAPPED
 
 控制面导出规范化任务清单、输入 Artifact 清单和签名。离线 Agent 验证控制面签名、有效期、tenant、agent、task、attempt 和 nonce 后构建，再输出包含产物清单、SHA 和 Agent 签名的结果包。导入时必须同时验证双方证书链、签名、防重放和当前 fencing attempt。
+
+状态表、规范 ZIP、双向 ECDSA 签名、导出/导入事务、本地防重放和断网验收的实施级约束见 [AIR_GAPPED Artifact 实施契约](./air-gapped-artifact-contract.md)。
 
 ## 5. 幂等与恢复
 
@@ -66,7 +70,7 @@ Agent 不把签名密码写入 `task.json`。密码只通过受限子进程环�
 4. URL、Secret、Keystore 和私钥不进入日志、数据库明文字段或诊断包。
 5. Agent 中断、Drain、证书吊销和 attempt 推进后，旧进程不能完成任务。
 
-当前首先落地 `CONTROL_PLANE_STORAGE`；完成真实 APK E2E 后，再依次实现 `CUSTOMER_STORAGE` 和 `AIR_GAPPED`，不得用枚举和元数据登记代替端到端验收。
+`CONTROL_PLANE_STORAGE`、`CUSTOMER_STORAGE` 与 `AIR_GAPPED` 均已使用合成 APK/Keystore 完成真实构建 E2E；客户对象存储、物理断网介质和正式证书环境仍需分别复验，不得用本地合成证据替代客户交付证据。
 
 ## 7. 当前落地状态
 
@@ -75,4 +79,9 @@ Agent 不把签名密码写入 `task.json`。密码只通过受限子进程环�
 - 协议3版本门禁、白名单 Task Manifest 和客户侧 `local-file://` 签名 Secret Provider 已实现并通过测试。
 - Manifest 不序列化控制面密码密文；需要控制面密文的签名配置或白标敏感参数会返回结构化阻断原因。
 - 仓库内固定执行器 `appforge-local-build` 已实现；任务 JSON 不允许命令字段，并对输入路径、权限、大小和 SHA-256 做强校验。Docker 真实验收已完成最小 APK 的渠道注入、对齐、证书指纹核验、签名、包名/内置快照核验和产物摘要输出。
-- APK/Keystore 的 mTLS 输入传输、构建产物上传和控制面字节级复验尚未启用。启用前必须由部署方明确选择数据模式并授权相应敏感数据从控制面传输到指定客户 Agent。
+- Core 已对 `CONTROL_PLANE_STORAGE` 强制使用规范的 `storage-object://ID` 引用，并在同一任务事务内校验对象 tenant、app、Artifact/存储对象类型、READY/BOUND 状态、大小和 SHA-256；跨租户、跨应用、错误类型、未完成上传和完整性不一致均拒绝。成功对象会绑定为 BOUND，APK/日志对象 ID 会写回构建任务，防止仅登记任意 URL 或声明元数据。
+- `CONTROL_PLANE_STORAGE` 已在获得明确授权后启用：Gateway 使用 Redis TTL 保存票据哈希及 task/attempt 状态，签发绑定 mTLS 证书、原子单次消费、5 分钟有效且仅含相对路径的 GET/PUT 票据；Agent 不接受绝对主机、查询串或越界路径。
+- Agent 将下载输入保存为 `0700/0600` 临时文件并独立校验大小/SHA；固定执行器只接收本地路径，不接收票据、控制面 Secret 引用或对象 Key，APK/日志输出在上传前强制收口为私有普通文件。
+- Gateway 不接受 Agent 指定对象 Key；上传流由控制面生成租户对象 Key 并首次计算 SHA，完成前再从私有对象存储读取全部字节独立重算大小/SHA，随后 Core 完成元数据、BOUND 绑定和任务对象 ID 回填。
+- `deploy/acceptance/v7-control-plane-storage.sh` 已使用临时真实 APK、Keystore 和证书通过完整 E2E，并覆盖错误证书消费、票据重放、上传后对象篡改、旧 attempt fencing 和 attempt 2 恢复。验收结束自动删除临时租户、对象、证书卷和容器，不读取现有客户数据。
+- `CUSTOMER_STORAGE` 已实现同等级真实数据搬运与独立字节校验，并通过受限临时 MinIO E2E；`AIR_GAPPED` 已实现双向签名 ZIP、任务/额度锁定、本地防重放、`--network none` 构建和事务导入，并通过合成 E2E。

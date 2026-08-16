@@ -28,6 +28,12 @@ BuilderRpc:
   Middlewares:
     Duration: false
 
+# Local Agent Artifact 短时票据；本地开发请按实际 Redis 地址调整。
+CacheRedis:
+  - Host: 127.0.0.1:6379
+    Type: node
+    Pass: ""
+
 # 仅用于本地开发。生产环境必须由 Secret Manager 注入独立的 32 字节 Base64 密钥。
 SigningSecrets:
   MasterKeyBase64: YXBwZm9yZ2UtZGV2LXNpZ25pbmcta2V5LTAwMDAwMSE=
@@ -87,7 +93,7 @@ Deployment:
   DeploymentId: local-development
   DeploymentMode: saas
   ProductVersion: 0.0.0-dev
-  TargetSchemaVersion: 20260815_111_v7_deployment_console
+  TargetSchemaVersion: 20260815_113_v7_air_gapped
   MaxVersionSkew: 1
   AgentProtocolCurrent: 3
   AgentProtocolMinimum: 2

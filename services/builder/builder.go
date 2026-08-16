@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"appforge/common/etcd"
+	"appforge/common/observability"
 	"appforge/common/rpcauth"
 	pb "appforge/proto/builder"
 	"appforge/services/builder/internal/config"
@@ -30,6 +31,9 @@ func main() {
 
 	var c config.Config
 	if err := etcd.LoadFromEtcdAndMerge(strings.Split(*endpoints, ","), []string{*commonKey, *configKey}, &c); err != nil {
+		log.Fatal(err)
+	}
+	if err := observability.ApplyEnvironment(&c.RpcServerConf.ServiceConf); err != nil {
 		log.Fatal(err)
 	}
 

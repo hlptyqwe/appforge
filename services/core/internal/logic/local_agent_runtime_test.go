@@ -202,6 +202,21 @@ VALUES (?,'build.count',1,'build',?,CONCAT('build:',?),DATE_FORMAT(CURRENT_DATE,
 	}); status.Code(err) != codes.NotFound {
 		t.Fatalf("old attempt completed after recovery: code=%v err=%v", status.Code(err), err)
 	}
+	if _, err := failLocalAgentBuildTask(context.Background(), svcCtx, &core.FailLocalAgentBuildTaskReq{
+		Auth: auth(rotated.Certificate), TaskId: taskID, BuilderAttempt: 2, ErrorMessage: "acceptance failure without log",
+	}); err != nil {
+		t.Fatalf("Local Agent failure without log was rejected: %v", err)
+	}
+	var failedTask struct {
+		Status      string `db:"status"`
+		LogObjectID int64  `db:"log_object_id"`
+	}
+	if err := db.QueryRowCtx(context.Background(), &failedTask, `SELECT status,log_object_id FROM t_build_task WHERE id=?`, taskID); err != nil {
+		t.Fatal(err)
+	}
+	if failedTask.Status != buildStatusFailed || failedTask.LogObjectID != 0 {
+		t.Fatalf("unexpected failed task without log: %#v", failedTask)
+	}
 	if _, err := drainLocalAgent(ctx, svcCtx, &core.DrainLocalAgentReq{Id: agentID,
 		DrainStatus: core.LocalAgentDrainStatus_LOCAL_AGENT_DRAIN_STATUS_DRAINING}); err != nil {
 		t.Fatal(err)

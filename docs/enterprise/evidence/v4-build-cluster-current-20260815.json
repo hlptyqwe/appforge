@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-15",
+  "mode": "read-only-current-v4-evidence",
+  "databaseMutated": false,
+  "currentStatus": "passed",
+  "nodes": {
+    "workerContainersRunning": 3,
+    "onlineAcceptingNodes": 3,
+    "isolatedNodes": 0,
+    "minimumDiskFreeBytes": 3769507840,
+    "minimumDiskFreePercent": 6.015
+  },
+  "historicalEvidenceCounts": {
+    "successfulBuilderNodes": 3,
+    "activeConcurrencyPolicyLevels": 3,
+    "globalLimitOneEvents": 4,
+    "fairQueueClaims": 25,
+    "validatedCacheHits": 3,
+    "cacheValidationFailures": 2,
+    "expiredLeaseRecoveries": 2,
+    "userCancellations": 1,
+    "manualRetries": 1
+  },
+  "checks": {
+    "threeWorkerContainers": "passed",
+    "threeOnlineAcceptingNodes": "passed",
+    "databaseInvariants": "passed"
+  },
+  "limitations": [
+    "This verifier is read-only and relies on existing synthetic V4 scheduler records.",
+    "It does not recreate parallel builds, cancellation, cache corruption or lease failure during this run."
+  ]
+}

@@ -14,6 +14,10 @@ import (
 )
 
 type (
+	AbortAirGappedExportReq               = core.AbortAirGappedExportReq
+	AirGappedPackage                      = core.AirGappedPackage
+	AirGappedPackageReq                   = core.AirGappedPackageReq
+	AirGappedPackageResp                  = core.AirGappedPackageResp
 	Application                           = core.Application
 	ApplicationIdReq                      = core.ApplicationIdReq
 	ApplicationListReq                    = core.ApplicationListReq
@@ -135,9 +139,11 @@ type (
 	FailLocalAgentBuildTaskReq            = core.FailLocalAgentBuildTaskReq
 	FailSourceWebhookEventReq             = core.FailSourceWebhookEventReq
 	FailStorageObjectReq                  = core.FailStorageObjectReq
+	FinalizeAirGappedExportReq            = core.FinalizeAirGappedExportReq
 	GetBuildExecutionContextReq           = core.GetBuildExecutionContextReq
 	HeartbeatBuildTaskReq                 = core.HeartbeatBuildTaskReq
 	HeartbeatLocalAgentReq                = core.HeartbeatLocalAgentReq
+	ImportAirGappedResultReq              = core.ImportAirGappedResultReq
 	ImportSourceArtifactReq               = core.ImportSourceArtifactReq
 	InstallReportReq                      = core.InstallReportReq
 	InvalidateBuildCacheReq               = core.InvalidateBuildCacheReq
@@ -167,6 +173,8 @@ type (
 	OpenApiCredentialSecretResp           = core.OpenApiCredentialSecretResp
 	OpenApiIdempotencyResp                = core.OpenApiIdempotencyResp
 	OpenApiIdempotencyResult              = core.OpenApiIdempotencyResult
+	PrepareAirGappedExportReq             = core.PrepareAirGappedExportReq
+	PrepareAirGappedExportResp            = core.PrepareAirGappedExportResp
 	PublishBuildCacheReq                  = core.PublishBuildCacheReq
 	PublishWhiteLabelTemplateReq          = core.PublishWhiteLabelTemplateReq
 	QuotaReservation                      = core.QuotaReservation
@@ -177,6 +185,7 @@ type (
 	RecordUsageReq                        = core.RecordUsageReq
 	RecoverBuilderNodeReq                 = core.RecoverBuilderNodeReq
 	RegisterBuilderNodeReq                = core.RegisterBuilderNodeReq
+	RegisterCustomerStorageInputReq       = core.RegisterCustomerStorageInputReq
 	RegisterLocalAgentReq                 = core.RegisterLocalAgentReq
 	RegisterLocalAgentResp                = core.RegisterLocalAgentResp
 	RenewLocalAgentTaskLeaseReq           = core.RenewLocalAgentTaskLeaseReq
@@ -192,6 +201,8 @@ type (
 	RevokeLocalAgentReq                   = core.RevokeLocalAgentReq
 	RotateLocalAgentCertificateReq        = core.RotateLocalAgentCertificateReq
 	RotateOpenApiCredentialReq            = core.RotateOpenApiCredentialReq
+	SignAirGappedManifestReq              = core.SignAirGappedManifestReq
+	SignAirGappedManifestResp             = core.SignAirGappedManifestResp
 	SigningConfig                         = core.SigningConfig
 	SigningConfigIdReq                    = core.SigningConfigIdReq
 	SigningConfigListReq                  = core.SigningConfigListReq
@@ -512,6 +523,8 @@ type (
 		RotateLocalAgentCertificate(ctx context.Context, in *RotateLocalAgentCertificateReq, opts ...grpc.CallOption) (*RegisterLocalAgentResp, error)
 		// Agent领取经过租户、应用、能力和协议范围校验的构建任务。
 		ClaimLocalAgentBuildTask(ctx context.Context, in *ClaimLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*LocalAgentBuildTaskResp, error)
+		// Agent登记已上传并重新校验的客户存储输入对象。
+		RegisterCustomerStorageInput(ctx context.Context, in *RegisterCustomerStorageInputReq, opts ...grpc.CallOption) (*StorageObjectResp, error)
 		// Agent按任务attempt续租，旧进程不能回写。
 		RenewLocalAgentTaskLease(ctx context.Context, in *RenewLocalAgentTaskLeaseReq, opts ...grpc.CallOption) (*RespBase, error)
 		// Agent回报预定义构建阶段，不支持任意命令。
@@ -522,6 +535,18 @@ type (
 		FailLocalAgentBuildTask(ctx context.Context, in *FailLocalAgentBuildTaskReq, opts ...grpc.CallOption) (*RespBase, error)
 		// 校验并登记三种存储模式下的Artifact引用。
 		VerifyHybridArtifact(ctx context.Context, in *VerifyHybridArtifactReq, opts ...grpc.CallOption) (*RespBase, error)
+		// 管理端锁定指定任务并准备AIR_GAPPED离线任务包。
+		PrepareAirGappedExport(ctx context.Context, in *PrepareAirGappedExportReq, opts ...grpc.CallOption) (*PrepareAirGappedExportResp, error)
+		// 使用控制面Agent CA签署严格规范化任务Manifest。
+		SignAirGappedManifest(ctx context.Context, in *SignAirGappedManifestReq, opts ...grpc.CallOption) (*SignAirGappedManifestResp, error)
+		// 绑定已复验的离线任务ZIP并开放结果导入。
+		FinalizeAirGappedExport(ctx context.Context, in *FinalizeAirGappedExportReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error)
+		// 撤销离线包并以失败状态关闭当前任务attempt。
+		AbortAirGappedExport(ctx context.Context, in *AbortAirGappedExportReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error)
+		// 查询当前租户AIR_GAPPED离线包状态。
+		GetAirGappedPackage(ctx context.Context, in *AirGappedPackageReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error)
+		// 校验Agent证书、签名、Nonce和attempt后导入离线结果。
+		ImportAirGappedResult(ctx context.Context, in *ImportAirGappedResultReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error)
 		ReportInstall(ctx context.Context, in *InstallReportReq, opts ...grpc.CallOption) (*RespBase, error)
 		ReportChannelEvent(ctx context.Context, in *ReportChannelEventReq, opts ...grpc.CallOption) (*RespBase, error)
 		GetChannelStats(ctx context.Context, in *ChannelStatsReq, opts ...grpc.CallOption) (*ChannelStatsResp, error)
@@ -1294,6 +1319,12 @@ func (m *defaultCore) ClaimLocalAgentBuildTask(ctx context.Context, in *ClaimLoc
 	return client.ClaimLocalAgentBuildTask(ctx, in, opts...)
 }
 
+// Agent登记已上传并重新校验的客户存储输入对象。
+func (m *defaultCore) RegisterCustomerStorageInput(ctx context.Context, in *RegisterCustomerStorageInputReq, opts ...grpc.CallOption) (*StorageObjectResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.RegisterCustomerStorageInput(ctx, in, opts...)
+}
+
 // Agent按任务attempt续租，旧进程不能回写。
 func (m *defaultCore) RenewLocalAgentTaskLease(ctx context.Context, in *RenewLocalAgentTaskLeaseReq, opts ...grpc.CallOption) (*RespBase, error) {
 	client := core.NewCoreClient(m.cli.Conn())
@@ -1322,6 +1353,42 @@ func (m *defaultCore) FailLocalAgentBuildTask(ctx context.Context, in *FailLocal
 func (m *defaultCore) VerifyHybridArtifact(ctx context.Context, in *VerifyHybridArtifactReq, opts ...grpc.CallOption) (*RespBase, error) {
 	client := core.NewCoreClient(m.cli.Conn())
 	return client.VerifyHybridArtifact(ctx, in, opts...)
+}
+
+// 管理端锁定指定任务并准备AIR_GAPPED离线任务包。
+func (m *defaultCore) PrepareAirGappedExport(ctx context.Context, in *PrepareAirGappedExportReq, opts ...grpc.CallOption) (*PrepareAirGappedExportResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.PrepareAirGappedExport(ctx, in, opts...)
+}
+
+// 使用控制面Agent CA签署严格规范化任务Manifest。
+func (m *defaultCore) SignAirGappedManifest(ctx context.Context, in *SignAirGappedManifestReq, opts ...grpc.CallOption) (*SignAirGappedManifestResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.SignAirGappedManifest(ctx, in, opts...)
+}
+
+// 绑定已复验的离线任务ZIP并开放结果导入。
+func (m *defaultCore) FinalizeAirGappedExport(ctx context.Context, in *FinalizeAirGappedExportReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.FinalizeAirGappedExport(ctx, in, opts...)
+}
+
+// 撤销离线包并以失败状态关闭当前任务attempt。
+func (m *defaultCore) AbortAirGappedExport(ctx context.Context, in *AbortAirGappedExportReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.AbortAirGappedExport(ctx, in, opts...)
+}
+
+// 查询当前租户AIR_GAPPED离线包状态。
+func (m *defaultCore) GetAirGappedPackage(ctx context.Context, in *AirGappedPackageReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.GetAirGappedPackage(ctx, in, opts...)
+}
+
+// 校验Agent证书、签名、Nonce和attempt后导入离线结果。
+func (m *defaultCore) ImportAirGappedResult(ctx context.Context, in *ImportAirGappedResultReq, opts ...grpc.CallOption) (*AirGappedPackageResp, error) {
+	client := core.NewCoreClient(m.cli.Conn())
+	return client.ImportAirGappedResult(ctx, in, opts...)
 }
 
 func (m *defaultCore) ReportInstall(ctx context.Context, in *InstallReportReq, opts ...grpc.CallOption) (*RespBase, error) {

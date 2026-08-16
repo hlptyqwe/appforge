@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-15",
+  "mode": "read-only-existing-synthetic-v5-evidence",
+  "databaseMutated": false,
+  "counts": {
+    "apiCredentials": 9,
+    "completedIdempotencyRecords": 8,
+    "openApiAudits": 27,
+    "forbiddenAudits": 2,
+    "conflictAudits": 1,
+    "buildOutboxEventTypes": 4,
+    "ssrfDeadLetters": 1,
+    "sourcePlatforms": 2,
+    "sourceEventPlatforms": 2,
+    "developerWriteAudits": 4
+  },
+  "checks": {
+    "requiredContainersAndUiRoutes": "passed",
+    "schemaMigrationsAndTables": "passed",
+    "apiSecretHashOnly": "passed",
+    "idempotencyUniqueness": "passed",
+    "authorizationAndConflictAudits": "passed",
+    "outboxEventCoverage": "passed",
+    "webhookDeliveryUniqueness": "passed",
+    "webhookSsrfDeadLetter": "passed",
+    "githubGitlabEvidence": "passed",
+    "sourceEventAndBuildIdempotency": "passed",
+    "acceptanceIntegrationsDisabled": "passed",
+    "operationLogSecretScan": "passed"
+  },
+  "limitations": [
+    "This verifier is read-only and relies on existing synthetic V5 runtime records.",
+    "It does not create, rotate or revoke a live API key during this run.",
+    "It does not replay the CLI upload-build-download flow during this run.",
+    "GitHub and GitLab evidence uses historical synthetic signed events; no real provider credentials are accessed."
+  ]
+}

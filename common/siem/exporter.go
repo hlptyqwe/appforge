@@ -89,7 +89,7 @@ func New(config Config) (*Exporter, error) {
 		}
 		tlsConfig.RootCAs = pool
 	}
-	transport := &http.Transport{TLSClientConfig: tlsConfig, MaxIdleConns: 10, IdleConnTimeout: 30 * time.Second}
+	transport := &http.Transport{Proxy: http.ProxyFromEnvironment, TLSClientConfig: tlsConfig, MaxIdleConns: 10, IdleConnTimeout: 30 * time.Second}
 	return &Exporter{config: config, client: &http.Client{Transport: transport, Timeout: config.Timeout}, queue: make(chan Event, config.QueueSize)}, nil
 }
 

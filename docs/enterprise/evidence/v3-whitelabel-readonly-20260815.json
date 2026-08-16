@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-15",
+  "mode": "read-only-existing-synthetic-v3-evidence",
+  "databaseMutated": false,
+  "objectStorageMutated": false,
+  "oldTaskId": 14,
+  "newTaskId": 15,
+  "oldOutputSha256": "41a32ac19b9aa9fb7a6ed07e5111931c11d8dd381b234a7a20d7670a00706046",
+  "newOutputSha256": "4a77f04ee410775a9dbd6a7bbcf7b8239be467cd1814759072bb79d0ab85fb78",
+  "packageName": "com.appforge.v3runtime20260814",
+  "certificateSha256": "59133f9c597d6968f37195a6b39330c0bef61a96be5faa7b98bedf0f60170d82",
+  "versionCodeUpgrade": [
+    20260820,
+    20260821
+  ],
+  "historicalScenarioTaskCount": 5,
+  "checks": {
+    "tenantAndAppReferenceIntegrity": "passed",
+    "immutableTaskSnapshots": "passed",
+    "historicalTemplateChecksumTraceability": "passed",
+    "packageCertificateBinding": "passed",
+    "sourceAndOutputObjectIntegrity": "passed",
+    "dynamicPackageName": "passed",
+    "relativeComponentClassProtection": "passed",
+    "permissionAndProviderAuthority": "passed",
+    "oauthSchemeAndAppLinkHost": "passed",
+    "versionCodeUpgradeOrder": "passed",
+    "sameSigningCertificate": "passed",
+    "classesDexAndLaunchableActivity": "passed",
+    "brandingAssetContinuity": "passed",
+    "templateAndExtensionAssets": "passed",
+    "schemaPathScriptSecretNegativeUnitTests": "passed"
+  },
+  "limitations": [
+    "This verifier is read-only and relies on existing synthetic V3 tasks 7-15.",
+    "It statically re-verifies APKs but does not mutate or launch an Android device.",
+    "Install, first-launch and in-place upgrade evidence remains the recorded 2026-08-14 API 29 emulator run.",
+    "Wrong-certificate and malformed-template API flows are not recreated; current negative evidence is code-level tests plus historical records.",
+    "V2 criterion 3 remains in closeout, so the V3 prerequisite chain is not yet release-complete."
+  ]
+}

@@ -42,7 +42,8 @@ func TestValidateControlPlaneStorageObject(t *testing.T) {
 	valid := func() *models.TStorageObject {
 		return &models.TStorageObject{Id: 91, TenantId: 7, AppId: 11,
 			ObjectType: int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK), SizeBytes: 128,
-			Sha256: sql.NullString{String: digest, Valid: true}, Status: storageStatusReady}
+			Sha256: sql.NullString{String: digest, Valid: true}, Status: storageStatusReady,
+			StorageMode: int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE)}
 	}
 	if err := validateControlPlaneStorageObject(valid(), task, core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK, digest, 128); err != nil {
 		t.Fatalf("valid object rejected: %v", err)
@@ -70,5 +71,56 @@ func TestValidateControlPlaneStorageObject(t *testing.T) {
 				t.Fatalf("code=%v, want=%v", code, test.code)
 			}
 		})
+	}
+}
+
+func TestCustomerStorageReferencesAreCanonicalAndScoped(t *testing.T) {
+	secretPath, prefix, err := parseCustomerStorageDescriptor(
+		"local-file:///customer-storage.json#tenants/7/agents/build-a", 7, "build-a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if secretPath != "/customer-storage.json" || prefix != "tenants/7/agents/build-a" {
+		t.Fatalf("descriptor path=%q prefix=%q", secretPath, prefix)
+	}
+	key := customerInputObjectKey(prefix, 11, core.StorageObjectType_STORAGE_OBJECT_TYPE_SOURCE_APK, strings.Repeat("a", 64), "source.apk")
+	reference := customerObjectReference(19, key)
+	parsed, err := parseCustomerObjectReference(reference, 19, prefix)
+	if err != nil || parsed != key {
+		t.Fatalf("parsed=%q err=%v", parsed, err)
+	}
+
+	for _, invalid := range []string{
+		"local-file:///customer-storage.json#tenants/8/agents/build-a",
+		"local-file:///customer-storage.json?token=secret#tenants/7/agents/build-a",
+		"local-file:///customer-storage.json#tenants/7/agents/../build-a",
+	} {
+		if _, _, err := parseCustomerStorageDescriptor(invalid, 7, "build-a"); err == nil {
+			t.Fatalf("invalid descriptor accepted: %s", invalid)
+		}
+	}
+	for _, invalid := range []string{
+		"customer-object://20/" + key,
+		"customer-object://19/tenants/8/agents/build-a/inputs/a.apk",
+		"customer-object://19/" + key + "?token=secret",
+	} {
+		if _, err := parseCustomerObjectReference(invalid, 19, prefix); err == nil {
+			t.Fatalf("invalid object reference accepted: %s", invalid)
+		}
+	}
+}
+
+func TestCustomerTaskObjectKeyBindsAttemptAndType(t *testing.T) {
+	prefix := "tenants/7/agents/build-a"
+	if got := customerTaskObjectKey(prefix, 101, 3, core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK); got !=
+		"tenants/7/agents/build-a/tasks/101/attempts/3/built.apk" {
+		t.Fatalf("APK key=%q", got)
+	}
+	if got := customerTaskObjectKey(prefix, 101, 3, core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG); got !=
+		"tenants/7/agents/build-a/tasks/101/attempts/3/build.log" {
+		t.Fatalf("log key=%q", got)
+	}
+	if got := customerTaskObjectKey(prefix, 101, 3, core.HybridArtifactType_HYBRID_ARTIFACT_TYPE_SOURCE_APK); got != "" {
+		t.Fatalf("unsupported key=%q", got)
 	}
 }

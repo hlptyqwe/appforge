@@ -13,9 +13,12 @@ import (
 	"path"
 	"strings"
 
+	"appforge/common/remotesigner"
 	"appforge/common/secretbox"
+	"appforge/common/secretprovider"
 	"appforge/proto/builder"
 	"appforge/proto/common"
+	"appforge/proto/core"
 	"appforge/services/builder/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -41,6 +44,16 @@ func NewValidateSigningMaterialLogic(ctx context.Context, svcCtx *svc.ServiceCon
 func (l *ValidateSigningMaterialLogic) ValidateSigningMaterial(in *builder.ValidateSigningMaterialReq) (*builder.ValidateSigningMaterialResp, error) {
 	if in == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is required")
+	}
+	mode := in.SigningMode
+	if mode == core.SigningMode_SIGNING_MODE_UNSPECIFIED {
+		mode = core.SigningMode_SIGNING_MODE_LOCAL_KEYSTORE
+	}
+	if mode == core.SigningMode_SIGNING_MODE_REMOTE_APK_SIGNER {
+		return l.validateRemoteSigner(in)
+	}
+	if mode != core.SigningMode_SIGNING_MODE_LOCAL_KEYSTORE {
+		return nil, status.Error(codes.InvalidArgument, "signing mode is invalid")
 	}
 	objectKey := strings.TrimSpace(in.KeystoreObjectKey)
 	if objectKey == "" || path.Clean(objectKey) != objectKey || !strings.HasPrefix(objectKey, "tenants/") || !strings.Contains(objectKey, "/keystore/") {
@@ -128,6 +141,38 @@ func (l *ValidateSigningMaterialLogic) ValidateSigningMaterial(in *builder.Valid
 	return &builder.ValidateSigningMaterialResp{
 		Base: &common.RespBase{Code: 200, Msg: "OK"},
 		Data: &builder.SigningMaterialValidation{CertificateSha256: hex.EncodeToString(fingerprint[:])},
+	}, nil
+}
+
+func (l *ValidateSigningMaterialLogic) validateRemoteSigner(in *builder.ValidateSigningMaterialReq) (*builder.ValidateSigningMaterialResp, error) {
+	keyID := strings.TrimSpace(in.KeyAlias)
+	if keyID == "" || len(keyID) > 128 || strings.TrimSpace(in.SecretRef) == "" {
+		return nil, status.Error(codes.InvalidArgument, "remote signer key ID and secret reference are required")
+	}
+	raw, err := l.svcCtx.Resolver.Resolve(l.ctx, in.SecretRef)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "remote signer secret cannot be resolved")
+	}
+	defer secretprovider.Zero(raw)
+	secret, err := remotesigner.ParseSecret(raw)
+	if err != nil || secret.KeyID != keyID {
+		if secret != nil {
+			secret.Erase()
+		}
+		return nil, status.Error(codes.InvalidArgument, "remote signer secret or key ID is invalid")
+	}
+	defer secret.Erase()
+	client, err := remotesigner.NewClient(secret, 1<<30)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "remote signer mTLS configuration is invalid")
+	}
+	info, err := client.Info(l.ctx)
+	if err != nil {
+		return nil, status.Error(codes.FailedPrecondition, "remote signer identity validation failed")
+	}
+	return &builder.ValidateSigningMaterialResp{
+		Base: &common.RespBase{Code: 200, Msg: "OK"},
+		Data: &builder.SigningMaterialValidation{CertificateSha256: info.CertificateSHA256, KeyId: info.KeyID},
 	}, nil
 }
 

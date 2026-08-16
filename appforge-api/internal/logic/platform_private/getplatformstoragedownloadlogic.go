@@ -39,6 +39,12 @@ func (l *GetPlatformStorageDownloadLogic) GetPlatformStorageDownload(req *types.
 	if item.Data.ObjectType == core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE {
 		return nil, status.Error(codes.PermissionDenied, "keystore download is restricted to Builder workers")
 	}
+	if item.Data.StorageMode == core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CUSTOMER_STORAGE {
+		return nil, status.Error(codes.FailedPrecondition, "customer storage objects are available only inside the registered customer network")
+	}
+	if item.Data.StorageMode != core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE || item.Data.OwnerAgentId != 0 {
+		return nil, status.Error(codes.FailedPrecondition, "storage object ownership is invalid")
+	}
 	if item.Data.Status != core.StorageObjectStatus_STORAGE_OBJECT_STATUS_READY &&
 		item.Data.Status != core.StorageObjectStatus_STORAGE_OBJECT_STATUS_BOUND {
 		return nil, status.Error(codes.FailedPrecondition, "storage object is not available")

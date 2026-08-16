@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-15",
+  "mode": "synthetic-runtime-v6-evidence",
+  "databaseMutated": true,
+  "counts": {
+    "activeDefaultPlans": 3,
+    "tenants": 2,
+    "subscriptions": 2,
+    "entitlements": 2,
+    "usageLedgerEntries": 108,
+    "quotaReservations": 0,
+    "thresholdNotifications": 0,
+    "invoices": 0,
+    "paymentTransactions": 0,
+    "billingWebhookEvents": 0
+  },
+  "checks": {
+    "requiredContainersAndHealthRoutes": "passed",
+    "schemaMigrationsAndTables": "passed",
+    "defaultPlans": "passed",
+    "tenantSubscriptionAndEntitlementCoverage": "passed",
+    "singleCurrentSubscription": "passed",
+    "usageLedgerIdempotency": "passed",
+    "quotaReservationIdempotency": "passed",
+    "encryptedWebhookPayloadSchema": "passed",
+    "integerMoneySchema": "passed",
+    "stripeSignatureAndNormalizationUnitTests": "passed",
+    "concurrentQuotaAndPaymentRuntimeE2E": "passed"
+  },
+  "limitations": [
+    "The runtime test uses a temporary synthetic tenant and cleans it after completion.",
+    "No real Stripe charge is initiated and no production payment credential is accessed."
+  ]
+}

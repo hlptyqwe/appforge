@@ -31,6 +31,8 @@ spec:
       labels: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: {{ $component.name }}}
       annotations:
         prometheus.io/scrape: {{ $root.Values.observability.prometheus | quote }}
+        prometheus.io/port: {{ $root.Values.observability.metricsPort | quote }}
+        prometheus.io/path: {{ $root.Values.observability.metricsPath | quote }}
         checksum/runtime-config: {{ $root.Values.external.runtimeConfigSecret | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 60
@@ -55,15 +57,24 @@ spec:
             capabilities: {drop: ["ALL"]}
           envFrom:
             - secretRef: {name: {{ $root.Values.external.etcdAuthSecret }}}
-          {{- if eq $component.name "builder-worker" }}
           env:
+            - {name: APPFORGE_PROMETHEUS_ENABLED, value: {{ $root.Values.observability.prometheus | quote }}}
+            - {name: APPFORGE_PROMETHEUS_PORT, value: {{ $root.Values.observability.metricsPort | quote }}}
+            - {name: APPFORGE_PROMETHEUS_PATH, value: {{ $root.Values.observability.metricsPath | quote }}}
+            - {name: APPFORGE_OTLP_ENDPOINT, value: {{ $root.Values.observability.otlpEndpoint | quote }}}
+            - {name: APPFORGE_OTLP_SAMPLER, value: {{ $root.Values.observability.otlpSampler | quote }}}
+          {{- if $root.Values.egressProxy.enabled }}
+            - {name: HTTP_PROXY, value: {{ $root.Values.egressProxy.url | quote }}}
+            - {name: HTTPS_PROXY, value: {{ $root.Values.egressProxy.url | quote }}}
+            - {name: NO_PROXY, value: {{ $root.Values.egressProxy.noProxy | quote }}}
+          {{- end }}
+          {{- if eq $component.name "builder-worker" }}
             - name: APPFORGE_BUILDER_ID
               valueFrom: {fieldRef: {fieldPath: metadata.name}}
             - name: APPFORGE_BUILDER_ENDPOINT
               valueFrom: {fieldRef: {fieldPath: metadata.name}}
           {{- end }}
           {{- if eq $component.name "api" }}
-          env:
             - {name: APPFORGE_SIEM_ENDPOINT, value: {{ $root.Values.observability.siemWebhook | quote }}}
             - {name: APPFORGE_SIEM_TOKEN_FILE, value: /etc/appforge/siem/token}
             - {name: APPFORGE_SIEM_CA_FILE, value: /etc/appforge/siem/ca.crt}
@@ -73,12 +84,19 @@ spec:
             - {name: APPFORGE_SCHEMA_VERSION, value: {{ $root.Values.upgrade.schemaVersion | quote }}}
             - {name: APPFORGE_MAX_VERSION_SKEW, value: {{ $root.Values.upgrade.maxVersionSkew | quote }}}
           {{- end }}
-          {{- if gt ($component.port | int) 0 }}
+          {{- if or (gt ($component.port | int) 0) $root.Values.observability.prometheus }}
           ports:
+            {{- if gt ($component.port | int) 0 }}
             - {name: service, containerPort: {{ $component.port }}}
             {{- if eq $component.name "api" }}
             - {name: agent-mtls, containerPort: 9443}
             {{- end }}
+            {{- end }}
+            {{- if $root.Values.observability.prometheus }}
+            - {name: metrics, containerPort: {{ $root.Values.observability.metricsPort }}}
+            {{- end }}
+          {{- end }}
+          {{- if gt ($component.port | int) 0 }}
           readinessProbe:
             {{- if eq $component.probe "http" }}
             httpGet: {path: /readyz, port: service}

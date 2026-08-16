@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"database/sql"
 	"strings"
 	"testing"
 	"time"
@@ -11,6 +12,35 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+func TestBuilderNodeSupportsRemoteSigning(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		capability sql.NullString
+		want       bool
+	}{
+		{name: "enabled", capability: sql.NullString{String: `{"apk":true,"remoteSigning":true}`, Valid: true}, want: true},
+		{name: "disabled", capability: sql.NullString{String: `{"remoteSigning":false}`, Valid: true}},
+		{name: "missing", capability: sql.NullString{String: `{"apk":true}`, Valid: true}},
+		{name: "wrong type", capability: sql.NullString{String: `{"remoteSigning":"true"}`, Valid: true}},
+		{name: "invalid", capability: sql.NullString{String: `{`, Valid: true}},
+		{name: "null"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			node := &models.TBuilderNode{CapabilityJson: tt.capability}
+			if got := builderNodeSupportsRemoteSigning(node); got != tt.want {
+				t.Fatalf("builderNodeSupportsRemoteSigning() = %t, want %t", got, tt.want)
+			}
+		})
+	}
+	if builderNodeSupportsRemoteSigning(nil) {
+		t.Fatal("nil builder node must not support remote signing")
+	}
+}
 
 func TestEffectiveBuildCacheKey(t *testing.T) {
 	t.Parallel()

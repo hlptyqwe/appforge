@@ -1,0 +1,79 @@
+{{- if .Values.egressProxy.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: appforge-egress-proxy
+  labels:
+    {{- include "appforge.labels" . | nindent 4 }}
+data:
+  allowlist.txt: |
+    {{- range .Values.egressProxy.allowlist }}
+    {{ . }}
+    {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appforge-egress-proxy
+  labels:
+    {{- include "appforge.labels" . | nindent 4 }}
+    app.kubernetes.io/component: egress-proxy
+spec:
+  replicas: {{ .Values.replicas.egressProxy }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxUnavailable: 0, maxSurge: 1}
+  selector:
+    matchLabels: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: egress-proxy}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: egress-proxy}
+      annotations:
+        checksum/allowlist: {{ toJson .Values.egressProxy.allowlist | sha256sum }}
+    spec:
+      securityContext: {{ toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: egress-proxy
+          image: "{{ .Values.global.imageRegistry }}/egress-proxy:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          env:
+            - {name: APPFORGE_EGRESS_PROXY_LISTEN, value: ":3128"}
+            - {name: APPFORGE_EGRESS_PROXY_ALLOWLIST_FILE, value: /etc/appforge/egress/allowlist.txt}
+            - {name: APPFORGE_EGRESS_PROXY_MAX_CONNECTIONS, value: {{ .Values.egressProxy.maximumConnections | quote }}}
+          ports: [{name: proxy, containerPort: 3128}]
+          readinessProbe: {httpGet: {path: /readyz, port: proxy}, initialDelaySeconds: 2, periodSeconds: 5}
+          livenessProbe: {httpGet: {path: /healthz, port: proxy}, initialDelaySeconds: 10, periodSeconds: 10}
+          resources: {{ toYaml .Values.resources.rpc | nindent 12 }}
+          volumeMounts:
+            - {name: allowlist, mountPath: /etc/appforge/egress, readOnly: true}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: allowlist
+          configMap: {name: appforge-egress-proxy}
+        - name: tmp
+          emptyDir: {sizeLimit: 64Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appforge-egress-proxy
+spec:
+  selector: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: egress-proxy}
+  ports: [{name: proxy, port: 3128, targetPort: proxy}]
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: appforge-egress-proxy
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: {app.kubernetes.io/name: appforge, app.kubernetes.io/component: egress-proxy}
+{{- end }}

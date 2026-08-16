@@ -230,6 +230,7 @@ func mapSigningConfig(item *models.TAppSigningConfig) *core.SigningConfig {
 		UpdateTime:        millis(item.UpdateTime),
 		KeystoreObjectId:  item.KeystoreObjectId,
 		CertificateSha256: stringValue(item.CertificateSha256),
+		SigningMode:       signingModeOf(item),
 	}
 }
 
@@ -333,6 +334,8 @@ func mapStorageObject(item *models.TStorageObject) *core.StorageObject {
 		SizeBytes:    item.SizeBytes,
 		Sha256:       stringValue(item.Sha256),
 		Status:       core.StorageObjectStatus(item.Status),
+		StorageMode:  core.HybridArtifactMode(item.StorageMode),
+		OwnerAgentId: item.OwnerAgentId,
 		CreateBy:     item.CreateBy,
 		CreateTime:   millis(item.CreateTime),
 		UpdateTime:   millis(item.UpdateTime),

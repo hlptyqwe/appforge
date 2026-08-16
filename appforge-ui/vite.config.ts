@@ -10,8 +10,8 @@ export default defineConfig(({ mode }) => {
     plugins: [vue()],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src'),
-        '~': path.resolve(__dirname),
+        '@': path.resolve(import.meta.dirname, './src'),
+        '~': path.resolve(import.meta.dirname),
       },
     },
     define: {
@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      target: 'ES2022',
+      target: 'es2022',
       outDir: 'dist',
       assetsDir: 'assets',
       sourcemap: mode === 'development',
@@ -43,9 +43,15 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         output: {
-          manualChunks: {
-            'element-plus': ['element-plus'],
-            'vue-family': ['vue', 'vue-router', 'pinia', 'vue-i18n'],
+          manualChunks(id) {
+            if (id.includes('/node_modules/element-plus/')) return 'element-plus'
+            if (
+              ['/node_modules/vue/', '/node_modules/vue-router/', '/node_modules/pinia/', '/node_modules/vue-i18n/'].some(
+                (dependency) => id.includes(dependency),
+              )
+            ) {
+              return 'vue-family'
+            }
           },
         },
       },

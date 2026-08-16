@@ -443,8 +443,23 @@ func claimBrandingPreflight(ctx context.Context, svcCtx *svc.ServiceContext, in 
 		return nil, err
 	}
 	seconds := leaseSeconds(in.LeaseSeconds)
+	nodeCode := strings.TrimSpace(in.BuilderId)
 	var item models.TBrandingPreflight
 	err := svcCtx.DB.TransactCtx(ctx, func(txCtx context.Context, session sqlx.Session) error {
+		var node models.TBuilderNode
+		if err := session.QueryRowCtx(txCtx, &node, builderNodeSelect+` WHERE node_code = ? FOR UPDATE`, nodeCode); err != nil {
+			return status.Error(codes.FailedPrecondition, "builder node is not registered")
+		}
+		eligible, eligibilityErr := brandingPreflightNodeEligible(&node, time.Now())
+		if eligibilityErr != nil {
+			return eligibilityErr
+		}
+		if !eligible {
+			if time.Since(node.LastHeartbeatAt) > builderRecoveryHeartbeat && node.Status != builderNodeStatusIsolated {
+				_, _ = session.ExecCtx(txCtx, `UPDATE t_builder_node SET status = ?, update_time = CURRENT_TIMESTAMP(3) WHERE id = ?`, builderNodeStatusOffline, node.Id)
+			}
+			return nil
+		}
 		query := brandingPreflightSelect + ` WHERE status = ? AND (builder_id IS NULL OR lease_until IS NULL OR lease_until < CURRENT_TIMESTAMP)
 AND EXISTS (SELECT 1 FROM t_app_branding_profile p WHERE p.id = t_branding_preflight.branding_profile_id AND p.revision = t_branding_preflight.branding_revision)
 ORDER BY id ASC LIMIT 1 FOR UPDATE`
@@ -476,6 +491,9 @@ WHERE id = ? AND status = ?`, strings.TrimSpace(in.BuilderId), seconds, item.Id,
 		}
 		return nil, status.Errorf(codes.Internal, "claim branding preflight failed: %v", err)
 	}
+	if item.Id <= 0 {
+		return &core.BrandingPreflightExecutionContextResp{Base: okBase()}, nil
+	}
 	// 原子领取使用事务直写；再通过缓存模型写入同一快照以清除该记录的旧缓存。
 	if err := svcCtx.BrandingPreflightModel.Update(ctx, &item); err != nil {
 		return nil, status.Errorf(codes.Internal, "refresh claimed branding preflight cache failed: %v", err)
@@ -504,6 +522,36 @@ WHERE id = ? AND status = ?`, strings.TrimSpace(in.BuilderId), seconds, item.Id,
 		Preflight: mapBrandingPreflight(&item), Profile: mapBrandingProfile(profile), Version: mapVersion(version),
 		SourceApk: mapStorageObject(source), BrandLogo: mapStorageObject(logo), BrandSplash: mapStorageObject(splash),
 	}}, nil
+}
+
+func brandingPreflightNodeEligible(node *models.TBuilderNode, now time.Time) (bool, error) {
+	if node == nil {
+		return false, status.Error(codes.FailedPrecondition, "builder node is required")
+	}
+	if node.Status != builderNodeStatusOnline || node.DrainStatus != builderDrainAccepting {
+		return false, nil
+	}
+	if node.LastHeartbeatAt.IsZero() || now.Before(node.LastHeartbeatAt) || now.Sub(node.LastHeartbeatAt) > builderRecoveryHeartbeat {
+		return false, nil
+	}
+	if node.MaxConcurrency <= 0 || node.RunningCount >= node.MaxConcurrency {
+		return false, nil
+	}
+	if node.DiskCapacity <= 0 || node.DiskFree < builderMinimumDiskFree || node.DiskFree*100 < node.DiskCapacity*2 {
+		return false, nil
+	}
+	if node.BuildProtocolVersion < 1 || strings.TrimSpace(node.ToolchainVersion) == "" {
+		return false, status.Error(codes.FailedPrecondition, "builder node capability is incomplete")
+	}
+	var capabilities map[string]any
+	if err := json.Unmarshal([]byte(stringValue(node.CapabilityJson)), &capabilities); err != nil {
+		return false, status.Error(codes.FailedPrecondition, "builder node capability is invalid")
+	}
+	branding, ok := capabilities["branding"].(bool)
+	if !ok || !branding {
+		return false, status.Error(codes.FailedPrecondition, "builder node does not support branding preflight")
+	}
+	return true, nil
 }
 
 func bindBrandingObjects(ctx context.Context, svcCtx *svc.ServiceContext, items ...*models.TStorageObject) error {

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-15",
+  "mode": "isolated-compose-synthetic-v2-negative-e2e",
+  "inputs": {
+    "syntheticApkOnly": true,
+    "realCustomerDataAccessed": false,
+    "productionCredentialsAccessed": false,
+    "temporaryIsolatedEnvironment": true,
+    "sharedDevelopmentDatabaseMutated": false
+  },
+  "temporaryIdentity": {
+    "tenantId": 1,
+    "appId": 1,
+    "versionId": 1,
+    "brandingProfileId": 1,
+    "preflightId": 1
+  },
+  "worker": {
+    "eligibleBuilderCountBeforeWrite": 1,
+    "builderId": "builder-dev-01",
+    "builderAttempt": 1,
+    "toolchain": "apktool-2.7.0-dirty"
+  },
+  "sourceApkSha256": "481d46de63907248e0411b57bb41cfa789cb953f8ac8d94801dd057ef181baed",
+  "preflightReport": {
+    "checks": [
+      {
+        "name": "apktool_decode",
+        "passed": true,
+        "message": "APK解码成功"
+      },
+      {
+        "name": "application_label",
+        "passed": true,
+        "message": "application label为可替换字符串"
+      },
+      {
+        "name": "launcher_icon",
+        "passed": false,
+        "message": "未找到PNG/WebP位图资源: mipmap/ic_launcher"
+      },
+      {
+        "name": "splash_resource",
+        "passed": false,
+        "message": "未找到PNG/WebP位图资源: drawable/splash_logo"
+      },
+      {
+        "name": "apktool_rebuild",
+        "passed": true,
+        "message": "未修改APK重建成功"
+      }
+    ],
+    "toolchain": "apktool-2.7.0-dirty",
+    "compatible": false,
+    "schemaVersion": 1
+  },
+  "checks": {
+    "managementHttpApiCreatedApplicationAndUploads": "passed",
+    "managementHttpApiCreatedVersionAndBrandingProfile": "passed",
+    "managementHttpApiCreatedPreflight": "passed",
+    "realBuilderClaimedAndInspectedApk": "passed",
+    "missingLauncherAndSplashTargetsReported": "passed",
+    "preflightStatusIncompatible": "passed",
+    "noFormalBuildTaskViaApi": "passed",
+    "noFormalBuildTaskInDatabase": "passed",
+    "temporaryDatabaseRowsRemoved": "passed",
+    "temporaryObjectBytesRemoved": "passed",
+    "storageQuotaNetUsageRestored": "passed",
+    "isolatedComposeDestroyed": "passed"
+  },
+  "cleanup": {
+    "temporaryBusinessRowsRemaining": 0,
+    "objectBytesRemaining": 0,
+    "quotaReservationsRemaining": 0,
+    "storageUsageBefore": 0,
+    "storageUsageAfter": 0,
+    "immutableUsageCleanupAdjustments": 3,
+    "auditEventsMayRemainForTraceability": true,
+    "usageLedgerAdjustmentsRemainForTraceability": true,
+    "isolatedContainersRemaining": 0,
+    "isolatedVolumesRemaining": 0,
+    "isolatedNetworksRemaining": 0
+  },
+  "isolatedComposeProject": "appforge-v2-isolated-1786796097-69179"
+}

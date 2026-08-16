@@ -4,3 +4,31 @@
 {{- if and .Values.global.offline (ne .Values.image.pullPolicy "Never") -}}
 {{- fail "offline deployment requires image.pullPolicy=Never" -}}
 {{- end -}}
+{{- if and .Values.global.offline .Values.egressProxy.enabled -}}
+{{- fail "offline deployment cannot enable the external egress proxy" -}}
+{{- end -}}
+{{- if .Values.egressProxy.enabled -}}
+  {{- if not .Values.networkPolicy.enabled -}}
+  {{- fail "egressProxy requires networkPolicy.enabled=true" -}}
+  {{- end -}}
+  {{- if eq (len .Values.egressProxy.allowlist) 0 -}}
+  {{- fail "egressProxy requires at least one allowlisted host:port" -}}
+  {{- end -}}
+  {{- if or (not (contains "localhost" .Values.egressProxy.noProxy)) (not (contains "127.0.0.1" .Values.egressProxy.noProxy)) (not (contains ".svc" .Values.egressProxy.noProxy)) -}}
+  {{- fail "egressProxy.noProxy must retain localhost, 127.0.0.1 and .svc" -}}
+  {{- end -}}
+  {{- range .Values.egressProxy.allowlist -}}
+    {{- if contains "example.com" . -}}
+    {{- fail "egressProxy allowlist still contains an example.com placeholder" -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $hasProxyEgress := false -}}
+  {{- range .Values.networkPolicy.externalEgressRules -}}
+    {{- if eq .component "egress-proxy" -}}
+      {{- $hasProxyEgress = true -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if not $hasProxyEgress -}}
+  {{- fail "egressProxy requires an externalEgressRules entry for component=egress-proxy" -}}
+  {{- end -}}
+{{- end -}}

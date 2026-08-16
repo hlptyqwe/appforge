@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "scenario": "isolated-synthetic-appforge-schema112",
+  "acceptanceScript": "deploy/acceptance/v7-appforge-schema112-dr.sh",
+  "targetDatabaseSchema": "20260815_112_v7_customer_storage",
+  "candidateSchema113Excluded": true,
+  "recoveryPointMarkerAt": 1786799350235,
+  "backupCompletedAt": 1786799351896,
+  "restoreStartedAt": 1786799351929,
+  "recoveryVerifiedAt": 1786799361527,
+  "rpoSeconds": 2,
+  "rpoTargetSeconds": 900,
+  "rtoSeconds": 10,
+  "rtoTargetSeconds": 7200,
+  "appforgeTableCount": 57,
+  "businessSummarySha256": "1ed067dc79340c31b52cd5931765f651bd5436937de393724688e0542a1f585e",
+  "objectManifestSha256": "0e889cee0b658532588692e6c6525cd6ba90bee8c9ac3ded9ee7735c5be150b0",
+  "verifiedData": [
+    "appforge-schema-112",
+    "synthetic-tenant-and-operation-audit",
+    "synthetic-application-version-channel-signing-config",
+    "synthetic-successful-build-task-reference-chain",
+    "four-storage-object-metadata-and-bytes",
+    "synthetic-etcd-config"
+  ],
+  "limitations": [
+    "representative-synthetic-dataset-not-production-volume",
+    "not-customer-target-environment",
+    "not-pitr-or-cross-region"
+  ]
+}

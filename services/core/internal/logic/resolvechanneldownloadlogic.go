@@ -67,10 +67,11 @@ FROM t_promotion_channel c
 JOIN t_build_task b ON b.channel_id = c.id AND b.tenant_id = c.tenant_id
 JOIN t_storage_object o ON o.id = b.apk_object_id AND o.tenant_id = c.tenant_id
 WHERE c.channel_code = ? AND c.status = ? AND b.status = ?
-  AND b.apk_object_id > 0 AND o.object_type = ? AND o.status = ?
+  AND b.apk_object_id > 0 AND o.object_type = ? AND o.status = ? AND o.storage_mode = ? AND o.owner_agent_id = 0
 ORDER BY b.finish_time DESC, b.id DESC LIMIT 1`,
 		strings.TrimSpace(in.ChannelCode), int64(core.ChannelStatus_CHANNEL_STATUS_ENABLED), buildStatusSuccess,
-		int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK), storageStatusBound)
+		int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK), storageStatusBound,
+		int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE))
 	if err != nil {
 		if err == models.ErrNotFound || err == sqlx.ErrNotFound {
 			return nil, status.Error(codes.NotFound, "channel has no downloadable build")

@@ -35,6 +35,7 @@ CREATE TABLE t_app_application (
 -- 对象存储元数据
 -- 对象类型：1原始APK 2签名文件 3构建APK 4构建日志 5品牌Logo 6品牌启动图
 -- 状态：1上传中 2已就绪 3已绑定 4已删除 5失败
+-- 存储模式：1控制面存储 2客户存储
 -- =============================
 DROP TABLE IF EXISTS t_storage_object;
 CREATE TABLE t_storage_object (
@@ -48,13 +49,16 @@ CREATE TABLE t_storage_object (
   size_bytes BIGINT NOT NULL DEFAULT 0 COMMENT '对象大小，单位字节',
   sha256 CHAR(64) DEFAULT NULL COMMENT '对象SHA-256，小写十六进制',
   status TINYINT NOT NULL DEFAULT 1 COMMENT '状态：1上传中 2已就绪 3已绑定 4已删除 5失败',
+  storage_mode TINYINT NOT NULL DEFAULT 1 COMMENT '存储模式：1控制面存储 2客户存储',
+  owner_agent_id BIGINT NOT NULL DEFAULT 0 COMMENT '客户存储所属Local Agent ID，控制面存储为0',
   create_by BIGINT NOT NULL DEFAULT 0 COMMENT '创建人ID',
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (id),
   UNIQUE KEY uk_storage_object_key (object_key) COMMENT '对象Key唯一索引',
   KEY idx_storage_tenant_type_status (tenant_id, object_type, status) COMMENT '租户对象类型状态查询索引',
-  KEY idx_storage_tenant_app (tenant_id, app_id) COMMENT '租户应用对象查询索引'
+  KEY idx_storage_tenant_app (tenant_id, app_id) COMMENT '租户应用对象查询索引',
+  KEY idx_storage_mode_agent (tenant_id, storage_mode, owner_agent_id, status) COMMENT '客户存储对象归属和状态查询索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='私有对象存储元数据';
 
 
@@ -1260,3 +1264,35 @@ CREATE TABLE t_hybrid_artifact_reference (
   KEY idx_hybrid_artifact_agent (tenant_id,agent_id,status,create_time) COMMENT 'Agent Artifact引用查询索引',
   KEY idx_hybrid_artifact_sha (sha256,size_bytes) COMMENT 'Artifact完整性追溯索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='V7 Hybrid和离线Artifact授权引用';
+
+-- APPFORGE_SCHEMA_113_BEGIN：历史目标112迁移镜像排除此Schema 113块
+CREATE TABLE IF NOT EXISTS t_air_gapped_package (
+  id BIGINT NOT NULL AUTO_INCREMENT COMMENT 'AIR_GAPPED离线包记录ID',
+  tenant_id BIGINT NOT NULL COMMENT '所属租户ID',
+  app_id BIGINT NOT NULL COMMENT '关联应用ID',
+  package_code VARCHAR(128) NOT NULL COMMENT '离线包全局唯一编码',
+  agent_id BIGINT NOT NULL COMMENT '目标Local Agent ID',
+  task_id BIGINT NOT NULL COMMENT '关联构建任务ID',
+  builder_attempt INT NOT NULL COMMENT '构建任务fencing尝试次数',
+  agent_certificate_serial VARCHAR(128) NOT NULL COMMENT '导出时绑定的Agent客户端证书序列号',
+  nonce_hash CHAR(64) NOT NULL COMMENT '一次性防重放Nonce的SHA-256摘要',
+  export_object_id BIGINT NOT NULL DEFAULT 0 COMMENT '控制面离线任务ZIP对象ID',
+  export_sha256 CHAR(64) DEFAULT NULL COMMENT '离线任务ZIP内容SHA-256',
+  export_size_bytes BIGINT NOT NULL DEFAULT 0 COMMENT '离线任务ZIP大小字节数',
+  result_object_id BIGINT NOT NULL DEFAULT 0 COMMENT 'Agent离线结果ZIP对象ID',
+  result_sha256 CHAR(64) DEFAULT NULL COMMENT '离线结果ZIP内容SHA-256',
+  result_size_bytes BIGINT NOT NULL DEFAULT 0 COMMENT '离线结果ZIP大小字节数',
+  status TINYINT NOT NULL DEFAULT 1 COMMENT '离线包状态：1准备中 2已导出 3已导入 4已过期 5已撤销',
+  issued_at DATETIME(3) NOT NULL COMMENT '任务包签发时间',
+  expires_at DATETIME(3) NOT NULL COMMENT '任务包过期时间',
+  imported_at DATETIME(3) DEFAULT NULL COMMENT '结果包成功导入时间',
+  create_by BIGINT NOT NULL DEFAULT 0 COMMENT '创建人ID',
+  create_time DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  update_time DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_air_gapped_package_code (package_code) COMMENT '离线包编码全局唯一',
+  UNIQUE KEY uk_air_gapped_task_attempt (tenant_id,task_id,builder_attempt) COMMENT '任务attempt离线包唯一',
+  KEY idx_air_gapped_agent_status (tenant_id,agent_id,status,expires_at) COMMENT 'Agent离线包状态查询索引',
+  KEY idx_air_gapped_task_status (tenant_id,task_id,status) COMMENT '任务离线包状态查询索引'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='V7 AIR_GAPPED离线任务与结果双向签名状态';
+-- APPFORGE_SCHEMA_113_END

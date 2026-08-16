@@ -167,6 +167,7 @@ type CreatePlatformSigningConfigReq struct {
 	KeyPassword      string `json:"keyPassword,optional"`
 	SecretRef        string `json:"secretRef,optional"`
 	KeystoreObjectId int64  `json:"keystoreObjectId"`
+	SigningMode      int32  `json:"signingMode,optional"`
 }
 
 type CreatePlatformSourceBuildTriggerReq struct {
@@ -306,6 +307,11 @@ type Google2FAInitResp struct {
 
 type Google2FAResetReq struct {
 	UserId int64 `json:"userId"`
+}
+
+type ImportPlatformAirGappedResultReq struct {
+	PackageCode    string `json:"packageCode"`
+	ResultObjectId int64  `json:"resultObjectId"`
 }
 
 type ImportPlatformSourceArtifactReq struct {
@@ -608,6 +614,49 @@ type PageReq struct {
 	Cursor int64 `form:"cursor,optional"`
 	Limit  int64 `form:"limit,optional"`
 	Count  int64 `form:"count,optional"` // 已知总数；<=0 时服务端按需重新统计
+}
+
+type PlatformAirGappedExport struct {
+	PackageData PlatformAirGappedPackage `json:"package"`
+	DownloadUrl string                   `json:"downloadUrl"`
+	ExpiresAt   int64                    `json:"expiresAt"`
+}
+
+type PlatformAirGappedExportResp struct {
+	RespBase
+	Data PlatformAirGappedExport `json:"data"`
+}
+
+type PlatformAirGappedPackage struct {
+	Id                     int64  `json:"id"`
+	TenantId               int64  `json:"tenantId"`
+	AppId                  int64  `json:"appId"`
+	PackageCode            string `json:"packageCode"`
+	AgentId                int64  `json:"agentId"`
+	TaskId                 int64  `json:"taskId"`
+	BuilderAttempt         int32  `json:"builderAttempt"`
+	AgentCertificateSerial string `json:"agentCertificateSerial"`
+	Status                 int32  `json:"status"`
+	ExportObjectId         int64  `json:"exportObjectId,optional"`
+	ExportSha256           string `json:"exportSha256,optional"`
+	ExportSizeBytes        int64  `json:"exportSizeBytes,optional"`
+	ResultObjectId         int64  `json:"resultObjectId,optional"`
+	ResultSha256           string `json:"resultSha256,optional"`
+	ResultSizeBytes        int64  `json:"resultSizeBytes,optional"`
+	IssuedAt               int64  `json:"issuedAt"`
+	ExpiresAt              int64  `json:"expiresAt"`
+	ImportedAt             int64  `json:"importedAt,optional"`
+	CreateTime             int64  `json:"createTime"`
+	UpdateTime             int64  `json:"updateTime"`
+}
+
+type PlatformAirGappedPackageReq struct {
+	PackageCode string `path:"packageCode"`
+}
+
+type PlatformAirGappedPackageResp struct {
+	RespBase
+	Data PlatformAirGappedPackage `json:"data"`
 }
 
 type PlatformApplication struct {
@@ -1217,6 +1266,7 @@ type PlatformSigningConfig struct {
 	CreateTime        int64  `json:"createTime"`
 	UpdateTime        int64  `json:"updateTime"`
 	CertificateSha256 string `json:"certificateSha256,optional"`
+	SigningMode       int32  `json:"signingMode"`
 }
 
 type PlatformSigningConfigListResp struct {
@@ -1413,6 +1463,8 @@ type PlatformStorageObject struct {
 	SizeBytes    int64  `json:"sizeBytes"`
 	Sha256       string `json:"sha256"`
 	Status       int32  `json:"status"`
+	StorageMode  int32  `json:"storageMode"`
+	OwnerAgentId int64  `json:"ownerAgentId"`
 }
 
 type PlatformStorageObjectIdReq struct {
@@ -1661,6 +1713,12 @@ type PlatformWhiteLabelTemplateRevisionListResp struct {
 type PlatformWhiteLabelTemplateRevisionResp struct {
 	RespBase
 	Data PlatformWhiteLabelTemplateRevision `json:"data"`
+}
+
+type PreparePlatformAirGappedExportReq struct {
+	AgentId        int64 `json:"agentId"`
+	TaskId         int64 `json:"taskId"`
+	ExpiresSeconds int64 `json:"expiresSeconds,optional"`
 }
 
 type ProfileData struct {

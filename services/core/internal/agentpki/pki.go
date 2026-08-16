@@ -15,6 +15,8 @@ import (
 	"net/url"
 	"os"
 	"time"
+
+	"appforge/common/airgap"
 )
 
 type Certificate struct {
@@ -137,6 +139,44 @@ func (s *Signer) SignCSR(csrPEM string, tenantID, agentID int64) (*Certificate, 
 }
 
 func (s *Signer) CAPEM() string { return s.caPEM }
+
+// SignManifest signs canonical AIR_GAPPED metadata with the Agent CA key.
+func (s *Signer) SignManifest(canonical []byte) (airgap.Signature, error) {
+	if s == nil {
+		return airgap.Signature{}, errors.New("Agent CA signer is unavailable")
+	}
+	return airgap.Sign(s.privateKey, canonical)
+}
+
+// VerifyClientCertificate validates a Local Agent certificate against the
+// configured Agent CA and its tenant-scoped SPIFFE identity at the build time.
+func (s *Signer) VerifyClientCertificate(certificatePEM string, tenantID, agentID int64, at time.Time) (*x509.Certificate, error) {
+	if s == nil || tenantID <= 0 || agentID <= 0 || at.IsZero() {
+		return nil, errors.New("Agent certificate verification context is invalid")
+	}
+	block, trailing := pem.Decode([]byte(certificatePEM))
+	if block == nil || block.Type != "CERTIFICATE" || len(trailing) != 0 {
+		return nil, errors.New("Agent certificate PEM is invalid")
+	}
+	certificate, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return nil, errors.New("Agent certificate DER is invalid")
+	}
+	roots := x509.NewCertPool()
+	roots.AddCert(s.certificate)
+	if _, err := certificate.Verify(x509.VerifyOptions{Roots: roots, CurrentTime: at, KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}}); err != nil {
+		return nil, fmt.Errorf("verify Agent certificate chain: %w", err)
+	}
+	publicKey, ok := certificate.PublicKey.(*ecdsa.PublicKey)
+	if !ok || publicKey.Curve == nil || publicKey.Curve.Params().Name != "P-256" {
+		return nil, errors.New("Agent certificate must use ECDSA P-256")
+	}
+	expected := fmt.Sprintf("spiffe://appforge/tenant/%d/local-agent/%d", tenantID, agentID)
+	if len(certificate.URIs) != 1 || certificate.URIs[0].String() != expected {
+		return nil, errors.New("Agent certificate identity does not match package")
+	}
+	return certificate, nil
+}
 
 func randomSerial() *big.Int {
 	limit := new(big.Int).Lsh(big.NewInt(1), 128)

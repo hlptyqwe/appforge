@@ -64,9 +64,15 @@ func (l *GetBuildExecutionContextLogic) GetBuildExecutionContext(in *core.GetBui
 	if err != nil || source.TenantId != task.TenantId || source.ObjectType != int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_SOURCE_APK) || source.Status != storageStatusBound {
 		return nil, status.Error(codes.FailedPrecondition, "source APK object is unavailable")
 	}
-	keystore, err := l.svcCtx.StorageObjectModel.FindOne(l.ctx, signing.KeystoreObjectId)
-	if err != nil || keystore.TenantId != task.TenantId || keystore.ObjectType != int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE) || keystore.Status != storageStatusBound {
-		return nil, status.Error(codes.FailedPrecondition, "keystore object is unavailable")
+	mode := signingModeOf(signing)
+	var keystore *models.TStorageObject
+	if mode == core.SigningMode_SIGNING_MODE_LOCAL_KEYSTORE {
+		keystore, err = l.svcCtx.StorageObjectModel.FindOne(l.ctx, signing.KeystoreObjectId)
+		if err != nil || keystore.TenantId != task.TenantId || keystore.ObjectType != int64(core.StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE) || keystore.Status != storageStatusBound {
+			return nil, status.Error(codes.FailedPrecondition, "keystore object is unavailable")
+		}
+	} else if signing.KeystoreObjectId != 0 || validateRemoteSignerSecretReference(stringValue(signing.SecretRef)) != nil {
+		return nil, status.Error(codes.FailedPrecondition, "remote signing configuration is unavailable")
 	}
 	branding, err := parseBrandingSnapshot(stringValue(task.BrandingSnapshot))
 	if err != nil {
@@ -136,6 +142,7 @@ func (l *GetBuildExecutionContextLogic) GetBuildExecutionContext(in *core.GetBui
 			TemplateSnapshotJson:       stringValue(task.TemplateSnapshot),
 			SignerCertificateSha256:    certificateSHA256,
 			TemplateFiles:              templateFiles,
+			SigningMode:                mode,
 		},
 	}, nil
 }

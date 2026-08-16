@@ -1,23 +1,42 @@
 {
+  "schemaVersion": 2,
   "evidenceType": "v1-v7-base-regression",
-  "executedAt": "2026-08-15T13:56:00+08:00",
+  "executedAt": "2026-08-16T18:27:42+08:00",
   "status": "passed",
   "command": "deploy/acceptance/v1-v7-regression-base.sh",
   "coverage": {
     "goModules": 11,
     "frontend": "Vue/TypeScript type-check on Node v20.20.2",
     "shell": "acceptance, production delivery and Local Agent scripts",
-    "runtimeAcceptance": ["V4 build cluster", "V5 open platform", "V6 commercialization", "V7 enterprise delivery"],
-    "performance": "bounded health and authenticated deployment-status concurrency smoke"
+    "runtimeAcceptance": [
+      "V2 read-only and no-write negative fixture",
+      "V3 read-only",
+      "V4 build cluster",
+      "V5 open platform",
+      "V6 commercialization",
+      "V7 enterprise delivery"
+    ],
+    "performance": "bounded health and authenticated deployment-status concurrency smoke",
+    "v2WriteNegativeE2E": false,
+    "remoteSigningTaskE2E": true,
+    "androidRuntime": false
   },
-  "issuesFoundAndFixed": [
-    "The frontend regression now enforces Node.js 20 or newer instead of silently using an incompatible system Node.js 14.",
-    "Three intentionally isolated development Builder nodes are recovered only through authenticated admin API and Core RPC precondition checks; the script does not update the database directly.",
-    "The secretbox tamper test now flips a decoded ciphertext byte, avoiding non-canonical Base64 characters that can decode to unchanged bytes."
-  ],
+  "checks": {
+    "goModules": "passed",
+    "frontendTypeCheck": "passed",
+    "shellSyntax": "passed",
+    "v2NoWriteFixture": "passed",
+    "v4CurrentRuntime": "passed",
+    "v5CurrentRuntime": "passed",
+    "v6CurrentRuntime": "passed",
+    "v7BaseRuntime": "passed",
+    "releaseEvidenceContract": "passed",
+    "performanceSmoke": "passed"
+  },
   "limitations": [
-    "V3 Android device runtime acceptance was not executed because no explicitly authorized device was attached.",
-    "Customer capacity, peak-load, APK throughput and long-duration stability tests are not part of this base regression.",
-    "Control-plane-to-Agent Artifact E2E, real AWS, customer SIEM and formal release pipeline evidence remain separate V7 gates."
+    "V2 public-API-to-real-Worker incompatible APK write E2E was not executed.",
+    "V3 Android device runtime acceptance was not executed.",
+    "Customer capacity, peak-load, production-scale object throughput and long-duration stability are separate gates.",
+    "Real AWS/S3/OSS, customer SIEM, physical air gap and real tag/OIDC/vulnerability-database release execution remain separate V7 gates."
   ]
 }

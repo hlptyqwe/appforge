@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-15",
+  "mode": "synthetic-remote-apk-signer",
+  "realHSM": false,
+  "productionCredentialsUsed": false,
+  "certificateSha256": "fc63dd5ffac77d3d32538b9ad45930873cce2309c5bf46c01bdaca8c04de15c1",
+  "checks": {
+    "mutualTLS": "passed",
+    "validAPKSignature": "passed",
+    "certificateBinding": "passed",
+    "requestDigestTamperRejected": "passed",
+    "responseDigestTamperRejected": "passed",
+    "untrustedClientRejected": "passed",
+    "wrongKeyIdRejected": "passed",
+    "wrongCertificateRejected": "passed",
+    "persistentReplayProtection": "passed",
+    "timeoutRejectedWithoutOutput": "passed",
+    "secretLogLeakScan": "passed"
+  },
+  "limitations": [
+    "The signer is a local apksigner-backed protocol fixture, not a real HSM.",
+    "Persistent Core/API/Builder signing-mode integration is not enabled."
+  ]
+}

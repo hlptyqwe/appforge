@@ -12,6 +12,7 @@ import (
 	"appforge/common/rpcauth"
 	"appforge/common/siem"
 
+	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
 )
@@ -27,6 +28,7 @@ type Config struct {
 	SystemRpc      zrpc.RpcClientConf
 	CoreRpc        zrpc.RpcClientConf
 	BuilderRpc     zrpc.RpcClientConf
+	CacheRedis     cache.CacheConf `json:"CacheRedis" yaml:"CacheRedis"`
 	SigningSecrets struct {
 		MasterKeyBase64 string
 	} `json:"SigningSecrets" yaml:"SigningSecrets"`
@@ -58,6 +60,14 @@ func ApplyDeploymentEnvironment(c *Config) error {
 	overrideString(&c.Deployment.DeploymentMode, "APPFORGE_DEPLOYMENT_MODE")
 	overrideString(&c.Deployment.ProductVersion, "APPFORGE_VERSION")
 	overrideString(&c.Deployment.TargetSchemaVersion, "APPFORGE_SCHEMA_VERSION")
+	if password := os.Getenv("APPFORGE_REDIS_PASSWORD"); password != "" {
+		if len(c.CacheRedis) == 0 {
+			return fmt.Errorf("CacheRedis is required when APPFORGE_REDIS_PASSWORD is set")
+		}
+		for index := range c.CacheRedis {
+			c.CacheRedis[index].Pass = password
+		}
+	}
 	if value := strings.TrimSpace(os.Getenv("APPFORGE_MAX_VERSION_SKEW")); value != "" {
 		parsed, err := strconv.ParseInt(value, 10, 32)
 		if err != nil {
@@ -75,7 +85,7 @@ func ApplyDeploymentEnvironment(c *Config) error {
 		c.Deployment.ProductVersion = "0.0.0-dev"
 	}
 	if c.Deployment.TargetSchemaVersion == "" {
-		c.Deployment.TargetSchemaVersion = "20260815_111_v7_deployment_console"
+		c.Deployment.TargetSchemaVersion = "20260815_113_v7_air_gapped"
 	}
 	if c.Deployment.MaxVersionSkew <= 0 {
 		c.Deployment.MaxVersionSkew = 1

@@ -45,7 +45,7 @@ func MapPlatformSigningConfig(item *core.SigningConfig) types.PlatformSigningCon
 	if item == nil {
 		return types.PlatformSigningConfig{}
 	}
-	return types.PlatformSigningConfig{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId, Name: item.Name, KeystoreObjectKey: item.KeystoreObjectKey, KeystoreObjectId: item.KeystoreObjectId, KeyAlias: item.KeyAlias, SecretRef: item.SecretRef, Status: item.Status, LastVerifiedAt: item.LastVerifiedAt, CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime, CertificateSha256: item.CertificateSha256}
+	return types.PlatformSigningConfig{Id: item.Id, TenantId: item.TenantId, AppId: item.AppId, Name: item.Name, KeystoreObjectKey: item.KeystoreObjectKey, KeystoreObjectId: item.KeystoreObjectId, KeyAlias: item.KeyAlias, SecretRef: item.SecretRef, Status: item.Status, LastVerifiedAt: item.LastVerifiedAt, CreateBy: item.CreateBy, CreateTime: item.CreateTime, UpdateTime: item.UpdateTime, CertificateSha256: item.CertificateSha256, SigningMode: int32(item.SigningMode)}
 }
 
 func MapPlatformBuildTask(item *core.BuildTask) types.PlatformBuildTask {

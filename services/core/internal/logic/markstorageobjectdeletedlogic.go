@@ -40,7 +40,9 @@ func (l *MarkStorageObjectDeletedLogic) MarkStorageObjectDeleted(in *core.MarkSt
 		return nil, status.Error(codes.InvalidArgument, "object_key is invalid")
 	}
 	result, err := l.svcCtx.DB.ExecCtx(l.ctx, `UPDATE t_storage_object SET status = ?, update_time = CURRENT_TIMESTAMP
-WHERE id = ? AND object_key = ? AND status = ?`, storageStatusDeleted, in.Id, objectKey, storageStatusFailed)
+WHERE id = ? AND object_key = ? AND status = ? AND storage_mode = ? AND owner_agent_id = 0`,
+		storageStatusDeleted, in.Id, objectKey, storageStatusFailed,
+		int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "mark storage object deleted failed: %v", err)
 	}
@@ -53,7 +55,8 @@ WHERE id = ? AND object_key = ? AND status = ?`, storageStatusDeleted, in.Id, ob
 			Status int64 `db:"status"`
 		}
 		if queryErr := l.svcCtx.DB.QueryRowCtx(l.ctx, &existing,
-			`SELECT status FROM t_storage_object WHERE id = ? AND object_key = ? LIMIT 1`, in.Id, objectKey); queryErr == nil && existing.Status == storageStatusDeleted {
+			`SELECT status FROM t_storage_object WHERE id = ? AND object_key = ? AND storage_mode = ? AND owner_agent_id = 0 LIMIT 1`,
+			in.Id, objectKey, int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE)); queryErr == nil && existing.Status == storageStatusDeleted {
 			return workerBase(), nil
 		}
 		return nil, status.Error(codes.NotFound, "failed storage object was not found")

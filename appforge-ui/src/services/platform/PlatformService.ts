@@ -75,6 +75,7 @@ export type PlatformSigningConfig = {
   createTime: number
   updateTime: number
   certificateSha256?: string
+  signingMode: number
 }
 
 export type PlatformBuildTask = {
@@ -170,6 +171,35 @@ export type PlatformLocalAgent = {
 
 export type PlatformLocalAgentRegistration = {
   registrationToken: string
+  expiresAt: number
+}
+
+export type PlatformAirGappedPackage = {
+  id: number
+  tenantId: number
+  appId: number
+  packageCode: string
+  agentId: number
+  taskId: number
+  builderAttempt: number
+  agentCertificateSerial: string
+  status: number
+  exportObjectId?: number
+  exportSha256?: string
+  exportSizeBytes?: number
+  resultObjectId?: number
+  resultSha256?: string
+  resultSizeBytes?: number
+  issuedAt: number
+  expiresAt: number
+  importedAt?: number
+  createTime: number
+  updateTime: number
+}
+
+export type PlatformAirGappedExport = {
+  package: PlatformAirGappedPackage
+  downloadUrl: string
   expiresAt: number
 }
 
@@ -728,6 +758,9 @@ export class PlatformService {
   createLocalAgentRegistration = api.createLocalAgentRegistration
   drainLocalAgent = api.drainLocalAgent
   revokeLocalAgent = api.revokeLocalAgent
+  prepareAirGappedExport = api.prepareAirGappedExport
+  getAirGappedPackage = api.getAirGappedPackage
+  importAirGappedResult = api.importAirGappedResult
   getDeploymentStatus = api.getDeploymentStatus
   getChannelStats = api.getChannelStats
   getStorageDownload = api.getStorageDownload

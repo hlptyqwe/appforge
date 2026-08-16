@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "kind": "appforge-v7-release-evidence-contract-acceptance",
+  "generatedAt": "2026-08-16T10:26:28Z",
+  "result": "passed",
+  "mode": "synthetic-local-contract",
+  "releaseVersion": "1.2.3",
+  "components": [
+    "system",
+    "core",
+    "builder",
+    "builder-worker",
+    "api",
+    "admin-ui",
+    "agent-ui",
+    "local-agent",
+    "egress-proxy",
+    "etcd-init",
+    "migrate",
+    "mysql-binlog-tools"
+  ],
+  "checks": {
+    "tagOnlyTrigger": true,
+    "immutableDigestReferences": true,
+    "spdxSbom": true,
+    "normalizedLicenseInventory": true,
+    "trivySarif": true,
+    "perImageCosignVerificationRecord": true,
+    "aggregateManifest": true,
+    "aggregateSha256": true,
+    "sourceDependencyGateRequired": true,
+    "sourceDependencyDetailsExported": false,
+    "tamperRejected": true,
+    "dualArchitectureCliBuild": true
+  },
+  "thirdPartyImages": [
+    "mysql",
+    "redis",
+    "etcd",
+    "minio",
+    "minio-mc",
+    "alpine"
+  ],
+  "boundary": "本地验收验证发布证据结构、聚合、防篡改和源码依赖门禁结果绑定；源码门禁状态与 Sigstore 包均为合成输入，不代表真实 tag、Trivy 漏洞数据库、OIDC 或镜像签名运行证据。"
+}

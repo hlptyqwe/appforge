@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"appforge/common/etcd"
+	"appforge/common/observability"
 	"appforge/common/rpcauth"
 	builderpb "appforge/proto/builder"
 	"appforge/proto/core"
@@ -31,6 +32,10 @@ func main() {
 	if err := etcd.LoadFromEtcdAndMerge(strings.Split(*endpoints, ","), []string{*commonKey, *configKey}, &c); err != nil {
 		log.Fatal(err)
 	}
+	if err := observability.ApplyEnvironment(&c.RpcServerConf.ServiceConf); err != nil {
+		log.Fatal(err)
+	}
+	c.ServiceConf.MustSetUp()
 	if err := rpcauth.ValidateToken(c.InternalRpc.Token); err != nil {
 		log.Fatal(err)
 	}
@@ -39,6 +44,9 @@ func main() {
 	}
 	if value := strings.TrimSpace(os.Getenv("APPFORGE_BUILDER_ENDPOINT")); value != "" {
 		c.Builder.Endpoint = value
+	}
+	if value := strings.TrimSpace(os.Getenv("APPFORGE_BUILDER_CAPABILITY_JSON")); value != "" {
+		c.Builder.CapabilityJson = value
 	}
 	clientAuth := zrpc.WithUnaryClientInterceptor(rpcauth.UnaryClientInterceptor(c.InternalRpc.Token))
 	builderConnection := zrpc.MustNewClient(c.BuilderRpc, clientAuth)

@@ -26,7 +26,8 @@ printf '%s\n' 'acceptance-siem-token' >"$production/secrets/siem-token"
 
 printf '%s\n' \
   'APPFORGE_DEPLOYMENT_MODE=private' \
-  'APPFORGE_VERSION=1.1.0' \
+  'APPFORGE_VERSION=1.2.0' \
+  'APPFORGE_SCHEMA_VERSION=20260815_113_v7_air_gapped' \
   'APPFORGE_IMAGE_REGISTRY=registry.example.com/appforge' \
   'APPFORGE_PUBLIC_ORIGIN=https://appforge.example.com' \
   'APPFORGE_BUILDER_CONCURRENCY=2' \
@@ -58,6 +59,67 @@ chmod 0644 "$production/secrets/"*.crt "$production/secrets/"*.pem "$production/
 
 "$production/preflight.sh" "$production/.env" >/dev/null
 
+cp "$production/.env" "$temporary/schema-valid.env"
+sed -i.bak 's/APPFORGE_SCHEMA_VERSION=20260815_113_v7_air_gapped/APPFORGE_SCHEMA_VERSION=20260815_112_v7_customer_storage/' "$production/.env"
+if "$production/preflight.sh" "$production/.env" >/dev/null 2>&1; then
+  echo "验收失败: preflight接受了1.2.x与Schema 112的不兼容组合" >&2
+  exit 1
+fi
+cp "$temporary/schema-valid.env" "$production/.env"
+chmod 0600 "$production/.env"
+
+cp "$production/.env" "$temporary/base.env"
+printf '%s\n' 'siem.customer.test:443' 'collector.customer.test:4318' >"$production/secrets/egress-allowlist.txt"
+chmod 0444 "$production/secrets/egress-allowlist.txt"
+printf '%s\n' \
+  'APPFORGE_EGRESS_PROXY_ENABLED=true' \
+  'APPFORGE_EGRESS_PROXY_URL=http://egress-proxy:3128' \
+  'APPFORGE_EGRESS_PROXY_ALLOWLIST_FILE=./secrets/egress-allowlist.txt' \
+  'APPFORGE_EGRESS_PROXY_MAX_CONNECTIONS=128' \
+  'APPFORGE_EGRESS_NO_PROXY=localhost,127.0.0.1,mysql,redis,etcd,minio,system-rpc,core-rpc,builder-rpc' >>"$production/.env"
+"$production/preflight.sh" "$production/.env" >/dev/null
+docker compose --env-file "$production/.env" -f "$production/docker-compose.yml" --profile egress config --format json |
+  python3 -c '
+import json, sys
+services = json.load(sys.stdin)["services"]
+proxy = services["egress-proxy"]
+if set(proxy.get("networks", {})) != {"appforge-backend", "appforge-egress"}:
+    raise SystemExit("出口代理必须同时连接内部与出口网络")
+for name in ("api", "builder-worker", "core-rpc", "source-trigger-worker"):
+    environment = services[name].get("environment", {})
+    if environment.get("HTTPS_PROXY") != "http://egress-proxy:3128":
+        raise SystemExit(name + " 未接入受限出口代理")
+'
+chmod 0644 "$production/secrets/egress-allowlist.txt"
+printf '%s\n' 'siem.example.com:443' >"$production/secrets/egress-allowlist.txt"
+chmod 0444 "$production/secrets/egress-allowlist.txt"
+if "$production/preflight.sh" "$production/.env" >/dev/null 2>&1; then
+  echo "验收失败: preflight接受了出口Allowlist占位域名" >&2
+  exit 1
+fi
+cp "$temporary/base.env" "$production/.env"
+chmod 0600 "$production/.env"
+
+printf '%s\n' \
+  'APPFORGE_REPLICA_ENDPOINT=https://replica.example.com' \
+  'APPFORGE_REPLICA_ACCESS_KEY=replica_access_key' \
+  'APPFORGE_REPLICA_SECRET_KEY=replica_secret_password_12345' \
+  'APPFORGE_REPLICA_BUCKET=appforge' \
+  'APPFORGE_REPLICA_RULE_ID=appforge-dr' \
+  'APPFORGE_REPLICA_SYNC=false' >>"$production/.env"
+"$production/preflight.sh" "$production/.env" >/dev/null
+cp "$temporary/base.env" "$production/.env"
+printf '%s\n' \
+  'APPFORGE_REPLICA_ENDPOINT=http://replica.example.com' \
+  'APPFORGE_REPLICA_ACCESS_KEY=replica_access_key' \
+  'APPFORGE_REPLICA_SECRET_KEY=replica_secret_password_12345' >>"$production/.env"
+if "$production/preflight.sh" "$production/.env" >/dev/null 2>&1; then
+  echo "验收失败: preflight接受了HTTP对象副本Endpoint" >&2
+  exit 1
+fi
+cp "$temporary/base.env" "$production/.env"
+chmod 0600 "$production/.env"
+
 docker compose --env-file "$production/.env" -f "$production/docker-compose.yml" config --format json |
   python3 -c '
 import json, sys
@@ -72,7 +134,19 @@ for name in ("api", "builder-worker"):
     condition = services[name].get("depends_on", {}).get("minio-init", {}).get("condition")
     if condition != "service_completed_successfully":
         raise SystemExit(name + "未等待Bucket初始化成功")
+for name in ("api", "system-rpc", "core-rpc", "builder-rpc", "builder-worker", "webhook-worker", "billing-worker", "enterprise-worker", "source-trigger-worker"):
+    environment = services[name].get("environment", {})
+    if environment.get("APPFORGE_PROMETHEUS_ENABLED") != "true":
+        raise SystemExit(name + "未启用Prometheus")
+    if str(environment.get("APPFORGE_PROMETHEUS_PORT")) != "9101" or environment.get("APPFORGE_PROMETHEUS_PATH") != "/metrics":
+        raise SystemExit(name + "的Prometheus端口或路径错误")
+    if environment.get("APPFORGE_OTLP_SAMPLER") not in ("0.1", 0.1):
+        raise SystemExit(name + "的OTLP采样率错误")
 '
+grep -Fq 'Encoding: json' "$production/runtime/common.yaml" || {
+  echo "验收失败: 生产运行配置未启用JSON结构化日志" >&2
+  exit 1
+}
 
 cp "$production/secrets/agent-ca.key" "$temporary/agent-ca.key"
 cp "$production/secrets/agent-ca.crt" "$temporary/agent-ca.crt"

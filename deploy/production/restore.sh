@@ -33,5 +33,9 @@ docker compose -f "$delivery_dir/docker-compose.yml" run --rm --no-deps --entryp
 docker compose -f "$delivery_dir/docker-compose.yml" run --rm --no-deps --entrypoint /bin/sh \
   -v "$backup_dir:/backup:ro" archive -c \
   'find /data -mindepth 1 -delete && tar -C /data -xzf /backup/object-data.tar.gz'
-docker compose -f "$delivery_dir/docker-compose.yml" up -d
-echo "恢复已启动，请执行 acceptance/enterprise-delivery.sh 核对租户、任务、对象引用和审计摘要"
+if [[ ${APPFORGE_RESTORE_SKIP_START:-false} == true ]]; then
+  echo "基线恢复完成，业务服务保持停止，等待后续恢复步骤"
+else
+  docker compose -f "$delivery_dir/docker-compose.yml" up -d
+  echo "恢复已启动，请执行 acceptance/enterprise-delivery.sh 核对租户、任务、对象引用和审计摘要"
+fi

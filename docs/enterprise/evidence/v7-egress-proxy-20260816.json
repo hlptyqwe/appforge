@@ -1,0 +1,26 @@
+{
+  "acceptance": "V7_RESTRICTED_EGRESS_PROXY",
+  "fixture": "synthetic-loopback-tls-only",
+  "startedAt": "2026-08-16T10:26:37Z",
+  "finishedAt": "2026-08-16T10:26:37Z",
+  "checks": {
+    "approvedHttpsConnect": "passed",
+    "unlistedDestinationRejected": "passed",
+    "plaintextForwardingRejected": "passed",
+    "boundedAllowlistParser": "passed",
+    "siemEnvironmentProxy": "passed",
+    "remoteApkSignerProxyBypass": "passed",
+    "structuredJsonLog": "passed",
+    "composeInternalBackendAndProxyProfile": "passed",
+    "helmAndReleaseWiring": "passed"
+  },
+  "securityBoundary": {
+    "connectOnly": true,
+    "proxyReceivesApkRemoteSigningTraffic": false,
+    "webhookSsrFTransportChanged": false
+  },
+  "realCustomerDataAccessed": false,
+  "productionCredentialsAccessed": false,
+  "residualTemporaryResources": 0,
+  "result": "passed"
+}

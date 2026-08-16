@@ -2,12 +2,14 @@
 
 set -euo pipefail
 
+repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 mysql_container=${APPFORGE_V5_MYSQL_CONTAINER:-appforge-mysql}
 mysql_database=${APPFORGE_V5_MYSQL_DATABASE:-appforge}
 mysql_user=${APPFORGE_V5_MYSQL_USER:-appforge}
 mysql_password=${APPFORGE_V5_MYSQL_PASSWORD:-appforge_dev_password}
 agent_ui_url=${APPFORGE_V5_AGENT_UI_URL:-http://127.0.0.1:5174}
 admin_ui_url=${APPFORGE_V5_ADMIN_UI_URL:-http://127.0.0.1:5173}
+evidence=${APPFORGE_V5_EVIDENCE_PATH:-$repo_root/docs/enterprise/evidence/v5-open-platform-readonly-20260815.json}
 
 mysql_scalar() {
   docker exec -e MYSQL_PWD="$mysql_password" "$mysql_container" \
@@ -130,4 +132,69 @@ assert_zero "操作日志没有 API Key 明文特征" \
 assert_zero "操作日志没有源码 Webhook 路径令牌" \
   "SELECT COUNT(*) FROM sys_op_log WHERE req LIKE '%/source-webhooks/%' OR resp LIKE '%/source-webhooks/%';"
 
+credential_count=$(mysql_scalar "SELECT COUNT(*) FROM t_open_api_credential")
+idempotency_count=$(mysql_scalar "SELECT COUNT(*) FROM t_open_api_idempotency WHERE status=2 AND resource_id>0")
+audit_count=$(mysql_scalar "SELECT COUNT(*) FROM t_open_api_audit WHERE request_id<>'' AND request_path LIKE '/open/v1/%'")
+forbidden_audit_count=$(mysql_scalar "SELECT COUNT(*) FROM t_open_api_audit WHERE response_status=403")
+conflict_audit_count=$(mysql_scalar "SELECT COUNT(*) FROM t_open_api_audit WHERE response_status=409")
+outbox_event_type_count=$(mysql_scalar "SELECT COUNT(DISTINCT event_type) FROM t_outbox_event WHERE event_type IN ('build.queued','build.started','build.succeeded','build.failed')")
+ssrf_dead_letter_count=$(mysql_scalar "SELECT COUNT(*) FROM t_webhook_delivery WHERE status=5 AND (LOWER(error_message) LIKE '%private%' OR LOWER(error_message) LIKE '%reserved%' OR LOWER(error_message) LIKE '%loopback%')")
+source_platform_count=$(mysql_scalar "SELECT COUNT(DISTINCT platform) FROM t_source_integration WHERE platform IN (1,2)")
+source_event_platform_count=$(mysql_scalar "SELECT COUNT(DISTINCT i.platform) FROM t_source_webhook_event e JOIN t_source_build_trigger t ON t.id=e.trigger_id JOIN t_source_repository r ON r.id=t.repository_id JOIN t_source_integration i ON i.id=r.integration_id WHERE i.platform IN (1,2)")
+developer_audit_count=$(mysql_scalar "SELECT COUNT(*) FROM sys_op_log WHERE path LIKE '%/developer/%' AND method IN ('POST','PUT','DELETE')")
+
+mkdir -p "$(dirname "$evidence")"
+umask 077
+EVIDENCE_PATH="$evidence" CREDENTIAL_COUNT="$credential_count" IDEMPOTENCY_COUNT="$idempotency_count" \
+AUDIT_COUNT="$audit_count" FORBIDDEN_AUDIT_COUNT="$forbidden_audit_count" CONFLICT_AUDIT_COUNT="$conflict_audit_count" \
+OUTBOX_EVENT_TYPE_COUNT="$outbox_event_type_count" SSRF_DEAD_LETTER_COUNT="$ssrf_dead_letter_count" \
+SOURCE_PLATFORM_COUNT="$source_platform_count" SOURCE_EVENT_PLATFORM_COUNT="$source_event_platform_count" \
+DEVELOPER_AUDIT_COUNT="$developer_audit_count" python3 - <<'PY'
+import json, os, pathlib
+
+integer = lambda key: int(os.environ[key])
+payload = {
+  'schemaVersion': 1,
+  'date': '2026-08-15',
+  'mode': 'read-only-existing-synthetic-v5-evidence',
+  'databaseMutated': False,
+  'counts': {
+    'apiCredentials': integer('CREDENTIAL_COUNT'),
+    'completedIdempotencyRecords': integer('IDEMPOTENCY_COUNT'),
+    'openApiAudits': integer('AUDIT_COUNT'),
+    'forbiddenAudits': integer('FORBIDDEN_AUDIT_COUNT'),
+    'conflictAudits': integer('CONFLICT_AUDIT_COUNT'),
+    'buildOutboxEventTypes': integer('OUTBOX_EVENT_TYPE_COUNT'),
+    'ssrfDeadLetters': integer('SSRF_DEAD_LETTER_COUNT'),
+    'sourcePlatforms': integer('SOURCE_PLATFORM_COUNT'),
+    'sourceEventPlatforms': integer('SOURCE_EVENT_PLATFORM_COUNT'),
+    'developerWriteAudits': integer('DEVELOPER_AUDIT_COUNT'),
+  },
+  'checks': {
+    'requiredContainersAndUiRoutes': 'passed',
+    'schemaMigrationsAndTables': 'passed',
+    'apiSecretHashOnly': 'passed',
+    'idempotencyUniqueness': 'passed',
+    'authorizationAndConflictAudits': 'passed',
+    'outboxEventCoverage': 'passed',
+    'webhookDeliveryUniqueness': 'passed',
+    'webhookSsrfDeadLetter': 'passed',
+    'githubGitlabEvidence': 'passed',
+    'sourceEventAndBuildIdempotency': 'passed',
+    'acceptanceIntegrationsDisabled': 'passed',
+    'operationLogSecretScan': 'passed',
+  },
+  'limitations': [
+    'This verifier is read-only and relies on existing synthetic V5 runtime records.',
+    'It does not create, rotate or revoke a live API key during this run.',
+    'It does not replay the CLI upload-build-download flow during this run.',
+    'GitHub and GitLab evidence uses historical synthetic signed events; no real provider credentials are accessed.',
+  ],
+}
+path = pathlib.Path(os.environ['EVIDENCE_PATH'])
+path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n')
+PY
+chmod 0600 "$evidence"
+
 echo "V5 开放平台只读验收检查通过"
+echo "证据: $evidence"

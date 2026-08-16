@@ -69,6 +69,17 @@ func TestExporterRejectsPlainHTTPInProductionMode(t *testing.T) {
 	}
 }
 
+func TestExporterSupportsControlledEnvironmentProxy(t *testing.T) {
+	exporter, err := New(Config{Enabled: true, Endpoint: "https://siem.example.test/events"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	transport, ok := exporter.client.Transport.(*http.Transport)
+	if !ok || transport.Proxy == nil {
+		t.Fatal("SIEM exporter must support the controlled enterprise egress proxy")
+	}
+}
+
 func TestExporterUsesRealTLSRotatesTokenAndRetries(t *testing.T) {
 	var firstAttempts atomic.Int32
 	received := make(chan Event, 2)

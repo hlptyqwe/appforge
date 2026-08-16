@@ -115,6 +115,9 @@ func RegisterAgentHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		{Method: http.MethodGet, Path: "/enterprise/local-agents/:id", Handler: platform.GetPlatformLocalAgentHandler(serverCtx)},
 		{Method: http.MethodPost, Path: "/enterprise/local-agents/:id/drain", Handler: platform.DrainPlatformLocalAgentHandler(serverCtx)},
 		{Method: http.MethodPost, Path: "/enterprise/local-agents/:id/revoke", Handler: platform.RevokePlatformLocalAgentHandler(serverCtx)},
+		{Method: http.MethodPost, Path: "/enterprise/air-gapped/exports", Handler: platform.PreparePlatformAirGappedExportHandler(serverCtx)},
+		{Method: http.MethodPost, Path: "/enterprise/air-gapped/imports", Handler: platform.ImportPlatformAirGappedResultHandler(serverCtx)},
+		{Method: http.MethodGet, Path: "/enterprise/air-gapped/packages/:packageCode", Handler: platform.GetPlatformAirGappedPackageHandler(serverCtx)},
 	}, rest.WithJwt(serverCtx.Config.Jwt.AccessSecret), rest.WithPrefix("/agent/core"), rest.WithTimeout(600000*time.Millisecond))
 
 	server.AddRoutes([]rest.Route{

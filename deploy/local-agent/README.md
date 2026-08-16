@@ -22,6 +22,38 @@
 
 执行 `./secret-import.sh app-release.json /secure/path/app-release.json`。导入命令只接受单层 `.json` 文件名和固定字段，内容通过标准输入写入 Docker 管理卷 `agent-secrets`；控制面签名配置只填写 `local-file:///app-release.json`。确认任务预检成功后安全销毁临时明文文件。
 
+## CUSTOMER_STORAGE
+
+客户对象存储模式不会增加代理前端。APK/Keystore 由 Local Agent 直接写入客户 S3、MinIO 或阿里云 OSS，重新读取并校验后，只经 mTLS 向控制面登记对象 ID；现有控制面页面继续使用对象 ID 创建版本和签名配置。
+
+1. 准备权限为 `0600` 的严格 JSON，字段和最小权限策略见 [CUSTOMER_STORAGE 实施契约](../../docs/enterprise/customer-storage-contract.md)。`prefix` 必须与 Agent 注册时的 `customer_storage_ref` fragment 完全相同。
+2. 执行 `./customer-storage-secret-import.sh customer-storage.json /secure/path/customer-storage.json`。凭据只写入客户节点的 `agent-secrets` 卷。
+3. Agent 注册模式选择 `CUSTOMER_STORAGE`，引用示例：`local-file:///customer-storage.json#tenants/900101/agents/build-a`。
+4. 使用 `./customer-storage-import.sh APP_ID source-apk /secure/path/source.apk` 导入源 APK；使用 `keystore` 导入权限为 `0600` 的 Keystore。命令成功时输出控制面对象 ID和无凭据的规范引用。
+5. 将对象 ID 填入现有版本或签名配置。构建输入和输出字节只在 Agent 与客户存储之间流转。
+
+导入命令只接受固定对象类型和普通文件，不接受远程 URL、脚本或自定义命令；不会创建 bucket、修改 bucket policy，也不会访问登记前缀之外的对象。
+
+## AIR_GAPPED
+
+完全断网构建不启动在线 `run` 循环。把控制面生成的签名任务 ZIP、已注册 Agent 的 `agent-state` 卷和本地签名 Secret 卷带入隔离节点，然后以无网络容器运行固定命令：
+
+```bash
+docker run --rm --network none \
+  -v appforge-local-agent_agent-state:/var/lib/appforge-agent \
+  -v appforge-local-agent_agent-secrets:/etc/appforge/local-secrets:ro \
+  -v /absolute/offline-media:/offline \
+  "$APPFORGE_LOCAL_AGENT_IMAGE" air-gapped-build \
+  --task-package /offline/task.zip \
+  --result-package /offline/result.zip \
+  --state-dir /var/lib/appforge-agent \
+  --secret-root /etc/appforge/local-secrets
+```
+
+命令不接受执行器路径；只能调用镜像内 root 所有且不可被组/其他用户修改的 `/usr/local/bin/appforge-local-build`。任务包在控制面 CA 签名、Agent 身份、有效期、ZIP 路径及输入摘要全部验证后才会解压和构建；同一 `package_code + nonce` 成功发布结果后会写入私有状态卷，删除结果文件也不能重放。结果 ZIP 由当前 Agent 客户端证书私钥签名，必须回到原租户控制面验签导入。
+
+物理介质复制、生产角色授权和客户正式证书环境不属于本地合成验收；不得把真实客户 APK、Keystore 或生产凭据用于仓库验收脚本。
+
 ## 升级与回滚
 
 1. 在控制面把 Agent 设为 Drain，等待运行任务归零。

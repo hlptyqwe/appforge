@@ -51,7 +51,9 @@ func (l *ClaimExpiredStorageObjectsLogic) ClaimExpiredStorageObjects(in *core.Cl
 	if _, err := l.svcCtx.DB.ExecCtx(l.ctx, `UPDATE t_storage_object
 SET status = ?, update_time = CURRENT_TIMESTAMP
 WHERE status = ? AND create_time < DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? SECOND)
-ORDER BY id LIMIT ?`, storageStatusFailed, storageStatusUploading, staleSeconds, limit); err != nil {
+  AND storage_mode = ? AND owner_agent_id = 0
+ORDER BY id LIMIT ?`, storageStatusFailed, storageStatusUploading, staleSeconds,
+		int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE), limit); err != nil {
 		return nil, status.Errorf(codes.Internal, "claim stale storage objects failed: %v", err)
 	}
 
@@ -61,7 +63,9 @@ ORDER BY id LIMIT ?`, storageStatusFailed, storageStatusUploading, staleSeconds,
 	}
 	if err := l.svcCtx.DB.QueryRowsCtx(l.ctx, &rows, `SELECT id, object_key FROM t_storage_object
 WHERE status = ? AND create_time < DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? SECOND)
-ORDER BY id LIMIT ?`, storageStatusFailed, staleSeconds, limit); err != nil {
+  AND storage_mode = ? AND owner_agent_id = 0
+ORDER BY id LIMIT ?`, storageStatusFailed, staleSeconds,
+		int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE), limit); err != nil {
 		return nil, status.Errorf(codes.Internal, "list stale storage objects failed: %v", err)
 	}
 	data := make([]*core.ExpiredStorageObject, 0, len(rows))

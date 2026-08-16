@@ -309,7 +309,6 @@ onMounted(load)
       <el-table
         :data="invoices"
         stripe
-        height="100%"
       >
         <el-table-column prop="invoiceNo" label="账单号" min-width="180" /><el-table-column
           label="周期"
@@ -336,7 +335,7 @@ onMounted(load)
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination">
+      <div class="pagination-bar">
         <el-pagination
           v-model:current-page="invoicePage"
           :page-size="20"
@@ -438,9 +437,11 @@ onMounted(load)
 <style scoped>
 .billing-page {
   display: flex;
-  min-height: calc(100vh - 96px);
+  height: 100%;
+  min-height: 0;
   flex-direction: column;
   gap: 16px;
+  overflow-y: auto;
 }
 .plan-grid {
   display: grid;
@@ -477,12 +478,11 @@ onMounted(load)
 }
 .invoice-card :deep(.el-card__body) {
   display: flex;
-  height: calc(100% - 58px);
   flex-direction: column;
+  min-height: 0;
 }
-.pagination {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 16px;
+.invoice-card :deep(.el-table) {
+  flex: 1;
+  min-height: 0;
 }
 </style>

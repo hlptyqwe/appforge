@@ -244,40 +244,46 @@ func (BuildTaskStatus) EnumDescriptor() ([]byte, []int) {
 type StorageObjectType int32
 
 const (
-	StorageObjectType_STORAGE_OBJECT_TYPE_UNKNOWN       StorageObjectType = 0 // 未知类型
-	StorageObjectType_STORAGE_OBJECT_TYPE_SOURCE_APK    StorageObjectType = 1 // 客户上传的原始APK
-	StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE      StorageObjectType = 2 // APK签名文件
-	StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK     StorageObjectType = 3 // Builder生成的渠道APK
-	StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG     StorageObjectType = 4 // Builder构建日志
-	StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO    StorageObjectType = 5 // 品牌Logo图片
-	StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH  StorageObjectType = 6 // 品牌启动图图片
-	StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE StorageObjectType = 7 // V3模板声明式补丁引用的受控文件
-	StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_CACHE   StorageObjectType = 8 // V4独立构建缓存产物
+	StorageObjectType_STORAGE_OBJECT_TYPE_UNKNOWN                StorageObjectType = 0  // 未知类型
+	StorageObjectType_STORAGE_OBJECT_TYPE_SOURCE_APK             StorageObjectType = 1  // 客户上传的原始APK
+	StorageObjectType_STORAGE_OBJECT_TYPE_KEYSTORE               StorageObjectType = 2  // APK签名文件
+	StorageObjectType_STORAGE_OBJECT_TYPE_BUILT_APK              StorageObjectType = 3  // Builder生成的渠道APK
+	StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_LOG              StorageObjectType = 4  // Builder构建日志
+	StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_LOGO             StorageObjectType = 5  // 品牌Logo图片
+	StorageObjectType_STORAGE_OBJECT_TYPE_BRAND_SPLASH           StorageObjectType = 6  // 品牌启动图图片
+	StorageObjectType_STORAGE_OBJECT_TYPE_TEMPLATE_FILE          StorageObjectType = 7  // V3模板声明式补丁引用的受控文件
+	StorageObjectType_STORAGE_OBJECT_TYPE_BUILD_CACHE            StorageObjectType = 8  // V4独立构建缓存产物
+	StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_TASK_PACKAGE   StorageObjectType = 9  // V7控制面签名的离线任务包
+	StorageObjectType_STORAGE_OBJECT_TYPE_OFFLINE_RESULT_PACKAGE StorageObjectType = 10 // V7 Local Agent签名的离线结果包
 )
 
 // Enum value maps for StorageObjectType.
 var (
 	StorageObjectType_name = map[int32]string{
-		0: "STORAGE_OBJECT_TYPE_UNKNOWN",
-		1: "STORAGE_OBJECT_TYPE_SOURCE_APK",
-		2: "STORAGE_OBJECT_TYPE_KEYSTORE",
-		3: "STORAGE_OBJECT_TYPE_BUILT_APK",
-		4: "STORAGE_OBJECT_TYPE_BUILD_LOG",
-		5: "STORAGE_OBJECT_TYPE_BRAND_LOGO",
-		6: "STORAGE_OBJECT_TYPE_BRAND_SPLASH",
-		7: "STORAGE_OBJECT_TYPE_TEMPLATE_FILE",
-		8: "STORAGE_OBJECT_TYPE_BUILD_CACHE",
+		0:  "STORAGE_OBJECT_TYPE_UNKNOWN",
+		1:  "STORAGE_OBJECT_TYPE_SOURCE_APK",
+		2:  "STORAGE_OBJECT_TYPE_KEYSTORE",
+		3:  "STORAGE_OBJECT_TYPE_BUILT_APK",
+		4:  "STORAGE_OBJECT_TYPE_BUILD_LOG",
+		5:  "STORAGE_OBJECT_TYPE_BRAND_LOGO",
+		6:  "STORAGE_OBJECT_TYPE_BRAND_SPLASH",
+		7:  "STORAGE_OBJECT_TYPE_TEMPLATE_FILE",
+		8:  "STORAGE_OBJECT_TYPE_BUILD_CACHE",
+		9:  "STORAGE_OBJECT_TYPE_OFFLINE_TASK_PACKAGE",
+		10: "STORAGE_OBJECT_TYPE_OFFLINE_RESULT_PACKAGE",
 	}
 	StorageObjectType_value = map[string]int32{
-		"STORAGE_OBJECT_TYPE_UNKNOWN":       0,
-		"STORAGE_OBJECT_TYPE_SOURCE_APK":    1,
-		"STORAGE_OBJECT_TYPE_KEYSTORE":      2,
-		"STORAGE_OBJECT_TYPE_BUILT_APK":     3,
-		"STORAGE_OBJECT_TYPE_BUILD_LOG":     4,
-		"STORAGE_OBJECT_TYPE_BRAND_LOGO":    5,
-		"STORAGE_OBJECT_TYPE_BRAND_SPLASH":  6,
-		"STORAGE_OBJECT_TYPE_TEMPLATE_FILE": 7,
-		"STORAGE_OBJECT_TYPE_BUILD_CACHE":   8,
+		"STORAGE_OBJECT_TYPE_UNKNOWN":                0,
+		"STORAGE_OBJECT_TYPE_SOURCE_APK":             1,
+		"STORAGE_OBJECT_TYPE_KEYSTORE":               2,
+		"STORAGE_OBJECT_TYPE_BUILT_APK":              3,
+		"STORAGE_OBJECT_TYPE_BUILD_LOG":              4,
+		"STORAGE_OBJECT_TYPE_BRAND_LOGO":             5,
+		"STORAGE_OBJECT_TYPE_BRAND_SPLASH":           6,
+		"STORAGE_OBJECT_TYPE_TEMPLATE_FILE":          7,
+		"STORAGE_OBJECT_TYPE_BUILD_CACHE":            8,
+		"STORAGE_OBJECT_TYPE_OFFLINE_TASK_PACKAGE":   9,
+		"STORAGE_OBJECT_TYPE_OFFLINE_RESULT_PACKAGE": 10,
 	}
 )
 
@@ -2251,11 +2257,12 @@ func (LocalAgentCertificateStatus) EnumDescriptor() ([]byte, []int) {
 type HybridArtifactType int32
 
 const (
-	HybridArtifactType_HYBRID_ARTIFACT_TYPE_UNKNOWN              HybridArtifactType = 0 // 未知类型
-	HybridArtifactType_HYBRID_ARTIFACT_TYPE_SOURCE_APK           HybridArtifactType = 1 // 源APK
-	HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK            HybridArtifactType = 2 // 构建APK
-	HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG            HybridArtifactType = 3 // 构建日志
-	HybridArtifactType_HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE HybridArtifactType = 4 // 受签名离线任务包
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_UNKNOWN                HybridArtifactType = 0 // 未知类型
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_SOURCE_APK             HybridArtifactType = 1 // 源APK
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILT_APK              HybridArtifactType = 2 // 构建APK
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_BUILD_LOG              HybridArtifactType = 3 // 构建日志
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE   HybridArtifactType = 4 // 受签名离线任务包
+	HybridArtifactType_HYBRID_ARTIFACT_TYPE_OFFLINE_RESULT_PACKAGE HybridArtifactType = 5 // 受签名离线结果包
 )
 
 // Enum value maps for HybridArtifactType.
@@ -2266,13 +2273,15 @@ var (
 		2: "HYBRID_ARTIFACT_TYPE_BUILT_APK",
 		3: "HYBRID_ARTIFACT_TYPE_BUILD_LOG",
 		4: "HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE",
+		5: "HYBRID_ARTIFACT_TYPE_OFFLINE_RESULT_PACKAGE",
 	}
 	HybridArtifactType_value = map[string]int32{
-		"HYBRID_ARTIFACT_TYPE_UNKNOWN":              0,
-		"HYBRID_ARTIFACT_TYPE_SOURCE_APK":           1,
-		"HYBRID_ARTIFACT_TYPE_BUILT_APK":            2,
-		"HYBRID_ARTIFACT_TYPE_BUILD_LOG":            3,
-		"HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE": 4,
+		"HYBRID_ARTIFACT_TYPE_UNKNOWN":                0,
+		"HYBRID_ARTIFACT_TYPE_SOURCE_APK":             1,
+		"HYBRID_ARTIFACT_TYPE_BUILT_APK":              2,
+		"HYBRID_ARTIFACT_TYPE_BUILD_LOG":              3,
+		"HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE":   4,
+		"HYBRID_ARTIFACT_TYPE_OFFLINE_RESULT_PACKAGE": 5,
 	}
 )
 
@@ -2301,6 +2310,65 @@ func (x HybridArtifactType) Number() protoreflect.EnumNumber {
 // Deprecated: Use HybridArtifactType.Descriptor instead.
 func (HybridArtifactType) EnumDescriptor() ([]byte, []int) {
 	return file_proto_core_core_proto_rawDescGZIP(), []int{40}
+}
+
+// V7 AIR_GAPPED离线包生命周期状态。
+type AirGappedPackageStatus int32
+
+const (
+	AirGappedPackageStatus_AIR_GAPPED_PACKAGE_STATUS_UNKNOWN   AirGappedPackageStatus = 0 // 未知状态
+	AirGappedPackageStatus_AIR_GAPPED_PACKAGE_STATUS_PREPARING AirGappedPackageStatus = 1 // 已锁定任务，正在生成并签名任务包
+	AirGappedPackageStatus_AIR_GAPPED_PACKAGE_STATUS_EXPORTED  AirGappedPackageStatus = 2 // 任务包已导出，等待导入结果包
+	AirGappedPackageStatus_AIR_GAPPED_PACKAGE_STATUS_IMPORTED  AirGappedPackageStatus = 3 // 结果包已校验并完成任务
+	AirGappedPackageStatus_AIR_GAPPED_PACKAGE_STATUS_EXPIRED   AirGappedPackageStatus = 4 // 离线包或任务租约已过期
+	AirGappedPackageStatus_AIR_GAPPED_PACKAGE_STATUS_REVOKED   AirGappedPackageStatus = 5 // 离线包已人工撤销
+)
+
+// Enum value maps for AirGappedPackageStatus.
+var (
+	AirGappedPackageStatus_name = map[int32]string{
+		0: "AIR_GAPPED_PACKAGE_STATUS_UNKNOWN",
+		1: "AIR_GAPPED_PACKAGE_STATUS_PREPARING",
+		2: "AIR_GAPPED_PACKAGE_STATUS_EXPORTED",
+		3: "AIR_GAPPED_PACKAGE_STATUS_IMPORTED",
+		4: "AIR_GAPPED_PACKAGE_STATUS_EXPIRED",
+		5: "AIR_GAPPED_PACKAGE_STATUS_REVOKED",
+	}
+	AirGappedPackageStatus_value = map[string]int32{
+		"AIR_GAPPED_PACKAGE_STATUS_UNKNOWN":   0,
+		"AIR_GAPPED_PACKAGE_STATUS_PREPARING": 1,
+		"AIR_GAPPED_PACKAGE_STATUS_EXPORTED":  2,
+		"AIR_GAPPED_PACKAGE_STATUS_IMPORTED":  3,
+		"AIR_GAPPED_PACKAGE_STATUS_EXPIRED":   4,
+		"AIR_GAPPED_PACKAGE_STATUS_REVOKED":   5,
+	}
+)
+
+func (x AirGappedPackageStatus) Enum() *AirGappedPackageStatus {
+	p := new(AirGappedPackageStatus)
+	*p = x
+	return p
+}
+
+func (x AirGappedPackageStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AirGappedPackageStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[41].Descriptor()
+}
+
+func (AirGappedPackageStatus) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[41]
+}
+
+func (x AirGappedPackageStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AirGappedPackageStatus.Descriptor instead.
+func (AirGappedPackageStatus) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{41}
 }
 
 // 存储对象生命周期状态。
@@ -2346,11 +2414,11 @@ func (x StorageObjectStatus) String() string {
 }
 
 func (StorageObjectStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[41].Descriptor()
+	return file_proto_core_core_proto_enumTypes[42].Descriptor()
 }
 
 func (StorageObjectStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[41]
+	return &file_proto_core_core_proto_enumTypes[42]
 }
 
 func (x StorageObjectStatus) Number() protoreflect.EnumNumber {
@@ -2359,7 +2427,7 @@ func (x StorageObjectStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use StorageObjectStatus.Descriptor instead.
 func (StorageObjectStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{41}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{42}
 }
 
 // 品牌资源改写模式。
@@ -2396,11 +2464,11 @@ func (x BrandingRewriteMode) String() string {
 }
 
 func (BrandingRewriteMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[42].Descriptor()
+	return file_proto_core_core_proto_enumTypes[43].Descriptor()
 }
 
 func (BrandingRewriteMode) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[42]
+	return &file_proto_core_core_proto_enumTypes[43]
 }
 
 func (x BrandingRewriteMode) Number() protoreflect.EnumNumber {
@@ -2409,7 +2477,7 @@ func (x BrandingRewriteMode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use BrandingRewriteMode.Descriptor instead.
 func (BrandingRewriteMode) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{42}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{43}
 }
 
 // 品牌配置状态。
@@ -2449,11 +2517,11 @@ func (x BrandingProfileStatus) String() string {
 }
 
 func (BrandingProfileStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[43].Descriptor()
+	return file_proto_core_core_proto_enumTypes[44].Descriptor()
 }
 
 func (BrandingProfileStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[43]
+	return &file_proto_core_core_proto_enumTypes[44]
 }
 
 func (x BrandingProfileStatus) Number() protoreflect.EnumNumber {
@@ -2462,7 +2530,7 @@ func (x BrandingProfileStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use BrandingProfileStatus.Descriptor instead.
 func (BrandingProfileStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{43}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{44}
 }
 
 // 品牌兼容性预检状态。
@@ -2505,11 +2573,11 @@ func (x BrandingPreflightStatus) String() string {
 }
 
 func (BrandingPreflightStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[44].Descriptor()
+	return file_proto_core_core_proto_enumTypes[45].Descriptor()
 }
 
 func (BrandingPreflightStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[44]
+	return &file_proto_core_core_proto_enumTypes[45]
 }
 
 func (x BrandingPreflightStatus) Number() protoreflect.EnumNumber {
@@ -2518,7 +2586,7 @@ func (x BrandingPreflightStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use BrandingPreflightStatus.Descriptor instead.
 func (BrandingPreflightStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{44}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{45}
 }
 
 // V3白标模板状态。
@@ -2558,11 +2626,11 @@ func (x WhiteLabelTemplateStatus) String() string {
 }
 
 func (WhiteLabelTemplateStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[45].Descriptor()
+	return file_proto_core_core_proto_enumTypes[46].Descriptor()
 }
 
 func (WhiteLabelTemplateStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[45]
+	return &file_proto_core_core_proto_enumTypes[46]
 }
 
 func (x WhiteLabelTemplateStatus) Number() protoreflect.EnumNumber {
@@ -2571,7 +2639,7 @@ func (x WhiteLabelTemplateStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WhiteLabelTemplateStatus.Descriptor instead.
 func (WhiteLabelTemplateStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{45}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{46}
 }
 
 // V3白标模板修订状态。
@@ -2611,11 +2679,11 @@ func (x WhiteLabelRevisionStatus) String() string {
 }
 
 func (WhiteLabelRevisionStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[46].Descriptor()
+	return file_proto_core_core_proto_enumTypes[47].Descriptor()
 }
 
 func (WhiteLabelRevisionStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[46]
+	return &file_proto_core_core_proto_enumTypes[47]
 }
 
 func (x WhiteLabelRevisionStatus) Number() protoreflect.EnumNumber {
@@ -2624,7 +2692,7 @@ func (x WhiteLabelRevisionStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WhiteLabelRevisionStatus.Descriptor instead.
 func (WhiteLabelRevisionStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{46}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{47}
 }
 
 // V3白标产品状态。
@@ -2664,11 +2732,11 @@ func (x WhiteLabelProductStatus) String() string {
 }
 
 func (WhiteLabelProductStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_core_core_proto_enumTypes[47].Descriptor()
+	return file_proto_core_core_proto_enumTypes[48].Descriptor()
 }
 
 func (WhiteLabelProductStatus) Type() protoreflect.EnumType {
-	return &file_proto_core_core_proto_enumTypes[47]
+	return &file_proto_core_core_proto_enumTypes[48]
 }
 
 func (x WhiteLabelProductStatus) Number() protoreflect.EnumNumber {
@@ -2677,7 +2745,57 @@ func (x WhiteLabelProductStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WhiteLabelProductStatus.Descriptor instead.
 func (WhiteLabelProductStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{47}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{48}
+}
+
+// APK签名模式。
+type SigningMode int32
+
+const (
+	SigningMode_SIGNING_MODE_UNSPECIFIED       SigningMode = 0 // 未指定，创建接口按本地Keystore兼容处理
+	SigningMode_SIGNING_MODE_LOCAL_KEYSTORE    SigningMode = 1 // Builder读取受控Keystore并在本地签名
+	SigningMode_SIGNING_MODE_REMOTE_APK_SIGNER SigningMode = 2 // Builder通过固定mTLS协议请求客户远程签名服务
+)
+
+// Enum value maps for SigningMode.
+var (
+	SigningMode_name = map[int32]string{
+		0: "SIGNING_MODE_UNSPECIFIED",
+		1: "SIGNING_MODE_LOCAL_KEYSTORE",
+		2: "SIGNING_MODE_REMOTE_APK_SIGNER",
+	}
+	SigningMode_value = map[string]int32{
+		"SIGNING_MODE_UNSPECIFIED":       0,
+		"SIGNING_MODE_LOCAL_KEYSTORE":    1,
+		"SIGNING_MODE_REMOTE_APK_SIGNER": 2,
+	}
+)
+
+func (x SigningMode) Enum() *SigningMode {
+	p := new(SigningMode)
+	*p = x
+	return p
+}
+
+func (x SigningMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SigningMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_core_core_proto_enumTypes[49].Descriptor()
+}
+
+func (SigningMode) Type() protoreflect.EnumType {
+	return &file_proto_core_core_proto_enumTypes[49]
+}
+
+func (x SigningMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SigningMode.Descriptor instead.
+func (SigningMode) EnumDescriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{49}
 }
 
 type RespBase struct {
@@ -3152,8 +3270,9 @@ type SigningConfig struct {
 	CreateBy          int64                  `protobuf:"varint,10,opt,name=create_by,json=createBy,proto3" json:"create_by,omitempty"`
 	CreateTime        int64                  `protobuf:"varint,11,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
 	UpdateTime        int64                  `protobuf:"varint,12,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`
-	KeystoreObjectId  int64                  `protobuf:"varint,13,opt,name=keystore_object_id,json=keystoreObjectId,proto3" json:"keystore_object_id,omitempty"` // 签名文件存储对象ID
-	CertificateSha256 string                 `protobuf:"bytes,14,opt,name=certificate_sha256,json=certificateSha256,proto3" json:"certificate_sha256,omitempty"` // 签名证书SHA-256指纹
+	KeystoreObjectId  int64                  `protobuf:"varint,13,opt,name=keystore_object_id,json=keystoreObjectId,proto3" json:"keystore_object_id,omitempty"`      // 签名文件存储对象ID
+	CertificateSha256 string                 `protobuf:"bytes,14,opt,name=certificate_sha256,json=certificateSha256,proto3" json:"certificate_sha256,omitempty"`      // 签名证书SHA-256指纹
+	SigningMode       SigningMode            `protobuf:"varint,15,opt,name=signing_mode,json=signingMode,proto3,enum=core.SigningMode" json:"signing_mode,omitempty"` // 持久化签名模式
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -3284,6 +3403,13 @@ func (x *SigningConfig) GetCertificateSha256() string {
 		return x.CertificateSha256
 	}
 	return ""
+}
+
+func (x *SigningConfig) GetSigningMode() SigningMode {
+	if x != nil {
+		return x.SigningMode
+	}
+	return SigningMode_SIGNING_MODE_UNSPECIFIED
 }
 
 type BuildTask struct {
@@ -3669,19 +3795,21 @@ func (x *BuildTask) GetRetryOfTaskId() int64 {
 // 私有对象存储元数据。
 type StorageObject struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                               // 存储对象ID
-	TenantId      int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                   // 所属租户ID
-	AppId         int64                  `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                            // 关联应用ID，上传时允许为0
-	ObjectType    StorageObjectType      `protobuf:"varint,4,opt,name=object_type,json=objectType,proto3,enum=core.StorageObjectType" json:"object_type,omitempty"` // 对象类型
-	ObjectKey     string                 `protobuf:"bytes,5,opt,name=object_key,json=objectKey,proto3" json:"object_key,omitempty"`                                 // 私有对象存储Key
-	OriginalName  string                 `protobuf:"bytes,6,opt,name=original_name,json=originalName,proto3" json:"original_name,omitempty"`                        // 用户上传时的原始文件名
-	ContentType   string                 `protobuf:"bytes,7,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`                           // 对象内容类型
-	SizeBytes     int64                  `protobuf:"varint,8,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`                                // 对象大小，单位字节
-	Sha256        string                 `protobuf:"bytes,9,opt,name=sha256,proto3" json:"sha256,omitempty"`                                                        // 对象SHA-256
-	Status        StorageObjectStatus    `protobuf:"varint,10,opt,name=status,proto3,enum=core.StorageObjectStatus" json:"status,omitempty"`                        // 生命周期状态
-	CreateBy      int64                  `protobuf:"varint,11,opt,name=create_by,json=createBy,proto3" json:"create_by,omitempty"`                                  // 创建人ID
-	CreateTime    int64                  `protobuf:"varint,12,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                            // 创建时间，Unix毫秒
-	UpdateTime    int64                  `protobuf:"varint,13,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                            // 更新时间，Unix毫秒
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                    // 存储对象ID
+	TenantId      int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                        // 所属租户ID
+	AppId         int64                  `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                                 // 关联应用ID，上传时允许为0
+	ObjectType    StorageObjectType      `protobuf:"varint,4,opt,name=object_type,json=objectType,proto3,enum=core.StorageObjectType" json:"object_type,omitempty"`      // 对象类型
+	ObjectKey     string                 `protobuf:"bytes,5,opt,name=object_key,json=objectKey,proto3" json:"object_key,omitempty"`                                      // 私有对象存储Key
+	OriginalName  string                 `protobuf:"bytes,6,opt,name=original_name,json=originalName,proto3" json:"original_name,omitempty"`                             // 用户上传时的原始文件名
+	ContentType   string                 `protobuf:"bytes,7,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`                                // 对象内容类型
+	SizeBytes     int64                  `protobuf:"varint,8,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`                                     // 对象大小，单位字节
+	Sha256        string                 `protobuf:"bytes,9,opt,name=sha256,proto3" json:"sha256,omitempty"`                                                             // 对象SHA-256
+	Status        StorageObjectStatus    `protobuf:"varint,10,opt,name=status,proto3,enum=core.StorageObjectStatus" json:"status,omitempty"`                             // 生命周期状态
+	CreateBy      int64                  `protobuf:"varint,11,opt,name=create_by,json=createBy,proto3" json:"create_by,omitempty"`                                       // 创建人ID
+	CreateTime    int64                  `protobuf:"varint,12,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                                 // 创建时间，Unix毫秒
+	UpdateTime    int64                  `protobuf:"varint,13,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                                 // 更新时间，Unix毫秒
+	StorageMode   HybridArtifactMode     `protobuf:"varint,14,opt,name=storage_mode,json=storageMode,proto3,enum=core.HybridArtifactMode" json:"storage_mode,omitempty"` // 物理存储归属：控制面存储或客户存储
+	OwnerAgentId  int64                  `protobuf:"varint,15,opt,name=owner_agent_id,json=ownerAgentId,proto3" json:"owner_agent_id,omitempty"`                         // 客户存储所属Local Agent ID，控制面存储为0
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3803,6 +3931,20 @@ func (x *StorageObject) GetCreateTime() int64 {
 func (x *StorageObject) GetUpdateTime() int64 {
 	if x != nil {
 		return x.UpdateTime
+	}
+	return 0
+}
+
+func (x *StorageObject) GetStorageMode() HybridArtifactMode {
+	if x != nil {
+		return x.StorageMode
+	}
+	return HybridArtifactMode_HYBRID_ARTIFACT_MODE_UNKNOWN
+}
+
+func (x *StorageObject) GetOwnerAgentId() int64 {
+	if x != nil {
+		return x.OwnerAgentId
 	}
 	return 0
 }
@@ -14391,8 +14533,9 @@ type CreateSigningConfigReq struct {
 	KeystorePasswordCiphertext string                 `protobuf:"bytes,5,opt,name=keystore_password_ciphertext,json=keystorePasswordCiphertext,proto3" json:"keystore_password_ciphertext,omitempty"`
 	KeyPasswordCiphertext      string                 `protobuf:"bytes,6,opt,name=key_password_ciphertext,json=keyPasswordCiphertext,proto3" json:"key_password_ciphertext,omitempty"`
 	SecretRef                  string                 `protobuf:"bytes,7,opt,name=secret_ref,json=secretRef,proto3" json:"secret_ref,omitempty"`
-	KeystoreObjectId           int64                  `protobuf:"varint,8,opt,name=keystore_object_id,json=keystoreObjectId,proto3" json:"keystore_object_id,omitempty"` // 已校验的签名文件对象ID
-	CertificateSha256          string                 `protobuf:"bytes,9,opt,name=certificate_sha256,json=certificateSha256,proto3" json:"certificate_sha256,omitempty"` // Builder校验得到的签名证书SHA-256指纹
+	KeystoreObjectId           int64                  `protobuf:"varint,8,opt,name=keystore_object_id,json=keystoreObjectId,proto3" json:"keystore_object_id,omitempty"`       // 已校验的签名文件对象ID
+	CertificateSha256          string                 `protobuf:"bytes,9,opt,name=certificate_sha256,json=certificateSha256,proto3" json:"certificate_sha256,omitempty"`       // Builder校验得到的签名证书SHA-256指纹
+	SigningMode                SigningMode            `protobuf:"varint,10,opt,name=signing_mode,json=signingMode,proto3,enum=core.SigningMode" json:"signing_mode,omitempty"` // 签名模式，未指定时兼容为本地Keystore
 	unknownFields              protoimpl.UnknownFields
 	sizeCache                  protoimpl.SizeCache
 }
@@ -14488,6 +14631,13 @@ func (x *CreateSigningConfigReq) GetCertificateSha256() string {
 		return x.CertificateSha256
 	}
 	return ""
+}
+
+func (x *CreateSigningConfigReq) GetSigningMode() SigningMode {
+	if x != nil {
+		return x.SigningMode
+	}
+	return SigningMode_SIGNING_MODE_UNSPECIFIED
 }
 
 // 创建待上传对象元数据请求。
@@ -18893,6 +19043,7 @@ type BuildExecutionContext struct {
 	TemplateSnapshotJson       string                 `protobuf:"bytes,15,opt,name=template_snapshot_json,json=templateSnapshotJson,proto3" json:"template_snapshot_json,omitempty"`                  // V3模板和产品不可变构建快照JSON
 	SignerCertificateSha256    string                 `protobuf:"bytes,16,opt,name=signer_certificate_sha256,json=signerCertificateSha256,proto3" json:"signer_certificate_sha256,omitempty"`         // 构建应使用的签名证书SHA-256指纹
 	TemplateFiles              []*StorageObject       `protobuf:"bytes,17,rep,name=template_files,json=templateFiles,proto3" json:"template_files,omitempty"`                                         // V3模板修订绑定的受控私有文件
+	SigningMode                SigningMode            `protobuf:"varint,18,opt,name=signing_mode,json=signingMode,proto3,enum=core.SigningMode" json:"signing_mode,omitempty"`                        // 本次任务执行使用的签名模式
 	unknownFields              protoimpl.UnknownFields
 	sizeCache                  protoimpl.SizeCache
 }
@@ -19044,6 +19195,13 @@ func (x *BuildExecutionContext) GetTemplateFiles() []*StorageObject {
 		return x.TemplateFiles
 	}
 	return nil
+}
+
+func (x *BuildExecutionContext) GetSigningMode() SigningMode {
+	if x != nil {
+		return x.SigningMode
+	}
+	return SigningMode_SIGNING_MODE_UNSPECIFIED
 }
 
 // Builder内部执行上下文响应。
@@ -22892,12 +23050,13 @@ func (x *ClaimLocalAgentBuildTaskReq) GetLeaseSeconds() int32 {
 
 // V7 Agent任务响应，无任务时task为空。
 type LocalAgentBuildTaskResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                                                                   // 通用响应
-	Task          *BuildTask             `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`                                                                   // 已领取且经过租户、应用、能力检查的任务
-	ArtifactMode  HybridArtifactMode     `protobuf:"varint,3,opt,name=artifact_mode,json=artifactMode,proto3,enum=core.HybridArtifactMode" json:"artifact_mode,omitempty"` // 本任务Artifact模式
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Base               *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                                                                   // 通用响应
+	Task               *BuildTask             `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`                                                                   // 已领取且经过租户、应用、能力检查的任务
+	ArtifactMode       HybridArtifactMode     `protobuf:"varint,3,opt,name=artifact_mode,json=artifactMode,proto3,enum=core.HybridArtifactMode" json:"artifact_mode,omitempty"` // 本任务Artifact模式
+	CustomerStorageRef string                 `protobuf:"bytes,4,opt,name=customer_storage_ref,json=customerStorageRef,proto3" json:"customer_storage_ref,omitempty"`           // 客户侧本地Secret引用和已登记对象前缀，不包含访问凭据
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *LocalAgentBuildTaskResp) Reset() {
@@ -22951,6 +23110,114 @@ func (x *LocalAgentBuildTaskResp) GetArtifactMode() HybridArtifactMode {
 	return HybridArtifactMode_HYBRID_ARTIFACT_MODE_UNKNOWN
 }
 
+func (x *LocalAgentBuildTaskResp) GetCustomerStorageRef() string {
+	if x != nil {
+		return x.CustomerStorageRef
+	}
+	return ""
+}
+
+// V7 Agent把客户网络内对象登记为可供应用使用的输入对象请求。
+type RegisterCustomerStorageInputReq struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Auth            *LocalAgentAuth        `protobuf:"bytes,1,opt,name=auth,proto3" json:"auth,omitempty"`                                                            // mTLS认证上下文
+	AppId           int64                  `protobuf:"varint,2,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                            // 已授权应用ID
+	ObjectType      StorageObjectType      `protobuf:"varint,3,opt,name=object_type,json=objectType,proto3,enum=core.StorageObjectType" json:"object_type,omitempty"` // 输入对象类型
+	ObjectReference string                 `protobuf:"bytes,4,opt,name=object_reference,json=objectReference,proto3" json:"object_reference,omitempty"`               // 已登记前缀内的客户对象引用，不包含凭据
+	OriginalName    string                 `protobuf:"bytes,5,opt,name=original_name,json=originalName,proto3" json:"original_name,omitempty"`                        // 原始文件名
+	ContentType     string                 `protobuf:"bytes,6,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`                           // 内容类型
+	SizeBytes       int64                  `protobuf:"varint,7,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`                                // Agent重新读取后确认的字节数
+	Sha256          string                 `protobuf:"bytes,8,opt,name=sha256,proto3" json:"sha256,omitempty"`                                                        // Agent重新读取后计算的SHA-256
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *RegisterCustomerStorageInputReq) Reset() {
+	*x = RegisterCustomerStorageInputReq{}
+	mi := &file_proto_core_core_proto_msgTypes[256]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RegisterCustomerStorageInputReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegisterCustomerStorageInputReq) ProtoMessage() {}
+
+func (x *RegisterCustomerStorageInputReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[256]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegisterCustomerStorageInputReq.ProtoReflect.Descriptor instead.
+func (*RegisterCustomerStorageInputReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{256}
+}
+
+func (x *RegisterCustomerStorageInputReq) GetAuth() *LocalAgentAuth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *RegisterCustomerStorageInputReq) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *RegisterCustomerStorageInputReq) GetObjectType() StorageObjectType {
+	if x != nil {
+		return x.ObjectType
+	}
+	return StorageObjectType_STORAGE_OBJECT_TYPE_UNKNOWN
+}
+
+func (x *RegisterCustomerStorageInputReq) GetObjectReference() string {
+	if x != nil {
+		return x.ObjectReference
+	}
+	return ""
+}
+
+func (x *RegisterCustomerStorageInputReq) GetOriginalName() string {
+	if x != nil {
+		return x.OriginalName
+	}
+	return ""
+}
+
+func (x *RegisterCustomerStorageInputReq) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
+func (x *RegisterCustomerStorageInputReq) GetSizeBytes() int64 {
+	if x != nil {
+		return x.SizeBytes
+	}
+	return 0
+}
+
+func (x *RegisterCustomerStorageInputReq) GetSha256() string {
+	if x != nil {
+		return x.Sha256
+	}
+	return ""
+}
+
 // V7 Agent任务续租请求。
 type RenewLocalAgentTaskLeaseReq struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
@@ -22964,7 +23231,7 @@ type RenewLocalAgentTaskLeaseReq struct {
 
 func (x *RenewLocalAgentTaskLeaseReq) Reset() {
 	*x = RenewLocalAgentTaskLeaseReq{}
-	mi := &file_proto_core_core_proto_msgTypes[256]
+	mi := &file_proto_core_core_proto_msgTypes[257]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -22976,7 +23243,7 @@ func (x *RenewLocalAgentTaskLeaseReq) String() string {
 func (*RenewLocalAgentTaskLeaseReq) ProtoMessage() {}
 
 func (x *RenewLocalAgentTaskLeaseReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[256]
+	mi := &file_proto_core_core_proto_msgTypes[257]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -22989,7 +23256,7 @@ func (x *RenewLocalAgentTaskLeaseReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RenewLocalAgentTaskLeaseReq.ProtoReflect.Descriptor instead.
 func (*RenewLocalAgentTaskLeaseReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{256}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{257}
 }
 
 func (x *RenewLocalAgentTaskLeaseReq) GetAuth() *LocalAgentAuth {
@@ -23035,7 +23302,7 @@ type ReportLocalAgentBuildProgressReq struct {
 
 func (x *ReportLocalAgentBuildProgressReq) Reset() {
 	*x = ReportLocalAgentBuildProgressReq{}
-	mi := &file_proto_core_core_proto_msgTypes[257]
+	mi := &file_proto_core_core_proto_msgTypes[258]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -23047,7 +23314,7 @@ func (x *ReportLocalAgentBuildProgressReq) String() string {
 func (*ReportLocalAgentBuildProgressReq) ProtoMessage() {}
 
 func (x *ReportLocalAgentBuildProgressReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[257]
+	mi := &file_proto_core_core_proto_msgTypes[258]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -23060,7 +23327,7 @@ func (x *ReportLocalAgentBuildProgressReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportLocalAgentBuildProgressReq.ProtoReflect.Descriptor instead.
 func (*ReportLocalAgentBuildProgressReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{257}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{258}
 }
 
 func (x *ReportLocalAgentBuildProgressReq) GetAuth() *LocalAgentAuth {
@@ -23123,7 +23390,7 @@ type CompleteLocalAgentBuildTaskReq struct {
 
 func (x *CompleteLocalAgentBuildTaskReq) Reset() {
 	*x = CompleteLocalAgentBuildTaskReq{}
-	mi := &file_proto_core_core_proto_msgTypes[258]
+	mi := &file_proto_core_core_proto_msgTypes[259]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -23135,7 +23402,7 @@ func (x *CompleteLocalAgentBuildTaskReq) String() string {
 func (*CompleteLocalAgentBuildTaskReq) ProtoMessage() {}
 
 func (x *CompleteLocalAgentBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[258]
+	mi := &file_proto_core_core_proto_msgTypes[259]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -23148,7 +23415,7 @@ func (x *CompleteLocalAgentBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteLocalAgentBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*CompleteLocalAgentBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{258}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{259}
 }
 
 func (x *CompleteLocalAgentBuildTaskReq) GetAuth() *LocalAgentAuth {
@@ -23230,7 +23497,7 @@ type FailLocalAgentBuildTaskReq struct {
 
 func (x *FailLocalAgentBuildTaskReq) Reset() {
 	*x = FailLocalAgentBuildTaskReq{}
-	mi := &file_proto_core_core_proto_msgTypes[259]
+	mi := &file_proto_core_core_proto_msgTypes[260]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -23242,7 +23509,7 @@ func (x *FailLocalAgentBuildTaskReq) String() string {
 func (*FailLocalAgentBuildTaskReq) ProtoMessage() {}
 
 func (x *FailLocalAgentBuildTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[259]
+	mi := &file_proto_core_core_proto_msgTypes[260]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -23255,7 +23522,7 @@ func (x *FailLocalAgentBuildTaskReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FailLocalAgentBuildTaskReq.ProtoReflect.Descriptor instead.
 func (*FailLocalAgentBuildTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{259}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{260}
 }
 
 func (x *FailLocalAgentBuildTaskReq) GetAuth() *LocalAgentAuth {
@@ -23324,7 +23591,7 @@ type VerifyHybridArtifactReq struct {
 
 func (x *VerifyHybridArtifactReq) Reset() {
 	*x = VerifyHybridArtifactReq{}
-	mi := &file_proto_core_core_proto_msgTypes[260]
+	mi := &file_proto_core_core_proto_msgTypes[261]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -23336,7 +23603,7 @@ func (x *VerifyHybridArtifactReq) String() string {
 func (*VerifyHybridArtifactReq) ProtoMessage() {}
 
 func (x *VerifyHybridArtifactReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_core_core_proto_msgTypes[260]
+	mi := &file_proto_core_core_proto_msgTypes[261]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -23349,7 +23616,7 @@ func (x *VerifyHybridArtifactReq) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VerifyHybridArtifactReq.ProtoReflect.Descriptor instead.
 func (*VerifyHybridArtifactReq) Descriptor() ([]byte, []int) {
-	return file_proto_core_core_proto_rawDescGZIP(), []int{260}
+	return file_proto_core_core_proto_rawDescGZIP(), []int{261}
 }
 
 func (x *VerifyHybridArtifactReq) GetAuth() *LocalAgentAuth {
@@ -23404,6 +23671,840 @@ func (x *VerifyHybridArtifactReq) GetSha256() string {
 func (x *VerifyHybridArtifactReq) GetSizeBytes() int64 {
 	if x != nil {
 		return x.SizeBytes
+	}
+	return 0
+}
+
+// V7 AIR_GAPPED离线任务包状态记录。
+type AirGappedPackage struct {
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	Id                     int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                        // 离线包记录ID
+	TenantId               int64                  `protobuf:"varint,2,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                            // 所属租户ID
+	AppId                  int64                  `protobuf:"varint,3,opt,name=app_id,json=appId,proto3" json:"app_id,omitempty"`                                                     // 关联应用ID
+	PackageCode            string                 `protobuf:"bytes,4,opt,name=package_code,json=packageCode,proto3" json:"package_code,omitempty"`                                    // 离线包全局唯一编码
+	AgentId                int64                  `protobuf:"varint,5,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`                                               // 目标Local Agent ID
+	TaskId                 int64                  `protobuf:"varint,6,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                                                  // 构建任务ID
+	BuilderAttempt         int32                  `protobuf:"varint,7,opt,name=builder_attempt,json=builderAttempt,proto3" json:"builder_attempt,omitempty"`                          // 构建任务fencing尝试次数
+	AgentCertificateSerial string                 `protobuf:"bytes,8,opt,name=agent_certificate_serial,json=agentCertificateSerial,proto3" json:"agent_certificate_serial,omitempty"` // 导出时绑定的Agent客户端证书序列号
+	Status                 AirGappedPackageStatus `protobuf:"varint,9,opt,name=status,proto3,enum=core.AirGappedPackageStatus" json:"status,omitempty"`                               // 离线包生命周期状态
+	ExportObjectId         int64                  `protobuf:"varint,10,opt,name=export_object_id,json=exportObjectId,proto3" json:"export_object_id,omitempty"`                       // 控制面离线任务ZIP对象ID
+	ExportSha256           string                 `protobuf:"bytes,11,opt,name=export_sha256,json=exportSha256,proto3" json:"export_sha256,omitempty"`                                // 离线任务ZIP内容SHA-256
+	ExportSizeBytes        int64                  `protobuf:"varint,12,opt,name=export_size_bytes,json=exportSizeBytes,proto3" json:"export_size_bytes,omitempty"`                    // 离线任务ZIP大小字节数
+	ResultObjectId         int64                  `protobuf:"varint,13,opt,name=result_object_id,json=resultObjectId,proto3" json:"result_object_id,omitempty"`                       // Agent离线结果ZIP对象ID
+	ResultSha256           string                 `protobuf:"bytes,14,opt,name=result_sha256,json=resultSha256,proto3" json:"result_sha256,omitempty"`                                // 离线结果ZIP内容SHA-256
+	ResultSizeBytes        int64                  `protobuf:"varint,15,opt,name=result_size_bytes,json=resultSizeBytes,proto3" json:"result_size_bytes,omitempty"`                    // 离线结果ZIP大小字节数
+	IssuedAt               int64                  `protobuf:"varint,16,opt,name=issued_at,json=issuedAt,proto3" json:"issued_at,omitempty"`                                           // 任务包签发时间，Unix毫秒
+	ExpiresAt              int64                  `protobuf:"varint,17,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`                                        // 任务包过期时间，Unix毫秒
+	ImportedAt             int64                  `protobuf:"varint,18,opt,name=imported_at,json=importedAt,proto3" json:"imported_at,omitempty"`                                     // 结果包导入时间，Unix毫秒
+	CreateTime             int64                  `protobuf:"varint,19,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`                                     // 创建时间，Unix毫秒
+	UpdateTime             int64                  `protobuf:"varint,20,opt,name=update_time,json=updateTime,proto3" json:"update_time,omitempty"`                                     // 更新时间，Unix毫秒
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *AirGappedPackage) Reset() {
+	*x = AirGappedPackage{}
+	mi := &file_proto_core_core_proto_msgTypes[262]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AirGappedPackage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AirGappedPackage) ProtoMessage() {}
+
+func (x *AirGappedPackage) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[262]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AirGappedPackage.ProtoReflect.Descriptor instead.
+func (*AirGappedPackage) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{262}
+}
+
+func (x *AirGappedPackage) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetAppId() int64 {
+	if x != nil {
+		return x.AppId
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetPackageCode() string {
+	if x != nil {
+		return x.PackageCode
+	}
+	return ""
+}
+
+func (x *AirGappedPackage) GetAgentId() int64 {
+	if x != nil {
+		return x.AgentId
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetBuilderAttempt() int32 {
+	if x != nil {
+		return x.BuilderAttempt
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetAgentCertificateSerial() string {
+	if x != nil {
+		return x.AgentCertificateSerial
+	}
+	return ""
+}
+
+func (x *AirGappedPackage) GetStatus() AirGappedPackageStatus {
+	if x != nil {
+		return x.Status
+	}
+	return AirGappedPackageStatus_AIR_GAPPED_PACKAGE_STATUS_UNKNOWN
+}
+
+func (x *AirGappedPackage) GetExportObjectId() int64 {
+	if x != nil {
+		return x.ExportObjectId
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetExportSha256() string {
+	if x != nil {
+		return x.ExportSha256
+	}
+	return ""
+}
+
+func (x *AirGappedPackage) GetExportSizeBytes() int64 {
+	if x != nil {
+		return x.ExportSizeBytes
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetResultObjectId() int64 {
+	if x != nil {
+		return x.ResultObjectId
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetResultSha256() string {
+	if x != nil {
+		return x.ResultSha256
+	}
+	return ""
+}
+
+func (x *AirGappedPackage) GetResultSizeBytes() int64 {
+	if x != nil {
+		return x.ResultSizeBytes
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetIssuedAt() int64 {
+	if x != nil {
+		return x.IssuedAt
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetImportedAt() int64 {
+	if x != nil {
+		return x.ImportedAt
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *AirGappedPackage) GetUpdateTime() int64 {
+	if x != nil {
+		return x.UpdateTime
+	}
+	return 0
+}
+
+// V7 管理端准备AIR_GAPPED任务包请求。
+type PrepareAirGappedExportReq struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	TenantId       int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                   // 目标租户ID，0表示当前租户
+	AgentId        int64                  `protobuf:"varint,2,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`                      // 目标AIR_GAPPED Local Agent ID
+	TaskId         int64                  `protobuf:"varint,3,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`                         // 待离线构建任务ID
+	ExpiresSeconds int64                  `protobuf:"varint,4,opt,name=expires_seconds,json=expiresSeconds,proto3" json:"expires_seconds,omitempty"` // 离线任务包有效秒数
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *PrepareAirGappedExportReq) Reset() {
+	*x = PrepareAirGappedExportReq{}
+	mi := &file_proto_core_core_proto_msgTypes[263]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PrepareAirGappedExportReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PrepareAirGappedExportReq) ProtoMessage() {}
+
+func (x *PrepareAirGappedExportReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[263]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PrepareAirGappedExportReq.ProtoReflect.Descriptor instead.
+func (*PrepareAirGappedExportReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{263}
+}
+
+func (x *PrepareAirGappedExportReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *PrepareAirGappedExportReq) GetAgentId() int64 {
+	if x != nil {
+		return x.AgentId
+	}
+	return 0
+}
+
+func (x *PrepareAirGappedExportReq) GetTaskId() int64 {
+	if x != nil {
+		return x.TaskId
+	}
+	return 0
+}
+
+func (x *PrepareAirGappedExportReq) GetExpiresSeconds() int64 {
+	if x != nil {
+		return x.ExpiresSeconds
+	}
+	return 0
+}
+
+// V7 AIR_GAPPED任务包准备响应，Nonce仅返回给可信API一次。
+type PrepareAirGappedExportResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`           // 通用响应
+	Package       *AirGappedPackage      `protobuf:"bytes,2,opt,name=package,proto3" json:"package,omitempty"`     // 已锁定的离线包状态
+	Execution     *BuildExecutionContext `protobuf:"bytes,3,opt,name=execution,proto3" json:"execution,omitempty"` // 生成任务包所需的内部执行上下文
+	Nonce         string                 `protobuf:"bytes,4,opt,name=nonce,proto3" json:"nonce,omitempty"`         // 防重放随机Nonce明文
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PrepareAirGappedExportResp) Reset() {
+	*x = PrepareAirGappedExportResp{}
+	mi := &file_proto_core_core_proto_msgTypes[264]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PrepareAirGappedExportResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PrepareAirGappedExportResp) ProtoMessage() {}
+
+func (x *PrepareAirGappedExportResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[264]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PrepareAirGappedExportResp.ProtoReflect.Descriptor instead.
+func (*PrepareAirGappedExportResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{264}
+}
+
+func (x *PrepareAirGappedExportResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *PrepareAirGappedExportResp) GetPackage() *AirGappedPackage {
+	if x != nil {
+		return x.Package
+	}
+	return nil
+}
+
+func (x *PrepareAirGappedExportResp) GetExecution() *BuildExecutionContext {
+	if x != nil {
+		return x.Execution
+	}
+	return nil
+}
+
+func (x *PrepareAirGappedExportResp) GetNonce() string {
+	if x != nil {
+		return x.Nonce
+	}
+	return ""
+}
+
+// V7 请求控制面CA签署规范化任务Manifest。
+type SignAirGappedManifestReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`            // 目标租户ID，0表示当前租户
+	PackageCode   string                 `protobuf:"bytes,2,opt,name=package_code,json=packageCode,proto3" json:"package_code,omitempty"`    // 离线包编码
+	ManifestJson  string                 `protobuf:"bytes,3,opt,name=manifest_json,json=manifestJson,proto3" json:"manifest_json,omitempty"` // 严格规范化任务Manifest JSON
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SignAirGappedManifestReq) Reset() {
+	*x = SignAirGappedManifestReq{}
+	mi := &file_proto_core_core_proto_msgTypes[265]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SignAirGappedManifestReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SignAirGappedManifestReq) ProtoMessage() {}
+
+func (x *SignAirGappedManifestReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[265]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SignAirGappedManifestReq.ProtoReflect.Descriptor instead.
+func (*SignAirGappedManifestReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{265}
+}
+
+func (x *SignAirGappedManifestReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *SignAirGappedManifestReq) GetPackageCode() string {
+	if x != nil {
+		return x.PackageCode
+	}
+	return ""
+}
+
+func (x *SignAirGappedManifestReq) GetManifestJson() string {
+	if x != nil {
+		return x.ManifestJson
+	}
+	return ""
+}
+
+// V7 控制面任务Manifest签名响应。
+type SignAirGappedManifestResp struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Base                 *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`                                                               // 通用响应
+	Algorithm            string                 `protobuf:"bytes,2,opt,name=algorithm,proto3" json:"algorithm,omitempty"`                                                     // 签名算法，固定为ECDSA_P256_SHA256
+	SignatureBase64      string                 `protobuf:"bytes,3,opt,name=signature_base64,json=signatureBase64,proto3" json:"signature_base64,omitempty"`                  // ASN.1 DER ECDSA签名Base64
+	SignerCertificatePem string                 `protobuf:"bytes,4,opt,name=signer_certificate_pem,json=signerCertificatePem,proto3" json:"signer_certificate_pem,omitempty"` // 控制面Agent CA公开证书PEM
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *SignAirGappedManifestResp) Reset() {
+	*x = SignAirGappedManifestResp{}
+	mi := &file_proto_core_core_proto_msgTypes[266]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SignAirGappedManifestResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SignAirGappedManifestResp) ProtoMessage() {}
+
+func (x *SignAirGappedManifestResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[266]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SignAirGappedManifestResp.ProtoReflect.Descriptor instead.
+func (*SignAirGappedManifestResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{266}
+}
+
+func (x *SignAirGappedManifestResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *SignAirGappedManifestResp) GetAlgorithm() string {
+	if x != nil {
+		return x.Algorithm
+	}
+	return ""
+}
+
+func (x *SignAirGappedManifestResp) GetSignatureBase64() string {
+	if x != nil {
+		return x.SignatureBase64
+	}
+	return ""
+}
+
+func (x *SignAirGappedManifestResp) GetSignerCertificatePem() string {
+	if x != nil {
+		return x.SignerCertificatePem
+	}
+	return ""
+}
+
+// V7 完成AIR_GAPPED任务包导出请求。
+type FinalizeAirGappedExportReq struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	TenantId        int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                        // 目标租户ID，0表示当前租户
+	PackageCode     string                 `protobuf:"bytes,2,opt,name=package_code,json=packageCode,proto3" json:"package_code,omitempty"`                // 离线包编码
+	ExportObjectId  int64                  `protobuf:"varint,3,opt,name=export_object_id,json=exportObjectId,proto3" json:"export_object_id,omitempty"`    // 已上传并复验的任务ZIP对象ID
+	ExportSha256    string                 `protobuf:"bytes,4,opt,name=export_sha256,json=exportSha256,proto3" json:"export_sha256,omitempty"`             // 任务ZIP内容SHA-256
+	ExportSizeBytes int64                  `protobuf:"varint,5,opt,name=export_size_bytes,json=exportSizeBytes,proto3" json:"export_size_bytes,omitempty"` // 任务ZIP大小字节数
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *FinalizeAirGappedExportReq) Reset() {
+	*x = FinalizeAirGappedExportReq{}
+	mi := &file_proto_core_core_proto_msgTypes[267]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FinalizeAirGappedExportReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FinalizeAirGappedExportReq) ProtoMessage() {}
+
+func (x *FinalizeAirGappedExportReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[267]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FinalizeAirGappedExportReq.ProtoReflect.Descriptor instead.
+func (*FinalizeAirGappedExportReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{267}
+}
+
+func (x *FinalizeAirGappedExportReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *FinalizeAirGappedExportReq) GetPackageCode() string {
+	if x != nil {
+		return x.PackageCode
+	}
+	return ""
+}
+
+func (x *FinalizeAirGappedExportReq) GetExportObjectId() int64 {
+	if x != nil {
+		return x.ExportObjectId
+	}
+	return 0
+}
+
+func (x *FinalizeAirGappedExportReq) GetExportSha256() string {
+	if x != nil {
+		return x.ExportSha256
+	}
+	return ""
+}
+
+func (x *FinalizeAirGappedExportReq) GetExportSizeBytes() int64 {
+	if x != nil {
+		return x.ExportSizeBytes
+	}
+	return 0
+}
+
+// V7 撤销尚未导入的AIR_GAPPED包并结束当前任务attempt。
+type AbortAirGappedExportReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`         // 目标租户ID，0表示当前租户
+	PackageCode   string                 `protobuf:"bytes,2,opt,name=package_code,json=packageCode,proto3" json:"package_code,omitempty"` // 离线包编码
+	Reason        string                 `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`                              // 脱敏撤销原因
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AbortAirGappedExportReq) Reset() {
+	*x = AbortAirGappedExportReq{}
+	mi := &file_proto_core_core_proto_msgTypes[268]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AbortAirGappedExportReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AbortAirGappedExportReq) ProtoMessage() {}
+
+func (x *AbortAirGappedExportReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[268]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AbortAirGappedExportReq.ProtoReflect.Descriptor instead.
+func (*AbortAirGappedExportReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{268}
+}
+
+func (x *AbortAirGappedExportReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *AbortAirGappedExportReq) GetPackageCode() string {
+	if x != nil {
+		return x.PackageCode
+	}
+	return ""
+}
+
+func (x *AbortAirGappedExportReq) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+// V7 AIR_GAPPED离线包查询请求。
+type AirGappedPackageReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`         // 目标租户ID，0表示当前租户
+	PackageCode   string                 `protobuf:"bytes,2,opt,name=package_code,json=packageCode,proto3" json:"package_code,omitempty"` // 离线包编码
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AirGappedPackageReq) Reset() {
+	*x = AirGappedPackageReq{}
+	mi := &file_proto_core_core_proto_msgTypes[269]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AirGappedPackageReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AirGappedPackageReq) ProtoMessage() {}
+
+func (x *AirGappedPackageReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[269]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AirGappedPackageReq.ProtoReflect.Descriptor instead.
+func (*AirGappedPackageReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{269}
+}
+
+func (x *AirGappedPackageReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *AirGappedPackageReq) GetPackageCode() string {
+	if x != nil {
+		return x.PackageCode
+	}
+	return ""
+}
+
+// V7 AIR_GAPPED离线包响应。
+type AirGappedPackageResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Base          *common.RespBase       `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"` // 通用响应
+	Data          *AirGappedPackage      `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"` // 离线包状态
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AirGappedPackageResp) Reset() {
+	*x = AirGappedPackageResp{}
+	mi := &file_proto_core_core_proto_msgTypes[270]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AirGappedPackageResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AirGappedPackageResp) ProtoMessage() {}
+
+func (x *AirGappedPackageResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[270]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AirGappedPackageResp.ProtoReflect.Descriptor instead.
+func (*AirGappedPackageResp) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{270}
+}
+
+func (x *AirGappedPackageResp) GetBase() *common.RespBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *AirGappedPackageResp) GetData() *AirGappedPackage {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+// V7 导入并校验AIR_GAPPED结果包请求。
+type ImportAirGappedResultReq struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	TenantId            int64                  `protobuf:"varint,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                   // 目标租户ID，0表示当前租户
+	PackageCode         string                 `protobuf:"bytes,2,opt,name=package_code,json=packageCode,proto3" json:"package_code,omitempty"`                           // 离线包编码
+	ResultObjectId      int64                  `protobuf:"varint,3,opt,name=result_object_id,json=resultObjectId,proto3" json:"result_object_id,omitempty"`               // 已上传并复验的结果ZIP对象ID
+	ResultSha256        string                 `protobuf:"bytes,4,opt,name=result_sha256,json=resultSha256,proto3" json:"result_sha256,omitempty"`                        // 结果ZIP内容SHA-256
+	ResultSizeBytes     int64                  `protobuf:"varint,5,opt,name=result_size_bytes,json=resultSizeBytes,proto3" json:"result_size_bytes,omitempty"`            // 结果ZIP大小字节数
+	ResultManifestJson  string                 `protobuf:"bytes,6,opt,name=result_manifest_json,json=resultManifestJson,proto3" json:"result_manifest_json,omitempty"`    // 严格规范化结果Manifest JSON
+	AgentCertificatePem string                 `protobuf:"bytes,7,opt,name=agent_certificate_pem,json=agentCertificatePem,proto3" json:"agent_certificate_pem,omitempty"` // Agent公开客户端证书PEM
+	SignatureAlgorithm  string                 `protobuf:"bytes,8,opt,name=signature_algorithm,json=signatureAlgorithm,proto3" json:"signature_algorithm,omitempty"`      // Agent签名算法
+	SignatureBase64     string                 `protobuf:"bytes,9,opt,name=signature_base64,json=signatureBase64,proto3" json:"signature_base64,omitempty"`               // Agent结果Manifest签名Base64
+	ApkObjectId         int64                  `protobuf:"varint,10,opt,name=apk_object_id,json=apkObjectId,proto3" json:"apk_object_id,omitempty"`                       // 已提取、上传并复验的构建APK对象ID，失败时为0
+	LogObjectId         int64                  `protobuf:"varint,11,opt,name=log_object_id,json=logObjectId,proto3" json:"log_object_id,omitempty"`                       // 已提取、上传并复验的日志对象ID，可为0
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *ImportAirGappedResultReq) Reset() {
+	*x = ImportAirGappedResultReq{}
+	mi := &file_proto_core_core_proto_msgTypes[271]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImportAirGappedResultReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImportAirGappedResultReq) ProtoMessage() {}
+
+func (x *ImportAirGappedResultReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_core_core_proto_msgTypes[271]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImportAirGappedResultReq.ProtoReflect.Descriptor instead.
+func (*ImportAirGappedResultReq) Descriptor() ([]byte, []int) {
+	return file_proto_core_core_proto_rawDescGZIP(), []int{271}
+}
+
+func (x *ImportAirGappedResultReq) GetTenantId() int64 {
+	if x != nil {
+		return x.TenantId
+	}
+	return 0
+}
+
+func (x *ImportAirGappedResultReq) GetPackageCode() string {
+	if x != nil {
+		return x.PackageCode
+	}
+	return ""
+}
+
+func (x *ImportAirGappedResultReq) GetResultObjectId() int64 {
+	if x != nil {
+		return x.ResultObjectId
+	}
+	return 0
+}
+
+func (x *ImportAirGappedResultReq) GetResultSha256() string {
+	if x != nil {
+		return x.ResultSha256
+	}
+	return ""
+}
+
+func (x *ImportAirGappedResultReq) GetResultSizeBytes() int64 {
+	if x != nil {
+		return x.ResultSizeBytes
+	}
+	return 0
+}
+
+func (x *ImportAirGappedResultReq) GetResultManifestJson() string {
+	if x != nil {
+		return x.ResultManifestJson
+	}
+	return ""
+}
+
+func (x *ImportAirGappedResultReq) GetAgentCertificatePem() string {
+	if x != nil {
+		return x.AgentCertificatePem
+	}
+	return ""
+}
+
+func (x *ImportAirGappedResultReq) GetSignatureAlgorithm() string {
+	if x != nil {
+		return x.SignatureAlgorithm
+	}
+	return ""
+}
+
+func (x *ImportAirGappedResultReq) GetSignatureBase64() string {
+	if x != nil {
+		return x.SignatureBase64
+	}
+	return ""
+}
+
+func (x *ImportAirGappedResultReq) GetApkObjectId() int64 {
+	if x != nil {
+		return x.ApkObjectId
+	}
+	return 0
+}
+
+func (x *ImportAirGappedResultReq) GetLogObjectId() int64 {
+	if x != nil {
+		return x.LogObjectId
 	}
 	return 0
 }
@@ -23465,7 +24566,7 @@ const file_proto_core_core_proto_rawDesc = "" +
 	" \x01(\x03R\n" +
 	"createTime\x12\x1f\n" +
 	"\vupdate_time\x18\v \x01(\x03R\n" +
-	"updateTime\"\xd1\x03\n" +
+	"updateTime\"\x87\x04\n" +
 	"\rSigningConfig\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
 	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
@@ -23484,7 +24585,8 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\vupdate_time\x18\f \x01(\x03R\n" +
 	"updateTime\x12,\n" +
 	"\x12keystore_object_id\x18\r \x01(\x03R\x10keystoreObjectId\x12-\n" +
-	"\x12certificate_sha256\x18\x0e \x01(\tR\x11certificateSha256\"\x96\f\n" +
+	"\x12certificate_sha256\x18\x0e \x01(\tR\x11certificateSha256\x124\n" +
+	"\fsigning_mode\x18\x0f \x01(\x0e2\x11.core.SigningModeR\vsigningMode\"\x96\f\n" +
 	"\tBuildTask\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
 	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
@@ -23537,7 +24639,7 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x13cancel_requested_at\x18( \x01(\x03R\x11cancelRequestedAt\x12!\n" +
 	"\fcancelled_at\x18) \x01(\x03R\vcancelledAt\x12#\n" +
 	"\rcancel_reason\x18* \x01(\tR\fcancelReason\x12'\n" +
-	"\x10retry_of_task_id\x18+ \x01(\x03R\rretryOfTaskId\"\xbd\x03\n" +
+	"\x10retry_of_task_id\x18+ \x01(\x03R\rretryOfTaskId\"\xa0\x04\n" +
 	"\rStorageObject\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
 	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
@@ -23557,7 +24659,9 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\vcreate_time\x18\f \x01(\x03R\n" +
 	"createTime\x12\x1f\n" +
 	"\vupdate_time\x18\r \x01(\x03R\n" +
-	"updateTime\"\x84\x05\n" +
+	"updateTime\x12;\n" +
+	"\fstorage_mode\x18\x0e \x01(\x0e2\x18.core.HybridArtifactModeR\vstorageMode\x12$\n" +
+	"\x0eowner_agent_id\x18\x0f \x01(\x03R\fownerAgentId\"\x84\x05\n" +
 	"\x0fBrandingProfile\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
 	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
@@ -24495,7 +25599,7 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"landingUrl\x12!\n" +
 	"\fdownload_url\x18\x05 \x01(\tR\vdownloadUrl\"$\n" +
 	"\x12SigningConfigIdReq\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\x86\x03\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"\xbc\x03\n" +
 	"\x16CreateSigningConfigReq\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\x03R\x05appId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12.\n" +
@@ -24506,7 +25610,9 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\n" +
 	"secret_ref\x18\a \x01(\tR\tsecretRef\x12,\n" +
 	"\x12keystore_object_id\x18\b \x01(\x03R\x10keystoreObjectId\x12-\n" +
-	"\x12certificate_sha256\x18\t \x01(\tR\x11certificateSha256\"\xef\x01\n" +
+	"\x12certificate_sha256\x18\t \x01(\tR\x11certificateSha256\x124\n" +
+	"\fsigning_mode\x18\n" +
+	" \x01(\x0e2\x11.core.SigningModeR\vsigningMode\"\xef\x01\n" +
 	"\x16CreateStorageObjectReq\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\x03R\x05appId\x128\n" +
 	"\vobject_type\x18\x02 \x01(\x0e2\x17.core.StorageObjectTypeR\n" +
@@ -24888,7 +25994,7 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1d\n" +
 	"\n" +
 	"builder_id\x18\x02 \x01(\tR\tbuilderId\x12'\n" +
-	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\"\xa9\x06\n" +
+	"\x0fbuilder_attempt\x18\x03 \x01(\x05R\x0ebuilderAttempt\"\xdf\x06\n" +
 	"\x15BuildExecutionContext\x12#\n" +
 	"\x04task\x18\x01 \x01(\v2\x0f.core.BuildTaskR\x04task\x12!\n" +
 	"\fpackage_name\x18\x02 \x01(\tR\vpackageName\x12\x19\n" +
@@ -24911,7 +26017,8 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\fbrand_splash\x18\x0e \x01(\v2\x13.core.StorageObjectR\vbrandSplash\x124\n" +
 	"\x16template_snapshot_json\x18\x0f \x01(\tR\x14templateSnapshotJson\x12:\n" +
 	"\x19signer_certificate_sha256\x18\x10 \x01(\tR\x17signerCertificateSha256\x12:\n" +
-	"\x0etemplate_files\x18\x11 \x03(\v2\x13.core.StorageObjectR\rtemplateFiles\"r\n" +
+	"\x0etemplate_files\x18\x11 \x03(\v2\x13.core.StorageObjectR\rtemplateFiles\x124\n" +
+	"\fsigning_mode\x18\x12 \x01(\x0e2\x11.core.SigningModeR\vsigningMode\"r\n" +
 	"\x19BuildExecutionContextResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12/\n" +
 	"\x04data\x18\x02 \x01(\v2\x1b.core.BuildExecutionContextR\x04data\"\xf9\x05\n" +
@@ -25280,11 +26387,23 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\acsr_pem\x18\x02 \x01(\tR\x06csrPem\"l\n" +
 	"\x1bClaimLocalAgentBuildTaskReq\x12(\n" +
 	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12#\n" +
-	"\rlease_seconds\x18\x02 \x01(\x05R\fleaseSeconds\"\xa3\x01\n" +
+	"\rlease_seconds\x18\x02 \x01(\x05R\fleaseSeconds\"\xd5\x01\n" +
 	"\x17LocalAgentBuildTaskResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12#\n" +
 	"\x04task\x18\x02 \x01(\v2\x0f.core.BuildTaskR\x04task\x12=\n" +
-	"\rartifact_mode\x18\x03 \x01(\x0e2\x18.core.HybridArtifactModeR\fartifactMode\"\xae\x01\n" +
+	"\rartifact_mode\x18\x03 \x01(\x0e2\x18.core.HybridArtifactModeR\fartifactMode\x120\n" +
+	"\x14customer_storage_ref\x18\x04 \x01(\tR\x12customerStorageRef\"\xc6\x02\n" +
+	"\x1fRegisterCustomerStorageInputReq\x12(\n" +
+	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12\x15\n" +
+	"\x06app_id\x18\x02 \x01(\x03R\x05appId\x128\n" +
+	"\vobject_type\x18\x03 \x01(\x0e2\x17.core.StorageObjectTypeR\n" +
+	"objectType\x12)\n" +
+	"\x10object_reference\x18\x04 \x01(\tR\x0fobjectReference\x12#\n" +
+	"\roriginal_name\x18\x05 \x01(\tR\foriginalName\x12!\n" +
+	"\fcontent_type\x18\x06 \x01(\tR\vcontentType\x12\x1d\n" +
+	"\n" +
+	"size_bytes\x18\a \x01(\x03R\tsizeBytes\x12\x16\n" +
+	"\x06sha256\x18\b \x01(\tR\x06sha256\"\xae\x01\n" +
 	"\x1bRenewLocalAgentTaskLeaseReq\x12(\n" +
 	"\x04auth\x18\x01 \x01(\v2\x14.core.LocalAgentAuthR\x04auth\x12\x17\n" +
 	"\atask_id\x18\x02 \x01(\x03R\x06taskId\x12'\n" +
@@ -25327,7 +26446,81 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x10object_reference\x18\x06 \x01(\tR\x0fobjectReference\x12\x16\n" +
 	"\x06sha256\x18\a \x01(\tR\x06sha256\x12\x1d\n" +
 	"\n" +
-	"size_bytes\x18\b \x01(\x03R\tsizeBytes*t\n" +
+	"size_bytes\x18\b \x01(\x03R\tsizeBytes\"\xdb\x05\n" +
+	"\x10AirGappedPackage\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\ttenant_id\x18\x02 \x01(\x03R\btenantId\x12\x15\n" +
+	"\x06app_id\x18\x03 \x01(\x03R\x05appId\x12!\n" +
+	"\fpackage_code\x18\x04 \x01(\tR\vpackageCode\x12\x19\n" +
+	"\bagent_id\x18\x05 \x01(\x03R\aagentId\x12\x17\n" +
+	"\atask_id\x18\x06 \x01(\x03R\x06taskId\x12'\n" +
+	"\x0fbuilder_attempt\x18\a \x01(\x05R\x0ebuilderAttempt\x128\n" +
+	"\x18agent_certificate_serial\x18\b \x01(\tR\x16agentCertificateSerial\x124\n" +
+	"\x06status\x18\t \x01(\x0e2\x1c.core.AirGappedPackageStatusR\x06status\x12(\n" +
+	"\x10export_object_id\x18\n" +
+	" \x01(\x03R\x0eexportObjectId\x12#\n" +
+	"\rexport_sha256\x18\v \x01(\tR\fexportSha256\x12*\n" +
+	"\x11export_size_bytes\x18\f \x01(\x03R\x0fexportSizeBytes\x12(\n" +
+	"\x10result_object_id\x18\r \x01(\x03R\x0eresultObjectId\x12#\n" +
+	"\rresult_sha256\x18\x0e \x01(\tR\fresultSha256\x12*\n" +
+	"\x11result_size_bytes\x18\x0f \x01(\x03R\x0fresultSizeBytes\x12\x1b\n" +
+	"\tissued_at\x18\x10 \x01(\x03R\bissuedAt\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x11 \x01(\x03R\texpiresAt\x12\x1f\n" +
+	"\vimported_at\x18\x12 \x01(\x03R\n" +
+	"importedAt\x12\x1f\n" +
+	"\vcreate_time\x18\x13 \x01(\x03R\n" +
+	"createTime\x12\x1f\n" +
+	"\vupdate_time\x18\x14 \x01(\x03R\n" +
+	"updateTime\"\x95\x01\n" +
+	"\x19PrepareAirGappedExportReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12\x19\n" +
+	"\bagent_id\x18\x02 \x01(\x03R\aagentId\x12\x17\n" +
+	"\atask_id\x18\x03 \x01(\x03R\x06taskId\x12'\n" +
+	"\x0fexpires_seconds\x18\x04 \x01(\x03R\x0eexpiresSeconds\"\xc5\x01\n" +
+	"\x1aPrepareAirGappedExportResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x120\n" +
+	"\apackage\x18\x02 \x01(\v2\x16.core.AirGappedPackageR\apackage\x129\n" +
+	"\texecution\x18\x03 \x01(\v2\x1b.core.BuildExecutionContextR\texecution\x12\x14\n" +
+	"\x05nonce\x18\x04 \x01(\tR\x05nonce\"\x7f\n" +
+	"\x18SignAirGappedManifestReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12!\n" +
+	"\fpackage_code\x18\x02 \x01(\tR\vpackageCode\x12#\n" +
+	"\rmanifest_json\x18\x03 \x01(\tR\fmanifestJson\"\xc0\x01\n" +
+	"\x19SignAirGappedManifestResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12\x1c\n" +
+	"\talgorithm\x18\x02 \x01(\tR\talgorithm\x12)\n" +
+	"\x10signature_base64\x18\x03 \x01(\tR\x0fsignatureBase64\x124\n" +
+	"\x16signer_certificate_pem\x18\x04 \x01(\tR\x14signerCertificatePem\"\xd7\x01\n" +
+	"\x1aFinalizeAirGappedExportReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12!\n" +
+	"\fpackage_code\x18\x02 \x01(\tR\vpackageCode\x12(\n" +
+	"\x10export_object_id\x18\x03 \x01(\x03R\x0eexportObjectId\x12#\n" +
+	"\rexport_sha256\x18\x04 \x01(\tR\fexportSha256\x12*\n" +
+	"\x11export_size_bytes\x18\x05 \x01(\x03R\x0fexportSizeBytes\"q\n" +
+	"\x17AbortAirGappedExportReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12!\n" +
+	"\fpackage_code\x18\x02 \x01(\tR\vpackageCode\x12\x16\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\"U\n" +
+	"\x13AirGappedPackageReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12!\n" +
+	"\fpackage_code\x18\x02 \x01(\tR\vpackageCode\"h\n" +
+	"\x14AirGappedPackageResp\x12$\n" +
+	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x12*\n" +
+	"\x04data\x18\x02 \x01(\v2\x16.core.AirGappedPackageR\x04data\"\xdf\x03\n" +
+	"\x18ImportAirGappedResultReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\x03R\btenantId\x12!\n" +
+	"\fpackage_code\x18\x02 \x01(\tR\vpackageCode\x12(\n" +
+	"\x10result_object_id\x18\x03 \x01(\x03R\x0eresultObjectId\x12#\n" +
+	"\rresult_sha256\x18\x04 \x01(\tR\fresultSha256\x12*\n" +
+	"\x11result_size_bytes\x18\x05 \x01(\x03R\x0fresultSizeBytes\x120\n" +
+	"\x14result_manifest_json\x18\x06 \x01(\tR\x12resultManifestJson\x122\n" +
+	"\x15agent_certificate_pem\x18\a \x01(\tR\x13agentCertificatePem\x12/\n" +
+	"\x13signature_algorithm\x18\b \x01(\tR\x12signatureAlgorithm\x12)\n" +
+	"\x10signature_base64\x18\t \x01(\tR\x0fsignatureBase64\x12\"\n" +
+	"\rapk_object_id\x18\n" +
+	" \x01(\x03R\vapkObjectId\x12\"\n" +
+	"\rlog_object_id\x18\v \x01(\x03R\vlogObjectId*t\n" +
 	"\x11ApplicationStatus\x12\x1e\n" +
 	"\x1aAPPLICATION_STATUS_UNKNOWN\x10\x00\x12\x1e\n" +
 	"\x1aAPPLICATION_STATUS_ENABLED\x10\x01\x12\x1f\n" +
@@ -25349,7 +26542,7 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x1bBUILD_TASK_STATUS_UPLOADING\x10\x04\x12\x1d\n" +
 	"\x19BUILD_TASK_STATUS_SUCCESS\x10\x05\x12\x1c\n" +
 	"\x18BUILD_TASK_STATUS_FAILED\x10\x06\x12\x1f\n" +
-	"\x1bBUILD_TASK_STATUS_CANCELLED\x10\a*\xd6\x02\n" +
+	"\x1bBUILD_TASK_STATUS_CANCELLED\x10\a*\xb4\x03\n" +
 	"\x11StorageObjectType\x12\x1f\n" +
 	"\x1bSTORAGE_OBJECT_TYPE_UNKNOWN\x10\x00\x12\"\n" +
 	"\x1eSTORAGE_OBJECT_TYPE_SOURCE_APK\x10\x01\x12 \n" +
@@ -25359,7 +26552,10 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x1eSTORAGE_OBJECT_TYPE_BRAND_LOGO\x10\x05\x12$\n" +
 	" STORAGE_OBJECT_TYPE_BRAND_SPLASH\x10\x06\x12%\n" +
 	"!STORAGE_OBJECT_TYPE_TEMPLATE_FILE\x10\a\x12#\n" +
-	"\x1fSTORAGE_OBJECT_TYPE_BUILD_CACHE\x10\b*\x97\x01\n" +
+	"\x1fSTORAGE_OBJECT_TYPE_BUILD_CACHE\x10\b\x12,\n" +
+	"(STORAGE_OBJECT_TYPE_OFFLINE_TASK_PACKAGE\x10\t\x12.\n" +
+	"*STORAGE_OBJECT_TYPE_OFFLINE_RESULT_PACKAGE\x10\n" +
+	"*\x97\x01\n" +
 	"\x11BuilderNodeStatus\x12\x1f\n" +
 	"\x1bBUILDER_NODE_STATUS_UNKNOWN\x10\x00\x12\x1e\n" +
 	"\x1aBUILDER_NODE_STATUS_ONLINE\x10\x01\x12\x1f\n" +
@@ -25564,13 +26760,21 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"%LOCAL_AGENT_CERTIFICATE_STATUS_ACTIVE\x10\x01\x12*\n" +
 	"&LOCAL_AGENT_CERTIFICATE_STATUS_ROTATED\x10\x02\x12*\n" +
 	"&LOCAL_AGENT_CERTIFICATE_STATUS_REVOKED\x10\x03\x12*\n" +
-	"&LOCAL_AGENT_CERTIFICATE_STATUS_EXPIRED\x10\x04*\xd2\x01\n" +
+	"&LOCAL_AGENT_CERTIFICATE_STATUS_EXPIRED\x10\x04*\x83\x02\n" +
 	"\x12HybridArtifactType\x12 \n" +
 	"\x1cHYBRID_ARTIFACT_TYPE_UNKNOWN\x10\x00\x12#\n" +
 	"\x1fHYBRID_ARTIFACT_TYPE_SOURCE_APK\x10\x01\x12\"\n" +
 	"\x1eHYBRID_ARTIFACT_TYPE_BUILT_APK\x10\x02\x12\"\n" +
 	"\x1eHYBRID_ARTIFACT_TYPE_BUILD_LOG\x10\x03\x12-\n" +
-	")HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE\x10\x04*\xe4\x01\n" +
+	")HYBRID_ARTIFACT_TYPE_OFFLINE_TASK_PACKAGE\x10\x04\x12/\n" +
+	"+HYBRID_ARTIFACT_TYPE_OFFLINE_RESULT_PACKAGE\x10\x05*\x86\x02\n" +
+	"\x16AirGappedPackageStatus\x12%\n" +
+	"!AIR_GAPPED_PACKAGE_STATUS_UNKNOWN\x10\x00\x12'\n" +
+	"#AIR_GAPPED_PACKAGE_STATUS_PREPARING\x10\x01\x12&\n" +
+	"\"AIR_GAPPED_PACKAGE_STATUS_EXPORTED\x10\x02\x12&\n" +
+	"\"AIR_GAPPED_PACKAGE_STATUS_IMPORTED\x10\x03\x12%\n" +
+	"!AIR_GAPPED_PACKAGE_STATUS_EXPIRED\x10\x04\x12%\n" +
+	"!AIR_GAPPED_PACKAGE_STATUS_REVOKED\x10\x05*\xe4\x01\n" +
 	"\x13StorageObjectStatus\x12!\n" +
 	"\x1dSTORAGE_OBJECT_STATUS_UNKNOWN\x10\x00\x12#\n" +
 	"\x1fSTORAGE_OBJECT_STATUS_UPLOADING\x10\x01\x12\x1f\n" +
@@ -25607,7 +26811,11 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\"WHITE_LABEL_PRODUCT_STATUS_UNKNOWN\x10\x00\x12$\n" +
 	" WHITE_LABEL_PRODUCT_STATUS_DRAFT\x10\x01\x12&\n" +
 	"\"WHITE_LABEL_PRODUCT_STATUS_ENABLED\x10\x02\x12'\n" +
-	"#WHITE_LABEL_PRODUCT_STATUS_DISABLED\x10\x032\xdf]\n" +
+	"#WHITE_LABEL_PRODUCT_STATUS_DISABLED\x10\x03*p\n" +
+	"\vSigningMode\x12\x1c\n" +
+	"\x18SIGNING_MODE_UNSPECIFIED\x10\x00\x12\x1f\n" +
+	"\x1bSIGNING_MODE_LOCAL_KEYSTORE\x10\x01\x12\"\n" +
+	"\x1eSIGNING_MODE_REMOTE_APK_SIGNER\x10\x022\xc5b\n" +
 	"\x04Core\x12F\n" +
 	"\x11CreateApplication\x12\x1a.core.CreateApplicationReq\x1a\x15.core.ApplicationResp\x12?\n" +
 	"\x0eGetApplication\x12\x16.core.ApplicationIdReq\x1a\x15.core.ApplicationResp\x12G\n" +
@@ -25735,12 +26943,19 @@ const file_proto_core_core_proto_rawDesc = "" +
 	"\x0fDrainLocalAgent\x12\x18.core.DrainLocalAgentReq\x1a\x14.core.LocalAgentResp\x12C\n" +
 	"\x10RevokeLocalAgent\x12\x19.core.RevokeLocalAgentReq\x1a\x14.core.LocalAgentResp\x12a\n" +
 	"\x1bRotateLocalAgentCertificate\x12$.core.RotateLocalAgentCertificateReq\x1a\x1c.core.RegisterLocalAgentResp\x12\\\n" +
-	"\x18ClaimLocalAgentBuildTask\x12!.core.ClaimLocalAgentBuildTaskReq\x1a\x1d.core.LocalAgentBuildTaskResp\x12M\n" +
+	"\x18ClaimLocalAgentBuildTask\x12!.core.ClaimLocalAgentBuildTaskReq\x1a\x1d.core.LocalAgentBuildTaskResp\x12^\n" +
+	"\x1cRegisterCustomerStorageInput\x12%.core.RegisterCustomerStorageInputReq\x1a\x17.core.StorageObjectResp\x12M\n" +
 	"\x18RenewLocalAgentTaskLease\x12!.core.RenewLocalAgentTaskLeaseReq\x1a\x0e.core.RespBase\x12W\n" +
 	"\x1dReportLocalAgentBuildProgress\x12&.core.ReportLocalAgentBuildProgressReq\x1a\x0e.core.RespBase\x12S\n" +
 	"\x1bCompleteLocalAgentBuildTask\x12$.core.CompleteLocalAgentBuildTaskReq\x1a\x0e.core.RespBase\x12K\n" +
 	"\x17FailLocalAgentBuildTask\x12 .core.FailLocalAgentBuildTaskReq\x1a\x0e.core.RespBase\x12E\n" +
-	"\x14VerifyHybridArtifact\x12\x1d.core.VerifyHybridArtifactReq\x1a\x0e.core.RespBase\x127\n" +
+	"\x14VerifyHybridArtifact\x12\x1d.core.VerifyHybridArtifactReq\x1a\x0e.core.RespBase\x12[\n" +
+	"\x16PrepareAirGappedExport\x12\x1f.core.PrepareAirGappedExportReq\x1a .core.PrepareAirGappedExportResp\x12X\n" +
+	"\x15SignAirGappedManifest\x12\x1e.core.SignAirGappedManifestReq\x1a\x1f.core.SignAirGappedManifestResp\x12W\n" +
+	"\x17FinalizeAirGappedExport\x12 .core.FinalizeAirGappedExportReq\x1a\x1a.core.AirGappedPackageResp\x12Q\n" +
+	"\x14AbortAirGappedExport\x12\x1d.core.AbortAirGappedExportReq\x1a\x1a.core.AirGappedPackageResp\x12L\n" +
+	"\x13GetAirGappedPackage\x12\x19.core.AirGappedPackageReq\x1a\x1a.core.AirGappedPackageResp\x12S\n" +
+	"\x15ImportAirGappedResult\x12\x1e.core.ImportAirGappedResultReq\x1a\x1a.core.AirGappedPackageResp\x127\n" +
 	"\rReportInstall\x12\x16.core.InstallReportReq\x1a\x0e.core.RespBase\x12A\n" +
 	"\x12ReportChannelEvent\x12\x1b.core.ReportChannelEventReq\x1a\x0e.core.RespBase\x12@\n" +
 	"\x0fGetChannelStats\x12\x15.core.ChannelStatsReq\x1a\x16.core.ChannelStatsResp\x12\\\n" +
@@ -25770,8 +26985,8 @@ func file_proto_core_core_proto_rawDescGZIP() []byte {
 	return file_proto_core_core_proto_rawDescData
 }
 
-var file_proto_core_core_proto_enumTypes = make([]protoimpl.EnumInfo, 48)
-var file_proto_core_core_proto_msgTypes = make([]protoimpl.MessageInfo, 261)
+var file_proto_core_core_proto_enumTypes = make([]protoimpl.EnumInfo, 50)
+var file_proto_core_core_proto_msgTypes = make([]protoimpl.MessageInfo, 272)
 var file_proto_core_core_proto_goTypes = []any{
 	(ApplicationStatus)(0),                        // 0: core.ApplicationStatus
 	(VersionStatus)(0),                            // 1: core.VersionStatus
@@ -25814,883 +27029,923 @@ var file_proto_core_core_proto_goTypes = []any{
 	(HybridArtifactMode)(0),                       // 38: core.HybridArtifactMode
 	(LocalAgentCertificateStatus)(0),              // 39: core.LocalAgentCertificateStatus
 	(HybridArtifactType)(0),                       // 40: core.HybridArtifactType
-	(StorageObjectStatus)(0),                      // 41: core.StorageObjectStatus
-	(BrandingRewriteMode)(0),                      // 42: core.BrandingRewriteMode
-	(BrandingProfileStatus)(0),                    // 43: core.BrandingProfileStatus
-	(BrandingPreflightStatus)(0),                  // 44: core.BrandingPreflightStatus
-	(WhiteLabelTemplateStatus)(0),                 // 45: core.WhiteLabelTemplateStatus
-	(WhiteLabelRevisionStatus)(0),                 // 46: core.WhiteLabelRevisionStatus
-	(WhiteLabelProductStatus)(0),                  // 47: core.WhiteLabelProductStatus
-	(*RespBase)(nil),                              // 48: core.RespBase
-	(*Application)(nil),                           // 49: core.Application
-	(*Version)(nil),                               // 50: core.Version
-	(*Channel)(nil),                               // 51: core.Channel
-	(*SigningConfig)(nil),                         // 52: core.SigningConfig
-	(*BuildTask)(nil),                             // 53: core.BuildTask
-	(*StorageObject)(nil),                         // 54: core.StorageObject
-	(*BrandingProfile)(nil),                       // 55: core.BrandingProfile
-	(*BrandingPreflight)(nil),                     // 56: core.BrandingPreflight
-	(*WhiteLabelTemplate)(nil),                    // 57: core.WhiteLabelTemplate
-	(*WhiteLabelTemplateRevision)(nil),            // 58: core.WhiteLabelTemplateRevision
-	(*WhiteLabelProduct)(nil),                     // 59: core.WhiteLabelProduct
-	(*BuilderNode)(nil),                           // 60: core.BuilderNode
-	(*BuildConcurrencyPolicy)(nil),                // 61: core.BuildConcurrencyPolicy
-	(*BuildCacheEntry)(nil),                       // 62: core.BuildCacheEntry
-	(*BuildSchedulerEvent)(nil),                   // 63: core.BuildSchedulerEvent
-	(*BuildClusterMetrics)(nil),                   // 64: core.BuildClusterMetrics
-	(*OpenApiCredential)(nil),                     // 65: core.OpenApiCredential
-	(*OpenApiCredentialSecret)(nil),               // 66: core.OpenApiCredentialSecret
-	(*OpenApiAuthContext)(nil),                    // 67: core.OpenApiAuthContext
-	(*ApplicationIdReq)(nil),                      // 68: core.ApplicationIdReq
-	(*VersionIdReq)(nil),                          // 69: core.VersionIdReq
-	(*ChannelIdReq)(nil),                          // 70: core.ChannelIdReq
-	(*BuildTaskIdReq)(nil),                        // 71: core.BuildTaskIdReq
-	(*BrandingProfileIdReq)(nil),                  // 72: core.BrandingProfileIdReq
-	(*BrandingPreflightIdReq)(nil),                // 73: core.BrandingPreflightIdReq
-	(*WhiteLabelTemplateIdReq)(nil),               // 74: core.WhiteLabelTemplateIdReq
-	(*WhiteLabelTemplateRevisionIdReq)(nil),       // 75: core.WhiteLabelTemplateRevisionIdReq
-	(*WhiteLabelProductIdReq)(nil),                // 76: core.WhiteLabelProductIdReq
-	(*ApplicationResp)(nil),                       // 77: core.ApplicationResp
-	(*VersionResp)(nil),                           // 78: core.VersionResp
-	(*ChannelResp)(nil),                           // 79: core.ChannelResp
-	(*SigningConfigResp)(nil),                     // 80: core.SigningConfigResp
-	(*SigningConfigListReq)(nil),                  // 81: core.SigningConfigListReq
-	(*SigningConfigListResp)(nil),                 // 82: core.SigningConfigListResp
-	(*BuildTaskResp)(nil),                         // 83: core.BuildTaskResp
-	(*BuilderNodeResp)(nil),                       // 84: core.BuilderNodeResp
-	(*BuilderNodeListReq)(nil),                    // 85: core.BuilderNodeListReq
-	(*BuilderNodeListResp)(nil),                   // 86: core.BuilderNodeListResp
-	(*BuildConcurrencyPolicyResp)(nil),            // 87: core.BuildConcurrencyPolicyResp
-	(*BuildConcurrencyPolicyListReq)(nil),         // 88: core.BuildConcurrencyPolicyListReq
-	(*BuildConcurrencyPolicyListResp)(nil),        // 89: core.BuildConcurrencyPolicyListResp
-	(*BuildCacheEntryResp)(nil),                   // 90: core.BuildCacheEntryResp
-	(*BuildCacheEntryListReq)(nil),                // 91: core.BuildCacheEntryListReq
-	(*BuildCacheEntryListResp)(nil),               // 92: core.BuildCacheEntryListResp
-	(*BuildSchedulerEventListReq)(nil),            // 93: core.BuildSchedulerEventListReq
-	(*BuildSchedulerEventListResp)(nil),           // 94: core.BuildSchedulerEventListResp
-	(*BuildClusterMetricsReq)(nil),                // 95: core.BuildClusterMetricsReq
-	(*BuildClusterMetricsResp)(nil),               // 96: core.BuildClusterMetricsResp
-	(*OpenApiCredentialListReq)(nil),              // 97: core.OpenApiCredentialListReq
-	(*OpenApiCredentialListResp)(nil),             // 98: core.OpenApiCredentialListResp
-	(*OpenApiCredentialResp)(nil),                 // 99: core.OpenApiCredentialResp
-	(*OpenApiCredentialSecretResp)(nil),           // 100: core.OpenApiCredentialSecretResp
-	(*CreateOpenApiCredentialReq)(nil),            // 101: core.CreateOpenApiCredentialReq
-	(*OpenApiCredentialIdReq)(nil),                // 102: core.OpenApiCredentialIdReq
-	(*RotateOpenApiCredentialReq)(nil),            // 103: core.RotateOpenApiCredentialReq
-	(*AuthenticateOpenApiCredentialReq)(nil),      // 104: core.AuthenticateOpenApiCredentialReq
-	(*OpenApiAuthContextResp)(nil),                // 105: core.OpenApiAuthContextResp
-	(*BeginOpenApiIdempotencyReq)(nil),            // 106: core.BeginOpenApiIdempotencyReq
-	(*OpenApiIdempotencyResult)(nil),              // 107: core.OpenApiIdempotencyResult
-	(*OpenApiIdempotencyResp)(nil),                // 108: core.OpenApiIdempotencyResp
-	(*CompleteOpenApiIdempotencyReq)(nil),         // 109: core.CompleteOpenApiIdempotencyReq
-	(*RecordOpenApiAuditReq)(nil),                 // 110: core.RecordOpenApiAuditReq
-	(*WebhookEndpoint)(nil),                       // 111: core.WebhookEndpoint
-	(*WebhookEndpointSecret)(nil),                 // 112: core.WebhookEndpointSecret
-	(*WebhookDelivery)(nil),                       // 113: core.WebhookDelivery
-	(*CreateWebhookEndpointReq)(nil),              // 114: core.CreateWebhookEndpointReq
-	(*UpdateWebhookEndpointReq)(nil),              // 115: core.UpdateWebhookEndpointReq
-	(*WebhookEndpointIdReq)(nil),                  // 116: core.WebhookEndpointIdReq
-	(*WebhookEndpointListReq)(nil),                // 117: core.WebhookEndpointListReq
-	(*WebhookEndpointResp)(nil),                   // 118: core.WebhookEndpointResp
-	(*WebhookEndpointListResp)(nil),               // 119: core.WebhookEndpointListResp
-	(*WebhookEndpointSecretResp)(nil),             // 120: core.WebhookEndpointSecretResp
-	(*WebhookDeliveryListReq)(nil),                // 121: core.WebhookDeliveryListReq
-	(*WebhookDeliveryListResp)(nil),               // 122: core.WebhookDeliveryListResp
-	(*WebhookDeliveryResp)(nil),                   // 123: core.WebhookDeliveryResp
-	(*WebhookDeliveryIdReq)(nil),                  // 124: core.WebhookDeliveryIdReq
-	(*CreateTestWebhookEventReq)(nil),             // 125: core.CreateTestWebhookEventReq
-	(*SourceIntegration)(nil),                     // 126: core.SourceIntegration
-	(*CompleteSourceIntegrationReq)(nil),          // 127: core.CompleteSourceIntegrationReq
-	(*SourceIntegrationIdReq)(nil),                // 128: core.SourceIntegrationIdReq
-	(*SourceIntegrationListReq)(nil),              // 129: core.SourceIntegrationListReq
-	(*SourceIntegrationResp)(nil),                 // 130: core.SourceIntegrationResp
-	(*SourceIntegrationListResp)(nil),             // 131: core.SourceIntegrationListResp
-	(*SourceIntegrationCredential)(nil),           // 132: core.SourceIntegrationCredential
-	(*SourceIntegrationCredentialResp)(nil),       // 133: core.SourceIntegrationCredentialResp
-	(*SourceRepository)(nil),                      // 134: core.SourceRepository
-	(*AuthorizeSourceRepositoryReq)(nil),          // 135: core.AuthorizeSourceRepositoryReq
-	(*SourceRepositoryIdReq)(nil),                 // 136: core.SourceRepositoryIdReq
-	(*SourceRepositoryListReq)(nil),               // 137: core.SourceRepositoryListReq
-	(*SourceRepositoryResp)(nil),                  // 138: core.SourceRepositoryResp
-	(*SourceRepositoryListResp)(nil),              // 139: core.SourceRepositoryListResp
-	(*SourceArtifact)(nil),                        // 140: core.SourceArtifact
-	(*RecordSourceArtifactReq)(nil),               // 141: core.RecordSourceArtifactReq
-	(*SourceArtifactResp)(nil),                    // 142: core.SourceArtifactResp
-	(*ImportSourceArtifactReq)(nil),               // 143: core.ImportSourceArtifactReq
-	(*SourceArtifactImportResult)(nil),            // 144: core.SourceArtifactImportResult
-	(*SourceArtifactImportResp)(nil),              // 145: core.SourceArtifactImportResp
-	(*SourceBuildTrigger)(nil),                    // 146: core.SourceBuildTrigger
-	(*CreateSourceBuildTriggerReq)(nil),           // 147: core.CreateSourceBuildTriggerReq
-	(*UpdateSourceBuildTriggerReq)(nil),           // 148: core.UpdateSourceBuildTriggerReq
-	(*SourceBuildTriggerIdReq)(nil),               // 149: core.SourceBuildTriggerIdReq
-	(*SourceBuildTriggerListReq)(nil),             // 150: core.SourceBuildTriggerListReq
-	(*SourceBuildTriggerResp)(nil),                // 151: core.SourceBuildTriggerResp
-	(*SourceBuildTriggerListResp)(nil),            // 152: core.SourceBuildTriggerListResp
-	(*SourceBuildTriggerSecret)(nil),              // 153: core.SourceBuildTriggerSecret
-	(*SourceBuildTriggerSecretResp)(nil),          // 154: core.SourceBuildTriggerSecretResp
-	(*ResolveSourceBuildTriggerReq)(nil),          // 155: core.ResolveSourceBuildTriggerReq
-	(*SourceBuildTriggerCredential)(nil),          // 156: core.SourceBuildTriggerCredential
-	(*SourceBuildTriggerCredentialResp)(nil),      // 157: core.SourceBuildTriggerCredentialResp
-	(*SourceWebhookEvent)(nil),                    // 158: core.SourceWebhookEvent
-	(*EnqueueSourceWebhookEventReq)(nil),          // 159: core.EnqueueSourceWebhookEventReq
-	(*EnqueueSourceWebhookEventResult)(nil),       // 160: core.EnqueueSourceWebhookEventResult
-	(*EnqueueSourceWebhookEventResp)(nil),         // 161: core.EnqueueSourceWebhookEventResp
-	(*ClaimSourceWebhookEventReq)(nil),            // 162: core.ClaimSourceWebhookEventReq
-	(*ClaimedSourceWebhookEvent)(nil),             // 163: core.ClaimedSourceWebhookEvent
-	(*ClaimSourceWebhookEventResp)(nil),           // 164: core.ClaimSourceWebhookEventResp
-	(*CompleteSourceWebhookEventReq)(nil),         // 165: core.CompleteSourceWebhookEventReq
-	(*FailSourceWebhookEventReq)(nil),             // 166: core.FailSourceWebhookEventReq
-	(*SourceWebhookEventListReq)(nil),             // 167: core.SourceWebhookEventListReq
-	(*SourceWebhookEventListResp)(nil),            // 168: core.SourceWebhookEventListResp
-	(*BrandingProfileResp)(nil),                   // 169: core.BrandingProfileResp
-	(*BrandingProfileListReq)(nil),                // 170: core.BrandingProfileListReq
-	(*BrandingProfileListResp)(nil),               // 171: core.BrandingProfileListResp
-	(*BrandingPreflightResp)(nil),                 // 172: core.BrandingPreflightResp
-	(*BrandingPreflightListReq)(nil),              // 173: core.BrandingPreflightListReq
-	(*BrandingPreflightListResp)(nil),             // 174: core.BrandingPreflightListResp
-	(*WhiteLabelTemplateResp)(nil),                // 175: core.WhiteLabelTemplateResp
-	(*WhiteLabelTemplateListReq)(nil),             // 176: core.WhiteLabelTemplateListReq
-	(*WhiteLabelTemplateListResp)(nil),            // 177: core.WhiteLabelTemplateListResp
-	(*WhiteLabelTemplateRevisionResp)(nil),        // 178: core.WhiteLabelTemplateRevisionResp
-	(*WhiteLabelTemplateRevisionListReq)(nil),     // 179: core.WhiteLabelTemplateRevisionListReq
-	(*WhiteLabelTemplateRevisionListResp)(nil),    // 180: core.WhiteLabelTemplateRevisionListResp
-	(*WhiteLabelProductResp)(nil),                 // 181: core.WhiteLabelProductResp
-	(*WhiteLabelProductListReq)(nil),              // 182: core.WhiteLabelProductListReq
-	(*WhiteLabelProductListResp)(nil),             // 183: core.WhiteLabelProductListResp
-	(*WhiteLabelProductPreflightResp)(nil),        // 184: core.WhiteLabelProductPreflightResp
-	(*ApplicationListReq)(nil),                    // 185: core.ApplicationListReq
-	(*ApplicationListResp)(nil),                   // 186: core.ApplicationListResp
-	(*VersionListReq)(nil),                        // 187: core.VersionListReq
-	(*VersionListResp)(nil),                       // 188: core.VersionListResp
-	(*ChannelListReq)(nil),                        // 189: core.ChannelListReq
-	(*ChannelListResp)(nil),                       // 190: core.ChannelListResp
-	(*BuildTaskListReq)(nil),                      // 191: core.BuildTaskListReq
-	(*BuildTaskListResp)(nil),                     // 192: core.BuildTaskListResp
-	(*CreateApplicationReq)(nil),                  // 193: core.CreateApplicationReq
-	(*CreateVersionReq)(nil),                      // 194: core.CreateVersionReq
-	(*CreateChannelReq)(nil),                      // 195: core.CreateChannelReq
-	(*SigningConfigIdReq)(nil),                    // 196: core.SigningConfigIdReq
-	(*CreateSigningConfigReq)(nil),                // 197: core.CreateSigningConfigReq
-	(*CreateStorageObjectReq)(nil),                // 198: core.CreateStorageObjectReq
-	(*CompleteStorageObjectReq)(nil),              // 199: core.CompleteStorageObjectReq
-	(*FailStorageObjectReq)(nil),                  // 200: core.FailStorageObjectReq
-	(*ExpiredStorageObject)(nil),                  // 201: core.ExpiredStorageObject
-	(*ClaimExpiredStorageObjectsReq)(nil),         // 202: core.ClaimExpiredStorageObjectsReq
-	(*ClaimExpiredStorageObjectsResp)(nil),        // 203: core.ClaimExpiredStorageObjectsResp
-	(*MarkStorageObjectDeletedReq)(nil),           // 204: core.MarkStorageObjectDeletedReq
-	(*StorageObjectIdReq)(nil),                    // 205: core.StorageObjectIdReq
-	(*StorageObjectResp)(nil),                     // 206: core.StorageObjectResp
-	(*CreateBuildTaskReq)(nil),                    // 207: core.CreateBuildTaskReq
-	(*BuilderNodeIdReq)(nil),                      // 208: core.BuilderNodeIdReq
-	(*RegisterBuilderNodeReq)(nil),                // 209: core.RegisterBuilderNodeReq
-	(*BuilderNodeHeartbeatReq)(nil),               // 210: core.BuilderNodeHeartbeatReq
-	(*DrainBuilderNodeReq)(nil),                   // 211: core.DrainBuilderNodeReq
-	(*RecoverBuilderNodeReq)(nil),                 // 212: core.RecoverBuilderNodeReq
-	(*ClaimScheduledBuildTaskReq)(nil),            // 213: core.ClaimScheduledBuildTaskReq
-	(*CancelBuildTaskReq)(nil),                    // 214: core.CancelBuildTaskReq
-	(*RetryBuildTaskReq)(nil),                     // 215: core.RetryBuildTaskReq
-	(*UpsertBuildConcurrencyPolicyReq)(nil),       // 216: core.UpsertBuildConcurrencyPolicyReq
-	(*BuildCacheEntryIdReq)(nil),                  // 217: core.BuildCacheEntryIdReq
-	(*ResolveBuildCacheReq)(nil),                  // 218: core.ResolveBuildCacheReq
-	(*BuildCacheResolution)(nil),                  // 219: core.BuildCacheResolution
-	(*BuildCacheResolutionResp)(nil),              // 220: core.BuildCacheResolutionResp
-	(*PublishBuildCacheReq)(nil),                  // 221: core.PublishBuildCacheReq
-	(*InvalidateBuildCacheReq)(nil),               // 222: core.InvalidateBuildCacheReq
-	(*CleanupBuildCacheReq)(nil),                  // 223: core.CleanupBuildCacheReq
-	(*CleanupBuildCacheResult)(nil),               // 224: core.CleanupBuildCacheResult
-	(*CleanupBuildCacheResp)(nil),                 // 225: core.CleanupBuildCacheResp
-	(*CreateWhiteLabelTemplateReq)(nil),           // 226: core.CreateWhiteLabelTemplateReq
-	(*UpdateWhiteLabelTemplateReq)(nil),           // 227: core.UpdateWhiteLabelTemplateReq
-	(*CopyWhiteLabelTemplateReq)(nil),             // 228: core.CopyWhiteLabelTemplateReq
-	(*CreateWhiteLabelTemplateRevisionReq)(nil),   // 229: core.CreateWhiteLabelTemplateRevisionReq
-	(*UpdateWhiteLabelTemplateRevisionReq)(nil),   // 230: core.UpdateWhiteLabelTemplateRevisionReq
-	(*PublishWhiteLabelTemplateReq)(nil),          // 231: core.PublishWhiteLabelTemplateReq
-	(*CreateWhiteLabelProductReq)(nil),            // 232: core.CreateWhiteLabelProductReq
-	(*UpdateWhiteLabelProductReq)(nil),            // 233: core.UpdateWhiteLabelProductReq
-	(*ChangeWhiteLabelTemplateStatusReq)(nil),     // 234: core.ChangeWhiteLabelTemplateStatusReq
-	(*ChangeWhiteLabelProductStatusReq)(nil),      // 235: core.ChangeWhiteLabelProductStatusReq
-	(*CreateBrandingProfileReq)(nil),              // 236: core.CreateBrandingProfileReq
-	(*UpdateBrandingProfileReq)(nil),              // 237: core.UpdateBrandingProfileReq
-	(*ChangeBrandingProfileStatusReq)(nil),        // 238: core.ChangeBrandingProfileStatusReq
-	(*CreateBrandingPreflightReq)(nil),            // 239: core.CreateBrandingPreflightReq
-	(*CompleteBrandingPreflightReq)(nil),          // 240: core.CompleteBrandingPreflightReq
-	(*ClaimBrandingPreflightReq)(nil),             // 241: core.ClaimBrandingPreflightReq
-	(*BrandingPreflightExecutionContext)(nil),     // 242: core.BrandingPreflightExecutionContext
-	(*BrandingPreflightExecutionContextResp)(nil), // 243: core.BrandingPreflightExecutionContextResp
-	(*InstallReportReq)(nil),                      // 244: core.InstallReportReq
-	(*ChannelStatsReq)(nil),                       // 245: core.ChannelStatsReq
-	(*ChannelStats)(nil),                          // 246: core.ChannelStats
-	(*ChannelStatsResp)(nil),                      // 247: core.ChannelStatsResp
-	(*ReportChannelEventReq)(nil),                 // 248: core.ReportChannelEventReq
-	(*ResolveChannelDownloadReq)(nil),             // 249: core.ResolveChannelDownloadReq
-	(*ChannelDownloadArtifact)(nil),               // 250: core.ChannelDownloadArtifact
-	(*ChannelDownloadArtifactResp)(nil),           // 251: core.ChannelDownloadArtifactResp
-	(*ClaimBuildTaskReq)(nil),                     // 252: core.ClaimBuildTaskReq
-	(*HeartbeatBuildTaskReq)(nil),                 // 253: core.HeartbeatBuildTaskReq
-	(*ReportBuildProgressReq)(nil),                // 254: core.ReportBuildProgressReq
-	(*CompleteBuildTaskReq)(nil),                  // 255: core.CompleteBuildTaskReq
-	(*FailBuildTaskReq)(nil),                      // 256: core.FailBuildTaskReq
-	(*GetBuildExecutionContextReq)(nil),           // 257: core.GetBuildExecutionContextReq
-	(*BuildExecutionContext)(nil),                 // 258: core.BuildExecutionContext
-	(*BuildExecutionContextResp)(nil),             // 259: core.BuildExecutionContextResp
-	(*BillingPlan)(nil),                           // 260: core.BillingPlan
-	(*CreateBillingPlanReq)(nil),                  // 261: core.CreateBillingPlanReq
-	(*BillingPlanIdReq)(nil),                      // 262: core.BillingPlanIdReq
-	(*BillingPlanListReq)(nil),                    // 263: core.BillingPlanListReq
-	(*BillingPlanResp)(nil),                       // 264: core.BillingPlanResp
-	(*BillingPlanListResp)(nil),                   // 265: core.BillingPlanListResp
-	(*TenantSubscription)(nil),                    // 266: core.TenantSubscription
-	(*TenantEntitlement)(nil),                     // 267: core.TenantEntitlement
-	(*TenantBillingReq)(nil),                      // 268: core.TenantBillingReq
-	(*TenantBillingResp)(nil),                     // 269: core.TenantBillingResp
-	(*UpsertManualSubscriptionReq)(nil),           // 270: core.UpsertManualSubscriptionReq
-	(*ChangeTenantSubscriptionReq)(nil),           // 271: core.ChangeTenantSubscriptionReq
-	(*CancelTenantSubscriptionReq)(nil),           // 272: core.CancelTenantSubscriptionReq
-	(*ReserveQuotaReq)(nil),                       // 273: core.ReserveQuotaReq
-	(*QuotaReservation)(nil),                      // 274: core.QuotaReservation
-	(*QuotaReservationResp)(nil),                  // 275: core.QuotaReservationResp
-	(*QuotaReservationActionReq)(nil),             // 276: core.QuotaReservationActionReq
-	(*RecordUsageReq)(nil),                        // 277: core.RecordUsageReq
-	(*UsageMetricSummary)(nil),                    // 278: core.UsageMetricSummary
-	(*BillingUsageReq)(nil),                       // 279: core.BillingUsageReq
-	(*BillingUsageResp)(nil),                      // 280: core.BillingUsageResp
-	(*InvoiceItem)(nil),                           // 281: core.InvoiceItem
-	(*Invoice)(nil),                               // 282: core.Invoice
-	(*InvoiceListReq)(nil),                        // 283: core.InvoiceListReq
-	(*InvoiceListResp)(nil),                       // 284: core.InvoiceListResp
-	(*ApplyBillingWebhookReq)(nil),                // 285: core.ApplyBillingWebhookReq
-	(*LocalAgentCapability)(nil),                  // 286: core.LocalAgentCapability
-	(*LocalAgentCertificate)(nil),                 // 287: core.LocalAgentCertificate
-	(*LocalAgent)(nil),                            // 288: core.LocalAgent
-	(*CreateLocalAgentRegistrationReq)(nil),       // 289: core.CreateLocalAgentRegistrationReq
-	(*LocalAgentRegistrationResp)(nil),            // 290: core.LocalAgentRegistrationResp
-	(*RegisterLocalAgentReq)(nil),                 // 291: core.RegisterLocalAgentReq
-	(*RegisterLocalAgentResp)(nil),                // 292: core.RegisterLocalAgentResp
-	(*LocalAgentIdReq)(nil),                       // 293: core.LocalAgentIdReq
-	(*LocalAgentResp)(nil),                        // 294: core.LocalAgentResp
-	(*LocalAgentListReq)(nil),                     // 295: core.LocalAgentListReq
-	(*LocalAgentListResp)(nil),                    // 296: core.LocalAgentListResp
-	(*LocalAgentAuth)(nil),                        // 297: core.LocalAgentAuth
-	(*HeartbeatLocalAgentReq)(nil),                // 298: core.HeartbeatLocalAgentReq
-	(*DrainLocalAgentReq)(nil),                    // 299: core.DrainLocalAgentReq
-	(*RevokeLocalAgentReq)(nil),                   // 300: core.RevokeLocalAgentReq
-	(*RotateLocalAgentCertificateReq)(nil),        // 301: core.RotateLocalAgentCertificateReq
-	(*ClaimLocalAgentBuildTaskReq)(nil),           // 302: core.ClaimLocalAgentBuildTaskReq
-	(*LocalAgentBuildTaskResp)(nil),               // 303: core.LocalAgentBuildTaskResp
-	(*RenewLocalAgentTaskLeaseReq)(nil),           // 304: core.RenewLocalAgentTaskLeaseReq
-	(*ReportLocalAgentBuildProgressReq)(nil),      // 305: core.ReportLocalAgentBuildProgressReq
-	(*CompleteLocalAgentBuildTaskReq)(nil),        // 306: core.CompleteLocalAgentBuildTaskReq
-	(*FailLocalAgentBuildTaskReq)(nil),            // 307: core.FailLocalAgentBuildTaskReq
-	(*VerifyHybridArtifactReq)(nil),               // 308: core.VerifyHybridArtifactReq
-	(*common.RespBase)(nil),                       // 309: common.RespBase
-	(*common.PageReq)(nil),                        // 310: common.PageReq
+	(AirGappedPackageStatus)(0),                   // 41: core.AirGappedPackageStatus
+	(StorageObjectStatus)(0),                      // 42: core.StorageObjectStatus
+	(BrandingRewriteMode)(0),                      // 43: core.BrandingRewriteMode
+	(BrandingProfileStatus)(0),                    // 44: core.BrandingProfileStatus
+	(BrandingPreflightStatus)(0),                  // 45: core.BrandingPreflightStatus
+	(WhiteLabelTemplateStatus)(0),                 // 46: core.WhiteLabelTemplateStatus
+	(WhiteLabelRevisionStatus)(0),                 // 47: core.WhiteLabelRevisionStatus
+	(WhiteLabelProductStatus)(0),                  // 48: core.WhiteLabelProductStatus
+	(SigningMode)(0),                              // 49: core.SigningMode
+	(*RespBase)(nil),                              // 50: core.RespBase
+	(*Application)(nil),                           // 51: core.Application
+	(*Version)(nil),                               // 52: core.Version
+	(*Channel)(nil),                               // 53: core.Channel
+	(*SigningConfig)(nil),                         // 54: core.SigningConfig
+	(*BuildTask)(nil),                             // 55: core.BuildTask
+	(*StorageObject)(nil),                         // 56: core.StorageObject
+	(*BrandingProfile)(nil),                       // 57: core.BrandingProfile
+	(*BrandingPreflight)(nil),                     // 58: core.BrandingPreflight
+	(*WhiteLabelTemplate)(nil),                    // 59: core.WhiteLabelTemplate
+	(*WhiteLabelTemplateRevision)(nil),            // 60: core.WhiteLabelTemplateRevision
+	(*WhiteLabelProduct)(nil),                     // 61: core.WhiteLabelProduct
+	(*BuilderNode)(nil),                           // 62: core.BuilderNode
+	(*BuildConcurrencyPolicy)(nil),                // 63: core.BuildConcurrencyPolicy
+	(*BuildCacheEntry)(nil),                       // 64: core.BuildCacheEntry
+	(*BuildSchedulerEvent)(nil),                   // 65: core.BuildSchedulerEvent
+	(*BuildClusterMetrics)(nil),                   // 66: core.BuildClusterMetrics
+	(*OpenApiCredential)(nil),                     // 67: core.OpenApiCredential
+	(*OpenApiCredentialSecret)(nil),               // 68: core.OpenApiCredentialSecret
+	(*OpenApiAuthContext)(nil),                    // 69: core.OpenApiAuthContext
+	(*ApplicationIdReq)(nil),                      // 70: core.ApplicationIdReq
+	(*VersionIdReq)(nil),                          // 71: core.VersionIdReq
+	(*ChannelIdReq)(nil),                          // 72: core.ChannelIdReq
+	(*BuildTaskIdReq)(nil),                        // 73: core.BuildTaskIdReq
+	(*BrandingProfileIdReq)(nil),                  // 74: core.BrandingProfileIdReq
+	(*BrandingPreflightIdReq)(nil),                // 75: core.BrandingPreflightIdReq
+	(*WhiteLabelTemplateIdReq)(nil),               // 76: core.WhiteLabelTemplateIdReq
+	(*WhiteLabelTemplateRevisionIdReq)(nil),       // 77: core.WhiteLabelTemplateRevisionIdReq
+	(*WhiteLabelProductIdReq)(nil),                // 78: core.WhiteLabelProductIdReq
+	(*ApplicationResp)(nil),                       // 79: core.ApplicationResp
+	(*VersionResp)(nil),                           // 80: core.VersionResp
+	(*ChannelResp)(nil),                           // 81: core.ChannelResp
+	(*SigningConfigResp)(nil),                     // 82: core.SigningConfigResp
+	(*SigningConfigListReq)(nil),                  // 83: core.SigningConfigListReq
+	(*SigningConfigListResp)(nil),                 // 84: core.SigningConfigListResp
+	(*BuildTaskResp)(nil),                         // 85: core.BuildTaskResp
+	(*BuilderNodeResp)(nil),                       // 86: core.BuilderNodeResp
+	(*BuilderNodeListReq)(nil),                    // 87: core.BuilderNodeListReq
+	(*BuilderNodeListResp)(nil),                   // 88: core.BuilderNodeListResp
+	(*BuildConcurrencyPolicyResp)(nil),            // 89: core.BuildConcurrencyPolicyResp
+	(*BuildConcurrencyPolicyListReq)(nil),         // 90: core.BuildConcurrencyPolicyListReq
+	(*BuildConcurrencyPolicyListResp)(nil),        // 91: core.BuildConcurrencyPolicyListResp
+	(*BuildCacheEntryResp)(nil),                   // 92: core.BuildCacheEntryResp
+	(*BuildCacheEntryListReq)(nil),                // 93: core.BuildCacheEntryListReq
+	(*BuildCacheEntryListResp)(nil),               // 94: core.BuildCacheEntryListResp
+	(*BuildSchedulerEventListReq)(nil),            // 95: core.BuildSchedulerEventListReq
+	(*BuildSchedulerEventListResp)(nil),           // 96: core.BuildSchedulerEventListResp
+	(*BuildClusterMetricsReq)(nil),                // 97: core.BuildClusterMetricsReq
+	(*BuildClusterMetricsResp)(nil),               // 98: core.BuildClusterMetricsResp
+	(*OpenApiCredentialListReq)(nil),              // 99: core.OpenApiCredentialListReq
+	(*OpenApiCredentialListResp)(nil),             // 100: core.OpenApiCredentialListResp
+	(*OpenApiCredentialResp)(nil),                 // 101: core.OpenApiCredentialResp
+	(*OpenApiCredentialSecretResp)(nil),           // 102: core.OpenApiCredentialSecretResp
+	(*CreateOpenApiCredentialReq)(nil),            // 103: core.CreateOpenApiCredentialReq
+	(*OpenApiCredentialIdReq)(nil),                // 104: core.OpenApiCredentialIdReq
+	(*RotateOpenApiCredentialReq)(nil),            // 105: core.RotateOpenApiCredentialReq
+	(*AuthenticateOpenApiCredentialReq)(nil),      // 106: core.AuthenticateOpenApiCredentialReq
+	(*OpenApiAuthContextResp)(nil),                // 107: core.OpenApiAuthContextResp
+	(*BeginOpenApiIdempotencyReq)(nil),            // 108: core.BeginOpenApiIdempotencyReq
+	(*OpenApiIdempotencyResult)(nil),              // 109: core.OpenApiIdempotencyResult
+	(*OpenApiIdempotencyResp)(nil),                // 110: core.OpenApiIdempotencyResp
+	(*CompleteOpenApiIdempotencyReq)(nil),         // 111: core.CompleteOpenApiIdempotencyReq
+	(*RecordOpenApiAuditReq)(nil),                 // 112: core.RecordOpenApiAuditReq
+	(*WebhookEndpoint)(nil),                       // 113: core.WebhookEndpoint
+	(*WebhookEndpointSecret)(nil),                 // 114: core.WebhookEndpointSecret
+	(*WebhookDelivery)(nil),                       // 115: core.WebhookDelivery
+	(*CreateWebhookEndpointReq)(nil),              // 116: core.CreateWebhookEndpointReq
+	(*UpdateWebhookEndpointReq)(nil),              // 117: core.UpdateWebhookEndpointReq
+	(*WebhookEndpointIdReq)(nil),                  // 118: core.WebhookEndpointIdReq
+	(*WebhookEndpointListReq)(nil),                // 119: core.WebhookEndpointListReq
+	(*WebhookEndpointResp)(nil),                   // 120: core.WebhookEndpointResp
+	(*WebhookEndpointListResp)(nil),               // 121: core.WebhookEndpointListResp
+	(*WebhookEndpointSecretResp)(nil),             // 122: core.WebhookEndpointSecretResp
+	(*WebhookDeliveryListReq)(nil),                // 123: core.WebhookDeliveryListReq
+	(*WebhookDeliveryListResp)(nil),               // 124: core.WebhookDeliveryListResp
+	(*WebhookDeliveryResp)(nil),                   // 125: core.WebhookDeliveryResp
+	(*WebhookDeliveryIdReq)(nil),                  // 126: core.WebhookDeliveryIdReq
+	(*CreateTestWebhookEventReq)(nil),             // 127: core.CreateTestWebhookEventReq
+	(*SourceIntegration)(nil),                     // 128: core.SourceIntegration
+	(*CompleteSourceIntegrationReq)(nil),          // 129: core.CompleteSourceIntegrationReq
+	(*SourceIntegrationIdReq)(nil),                // 130: core.SourceIntegrationIdReq
+	(*SourceIntegrationListReq)(nil),              // 131: core.SourceIntegrationListReq
+	(*SourceIntegrationResp)(nil),                 // 132: core.SourceIntegrationResp
+	(*SourceIntegrationListResp)(nil),             // 133: core.SourceIntegrationListResp
+	(*SourceIntegrationCredential)(nil),           // 134: core.SourceIntegrationCredential
+	(*SourceIntegrationCredentialResp)(nil),       // 135: core.SourceIntegrationCredentialResp
+	(*SourceRepository)(nil),                      // 136: core.SourceRepository
+	(*AuthorizeSourceRepositoryReq)(nil),          // 137: core.AuthorizeSourceRepositoryReq
+	(*SourceRepositoryIdReq)(nil),                 // 138: core.SourceRepositoryIdReq
+	(*SourceRepositoryListReq)(nil),               // 139: core.SourceRepositoryListReq
+	(*SourceRepositoryResp)(nil),                  // 140: core.SourceRepositoryResp
+	(*SourceRepositoryListResp)(nil),              // 141: core.SourceRepositoryListResp
+	(*SourceArtifact)(nil),                        // 142: core.SourceArtifact
+	(*RecordSourceArtifactReq)(nil),               // 143: core.RecordSourceArtifactReq
+	(*SourceArtifactResp)(nil),                    // 144: core.SourceArtifactResp
+	(*ImportSourceArtifactReq)(nil),               // 145: core.ImportSourceArtifactReq
+	(*SourceArtifactImportResult)(nil),            // 146: core.SourceArtifactImportResult
+	(*SourceArtifactImportResp)(nil),              // 147: core.SourceArtifactImportResp
+	(*SourceBuildTrigger)(nil),                    // 148: core.SourceBuildTrigger
+	(*CreateSourceBuildTriggerReq)(nil),           // 149: core.CreateSourceBuildTriggerReq
+	(*UpdateSourceBuildTriggerReq)(nil),           // 150: core.UpdateSourceBuildTriggerReq
+	(*SourceBuildTriggerIdReq)(nil),               // 151: core.SourceBuildTriggerIdReq
+	(*SourceBuildTriggerListReq)(nil),             // 152: core.SourceBuildTriggerListReq
+	(*SourceBuildTriggerResp)(nil),                // 153: core.SourceBuildTriggerResp
+	(*SourceBuildTriggerListResp)(nil),            // 154: core.SourceBuildTriggerListResp
+	(*SourceBuildTriggerSecret)(nil),              // 155: core.SourceBuildTriggerSecret
+	(*SourceBuildTriggerSecretResp)(nil),          // 156: core.SourceBuildTriggerSecretResp
+	(*ResolveSourceBuildTriggerReq)(nil),          // 157: core.ResolveSourceBuildTriggerReq
+	(*SourceBuildTriggerCredential)(nil),          // 158: core.SourceBuildTriggerCredential
+	(*SourceBuildTriggerCredentialResp)(nil),      // 159: core.SourceBuildTriggerCredentialResp
+	(*SourceWebhookEvent)(nil),                    // 160: core.SourceWebhookEvent
+	(*EnqueueSourceWebhookEventReq)(nil),          // 161: core.EnqueueSourceWebhookEventReq
+	(*EnqueueSourceWebhookEventResult)(nil),       // 162: core.EnqueueSourceWebhookEventResult
+	(*EnqueueSourceWebhookEventResp)(nil),         // 163: core.EnqueueSourceWebhookEventResp
+	(*ClaimSourceWebhookEventReq)(nil),            // 164: core.ClaimSourceWebhookEventReq
+	(*ClaimedSourceWebhookEvent)(nil),             // 165: core.ClaimedSourceWebhookEvent
+	(*ClaimSourceWebhookEventResp)(nil),           // 166: core.ClaimSourceWebhookEventResp
+	(*CompleteSourceWebhookEventReq)(nil),         // 167: core.CompleteSourceWebhookEventReq
+	(*FailSourceWebhookEventReq)(nil),             // 168: core.FailSourceWebhookEventReq
+	(*SourceWebhookEventListReq)(nil),             // 169: core.SourceWebhookEventListReq
+	(*SourceWebhookEventListResp)(nil),            // 170: core.SourceWebhookEventListResp
+	(*BrandingProfileResp)(nil),                   // 171: core.BrandingProfileResp
+	(*BrandingProfileListReq)(nil),                // 172: core.BrandingProfileListReq
+	(*BrandingProfileListResp)(nil),               // 173: core.BrandingProfileListResp
+	(*BrandingPreflightResp)(nil),                 // 174: core.BrandingPreflightResp
+	(*BrandingPreflightListReq)(nil),              // 175: core.BrandingPreflightListReq
+	(*BrandingPreflightListResp)(nil),             // 176: core.BrandingPreflightListResp
+	(*WhiteLabelTemplateResp)(nil),                // 177: core.WhiteLabelTemplateResp
+	(*WhiteLabelTemplateListReq)(nil),             // 178: core.WhiteLabelTemplateListReq
+	(*WhiteLabelTemplateListResp)(nil),            // 179: core.WhiteLabelTemplateListResp
+	(*WhiteLabelTemplateRevisionResp)(nil),        // 180: core.WhiteLabelTemplateRevisionResp
+	(*WhiteLabelTemplateRevisionListReq)(nil),     // 181: core.WhiteLabelTemplateRevisionListReq
+	(*WhiteLabelTemplateRevisionListResp)(nil),    // 182: core.WhiteLabelTemplateRevisionListResp
+	(*WhiteLabelProductResp)(nil),                 // 183: core.WhiteLabelProductResp
+	(*WhiteLabelProductListReq)(nil),              // 184: core.WhiteLabelProductListReq
+	(*WhiteLabelProductListResp)(nil),             // 185: core.WhiteLabelProductListResp
+	(*WhiteLabelProductPreflightResp)(nil),        // 186: core.WhiteLabelProductPreflightResp
+	(*ApplicationListReq)(nil),                    // 187: core.ApplicationListReq
+	(*ApplicationListResp)(nil),                   // 188: core.ApplicationListResp
+	(*VersionListReq)(nil),                        // 189: core.VersionListReq
+	(*VersionListResp)(nil),                       // 190: core.VersionListResp
+	(*ChannelListReq)(nil),                        // 191: core.ChannelListReq
+	(*ChannelListResp)(nil),                       // 192: core.ChannelListResp
+	(*BuildTaskListReq)(nil),                      // 193: core.BuildTaskListReq
+	(*BuildTaskListResp)(nil),                     // 194: core.BuildTaskListResp
+	(*CreateApplicationReq)(nil),                  // 195: core.CreateApplicationReq
+	(*CreateVersionReq)(nil),                      // 196: core.CreateVersionReq
+	(*CreateChannelReq)(nil),                      // 197: core.CreateChannelReq
+	(*SigningConfigIdReq)(nil),                    // 198: core.SigningConfigIdReq
+	(*CreateSigningConfigReq)(nil),                // 199: core.CreateSigningConfigReq
+	(*CreateStorageObjectReq)(nil),                // 200: core.CreateStorageObjectReq
+	(*CompleteStorageObjectReq)(nil),              // 201: core.CompleteStorageObjectReq
+	(*FailStorageObjectReq)(nil),                  // 202: core.FailStorageObjectReq
+	(*ExpiredStorageObject)(nil),                  // 203: core.ExpiredStorageObject
+	(*ClaimExpiredStorageObjectsReq)(nil),         // 204: core.ClaimExpiredStorageObjectsReq
+	(*ClaimExpiredStorageObjectsResp)(nil),        // 205: core.ClaimExpiredStorageObjectsResp
+	(*MarkStorageObjectDeletedReq)(nil),           // 206: core.MarkStorageObjectDeletedReq
+	(*StorageObjectIdReq)(nil),                    // 207: core.StorageObjectIdReq
+	(*StorageObjectResp)(nil),                     // 208: core.StorageObjectResp
+	(*CreateBuildTaskReq)(nil),                    // 209: core.CreateBuildTaskReq
+	(*BuilderNodeIdReq)(nil),                      // 210: core.BuilderNodeIdReq
+	(*RegisterBuilderNodeReq)(nil),                // 211: core.RegisterBuilderNodeReq
+	(*BuilderNodeHeartbeatReq)(nil),               // 212: core.BuilderNodeHeartbeatReq
+	(*DrainBuilderNodeReq)(nil),                   // 213: core.DrainBuilderNodeReq
+	(*RecoverBuilderNodeReq)(nil),                 // 214: core.RecoverBuilderNodeReq
+	(*ClaimScheduledBuildTaskReq)(nil),            // 215: core.ClaimScheduledBuildTaskReq
+	(*CancelBuildTaskReq)(nil),                    // 216: core.CancelBuildTaskReq
+	(*RetryBuildTaskReq)(nil),                     // 217: core.RetryBuildTaskReq
+	(*UpsertBuildConcurrencyPolicyReq)(nil),       // 218: core.UpsertBuildConcurrencyPolicyReq
+	(*BuildCacheEntryIdReq)(nil),                  // 219: core.BuildCacheEntryIdReq
+	(*ResolveBuildCacheReq)(nil),                  // 220: core.ResolveBuildCacheReq
+	(*BuildCacheResolution)(nil),                  // 221: core.BuildCacheResolution
+	(*BuildCacheResolutionResp)(nil),              // 222: core.BuildCacheResolutionResp
+	(*PublishBuildCacheReq)(nil),                  // 223: core.PublishBuildCacheReq
+	(*InvalidateBuildCacheReq)(nil),               // 224: core.InvalidateBuildCacheReq
+	(*CleanupBuildCacheReq)(nil),                  // 225: core.CleanupBuildCacheReq
+	(*CleanupBuildCacheResult)(nil),               // 226: core.CleanupBuildCacheResult
+	(*CleanupBuildCacheResp)(nil),                 // 227: core.CleanupBuildCacheResp
+	(*CreateWhiteLabelTemplateReq)(nil),           // 228: core.CreateWhiteLabelTemplateReq
+	(*UpdateWhiteLabelTemplateReq)(nil),           // 229: core.UpdateWhiteLabelTemplateReq
+	(*CopyWhiteLabelTemplateReq)(nil),             // 230: core.CopyWhiteLabelTemplateReq
+	(*CreateWhiteLabelTemplateRevisionReq)(nil),   // 231: core.CreateWhiteLabelTemplateRevisionReq
+	(*UpdateWhiteLabelTemplateRevisionReq)(nil),   // 232: core.UpdateWhiteLabelTemplateRevisionReq
+	(*PublishWhiteLabelTemplateReq)(nil),          // 233: core.PublishWhiteLabelTemplateReq
+	(*CreateWhiteLabelProductReq)(nil),            // 234: core.CreateWhiteLabelProductReq
+	(*UpdateWhiteLabelProductReq)(nil),            // 235: core.UpdateWhiteLabelProductReq
+	(*ChangeWhiteLabelTemplateStatusReq)(nil),     // 236: core.ChangeWhiteLabelTemplateStatusReq
+	(*ChangeWhiteLabelProductStatusReq)(nil),      // 237: core.ChangeWhiteLabelProductStatusReq
+	(*CreateBrandingProfileReq)(nil),              // 238: core.CreateBrandingProfileReq
+	(*UpdateBrandingProfileReq)(nil),              // 239: core.UpdateBrandingProfileReq
+	(*ChangeBrandingProfileStatusReq)(nil),        // 240: core.ChangeBrandingProfileStatusReq
+	(*CreateBrandingPreflightReq)(nil),            // 241: core.CreateBrandingPreflightReq
+	(*CompleteBrandingPreflightReq)(nil),          // 242: core.CompleteBrandingPreflightReq
+	(*ClaimBrandingPreflightReq)(nil),             // 243: core.ClaimBrandingPreflightReq
+	(*BrandingPreflightExecutionContext)(nil),     // 244: core.BrandingPreflightExecutionContext
+	(*BrandingPreflightExecutionContextResp)(nil), // 245: core.BrandingPreflightExecutionContextResp
+	(*InstallReportReq)(nil),                      // 246: core.InstallReportReq
+	(*ChannelStatsReq)(nil),                       // 247: core.ChannelStatsReq
+	(*ChannelStats)(nil),                          // 248: core.ChannelStats
+	(*ChannelStatsResp)(nil),                      // 249: core.ChannelStatsResp
+	(*ReportChannelEventReq)(nil),                 // 250: core.ReportChannelEventReq
+	(*ResolveChannelDownloadReq)(nil),             // 251: core.ResolveChannelDownloadReq
+	(*ChannelDownloadArtifact)(nil),               // 252: core.ChannelDownloadArtifact
+	(*ChannelDownloadArtifactResp)(nil),           // 253: core.ChannelDownloadArtifactResp
+	(*ClaimBuildTaskReq)(nil),                     // 254: core.ClaimBuildTaskReq
+	(*HeartbeatBuildTaskReq)(nil),                 // 255: core.HeartbeatBuildTaskReq
+	(*ReportBuildProgressReq)(nil),                // 256: core.ReportBuildProgressReq
+	(*CompleteBuildTaskReq)(nil),                  // 257: core.CompleteBuildTaskReq
+	(*FailBuildTaskReq)(nil),                      // 258: core.FailBuildTaskReq
+	(*GetBuildExecutionContextReq)(nil),           // 259: core.GetBuildExecutionContextReq
+	(*BuildExecutionContext)(nil),                 // 260: core.BuildExecutionContext
+	(*BuildExecutionContextResp)(nil),             // 261: core.BuildExecutionContextResp
+	(*BillingPlan)(nil),                           // 262: core.BillingPlan
+	(*CreateBillingPlanReq)(nil),                  // 263: core.CreateBillingPlanReq
+	(*BillingPlanIdReq)(nil),                      // 264: core.BillingPlanIdReq
+	(*BillingPlanListReq)(nil),                    // 265: core.BillingPlanListReq
+	(*BillingPlanResp)(nil),                       // 266: core.BillingPlanResp
+	(*BillingPlanListResp)(nil),                   // 267: core.BillingPlanListResp
+	(*TenantSubscription)(nil),                    // 268: core.TenantSubscription
+	(*TenantEntitlement)(nil),                     // 269: core.TenantEntitlement
+	(*TenantBillingReq)(nil),                      // 270: core.TenantBillingReq
+	(*TenantBillingResp)(nil),                     // 271: core.TenantBillingResp
+	(*UpsertManualSubscriptionReq)(nil),           // 272: core.UpsertManualSubscriptionReq
+	(*ChangeTenantSubscriptionReq)(nil),           // 273: core.ChangeTenantSubscriptionReq
+	(*CancelTenantSubscriptionReq)(nil),           // 274: core.CancelTenantSubscriptionReq
+	(*ReserveQuotaReq)(nil),                       // 275: core.ReserveQuotaReq
+	(*QuotaReservation)(nil),                      // 276: core.QuotaReservation
+	(*QuotaReservationResp)(nil),                  // 277: core.QuotaReservationResp
+	(*QuotaReservationActionReq)(nil),             // 278: core.QuotaReservationActionReq
+	(*RecordUsageReq)(nil),                        // 279: core.RecordUsageReq
+	(*UsageMetricSummary)(nil),                    // 280: core.UsageMetricSummary
+	(*BillingUsageReq)(nil),                       // 281: core.BillingUsageReq
+	(*BillingUsageResp)(nil),                      // 282: core.BillingUsageResp
+	(*InvoiceItem)(nil),                           // 283: core.InvoiceItem
+	(*Invoice)(nil),                               // 284: core.Invoice
+	(*InvoiceListReq)(nil),                        // 285: core.InvoiceListReq
+	(*InvoiceListResp)(nil),                       // 286: core.InvoiceListResp
+	(*ApplyBillingWebhookReq)(nil),                // 287: core.ApplyBillingWebhookReq
+	(*LocalAgentCapability)(nil),                  // 288: core.LocalAgentCapability
+	(*LocalAgentCertificate)(nil),                 // 289: core.LocalAgentCertificate
+	(*LocalAgent)(nil),                            // 290: core.LocalAgent
+	(*CreateLocalAgentRegistrationReq)(nil),       // 291: core.CreateLocalAgentRegistrationReq
+	(*LocalAgentRegistrationResp)(nil),            // 292: core.LocalAgentRegistrationResp
+	(*RegisterLocalAgentReq)(nil),                 // 293: core.RegisterLocalAgentReq
+	(*RegisterLocalAgentResp)(nil),                // 294: core.RegisterLocalAgentResp
+	(*LocalAgentIdReq)(nil),                       // 295: core.LocalAgentIdReq
+	(*LocalAgentResp)(nil),                        // 296: core.LocalAgentResp
+	(*LocalAgentListReq)(nil),                     // 297: core.LocalAgentListReq
+	(*LocalAgentListResp)(nil),                    // 298: core.LocalAgentListResp
+	(*LocalAgentAuth)(nil),                        // 299: core.LocalAgentAuth
+	(*HeartbeatLocalAgentReq)(nil),                // 300: core.HeartbeatLocalAgentReq
+	(*DrainLocalAgentReq)(nil),                    // 301: core.DrainLocalAgentReq
+	(*RevokeLocalAgentReq)(nil),                   // 302: core.RevokeLocalAgentReq
+	(*RotateLocalAgentCertificateReq)(nil),        // 303: core.RotateLocalAgentCertificateReq
+	(*ClaimLocalAgentBuildTaskReq)(nil),           // 304: core.ClaimLocalAgentBuildTaskReq
+	(*LocalAgentBuildTaskResp)(nil),               // 305: core.LocalAgentBuildTaskResp
+	(*RegisterCustomerStorageInputReq)(nil),       // 306: core.RegisterCustomerStorageInputReq
+	(*RenewLocalAgentTaskLeaseReq)(nil),           // 307: core.RenewLocalAgentTaskLeaseReq
+	(*ReportLocalAgentBuildProgressReq)(nil),      // 308: core.ReportLocalAgentBuildProgressReq
+	(*CompleteLocalAgentBuildTaskReq)(nil),        // 309: core.CompleteLocalAgentBuildTaskReq
+	(*FailLocalAgentBuildTaskReq)(nil),            // 310: core.FailLocalAgentBuildTaskReq
+	(*VerifyHybridArtifactReq)(nil),               // 311: core.VerifyHybridArtifactReq
+	(*AirGappedPackage)(nil),                      // 312: core.AirGappedPackage
+	(*PrepareAirGappedExportReq)(nil),             // 313: core.PrepareAirGappedExportReq
+	(*PrepareAirGappedExportResp)(nil),            // 314: core.PrepareAirGappedExportResp
+	(*SignAirGappedManifestReq)(nil),              // 315: core.SignAirGappedManifestReq
+	(*SignAirGappedManifestResp)(nil),             // 316: core.SignAirGappedManifestResp
+	(*FinalizeAirGappedExportReq)(nil),            // 317: core.FinalizeAirGappedExportReq
+	(*AbortAirGappedExportReq)(nil),               // 318: core.AbortAirGappedExportReq
+	(*AirGappedPackageReq)(nil),                   // 319: core.AirGappedPackageReq
+	(*AirGappedPackageResp)(nil),                  // 320: core.AirGappedPackageResp
+	(*ImportAirGappedResultReq)(nil),              // 321: core.ImportAirGappedResultReq
+	(*common.RespBase)(nil),                       // 322: common.RespBase
+	(*common.PageReq)(nil),                        // 323: common.PageReq
 }
 var file_proto_core_core_proto_depIdxs = []int32{
-	309, // 0: core.RespBase.base:type_name -> common.RespBase
+	322, // 0: core.RespBase.base:type_name -> common.RespBase
 	0,   // 1: core.Application.status:type_name -> core.ApplicationStatus
 	1,   // 2: core.Version.status:type_name -> core.VersionStatus
 	2,   // 3: core.Channel.status:type_name -> core.ChannelStatus
-	3,   // 4: core.BuildTask.status:type_name -> core.BuildTaskStatus
-	4,   // 5: core.StorageObject.object_type:type_name -> core.StorageObjectType
-	41,  // 6: core.StorageObject.status:type_name -> core.StorageObjectStatus
-	42,  // 7: core.BrandingProfile.rewrite_mode:type_name -> core.BrandingRewriteMode
-	43,  // 8: core.BrandingProfile.status:type_name -> core.BrandingProfileStatus
-	44,  // 9: core.BrandingPreflight.status:type_name -> core.BrandingPreflightStatus
-	45,  // 10: core.WhiteLabelTemplate.status:type_name -> core.WhiteLabelTemplateStatus
-	46,  // 11: core.WhiteLabelTemplateRevision.status:type_name -> core.WhiteLabelRevisionStatus
-	47,  // 12: core.WhiteLabelProduct.status:type_name -> core.WhiteLabelProductStatus
-	5,   // 13: core.BuilderNode.status:type_name -> core.BuilderNodeStatus
-	6,   // 14: core.BuilderNode.drain_status:type_name -> core.BuilderDrainStatus
-	7,   // 15: core.BuildConcurrencyPolicy.status:type_name -> core.BuildPolicyStatus
-	9,   // 16: core.BuildCacheEntry.cache_scope:type_name -> core.BuildCacheScope
-	10,  // 17: core.BuildCacheEntry.status:type_name -> core.BuildCacheStatus
-	11,  // 18: core.BuildSchedulerEvent.event_type:type_name -> core.BuildSchedulerEventType
-	13,  // 19: core.OpenApiCredential.scopes:type_name -> core.OpenApiScope
-	12,  // 20: core.OpenApiCredential.status:type_name -> core.OpenApiCredentialStatus
-	65,  // 21: core.OpenApiCredentialSecret.credential:type_name -> core.OpenApiCredential
-	13,  // 22: core.OpenApiAuthContext.scopes:type_name -> core.OpenApiScope
-	309, // 23: core.ApplicationResp.base:type_name -> common.RespBase
-	49,  // 24: core.ApplicationResp.data:type_name -> core.Application
-	309, // 25: core.VersionResp.base:type_name -> common.RespBase
-	50,  // 26: core.VersionResp.data:type_name -> core.Version
-	309, // 27: core.ChannelResp.base:type_name -> common.RespBase
-	51,  // 28: core.ChannelResp.data:type_name -> core.Channel
-	309, // 29: core.SigningConfigResp.base:type_name -> common.RespBase
-	52,  // 30: core.SigningConfigResp.data:type_name -> core.SigningConfig
-	310, // 31: core.SigningConfigListReq.page:type_name -> common.PageReq
-	309, // 32: core.SigningConfigListResp.base:type_name -> common.RespBase
-	52,  // 33: core.SigningConfigListResp.data:type_name -> core.SigningConfig
-	309, // 34: core.BuildTaskResp.base:type_name -> common.RespBase
-	53,  // 35: core.BuildTaskResp.data:type_name -> core.BuildTask
-	309, // 36: core.BuilderNodeResp.base:type_name -> common.RespBase
-	60,  // 37: core.BuilderNodeResp.data:type_name -> core.BuilderNode
-	310, // 38: core.BuilderNodeListReq.page:type_name -> common.PageReq
-	5,   // 39: core.BuilderNodeListReq.status:type_name -> core.BuilderNodeStatus
-	6,   // 40: core.BuilderNodeListReq.drain_status:type_name -> core.BuilderDrainStatus
-	309, // 41: core.BuilderNodeListResp.base:type_name -> common.RespBase
-	60,  // 42: core.BuilderNodeListResp.data:type_name -> core.BuilderNode
-	309, // 43: core.BuildConcurrencyPolicyResp.base:type_name -> common.RespBase
-	61,  // 44: core.BuildConcurrencyPolicyResp.data:type_name -> core.BuildConcurrencyPolicy
-	310, // 45: core.BuildConcurrencyPolicyListReq.page:type_name -> common.PageReq
-	7,   // 46: core.BuildConcurrencyPolicyListReq.status:type_name -> core.BuildPolicyStatus
-	309, // 47: core.BuildConcurrencyPolicyListResp.base:type_name -> common.RespBase
-	61,  // 48: core.BuildConcurrencyPolicyListResp.data:type_name -> core.BuildConcurrencyPolicy
-	309, // 49: core.BuildCacheEntryResp.base:type_name -> common.RespBase
-	62,  // 50: core.BuildCacheEntryResp.data:type_name -> core.BuildCacheEntry
-	310, // 51: core.BuildCacheEntryListReq.page:type_name -> common.PageReq
-	9,   // 52: core.BuildCacheEntryListReq.cache_scope:type_name -> core.BuildCacheScope
-	10,  // 53: core.BuildCacheEntryListReq.status:type_name -> core.BuildCacheStatus
-	309, // 54: core.BuildCacheEntryListResp.base:type_name -> common.RespBase
-	62,  // 55: core.BuildCacheEntryListResp.data:type_name -> core.BuildCacheEntry
-	310, // 56: core.BuildSchedulerEventListReq.page:type_name -> common.PageReq
-	11,  // 57: core.BuildSchedulerEventListReq.event_type:type_name -> core.BuildSchedulerEventType
-	309, // 58: core.BuildSchedulerEventListResp.base:type_name -> common.RespBase
-	63,  // 59: core.BuildSchedulerEventListResp.data:type_name -> core.BuildSchedulerEvent
-	309, // 60: core.BuildClusterMetricsResp.base:type_name -> common.RespBase
-	64,  // 61: core.BuildClusterMetricsResp.data:type_name -> core.BuildClusterMetrics
-	310, // 62: core.OpenApiCredentialListReq.page:type_name -> common.PageReq
-	12,  // 63: core.OpenApiCredentialListReq.status:type_name -> core.OpenApiCredentialStatus
-	309, // 64: core.OpenApiCredentialListResp.base:type_name -> common.RespBase
-	65,  // 65: core.OpenApiCredentialListResp.data:type_name -> core.OpenApiCredential
-	309, // 66: core.OpenApiCredentialResp.base:type_name -> common.RespBase
-	65,  // 67: core.OpenApiCredentialResp.data:type_name -> core.OpenApiCredential
-	309, // 68: core.OpenApiCredentialSecretResp.base:type_name -> common.RespBase
-	66,  // 69: core.OpenApiCredentialSecretResp.data:type_name -> core.OpenApiCredentialSecret
-	13,  // 70: core.CreateOpenApiCredentialReq.scopes:type_name -> core.OpenApiScope
-	309, // 71: core.OpenApiAuthContextResp.base:type_name -> common.RespBase
-	67,  // 72: core.OpenApiAuthContextResp.data:type_name -> core.OpenApiAuthContext
-	14,  // 73: core.OpenApiIdempotencyResult.decision:type_name -> core.OpenApiIdempotencyDecision
-	309, // 74: core.OpenApiIdempotencyResp.base:type_name -> common.RespBase
-	107, // 75: core.OpenApiIdempotencyResp.data:type_name -> core.OpenApiIdempotencyResult
-	15,  // 76: core.WebhookEndpoint.status:type_name -> core.WebhookEndpointStatus
-	111, // 77: core.WebhookEndpointSecret.endpoint:type_name -> core.WebhookEndpoint
-	16,  // 78: core.WebhookDelivery.status:type_name -> core.WebhookDeliveryStatus
-	15,  // 79: core.UpdateWebhookEndpointReq.status:type_name -> core.WebhookEndpointStatus
-	310, // 80: core.WebhookEndpointListReq.page:type_name -> common.PageReq
-	15,  // 81: core.WebhookEndpointListReq.status:type_name -> core.WebhookEndpointStatus
-	309, // 82: core.WebhookEndpointResp.base:type_name -> common.RespBase
-	111, // 83: core.WebhookEndpointResp.data:type_name -> core.WebhookEndpoint
-	309, // 84: core.WebhookEndpointListResp.base:type_name -> common.RespBase
-	111, // 85: core.WebhookEndpointListResp.data:type_name -> core.WebhookEndpoint
-	309, // 86: core.WebhookEndpointSecretResp.base:type_name -> common.RespBase
-	112, // 87: core.WebhookEndpointSecretResp.data:type_name -> core.WebhookEndpointSecret
-	310, // 88: core.WebhookDeliveryListReq.page:type_name -> common.PageReq
-	16,  // 89: core.WebhookDeliveryListReq.status:type_name -> core.WebhookDeliveryStatus
-	309, // 90: core.WebhookDeliveryListResp.base:type_name -> common.RespBase
-	113, // 91: core.WebhookDeliveryListResp.data:type_name -> core.WebhookDelivery
-	309, // 92: core.WebhookDeliveryResp.base:type_name -> common.RespBase
-	113, // 93: core.WebhookDeliveryResp.data:type_name -> core.WebhookDelivery
-	17,  // 94: core.SourceIntegration.platform:type_name -> core.SourcePlatform
-	18,  // 95: core.SourceIntegration.status:type_name -> core.SourceIntegrationStatus
-	17,  // 96: core.CompleteSourceIntegrationReq.platform:type_name -> core.SourcePlatform
-	310, // 97: core.SourceIntegrationListReq.page:type_name -> common.PageReq
-	17,  // 98: core.SourceIntegrationListReq.platform:type_name -> core.SourcePlatform
-	18,  // 99: core.SourceIntegrationListReq.status:type_name -> core.SourceIntegrationStatus
-	309, // 100: core.SourceIntegrationResp.base:type_name -> common.RespBase
-	126, // 101: core.SourceIntegrationResp.data:type_name -> core.SourceIntegration
-	309, // 102: core.SourceIntegrationListResp.base:type_name -> common.RespBase
-	126, // 103: core.SourceIntegrationListResp.data:type_name -> core.SourceIntegration
-	126, // 104: core.SourceIntegrationCredential.integration:type_name -> core.SourceIntegration
-	309, // 105: core.SourceIntegrationCredentialResp.base:type_name -> common.RespBase
-	132, // 106: core.SourceIntegrationCredentialResp.data:type_name -> core.SourceIntegrationCredential
-	19,  // 107: core.SourceRepository.status:type_name -> core.SourceRepositoryStatus
-	310, // 108: core.SourceRepositoryListReq.page:type_name -> common.PageReq
-	19,  // 109: core.SourceRepositoryListReq.status:type_name -> core.SourceRepositoryStatus
-	309, // 110: core.SourceRepositoryResp.base:type_name -> common.RespBase
-	134, // 111: core.SourceRepositoryResp.data:type_name -> core.SourceRepository
-	309, // 112: core.SourceRepositoryListResp.base:type_name -> common.RespBase
-	134, // 113: core.SourceRepositoryListResp.data:type_name -> core.SourceRepository
-	20,  // 114: core.SourceArtifact.artifact_source:type_name -> core.SourceArtifactType
-	20,  // 115: core.RecordSourceArtifactReq.artifact_source:type_name -> core.SourceArtifactType
-	309, // 116: core.SourceArtifactResp.base:type_name -> common.RespBase
-	140, // 117: core.SourceArtifactResp.data:type_name -> core.SourceArtifact
-	20,  // 118: core.ImportSourceArtifactReq.artifact_source:type_name -> core.SourceArtifactType
-	50,  // 119: core.SourceArtifactImportResult.version:type_name -> core.Version
-	140, // 120: core.SourceArtifactImportResult.artifact:type_name -> core.SourceArtifact
-	309, // 121: core.SourceArtifactImportResp.base:type_name -> common.RespBase
-	144, // 122: core.SourceArtifactImportResp.data:type_name -> core.SourceArtifactImportResult
-	21,  // 123: core.SourceBuildTrigger.event_type:type_name -> core.SourceBuildTriggerEventType
-	22,  // 124: core.SourceBuildTrigger.status:type_name -> core.SourceBuildTriggerStatus
-	17,  // 125: core.SourceBuildTrigger.platform:type_name -> core.SourcePlatform
-	21,  // 126: core.CreateSourceBuildTriggerReq.event_type:type_name -> core.SourceBuildTriggerEventType
-	21,  // 127: core.UpdateSourceBuildTriggerReq.event_type:type_name -> core.SourceBuildTriggerEventType
-	22,  // 128: core.UpdateSourceBuildTriggerReq.status:type_name -> core.SourceBuildTriggerStatus
-	310, // 129: core.SourceBuildTriggerListReq.page:type_name -> common.PageReq
-	22,  // 130: core.SourceBuildTriggerListReq.status:type_name -> core.SourceBuildTriggerStatus
-	309, // 131: core.SourceBuildTriggerResp.base:type_name -> common.RespBase
-	146, // 132: core.SourceBuildTriggerResp.data:type_name -> core.SourceBuildTrigger
-	309, // 133: core.SourceBuildTriggerListResp.base:type_name -> common.RespBase
-	146, // 134: core.SourceBuildTriggerListResp.data:type_name -> core.SourceBuildTrigger
-	146, // 135: core.SourceBuildTriggerSecret.trigger:type_name -> core.SourceBuildTrigger
-	309, // 136: core.SourceBuildTriggerSecretResp.base:type_name -> common.RespBase
-	153, // 137: core.SourceBuildTriggerSecretResp.data:type_name -> core.SourceBuildTriggerSecret
-	146, // 138: core.SourceBuildTriggerCredential.trigger:type_name -> core.SourceBuildTrigger
-	309, // 139: core.SourceBuildTriggerCredentialResp.base:type_name -> common.RespBase
-	156, // 140: core.SourceBuildTriggerCredentialResp.data:type_name -> core.SourceBuildTriggerCredential
-	20,  // 141: core.SourceWebhookEvent.artifact_source:type_name -> core.SourceArtifactType
-	23,  // 142: core.SourceWebhookEvent.status:type_name -> core.SourceWebhookEventStatus
-	20,  // 143: core.EnqueueSourceWebhookEventReq.artifact_source:type_name -> core.SourceArtifactType
-	158, // 144: core.EnqueueSourceWebhookEventResult.event:type_name -> core.SourceWebhookEvent
-	309, // 145: core.EnqueueSourceWebhookEventResp.base:type_name -> common.RespBase
-	160, // 146: core.EnqueueSourceWebhookEventResp.data:type_name -> core.EnqueueSourceWebhookEventResult
-	158, // 147: core.ClaimedSourceWebhookEvent.event:type_name -> core.SourceWebhookEvent
-	146, // 148: core.ClaimedSourceWebhookEvent.trigger:type_name -> core.SourceBuildTrigger
-	309, // 149: core.ClaimSourceWebhookEventResp.base:type_name -> common.RespBase
-	163, // 150: core.ClaimSourceWebhookEventResp.data:type_name -> core.ClaimedSourceWebhookEvent
-	310, // 151: core.SourceWebhookEventListReq.page:type_name -> common.PageReq
-	23,  // 152: core.SourceWebhookEventListReq.status:type_name -> core.SourceWebhookEventStatus
-	309, // 153: core.SourceWebhookEventListResp.base:type_name -> common.RespBase
-	158, // 154: core.SourceWebhookEventListResp.data:type_name -> core.SourceWebhookEvent
-	309, // 155: core.BrandingProfileResp.base:type_name -> common.RespBase
-	55,  // 156: core.BrandingProfileResp.data:type_name -> core.BrandingProfile
-	310, // 157: core.BrandingProfileListReq.page:type_name -> common.PageReq
-	43,  // 158: core.BrandingProfileListReq.status:type_name -> core.BrandingProfileStatus
-	309, // 159: core.BrandingProfileListResp.base:type_name -> common.RespBase
-	55,  // 160: core.BrandingProfileListResp.data:type_name -> core.BrandingProfile
-	309, // 161: core.BrandingPreflightResp.base:type_name -> common.RespBase
-	56,  // 162: core.BrandingPreflightResp.data:type_name -> core.BrandingPreflight
-	310, // 163: core.BrandingPreflightListReq.page:type_name -> common.PageReq
-	44,  // 164: core.BrandingPreflightListReq.status:type_name -> core.BrandingPreflightStatus
-	309, // 165: core.BrandingPreflightListResp.base:type_name -> common.RespBase
-	56,  // 166: core.BrandingPreflightListResp.data:type_name -> core.BrandingPreflight
-	309, // 167: core.WhiteLabelTemplateResp.base:type_name -> common.RespBase
-	57,  // 168: core.WhiteLabelTemplateResp.data:type_name -> core.WhiteLabelTemplate
-	310, // 169: core.WhiteLabelTemplateListReq.page:type_name -> common.PageReq
-	45,  // 170: core.WhiteLabelTemplateListReq.status:type_name -> core.WhiteLabelTemplateStatus
-	309, // 171: core.WhiteLabelTemplateListResp.base:type_name -> common.RespBase
-	57,  // 172: core.WhiteLabelTemplateListResp.data:type_name -> core.WhiteLabelTemplate
-	309, // 173: core.WhiteLabelTemplateRevisionResp.base:type_name -> common.RespBase
-	58,  // 174: core.WhiteLabelTemplateRevisionResp.data:type_name -> core.WhiteLabelTemplateRevision
-	310, // 175: core.WhiteLabelTemplateRevisionListReq.page:type_name -> common.PageReq
-	46,  // 176: core.WhiteLabelTemplateRevisionListReq.status:type_name -> core.WhiteLabelRevisionStatus
-	309, // 177: core.WhiteLabelTemplateRevisionListResp.base:type_name -> common.RespBase
-	58,  // 178: core.WhiteLabelTemplateRevisionListResp.data:type_name -> core.WhiteLabelTemplateRevision
-	309, // 179: core.WhiteLabelProductResp.base:type_name -> common.RespBase
-	59,  // 180: core.WhiteLabelProductResp.data:type_name -> core.WhiteLabelProduct
-	310, // 181: core.WhiteLabelProductListReq.page:type_name -> common.PageReq
-	47,  // 182: core.WhiteLabelProductListReq.status:type_name -> core.WhiteLabelProductStatus
-	309, // 183: core.WhiteLabelProductListResp.base:type_name -> common.RespBase
-	59,  // 184: core.WhiteLabelProductListResp.data:type_name -> core.WhiteLabelProduct
-	309, // 185: core.WhiteLabelProductPreflightResp.base:type_name -> common.RespBase
-	310, // 186: core.ApplicationListReq.page:type_name -> common.PageReq
-	0,   // 187: core.ApplicationListReq.status:type_name -> core.ApplicationStatus
-	309, // 188: core.ApplicationListResp.base:type_name -> common.RespBase
-	49,  // 189: core.ApplicationListResp.data:type_name -> core.Application
-	310, // 190: core.VersionListReq.page:type_name -> common.PageReq
-	1,   // 191: core.VersionListReq.status:type_name -> core.VersionStatus
-	309, // 192: core.VersionListResp.base:type_name -> common.RespBase
-	50,  // 193: core.VersionListResp.data:type_name -> core.Version
-	310, // 194: core.ChannelListReq.page:type_name -> common.PageReq
-	2,   // 195: core.ChannelListReq.status:type_name -> core.ChannelStatus
-	309, // 196: core.ChannelListResp.base:type_name -> common.RespBase
-	51,  // 197: core.ChannelListResp.data:type_name -> core.Channel
-	310, // 198: core.BuildTaskListReq.page:type_name -> common.PageReq
-	3,   // 199: core.BuildTaskListReq.status:type_name -> core.BuildTaskStatus
-	309, // 200: core.BuildTaskListResp.base:type_name -> common.RespBase
-	53,  // 201: core.BuildTaskListResp.data:type_name -> core.BuildTask
-	4,   // 202: core.CreateStorageObjectReq.object_type:type_name -> core.StorageObjectType
-	309, // 203: core.ClaimExpiredStorageObjectsResp.base:type_name -> common.RespBase
-	201, // 204: core.ClaimExpiredStorageObjectsResp.data:type_name -> core.ExpiredStorageObject
-	309, // 205: core.StorageObjectResp.base:type_name -> common.RespBase
-	54,  // 206: core.StorageObjectResp.data:type_name -> core.StorageObject
-	6,   // 207: core.DrainBuilderNodeReq.drain_status:type_name -> core.BuilderDrainStatus
-	7,   // 208: core.UpsertBuildConcurrencyPolicyReq.status:type_name -> core.BuildPolicyStatus
-	62,  // 209: core.BuildCacheResolution.entry:type_name -> core.BuildCacheEntry
-	54,  // 210: core.BuildCacheResolution.artifact:type_name -> core.StorageObject
-	309, // 211: core.BuildCacheResolutionResp.base:type_name -> common.RespBase
-	219, // 212: core.BuildCacheResolutionResp.data:type_name -> core.BuildCacheResolution
-	309, // 213: core.CleanupBuildCacheResp.base:type_name -> common.RespBase
-	224, // 214: core.CleanupBuildCacheResp.data:type_name -> core.CleanupBuildCacheResult
-	45,  // 215: core.ChangeWhiteLabelTemplateStatusReq.status:type_name -> core.WhiteLabelTemplateStatus
-	47,  // 216: core.ChangeWhiteLabelProductStatusReq.status:type_name -> core.WhiteLabelProductStatus
-	42,  // 217: core.CreateBrandingProfileReq.rewrite_mode:type_name -> core.BrandingRewriteMode
-	42,  // 218: core.UpdateBrandingProfileReq.rewrite_mode:type_name -> core.BrandingRewriteMode
-	43,  // 219: core.ChangeBrandingProfileStatusReq.status:type_name -> core.BrandingProfileStatus
-	44,  // 220: core.CompleteBrandingPreflightReq.status:type_name -> core.BrandingPreflightStatus
-	56,  // 221: core.BrandingPreflightExecutionContext.preflight:type_name -> core.BrandingPreflight
-	55,  // 222: core.BrandingPreflightExecutionContext.profile:type_name -> core.BrandingProfile
-	50,  // 223: core.BrandingPreflightExecutionContext.version:type_name -> core.Version
-	54,  // 224: core.BrandingPreflightExecutionContext.source_apk:type_name -> core.StorageObject
-	54,  // 225: core.BrandingPreflightExecutionContext.brand_logo:type_name -> core.StorageObject
-	54,  // 226: core.BrandingPreflightExecutionContext.brand_splash:type_name -> core.StorageObject
-	309, // 227: core.BrandingPreflightExecutionContextResp.base:type_name -> common.RespBase
-	242, // 228: core.BrandingPreflightExecutionContextResp.data:type_name -> core.BrandingPreflightExecutionContext
-	309, // 229: core.ChannelStatsResp.base:type_name -> common.RespBase
-	246, // 230: core.ChannelStatsResp.data:type_name -> core.ChannelStats
-	309, // 231: core.ChannelDownloadArtifactResp.base:type_name -> common.RespBase
-	250, // 232: core.ChannelDownloadArtifactResp.data:type_name -> core.ChannelDownloadArtifact
-	3,   // 233: core.ReportBuildProgressReq.status:type_name -> core.BuildTaskStatus
-	53,  // 234: core.BuildExecutionContext.task:type_name -> core.BuildTask
-	54,  // 235: core.BuildExecutionContext.source_apk:type_name -> core.StorageObject
-	54,  // 236: core.BuildExecutionContext.keystore:type_name -> core.StorageObject
-	54,  // 237: core.BuildExecutionContext.brand_logo:type_name -> core.StorageObject
-	54,  // 238: core.BuildExecutionContext.brand_splash:type_name -> core.StorageObject
-	54,  // 239: core.BuildExecutionContext.template_files:type_name -> core.StorageObject
-	309, // 240: core.BuildExecutionContextResp.base:type_name -> common.RespBase
-	258, // 241: core.BuildExecutionContextResp.data:type_name -> core.BuildExecutionContext
-	24,  // 242: core.BillingPlan.billing_cycle:type_name -> core.BillingCycle
-	25,  // 243: core.BillingPlan.status:type_name -> core.BillingPlanStatus
-	24,  // 244: core.CreateBillingPlanReq.billing_cycle:type_name -> core.BillingCycle
-	25,  // 245: core.BillingPlanListReq.status:type_name -> core.BillingPlanStatus
-	309, // 246: core.BillingPlanResp.base:type_name -> common.RespBase
-	260, // 247: core.BillingPlanResp.data:type_name -> core.BillingPlan
-	309, // 248: core.BillingPlanListResp.base:type_name -> common.RespBase
-	260, // 249: core.BillingPlanListResp.data:type_name -> core.BillingPlan
-	26,  // 250: core.TenantSubscription.status:type_name -> core.TenantSubscriptionStatus
-	27,  // 251: core.TenantSubscription.source:type_name -> core.TenantSubscriptionSource
-	28,  // 252: core.TenantEntitlement.status:type_name -> core.TenantEntitlementStatus
-	309, // 253: core.TenantBillingResp.base:type_name -> common.RespBase
-	266, // 254: core.TenantBillingResp.subscription:type_name -> core.TenantSubscription
-	267, // 255: core.TenantBillingResp.entitlement:type_name -> core.TenantEntitlement
-	260, // 256: core.TenantBillingResp.plan:type_name -> core.BillingPlan
-	32,  // 257: core.ChangeTenantSubscriptionReq.mode:type_name -> core.SubscriptionChangeMode
-	30,  // 258: core.ReserveQuotaReq.metric:type_name -> core.QuotaMetric
-	30,  // 259: core.QuotaReservation.metric:type_name -> core.QuotaMetric
-	31,  // 260: core.QuotaReservation.status:type_name -> core.QuotaReservationStatus
-	309, // 261: core.QuotaReservationResp.base:type_name -> common.RespBase
-	274, // 262: core.QuotaReservationResp.data:type_name -> core.QuotaReservation
-	30,  // 263: core.QuotaReservationActionReq.metric:type_name -> core.QuotaMetric
-	29,  // 264: core.QuotaReservationActionReq.usage_metric:type_name -> core.BillingUsageMetric
-	29,  // 265: core.RecordUsageReq.metric:type_name -> core.BillingUsageMetric
-	29,  // 266: core.UsageMetricSummary.metric:type_name -> core.BillingUsageMetric
-	309, // 267: core.BillingUsageResp.base:type_name -> common.RespBase
-	278, // 268: core.BillingUsageResp.data:type_name -> core.UsageMetricSummary
-	29,  // 269: core.InvoiceItem.metric:type_name -> core.BillingUsageMetric
-	33,  // 270: core.Invoice.status:type_name -> core.InvoiceStatus
-	281, // 271: core.Invoice.items:type_name -> core.InvoiceItem
-	33,  // 272: core.InvoiceListReq.status:type_name -> core.InvoiceStatus
-	309, // 273: core.InvoiceListResp.base:type_name -> common.RespBase
-	282, // 274: core.InvoiceListResp.data:type_name -> core.Invoice
-	39,  // 275: core.LocalAgentCertificate.status:type_name -> core.LocalAgentCertificateStatus
-	36,  // 276: core.LocalAgent.status:type_name -> core.LocalAgentStatus
-	37,  // 277: core.LocalAgent.drain_status:type_name -> core.LocalAgentDrainStatus
-	38,  // 278: core.LocalAgent.artifact_mode:type_name -> core.HybridArtifactMode
-	286, // 279: core.LocalAgent.capabilities:type_name -> core.LocalAgentCapability
-	38,  // 280: core.CreateLocalAgentRegistrationReq.artifact_mode:type_name -> core.HybridArtifactMode
-	286, // 281: core.CreateLocalAgentRegistrationReq.capabilities:type_name -> core.LocalAgentCapability
-	309, // 282: core.LocalAgentRegistrationResp.base:type_name -> common.RespBase
-	288, // 283: core.LocalAgentRegistrationResp.data:type_name -> core.LocalAgent
-	309, // 284: core.RegisterLocalAgentResp.base:type_name -> common.RespBase
-	288, // 285: core.RegisterLocalAgentResp.data:type_name -> core.LocalAgent
-	287, // 286: core.RegisterLocalAgentResp.certificate:type_name -> core.LocalAgentCertificate
-	309, // 287: core.LocalAgentResp.base:type_name -> common.RespBase
-	288, // 288: core.LocalAgentResp.data:type_name -> core.LocalAgent
-	36,  // 289: core.LocalAgentListReq.status:type_name -> core.LocalAgentStatus
-	309, // 290: core.LocalAgentListResp.base:type_name -> common.RespBase
-	288, // 291: core.LocalAgentListResp.data:type_name -> core.LocalAgent
-	297, // 292: core.HeartbeatLocalAgentReq.auth:type_name -> core.LocalAgentAuth
-	286, // 293: core.HeartbeatLocalAgentReq.capabilities:type_name -> core.LocalAgentCapability
-	37,  // 294: core.DrainLocalAgentReq.drain_status:type_name -> core.LocalAgentDrainStatus
-	297, // 295: core.RotateLocalAgentCertificateReq.auth:type_name -> core.LocalAgentAuth
-	297, // 296: core.ClaimLocalAgentBuildTaskReq.auth:type_name -> core.LocalAgentAuth
-	309, // 297: core.LocalAgentBuildTaskResp.base:type_name -> common.RespBase
-	53,  // 298: core.LocalAgentBuildTaskResp.task:type_name -> core.BuildTask
-	38,  // 299: core.LocalAgentBuildTaskResp.artifact_mode:type_name -> core.HybridArtifactMode
-	297, // 300: core.RenewLocalAgentTaskLeaseReq.auth:type_name -> core.LocalAgentAuth
-	297, // 301: core.ReportLocalAgentBuildProgressReq.auth:type_name -> core.LocalAgentAuth
-	3,   // 302: core.ReportLocalAgentBuildProgressReq.status:type_name -> core.BuildTaskStatus
-	297, // 303: core.CompleteLocalAgentBuildTaskReq.auth:type_name -> core.LocalAgentAuth
-	297, // 304: core.FailLocalAgentBuildTaskReq.auth:type_name -> core.LocalAgentAuth
-	297, // 305: core.VerifyHybridArtifactReq.auth:type_name -> core.LocalAgentAuth
-	40,  // 306: core.VerifyHybridArtifactReq.artifact_type:type_name -> core.HybridArtifactType
-	38,  // 307: core.VerifyHybridArtifactReq.storage_mode:type_name -> core.HybridArtifactMode
-	193, // 308: core.Core.CreateApplication:input_type -> core.CreateApplicationReq
-	68,  // 309: core.Core.GetApplication:input_type -> core.ApplicationIdReq
-	185, // 310: core.Core.ListApplications:input_type -> core.ApplicationListReq
-	198, // 311: core.Core.CreateStorageObject:input_type -> core.CreateStorageObjectReq
-	205, // 312: core.Core.GetStorageObject:input_type -> core.StorageObjectIdReq
-	199, // 313: core.Core.CompleteStorageObject:input_type -> core.CompleteStorageObjectReq
-	200, // 314: core.Core.FailStorageObject:input_type -> core.FailStorageObjectReq
-	202, // 315: core.Core.ClaimExpiredStorageObjects:input_type -> core.ClaimExpiredStorageObjectsReq
-	204, // 316: core.Core.MarkStorageObjectDeleted:input_type -> core.MarkStorageObjectDeletedReq
-	194, // 317: core.Core.CreateVersion:input_type -> core.CreateVersionReq
-	69,  // 318: core.Core.GetVersion:input_type -> core.VersionIdReq
-	187, // 319: core.Core.ListVersions:input_type -> core.VersionListReq
-	195, // 320: core.Core.CreateChannel:input_type -> core.CreateChannelReq
-	70,  // 321: core.Core.GetChannel:input_type -> core.ChannelIdReq
-	189, // 322: core.Core.ListChannels:input_type -> core.ChannelListReq
-	197, // 323: core.Core.CreateSigningConfig:input_type -> core.CreateSigningConfigReq
-	196, // 324: core.Core.GetSigningConfig:input_type -> core.SigningConfigIdReq
-	81,  // 325: core.Core.ListSigningConfigs:input_type -> core.SigningConfigListReq
-	236, // 326: core.Core.CreateBrandingProfile:input_type -> core.CreateBrandingProfileReq
-	237, // 327: core.Core.UpdateBrandingProfile:input_type -> core.UpdateBrandingProfileReq
-	72,  // 328: core.Core.GetBrandingProfile:input_type -> core.BrandingProfileIdReq
-	170, // 329: core.Core.ListBrandingProfiles:input_type -> core.BrandingProfileListReq
-	238, // 330: core.Core.ChangeBrandingProfileStatus:input_type -> core.ChangeBrandingProfileStatusReq
-	239, // 331: core.Core.CreateBrandingPreflight:input_type -> core.CreateBrandingPreflightReq
-	73,  // 332: core.Core.GetBrandingPreflight:input_type -> core.BrandingPreflightIdReq
-	173, // 333: core.Core.ListBrandingPreflights:input_type -> core.BrandingPreflightListReq
-	241, // 334: core.Core.ClaimBrandingPreflight:input_type -> core.ClaimBrandingPreflightReq
-	240, // 335: core.Core.CompleteBrandingPreflight:input_type -> core.CompleteBrandingPreflightReq
-	226, // 336: core.Core.CreateWhiteLabelTemplate:input_type -> core.CreateWhiteLabelTemplateReq
-	227, // 337: core.Core.UpdateWhiteLabelTemplate:input_type -> core.UpdateWhiteLabelTemplateReq
-	228, // 338: core.Core.CopyWhiteLabelTemplate:input_type -> core.CopyWhiteLabelTemplateReq
-	74,  // 339: core.Core.DeleteWhiteLabelTemplate:input_type -> core.WhiteLabelTemplateIdReq
-	74,  // 340: core.Core.GetWhiteLabelTemplate:input_type -> core.WhiteLabelTemplateIdReq
-	176, // 341: core.Core.ListWhiteLabelTemplates:input_type -> core.WhiteLabelTemplateListReq
-	229, // 342: core.Core.CreateWhiteLabelTemplateRevision:input_type -> core.CreateWhiteLabelTemplateRevisionReq
-	75,  // 343: core.Core.GetWhiteLabelTemplateRevision:input_type -> core.WhiteLabelTemplateRevisionIdReq
-	230, // 344: core.Core.UpdateWhiteLabelTemplateRevision:input_type -> core.UpdateWhiteLabelTemplateRevisionReq
-	75,  // 345: core.Core.DeleteWhiteLabelTemplateRevision:input_type -> core.WhiteLabelTemplateRevisionIdReq
-	179, // 346: core.Core.ListWhiteLabelTemplateRevisions:input_type -> core.WhiteLabelTemplateRevisionListReq
-	231, // 347: core.Core.PublishWhiteLabelTemplate:input_type -> core.PublishWhiteLabelTemplateReq
-	234, // 348: core.Core.ChangeWhiteLabelTemplateStatus:input_type -> core.ChangeWhiteLabelTemplateStatusReq
-	232, // 349: core.Core.CreateWhiteLabelProduct:input_type -> core.CreateWhiteLabelProductReq
-	233, // 350: core.Core.UpdateWhiteLabelProduct:input_type -> core.UpdateWhiteLabelProductReq
-	76,  // 351: core.Core.DeleteWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
-	76,  // 352: core.Core.GetWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
-	182, // 353: core.Core.ListWhiteLabelProducts:input_type -> core.WhiteLabelProductListReq
-	235, // 354: core.Core.ChangeWhiteLabelProductStatus:input_type -> core.ChangeWhiteLabelProductStatusReq
-	76,  // 355: core.Core.PreflightWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
-	207, // 356: core.Core.CreateBuildTask:input_type -> core.CreateBuildTaskReq
-	71,  // 357: core.Core.GetBuildTask:input_type -> core.BuildTaskIdReq
-	191, // 358: core.Core.ListBuildTasks:input_type -> core.BuildTaskListReq
-	214, // 359: core.Core.CancelBuildTask:input_type -> core.CancelBuildTaskReq
-	215, // 360: core.Core.RetryBuildTask:input_type -> core.RetryBuildTaskReq
-	208, // 361: core.Core.GetBuilderNode:input_type -> core.BuilderNodeIdReq
-	85,  // 362: core.Core.ListBuilderNodes:input_type -> core.BuilderNodeListReq
-	211, // 363: core.Core.DrainBuilderNode:input_type -> core.DrainBuilderNodeReq
-	212, // 364: core.Core.RecoverBuilderNode:input_type -> core.RecoverBuilderNodeReq
-	216, // 365: core.Core.UpsertBuildConcurrencyPolicy:input_type -> core.UpsertBuildConcurrencyPolicyReq
-	88,  // 366: core.Core.ListBuildConcurrencyPolicies:input_type -> core.BuildConcurrencyPolicyListReq
-	91,  // 367: core.Core.ListBuildCacheEntries:input_type -> core.BuildCacheEntryListReq
-	222, // 368: core.Core.InvalidateBuildCache:input_type -> core.InvalidateBuildCacheReq
-	93,  // 369: core.Core.ListBuildSchedulerEvents:input_type -> core.BuildSchedulerEventListReq
-	95,  // 370: core.Core.GetBuildClusterMetrics:input_type -> core.BuildClusterMetricsReq
-	101, // 371: core.Core.CreateOpenApiCredential:input_type -> core.CreateOpenApiCredentialReq
-	97,  // 372: core.Core.ListOpenApiCredentials:input_type -> core.OpenApiCredentialListReq
-	103, // 373: core.Core.RotateOpenApiCredential:input_type -> core.RotateOpenApiCredentialReq
-	102, // 374: core.Core.RevokeOpenApiCredential:input_type -> core.OpenApiCredentialIdReq
-	104, // 375: core.Core.AuthenticateOpenApiCredential:input_type -> core.AuthenticateOpenApiCredentialReq
-	106, // 376: core.Core.BeginOpenApiIdempotency:input_type -> core.BeginOpenApiIdempotencyReq
-	109, // 377: core.Core.CompleteOpenApiIdempotency:input_type -> core.CompleteOpenApiIdempotencyReq
-	110, // 378: core.Core.RecordOpenApiAudit:input_type -> core.RecordOpenApiAuditReq
-	114, // 379: core.Core.CreateWebhookEndpoint:input_type -> core.CreateWebhookEndpointReq
-	115, // 380: core.Core.UpdateWebhookEndpoint:input_type -> core.UpdateWebhookEndpointReq
-	116, // 381: core.Core.GetWebhookEndpoint:input_type -> core.WebhookEndpointIdReq
-	117, // 382: core.Core.ListWebhookEndpoints:input_type -> core.WebhookEndpointListReq
-	116, // 383: core.Core.RotateWebhookEndpointSecret:input_type -> core.WebhookEndpointIdReq
-	121, // 384: core.Core.ListWebhookDeliveries:input_type -> core.WebhookDeliveryListReq
-	124, // 385: core.Core.ReplayWebhookDelivery:input_type -> core.WebhookDeliveryIdReq
-	125, // 386: core.Core.CreateTestWebhookEvent:input_type -> core.CreateTestWebhookEventReq
-	127, // 387: core.Core.CompleteSourceIntegration:input_type -> core.CompleteSourceIntegrationReq
-	128, // 388: core.Core.GetSourceIntegration:input_type -> core.SourceIntegrationIdReq
-	129, // 389: core.Core.ListSourceIntegrations:input_type -> core.SourceIntegrationListReq
-	128, // 390: core.Core.GetSourceIntegrationCredential:input_type -> core.SourceIntegrationIdReq
-	128, // 391: core.Core.DisconnectSourceIntegration:input_type -> core.SourceIntegrationIdReq
-	135, // 392: core.Core.AuthorizeSourceRepository:input_type -> core.AuthorizeSourceRepositoryReq
-	136, // 393: core.Core.GetSourceRepository:input_type -> core.SourceRepositoryIdReq
-	137, // 394: core.Core.ListSourceRepositories:input_type -> core.SourceRepositoryListReq
-	136, // 395: core.Core.RevokeSourceRepository:input_type -> core.SourceRepositoryIdReq
-	141, // 396: core.Core.RecordSourceArtifact:input_type -> core.RecordSourceArtifactReq
-	143, // 397: core.Core.ImportSourceArtifact:input_type -> core.ImportSourceArtifactReq
-	147, // 398: core.Core.CreateSourceBuildTrigger:input_type -> core.CreateSourceBuildTriggerReq
-	148, // 399: core.Core.UpdateSourceBuildTrigger:input_type -> core.UpdateSourceBuildTriggerReq
-	149, // 400: core.Core.GetSourceBuildTrigger:input_type -> core.SourceBuildTriggerIdReq
-	150, // 401: core.Core.ListSourceBuildTriggers:input_type -> core.SourceBuildTriggerListReq
-	149, // 402: core.Core.RotateSourceBuildTriggerSecret:input_type -> core.SourceBuildTriggerIdReq
-	155, // 403: core.Core.ResolveSourceBuildTrigger:input_type -> core.ResolveSourceBuildTriggerReq
-	159, // 404: core.Core.EnqueueSourceWebhookEvent:input_type -> core.EnqueueSourceWebhookEventReq
-	162, // 405: core.Core.ClaimSourceWebhookEvent:input_type -> core.ClaimSourceWebhookEventReq
-	165, // 406: core.Core.CompleteSourceWebhookEvent:input_type -> core.CompleteSourceWebhookEventReq
-	166, // 407: core.Core.FailSourceWebhookEvent:input_type -> core.FailSourceWebhookEventReq
-	167, // 408: core.Core.ListSourceWebhookEvents:input_type -> core.SourceWebhookEventListReq
-	261, // 409: core.Core.CreateBillingPlan:input_type -> core.CreateBillingPlanReq
-	262, // 410: core.Core.GetBillingPlan:input_type -> core.BillingPlanIdReq
-	263, // 411: core.Core.ListBillingPlans:input_type -> core.BillingPlanListReq
-	262, // 412: core.Core.RetireBillingPlan:input_type -> core.BillingPlanIdReq
-	268, // 413: core.Core.GetTenantBilling:input_type -> core.TenantBillingReq
-	270, // 414: core.Core.UpsertManualSubscription:input_type -> core.UpsertManualSubscriptionReq
-	271, // 415: core.Core.ChangeTenantSubscription:input_type -> core.ChangeTenantSubscriptionReq
-	272, // 416: core.Core.CancelTenantSubscription:input_type -> core.CancelTenantSubscriptionReq
-	273, // 417: core.Core.ReserveQuota:input_type -> core.ReserveQuotaReq
-	276, // 418: core.Core.ConfirmQuota:input_type -> core.QuotaReservationActionReq
-	276, // 419: core.Core.ReleaseQuota:input_type -> core.QuotaReservationActionReq
-	277, // 420: core.Core.RecordUsage:input_type -> core.RecordUsageReq
-	279, // 421: core.Core.GetBillingUsage:input_type -> core.BillingUsageReq
-	283, // 422: core.Core.ListInvoices:input_type -> core.InvoiceListReq
-	285, // 423: core.Core.ApplyBillingWebhook:input_type -> core.ApplyBillingWebhookReq
-	289, // 424: core.Core.CreateLocalAgentRegistration:input_type -> core.CreateLocalAgentRegistrationReq
-	291, // 425: core.Core.RegisterLocalAgent:input_type -> core.RegisterLocalAgentReq
-	293, // 426: core.Core.GetLocalAgent:input_type -> core.LocalAgentIdReq
-	295, // 427: core.Core.ListLocalAgents:input_type -> core.LocalAgentListReq
-	298, // 428: core.Core.HeartbeatLocalAgent:input_type -> core.HeartbeatLocalAgentReq
-	299, // 429: core.Core.DrainLocalAgent:input_type -> core.DrainLocalAgentReq
-	300, // 430: core.Core.RevokeLocalAgent:input_type -> core.RevokeLocalAgentReq
-	301, // 431: core.Core.RotateLocalAgentCertificate:input_type -> core.RotateLocalAgentCertificateReq
-	302, // 432: core.Core.ClaimLocalAgentBuildTask:input_type -> core.ClaimLocalAgentBuildTaskReq
-	304, // 433: core.Core.RenewLocalAgentTaskLease:input_type -> core.RenewLocalAgentTaskLeaseReq
-	305, // 434: core.Core.ReportLocalAgentBuildProgress:input_type -> core.ReportLocalAgentBuildProgressReq
-	306, // 435: core.Core.CompleteLocalAgentBuildTask:input_type -> core.CompleteLocalAgentBuildTaskReq
-	307, // 436: core.Core.FailLocalAgentBuildTask:input_type -> core.FailLocalAgentBuildTaskReq
-	308, // 437: core.Core.VerifyHybridArtifact:input_type -> core.VerifyHybridArtifactReq
-	244, // 438: core.Core.ReportInstall:input_type -> core.InstallReportReq
-	248, // 439: core.Core.ReportChannelEvent:input_type -> core.ReportChannelEventReq
-	245, // 440: core.Core.GetChannelStats:input_type -> core.ChannelStatsReq
-	249, // 441: core.Core.ResolveChannelDownload:input_type -> core.ResolveChannelDownloadReq
-	252, // 442: core.Core.ClaimBuildTask:input_type -> core.ClaimBuildTaskReq
-	209, // 443: core.Core.RegisterBuilderNode:input_type -> core.RegisterBuilderNodeReq
-	210, // 444: core.Core.BuilderNodeHeartbeat:input_type -> core.BuilderNodeHeartbeatReq
-	213, // 445: core.Core.ClaimScheduledBuildTask:input_type -> core.ClaimScheduledBuildTaskReq
-	218, // 446: core.Core.ResolveBuildCache:input_type -> core.ResolveBuildCacheReq
-	221, // 447: core.Core.PublishBuildCache:input_type -> core.PublishBuildCacheReq
-	223, // 448: core.Core.CleanupBuildCache:input_type -> core.CleanupBuildCacheReq
-	257, // 449: core.Core.GetBuildExecutionContext:input_type -> core.GetBuildExecutionContextReq
-	253, // 450: core.Core.HeartbeatBuildTask:input_type -> core.HeartbeatBuildTaskReq
-	254, // 451: core.Core.ReportBuildProgress:input_type -> core.ReportBuildProgressReq
-	255, // 452: core.Core.CompleteBuildTask:input_type -> core.CompleteBuildTaskReq
-	256, // 453: core.Core.FailBuildTask:input_type -> core.FailBuildTaskReq
-	77,  // 454: core.Core.CreateApplication:output_type -> core.ApplicationResp
-	77,  // 455: core.Core.GetApplication:output_type -> core.ApplicationResp
-	186, // 456: core.Core.ListApplications:output_type -> core.ApplicationListResp
-	206, // 457: core.Core.CreateStorageObject:output_type -> core.StorageObjectResp
-	206, // 458: core.Core.GetStorageObject:output_type -> core.StorageObjectResp
-	206, // 459: core.Core.CompleteStorageObject:output_type -> core.StorageObjectResp
-	48,  // 460: core.Core.FailStorageObject:output_type -> core.RespBase
-	203, // 461: core.Core.ClaimExpiredStorageObjects:output_type -> core.ClaimExpiredStorageObjectsResp
-	48,  // 462: core.Core.MarkStorageObjectDeleted:output_type -> core.RespBase
-	78,  // 463: core.Core.CreateVersion:output_type -> core.VersionResp
-	78,  // 464: core.Core.GetVersion:output_type -> core.VersionResp
-	188, // 465: core.Core.ListVersions:output_type -> core.VersionListResp
-	79,  // 466: core.Core.CreateChannel:output_type -> core.ChannelResp
-	79,  // 467: core.Core.GetChannel:output_type -> core.ChannelResp
-	190, // 468: core.Core.ListChannels:output_type -> core.ChannelListResp
-	80,  // 469: core.Core.CreateSigningConfig:output_type -> core.SigningConfigResp
-	80,  // 470: core.Core.GetSigningConfig:output_type -> core.SigningConfigResp
-	82,  // 471: core.Core.ListSigningConfigs:output_type -> core.SigningConfigListResp
-	169, // 472: core.Core.CreateBrandingProfile:output_type -> core.BrandingProfileResp
-	169, // 473: core.Core.UpdateBrandingProfile:output_type -> core.BrandingProfileResp
-	169, // 474: core.Core.GetBrandingProfile:output_type -> core.BrandingProfileResp
-	171, // 475: core.Core.ListBrandingProfiles:output_type -> core.BrandingProfileListResp
-	169, // 476: core.Core.ChangeBrandingProfileStatus:output_type -> core.BrandingProfileResp
-	172, // 477: core.Core.CreateBrandingPreflight:output_type -> core.BrandingPreflightResp
-	172, // 478: core.Core.GetBrandingPreflight:output_type -> core.BrandingPreflightResp
-	174, // 479: core.Core.ListBrandingPreflights:output_type -> core.BrandingPreflightListResp
-	243, // 480: core.Core.ClaimBrandingPreflight:output_type -> core.BrandingPreflightExecutionContextResp
-	172, // 481: core.Core.CompleteBrandingPreflight:output_type -> core.BrandingPreflightResp
-	175, // 482: core.Core.CreateWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
-	175, // 483: core.Core.UpdateWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
-	175, // 484: core.Core.CopyWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
-	48,  // 485: core.Core.DeleteWhiteLabelTemplate:output_type -> core.RespBase
-	175, // 486: core.Core.GetWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
-	177, // 487: core.Core.ListWhiteLabelTemplates:output_type -> core.WhiteLabelTemplateListResp
-	178, // 488: core.Core.CreateWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
-	178, // 489: core.Core.GetWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
-	178, // 490: core.Core.UpdateWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
-	48,  // 491: core.Core.DeleteWhiteLabelTemplateRevision:output_type -> core.RespBase
-	180, // 492: core.Core.ListWhiteLabelTemplateRevisions:output_type -> core.WhiteLabelTemplateRevisionListResp
-	175, // 493: core.Core.PublishWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
-	175, // 494: core.Core.ChangeWhiteLabelTemplateStatus:output_type -> core.WhiteLabelTemplateResp
-	181, // 495: core.Core.CreateWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
-	181, // 496: core.Core.UpdateWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
-	48,  // 497: core.Core.DeleteWhiteLabelProduct:output_type -> core.RespBase
-	181, // 498: core.Core.GetWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
-	183, // 499: core.Core.ListWhiteLabelProducts:output_type -> core.WhiteLabelProductListResp
-	181, // 500: core.Core.ChangeWhiteLabelProductStatus:output_type -> core.WhiteLabelProductResp
-	184, // 501: core.Core.PreflightWhiteLabelProduct:output_type -> core.WhiteLabelProductPreflightResp
-	83,  // 502: core.Core.CreateBuildTask:output_type -> core.BuildTaskResp
-	83,  // 503: core.Core.GetBuildTask:output_type -> core.BuildTaskResp
-	192, // 504: core.Core.ListBuildTasks:output_type -> core.BuildTaskListResp
-	83,  // 505: core.Core.CancelBuildTask:output_type -> core.BuildTaskResp
-	83,  // 506: core.Core.RetryBuildTask:output_type -> core.BuildTaskResp
-	84,  // 507: core.Core.GetBuilderNode:output_type -> core.BuilderNodeResp
-	86,  // 508: core.Core.ListBuilderNodes:output_type -> core.BuilderNodeListResp
-	84,  // 509: core.Core.DrainBuilderNode:output_type -> core.BuilderNodeResp
-	84,  // 510: core.Core.RecoverBuilderNode:output_type -> core.BuilderNodeResp
-	87,  // 511: core.Core.UpsertBuildConcurrencyPolicy:output_type -> core.BuildConcurrencyPolicyResp
-	89,  // 512: core.Core.ListBuildConcurrencyPolicies:output_type -> core.BuildConcurrencyPolicyListResp
-	92,  // 513: core.Core.ListBuildCacheEntries:output_type -> core.BuildCacheEntryListResp
-	90,  // 514: core.Core.InvalidateBuildCache:output_type -> core.BuildCacheEntryResp
-	94,  // 515: core.Core.ListBuildSchedulerEvents:output_type -> core.BuildSchedulerEventListResp
-	96,  // 516: core.Core.GetBuildClusterMetrics:output_type -> core.BuildClusterMetricsResp
-	100, // 517: core.Core.CreateOpenApiCredential:output_type -> core.OpenApiCredentialSecretResp
-	98,  // 518: core.Core.ListOpenApiCredentials:output_type -> core.OpenApiCredentialListResp
-	100, // 519: core.Core.RotateOpenApiCredential:output_type -> core.OpenApiCredentialSecretResp
-	99,  // 520: core.Core.RevokeOpenApiCredential:output_type -> core.OpenApiCredentialResp
-	105, // 521: core.Core.AuthenticateOpenApiCredential:output_type -> core.OpenApiAuthContextResp
-	108, // 522: core.Core.BeginOpenApiIdempotency:output_type -> core.OpenApiIdempotencyResp
-	48,  // 523: core.Core.CompleteOpenApiIdempotency:output_type -> core.RespBase
-	48,  // 524: core.Core.RecordOpenApiAudit:output_type -> core.RespBase
-	120, // 525: core.Core.CreateWebhookEndpoint:output_type -> core.WebhookEndpointSecretResp
-	118, // 526: core.Core.UpdateWebhookEndpoint:output_type -> core.WebhookEndpointResp
-	118, // 527: core.Core.GetWebhookEndpoint:output_type -> core.WebhookEndpointResp
-	119, // 528: core.Core.ListWebhookEndpoints:output_type -> core.WebhookEndpointListResp
-	120, // 529: core.Core.RotateWebhookEndpointSecret:output_type -> core.WebhookEndpointSecretResp
-	122, // 530: core.Core.ListWebhookDeliveries:output_type -> core.WebhookDeliveryListResp
-	123, // 531: core.Core.ReplayWebhookDelivery:output_type -> core.WebhookDeliveryResp
-	48,  // 532: core.Core.CreateTestWebhookEvent:output_type -> core.RespBase
-	130, // 533: core.Core.CompleteSourceIntegration:output_type -> core.SourceIntegrationResp
-	130, // 534: core.Core.GetSourceIntegration:output_type -> core.SourceIntegrationResp
-	131, // 535: core.Core.ListSourceIntegrations:output_type -> core.SourceIntegrationListResp
-	133, // 536: core.Core.GetSourceIntegrationCredential:output_type -> core.SourceIntegrationCredentialResp
-	130, // 537: core.Core.DisconnectSourceIntegration:output_type -> core.SourceIntegrationResp
-	138, // 538: core.Core.AuthorizeSourceRepository:output_type -> core.SourceRepositoryResp
-	138, // 539: core.Core.GetSourceRepository:output_type -> core.SourceRepositoryResp
-	139, // 540: core.Core.ListSourceRepositories:output_type -> core.SourceRepositoryListResp
-	138, // 541: core.Core.RevokeSourceRepository:output_type -> core.SourceRepositoryResp
-	142, // 542: core.Core.RecordSourceArtifact:output_type -> core.SourceArtifactResp
-	145, // 543: core.Core.ImportSourceArtifact:output_type -> core.SourceArtifactImportResp
-	154, // 544: core.Core.CreateSourceBuildTrigger:output_type -> core.SourceBuildTriggerSecretResp
-	151, // 545: core.Core.UpdateSourceBuildTrigger:output_type -> core.SourceBuildTriggerResp
-	151, // 546: core.Core.GetSourceBuildTrigger:output_type -> core.SourceBuildTriggerResp
-	152, // 547: core.Core.ListSourceBuildTriggers:output_type -> core.SourceBuildTriggerListResp
-	154, // 548: core.Core.RotateSourceBuildTriggerSecret:output_type -> core.SourceBuildTriggerSecretResp
-	157, // 549: core.Core.ResolveSourceBuildTrigger:output_type -> core.SourceBuildTriggerCredentialResp
-	161, // 550: core.Core.EnqueueSourceWebhookEvent:output_type -> core.EnqueueSourceWebhookEventResp
-	164, // 551: core.Core.ClaimSourceWebhookEvent:output_type -> core.ClaimSourceWebhookEventResp
-	48,  // 552: core.Core.CompleteSourceWebhookEvent:output_type -> core.RespBase
-	48,  // 553: core.Core.FailSourceWebhookEvent:output_type -> core.RespBase
-	168, // 554: core.Core.ListSourceWebhookEvents:output_type -> core.SourceWebhookEventListResp
-	264, // 555: core.Core.CreateBillingPlan:output_type -> core.BillingPlanResp
-	264, // 556: core.Core.GetBillingPlan:output_type -> core.BillingPlanResp
-	265, // 557: core.Core.ListBillingPlans:output_type -> core.BillingPlanListResp
-	264, // 558: core.Core.RetireBillingPlan:output_type -> core.BillingPlanResp
-	269, // 559: core.Core.GetTenantBilling:output_type -> core.TenantBillingResp
-	269, // 560: core.Core.UpsertManualSubscription:output_type -> core.TenantBillingResp
-	269, // 561: core.Core.ChangeTenantSubscription:output_type -> core.TenantBillingResp
-	269, // 562: core.Core.CancelTenantSubscription:output_type -> core.TenantBillingResp
-	275, // 563: core.Core.ReserveQuota:output_type -> core.QuotaReservationResp
-	275, // 564: core.Core.ConfirmQuota:output_type -> core.QuotaReservationResp
-	275, // 565: core.Core.ReleaseQuota:output_type -> core.QuotaReservationResp
-	48,  // 566: core.Core.RecordUsage:output_type -> core.RespBase
-	280, // 567: core.Core.GetBillingUsage:output_type -> core.BillingUsageResp
-	284, // 568: core.Core.ListInvoices:output_type -> core.InvoiceListResp
-	48,  // 569: core.Core.ApplyBillingWebhook:output_type -> core.RespBase
-	290, // 570: core.Core.CreateLocalAgentRegistration:output_type -> core.LocalAgentRegistrationResp
-	292, // 571: core.Core.RegisterLocalAgent:output_type -> core.RegisterLocalAgentResp
-	294, // 572: core.Core.GetLocalAgent:output_type -> core.LocalAgentResp
-	296, // 573: core.Core.ListLocalAgents:output_type -> core.LocalAgentListResp
-	294, // 574: core.Core.HeartbeatLocalAgent:output_type -> core.LocalAgentResp
-	294, // 575: core.Core.DrainLocalAgent:output_type -> core.LocalAgentResp
-	294, // 576: core.Core.RevokeLocalAgent:output_type -> core.LocalAgentResp
-	292, // 577: core.Core.RotateLocalAgentCertificate:output_type -> core.RegisterLocalAgentResp
-	303, // 578: core.Core.ClaimLocalAgentBuildTask:output_type -> core.LocalAgentBuildTaskResp
-	48,  // 579: core.Core.RenewLocalAgentTaskLease:output_type -> core.RespBase
-	48,  // 580: core.Core.ReportLocalAgentBuildProgress:output_type -> core.RespBase
-	48,  // 581: core.Core.CompleteLocalAgentBuildTask:output_type -> core.RespBase
-	48,  // 582: core.Core.FailLocalAgentBuildTask:output_type -> core.RespBase
-	48,  // 583: core.Core.VerifyHybridArtifact:output_type -> core.RespBase
-	48,  // 584: core.Core.ReportInstall:output_type -> core.RespBase
-	48,  // 585: core.Core.ReportChannelEvent:output_type -> core.RespBase
-	247, // 586: core.Core.GetChannelStats:output_type -> core.ChannelStatsResp
-	251, // 587: core.Core.ResolveChannelDownload:output_type -> core.ChannelDownloadArtifactResp
-	83,  // 588: core.Core.ClaimBuildTask:output_type -> core.BuildTaskResp
-	84,  // 589: core.Core.RegisterBuilderNode:output_type -> core.BuilderNodeResp
-	84,  // 590: core.Core.BuilderNodeHeartbeat:output_type -> core.BuilderNodeResp
-	83,  // 591: core.Core.ClaimScheduledBuildTask:output_type -> core.BuildTaskResp
-	220, // 592: core.Core.ResolveBuildCache:output_type -> core.BuildCacheResolutionResp
-	90,  // 593: core.Core.PublishBuildCache:output_type -> core.BuildCacheEntryResp
-	225, // 594: core.Core.CleanupBuildCache:output_type -> core.CleanupBuildCacheResp
-	259, // 595: core.Core.GetBuildExecutionContext:output_type -> core.BuildExecutionContextResp
-	48,  // 596: core.Core.HeartbeatBuildTask:output_type -> core.RespBase
-	48,  // 597: core.Core.ReportBuildProgress:output_type -> core.RespBase
-	48,  // 598: core.Core.CompleteBuildTask:output_type -> core.RespBase
-	48,  // 599: core.Core.FailBuildTask:output_type -> core.RespBase
-	454, // [454:600] is the sub-list for method output_type
-	308, // [308:454] is the sub-list for method input_type
-	308, // [308:308] is the sub-list for extension type_name
-	308, // [308:308] is the sub-list for extension extendee
-	0,   // [0:308] is the sub-list for field type_name
+	49,  // 4: core.SigningConfig.signing_mode:type_name -> core.SigningMode
+	3,   // 5: core.BuildTask.status:type_name -> core.BuildTaskStatus
+	4,   // 6: core.StorageObject.object_type:type_name -> core.StorageObjectType
+	42,  // 7: core.StorageObject.status:type_name -> core.StorageObjectStatus
+	38,  // 8: core.StorageObject.storage_mode:type_name -> core.HybridArtifactMode
+	43,  // 9: core.BrandingProfile.rewrite_mode:type_name -> core.BrandingRewriteMode
+	44,  // 10: core.BrandingProfile.status:type_name -> core.BrandingProfileStatus
+	45,  // 11: core.BrandingPreflight.status:type_name -> core.BrandingPreflightStatus
+	46,  // 12: core.WhiteLabelTemplate.status:type_name -> core.WhiteLabelTemplateStatus
+	47,  // 13: core.WhiteLabelTemplateRevision.status:type_name -> core.WhiteLabelRevisionStatus
+	48,  // 14: core.WhiteLabelProduct.status:type_name -> core.WhiteLabelProductStatus
+	5,   // 15: core.BuilderNode.status:type_name -> core.BuilderNodeStatus
+	6,   // 16: core.BuilderNode.drain_status:type_name -> core.BuilderDrainStatus
+	7,   // 17: core.BuildConcurrencyPolicy.status:type_name -> core.BuildPolicyStatus
+	9,   // 18: core.BuildCacheEntry.cache_scope:type_name -> core.BuildCacheScope
+	10,  // 19: core.BuildCacheEntry.status:type_name -> core.BuildCacheStatus
+	11,  // 20: core.BuildSchedulerEvent.event_type:type_name -> core.BuildSchedulerEventType
+	13,  // 21: core.OpenApiCredential.scopes:type_name -> core.OpenApiScope
+	12,  // 22: core.OpenApiCredential.status:type_name -> core.OpenApiCredentialStatus
+	67,  // 23: core.OpenApiCredentialSecret.credential:type_name -> core.OpenApiCredential
+	13,  // 24: core.OpenApiAuthContext.scopes:type_name -> core.OpenApiScope
+	322, // 25: core.ApplicationResp.base:type_name -> common.RespBase
+	51,  // 26: core.ApplicationResp.data:type_name -> core.Application
+	322, // 27: core.VersionResp.base:type_name -> common.RespBase
+	52,  // 28: core.VersionResp.data:type_name -> core.Version
+	322, // 29: core.ChannelResp.base:type_name -> common.RespBase
+	53,  // 30: core.ChannelResp.data:type_name -> core.Channel
+	322, // 31: core.SigningConfigResp.base:type_name -> common.RespBase
+	54,  // 32: core.SigningConfigResp.data:type_name -> core.SigningConfig
+	323, // 33: core.SigningConfigListReq.page:type_name -> common.PageReq
+	322, // 34: core.SigningConfigListResp.base:type_name -> common.RespBase
+	54,  // 35: core.SigningConfigListResp.data:type_name -> core.SigningConfig
+	322, // 36: core.BuildTaskResp.base:type_name -> common.RespBase
+	55,  // 37: core.BuildTaskResp.data:type_name -> core.BuildTask
+	322, // 38: core.BuilderNodeResp.base:type_name -> common.RespBase
+	62,  // 39: core.BuilderNodeResp.data:type_name -> core.BuilderNode
+	323, // 40: core.BuilderNodeListReq.page:type_name -> common.PageReq
+	5,   // 41: core.BuilderNodeListReq.status:type_name -> core.BuilderNodeStatus
+	6,   // 42: core.BuilderNodeListReq.drain_status:type_name -> core.BuilderDrainStatus
+	322, // 43: core.BuilderNodeListResp.base:type_name -> common.RespBase
+	62,  // 44: core.BuilderNodeListResp.data:type_name -> core.BuilderNode
+	322, // 45: core.BuildConcurrencyPolicyResp.base:type_name -> common.RespBase
+	63,  // 46: core.BuildConcurrencyPolicyResp.data:type_name -> core.BuildConcurrencyPolicy
+	323, // 47: core.BuildConcurrencyPolicyListReq.page:type_name -> common.PageReq
+	7,   // 48: core.BuildConcurrencyPolicyListReq.status:type_name -> core.BuildPolicyStatus
+	322, // 49: core.BuildConcurrencyPolicyListResp.base:type_name -> common.RespBase
+	63,  // 50: core.BuildConcurrencyPolicyListResp.data:type_name -> core.BuildConcurrencyPolicy
+	322, // 51: core.BuildCacheEntryResp.base:type_name -> common.RespBase
+	64,  // 52: core.BuildCacheEntryResp.data:type_name -> core.BuildCacheEntry
+	323, // 53: core.BuildCacheEntryListReq.page:type_name -> common.PageReq
+	9,   // 54: core.BuildCacheEntryListReq.cache_scope:type_name -> core.BuildCacheScope
+	10,  // 55: core.BuildCacheEntryListReq.status:type_name -> core.BuildCacheStatus
+	322, // 56: core.BuildCacheEntryListResp.base:type_name -> common.RespBase
+	64,  // 57: core.BuildCacheEntryListResp.data:type_name -> core.BuildCacheEntry
+	323, // 58: core.BuildSchedulerEventListReq.page:type_name -> common.PageReq
+	11,  // 59: core.BuildSchedulerEventListReq.event_type:type_name -> core.BuildSchedulerEventType
+	322, // 60: core.BuildSchedulerEventListResp.base:type_name -> common.RespBase
+	65,  // 61: core.BuildSchedulerEventListResp.data:type_name -> core.BuildSchedulerEvent
+	322, // 62: core.BuildClusterMetricsResp.base:type_name -> common.RespBase
+	66,  // 63: core.BuildClusterMetricsResp.data:type_name -> core.BuildClusterMetrics
+	323, // 64: core.OpenApiCredentialListReq.page:type_name -> common.PageReq
+	12,  // 65: core.OpenApiCredentialListReq.status:type_name -> core.OpenApiCredentialStatus
+	322, // 66: core.OpenApiCredentialListResp.base:type_name -> common.RespBase
+	67,  // 67: core.OpenApiCredentialListResp.data:type_name -> core.OpenApiCredential
+	322, // 68: core.OpenApiCredentialResp.base:type_name -> common.RespBase
+	67,  // 69: core.OpenApiCredentialResp.data:type_name -> core.OpenApiCredential
+	322, // 70: core.OpenApiCredentialSecretResp.base:type_name -> common.RespBase
+	68,  // 71: core.OpenApiCredentialSecretResp.data:type_name -> core.OpenApiCredentialSecret
+	13,  // 72: core.CreateOpenApiCredentialReq.scopes:type_name -> core.OpenApiScope
+	322, // 73: core.OpenApiAuthContextResp.base:type_name -> common.RespBase
+	69,  // 74: core.OpenApiAuthContextResp.data:type_name -> core.OpenApiAuthContext
+	14,  // 75: core.OpenApiIdempotencyResult.decision:type_name -> core.OpenApiIdempotencyDecision
+	322, // 76: core.OpenApiIdempotencyResp.base:type_name -> common.RespBase
+	109, // 77: core.OpenApiIdempotencyResp.data:type_name -> core.OpenApiIdempotencyResult
+	15,  // 78: core.WebhookEndpoint.status:type_name -> core.WebhookEndpointStatus
+	113, // 79: core.WebhookEndpointSecret.endpoint:type_name -> core.WebhookEndpoint
+	16,  // 80: core.WebhookDelivery.status:type_name -> core.WebhookDeliveryStatus
+	15,  // 81: core.UpdateWebhookEndpointReq.status:type_name -> core.WebhookEndpointStatus
+	323, // 82: core.WebhookEndpointListReq.page:type_name -> common.PageReq
+	15,  // 83: core.WebhookEndpointListReq.status:type_name -> core.WebhookEndpointStatus
+	322, // 84: core.WebhookEndpointResp.base:type_name -> common.RespBase
+	113, // 85: core.WebhookEndpointResp.data:type_name -> core.WebhookEndpoint
+	322, // 86: core.WebhookEndpointListResp.base:type_name -> common.RespBase
+	113, // 87: core.WebhookEndpointListResp.data:type_name -> core.WebhookEndpoint
+	322, // 88: core.WebhookEndpointSecretResp.base:type_name -> common.RespBase
+	114, // 89: core.WebhookEndpointSecretResp.data:type_name -> core.WebhookEndpointSecret
+	323, // 90: core.WebhookDeliveryListReq.page:type_name -> common.PageReq
+	16,  // 91: core.WebhookDeliveryListReq.status:type_name -> core.WebhookDeliveryStatus
+	322, // 92: core.WebhookDeliveryListResp.base:type_name -> common.RespBase
+	115, // 93: core.WebhookDeliveryListResp.data:type_name -> core.WebhookDelivery
+	322, // 94: core.WebhookDeliveryResp.base:type_name -> common.RespBase
+	115, // 95: core.WebhookDeliveryResp.data:type_name -> core.WebhookDelivery
+	17,  // 96: core.SourceIntegration.platform:type_name -> core.SourcePlatform
+	18,  // 97: core.SourceIntegration.status:type_name -> core.SourceIntegrationStatus
+	17,  // 98: core.CompleteSourceIntegrationReq.platform:type_name -> core.SourcePlatform
+	323, // 99: core.SourceIntegrationListReq.page:type_name -> common.PageReq
+	17,  // 100: core.SourceIntegrationListReq.platform:type_name -> core.SourcePlatform
+	18,  // 101: core.SourceIntegrationListReq.status:type_name -> core.SourceIntegrationStatus
+	322, // 102: core.SourceIntegrationResp.base:type_name -> common.RespBase
+	128, // 103: core.SourceIntegrationResp.data:type_name -> core.SourceIntegration
+	322, // 104: core.SourceIntegrationListResp.base:type_name -> common.RespBase
+	128, // 105: core.SourceIntegrationListResp.data:type_name -> core.SourceIntegration
+	128, // 106: core.SourceIntegrationCredential.integration:type_name -> core.SourceIntegration
+	322, // 107: core.SourceIntegrationCredentialResp.base:type_name -> common.RespBase
+	134, // 108: core.SourceIntegrationCredentialResp.data:type_name -> core.SourceIntegrationCredential
+	19,  // 109: core.SourceRepository.status:type_name -> core.SourceRepositoryStatus
+	323, // 110: core.SourceRepositoryListReq.page:type_name -> common.PageReq
+	19,  // 111: core.SourceRepositoryListReq.status:type_name -> core.SourceRepositoryStatus
+	322, // 112: core.SourceRepositoryResp.base:type_name -> common.RespBase
+	136, // 113: core.SourceRepositoryResp.data:type_name -> core.SourceRepository
+	322, // 114: core.SourceRepositoryListResp.base:type_name -> common.RespBase
+	136, // 115: core.SourceRepositoryListResp.data:type_name -> core.SourceRepository
+	20,  // 116: core.SourceArtifact.artifact_source:type_name -> core.SourceArtifactType
+	20,  // 117: core.RecordSourceArtifactReq.artifact_source:type_name -> core.SourceArtifactType
+	322, // 118: core.SourceArtifactResp.base:type_name -> common.RespBase
+	142, // 119: core.SourceArtifactResp.data:type_name -> core.SourceArtifact
+	20,  // 120: core.ImportSourceArtifactReq.artifact_source:type_name -> core.SourceArtifactType
+	52,  // 121: core.SourceArtifactImportResult.version:type_name -> core.Version
+	142, // 122: core.SourceArtifactImportResult.artifact:type_name -> core.SourceArtifact
+	322, // 123: core.SourceArtifactImportResp.base:type_name -> common.RespBase
+	146, // 124: core.SourceArtifactImportResp.data:type_name -> core.SourceArtifactImportResult
+	21,  // 125: core.SourceBuildTrigger.event_type:type_name -> core.SourceBuildTriggerEventType
+	22,  // 126: core.SourceBuildTrigger.status:type_name -> core.SourceBuildTriggerStatus
+	17,  // 127: core.SourceBuildTrigger.platform:type_name -> core.SourcePlatform
+	21,  // 128: core.CreateSourceBuildTriggerReq.event_type:type_name -> core.SourceBuildTriggerEventType
+	21,  // 129: core.UpdateSourceBuildTriggerReq.event_type:type_name -> core.SourceBuildTriggerEventType
+	22,  // 130: core.UpdateSourceBuildTriggerReq.status:type_name -> core.SourceBuildTriggerStatus
+	323, // 131: core.SourceBuildTriggerListReq.page:type_name -> common.PageReq
+	22,  // 132: core.SourceBuildTriggerListReq.status:type_name -> core.SourceBuildTriggerStatus
+	322, // 133: core.SourceBuildTriggerResp.base:type_name -> common.RespBase
+	148, // 134: core.SourceBuildTriggerResp.data:type_name -> core.SourceBuildTrigger
+	322, // 135: core.SourceBuildTriggerListResp.base:type_name -> common.RespBase
+	148, // 136: core.SourceBuildTriggerListResp.data:type_name -> core.SourceBuildTrigger
+	148, // 137: core.SourceBuildTriggerSecret.trigger:type_name -> core.SourceBuildTrigger
+	322, // 138: core.SourceBuildTriggerSecretResp.base:type_name -> common.RespBase
+	155, // 139: core.SourceBuildTriggerSecretResp.data:type_name -> core.SourceBuildTriggerSecret
+	148, // 140: core.SourceBuildTriggerCredential.trigger:type_name -> core.SourceBuildTrigger
+	322, // 141: core.SourceBuildTriggerCredentialResp.base:type_name -> common.RespBase
+	158, // 142: core.SourceBuildTriggerCredentialResp.data:type_name -> core.SourceBuildTriggerCredential
+	20,  // 143: core.SourceWebhookEvent.artifact_source:type_name -> core.SourceArtifactType
+	23,  // 144: core.SourceWebhookEvent.status:type_name -> core.SourceWebhookEventStatus
+	20,  // 145: core.EnqueueSourceWebhookEventReq.artifact_source:type_name -> core.SourceArtifactType
+	160, // 146: core.EnqueueSourceWebhookEventResult.event:type_name -> core.SourceWebhookEvent
+	322, // 147: core.EnqueueSourceWebhookEventResp.base:type_name -> common.RespBase
+	162, // 148: core.EnqueueSourceWebhookEventResp.data:type_name -> core.EnqueueSourceWebhookEventResult
+	160, // 149: core.ClaimedSourceWebhookEvent.event:type_name -> core.SourceWebhookEvent
+	148, // 150: core.ClaimedSourceWebhookEvent.trigger:type_name -> core.SourceBuildTrigger
+	322, // 151: core.ClaimSourceWebhookEventResp.base:type_name -> common.RespBase
+	165, // 152: core.ClaimSourceWebhookEventResp.data:type_name -> core.ClaimedSourceWebhookEvent
+	323, // 153: core.SourceWebhookEventListReq.page:type_name -> common.PageReq
+	23,  // 154: core.SourceWebhookEventListReq.status:type_name -> core.SourceWebhookEventStatus
+	322, // 155: core.SourceWebhookEventListResp.base:type_name -> common.RespBase
+	160, // 156: core.SourceWebhookEventListResp.data:type_name -> core.SourceWebhookEvent
+	322, // 157: core.BrandingProfileResp.base:type_name -> common.RespBase
+	57,  // 158: core.BrandingProfileResp.data:type_name -> core.BrandingProfile
+	323, // 159: core.BrandingProfileListReq.page:type_name -> common.PageReq
+	44,  // 160: core.BrandingProfileListReq.status:type_name -> core.BrandingProfileStatus
+	322, // 161: core.BrandingProfileListResp.base:type_name -> common.RespBase
+	57,  // 162: core.BrandingProfileListResp.data:type_name -> core.BrandingProfile
+	322, // 163: core.BrandingPreflightResp.base:type_name -> common.RespBase
+	58,  // 164: core.BrandingPreflightResp.data:type_name -> core.BrandingPreflight
+	323, // 165: core.BrandingPreflightListReq.page:type_name -> common.PageReq
+	45,  // 166: core.BrandingPreflightListReq.status:type_name -> core.BrandingPreflightStatus
+	322, // 167: core.BrandingPreflightListResp.base:type_name -> common.RespBase
+	58,  // 168: core.BrandingPreflightListResp.data:type_name -> core.BrandingPreflight
+	322, // 169: core.WhiteLabelTemplateResp.base:type_name -> common.RespBase
+	59,  // 170: core.WhiteLabelTemplateResp.data:type_name -> core.WhiteLabelTemplate
+	323, // 171: core.WhiteLabelTemplateListReq.page:type_name -> common.PageReq
+	46,  // 172: core.WhiteLabelTemplateListReq.status:type_name -> core.WhiteLabelTemplateStatus
+	322, // 173: core.WhiteLabelTemplateListResp.base:type_name -> common.RespBase
+	59,  // 174: core.WhiteLabelTemplateListResp.data:type_name -> core.WhiteLabelTemplate
+	322, // 175: core.WhiteLabelTemplateRevisionResp.base:type_name -> common.RespBase
+	60,  // 176: core.WhiteLabelTemplateRevisionResp.data:type_name -> core.WhiteLabelTemplateRevision
+	323, // 177: core.WhiteLabelTemplateRevisionListReq.page:type_name -> common.PageReq
+	47,  // 178: core.WhiteLabelTemplateRevisionListReq.status:type_name -> core.WhiteLabelRevisionStatus
+	322, // 179: core.WhiteLabelTemplateRevisionListResp.base:type_name -> common.RespBase
+	60,  // 180: core.WhiteLabelTemplateRevisionListResp.data:type_name -> core.WhiteLabelTemplateRevision
+	322, // 181: core.WhiteLabelProductResp.base:type_name -> common.RespBase
+	61,  // 182: core.WhiteLabelProductResp.data:type_name -> core.WhiteLabelProduct
+	323, // 183: core.WhiteLabelProductListReq.page:type_name -> common.PageReq
+	48,  // 184: core.WhiteLabelProductListReq.status:type_name -> core.WhiteLabelProductStatus
+	322, // 185: core.WhiteLabelProductListResp.base:type_name -> common.RespBase
+	61,  // 186: core.WhiteLabelProductListResp.data:type_name -> core.WhiteLabelProduct
+	322, // 187: core.WhiteLabelProductPreflightResp.base:type_name -> common.RespBase
+	323, // 188: core.ApplicationListReq.page:type_name -> common.PageReq
+	0,   // 189: core.ApplicationListReq.status:type_name -> core.ApplicationStatus
+	322, // 190: core.ApplicationListResp.base:type_name -> common.RespBase
+	51,  // 191: core.ApplicationListResp.data:type_name -> core.Application
+	323, // 192: core.VersionListReq.page:type_name -> common.PageReq
+	1,   // 193: core.VersionListReq.status:type_name -> core.VersionStatus
+	322, // 194: core.VersionListResp.base:type_name -> common.RespBase
+	52,  // 195: core.VersionListResp.data:type_name -> core.Version
+	323, // 196: core.ChannelListReq.page:type_name -> common.PageReq
+	2,   // 197: core.ChannelListReq.status:type_name -> core.ChannelStatus
+	322, // 198: core.ChannelListResp.base:type_name -> common.RespBase
+	53,  // 199: core.ChannelListResp.data:type_name -> core.Channel
+	323, // 200: core.BuildTaskListReq.page:type_name -> common.PageReq
+	3,   // 201: core.BuildTaskListReq.status:type_name -> core.BuildTaskStatus
+	322, // 202: core.BuildTaskListResp.base:type_name -> common.RespBase
+	55,  // 203: core.BuildTaskListResp.data:type_name -> core.BuildTask
+	49,  // 204: core.CreateSigningConfigReq.signing_mode:type_name -> core.SigningMode
+	4,   // 205: core.CreateStorageObjectReq.object_type:type_name -> core.StorageObjectType
+	322, // 206: core.ClaimExpiredStorageObjectsResp.base:type_name -> common.RespBase
+	203, // 207: core.ClaimExpiredStorageObjectsResp.data:type_name -> core.ExpiredStorageObject
+	322, // 208: core.StorageObjectResp.base:type_name -> common.RespBase
+	56,  // 209: core.StorageObjectResp.data:type_name -> core.StorageObject
+	6,   // 210: core.DrainBuilderNodeReq.drain_status:type_name -> core.BuilderDrainStatus
+	7,   // 211: core.UpsertBuildConcurrencyPolicyReq.status:type_name -> core.BuildPolicyStatus
+	64,  // 212: core.BuildCacheResolution.entry:type_name -> core.BuildCacheEntry
+	56,  // 213: core.BuildCacheResolution.artifact:type_name -> core.StorageObject
+	322, // 214: core.BuildCacheResolutionResp.base:type_name -> common.RespBase
+	221, // 215: core.BuildCacheResolutionResp.data:type_name -> core.BuildCacheResolution
+	322, // 216: core.CleanupBuildCacheResp.base:type_name -> common.RespBase
+	226, // 217: core.CleanupBuildCacheResp.data:type_name -> core.CleanupBuildCacheResult
+	46,  // 218: core.ChangeWhiteLabelTemplateStatusReq.status:type_name -> core.WhiteLabelTemplateStatus
+	48,  // 219: core.ChangeWhiteLabelProductStatusReq.status:type_name -> core.WhiteLabelProductStatus
+	43,  // 220: core.CreateBrandingProfileReq.rewrite_mode:type_name -> core.BrandingRewriteMode
+	43,  // 221: core.UpdateBrandingProfileReq.rewrite_mode:type_name -> core.BrandingRewriteMode
+	44,  // 222: core.ChangeBrandingProfileStatusReq.status:type_name -> core.BrandingProfileStatus
+	45,  // 223: core.CompleteBrandingPreflightReq.status:type_name -> core.BrandingPreflightStatus
+	58,  // 224: core.BrandingPreflightExecutionContext.preflight:type_name -> core.BrandingPreflight
+	57,  // 225: core.BrandingPreflightExecutionContext.profile:type_name -> core.BrandingProfile
+	52,  // 226: core.BrandingPreflightExecutionContext.version:type_name -> core.Version
+	56,  // 227: core.BrandingPreflightExecutionContext.source_apk:type_name -> core.StorageObject
+	56,  // 228: core.BrandingPreflightExecutionContext.brand_logo:type_name -> core.StorageObject
+	56,  // 229: core.BrandingPreflightExecutionContext.brand_splash:type_name -> core.StorageObject
+	322, // 230: core.BrandingPreflightExecutionContextResp.base:type_name -> common.RespBase
+	244, // 231: core.BrandingPreflightExecutionContextResp.data:type_name -> core.BrandingPreflightExecutionContext
+	322, // 232: core.ChannelStatsResp.base:type_name -> common.RespBase
+	248, // 233: core.ChannelStatsResp.data:type_name -> core.ChannelStats
+	322, // 234: core.ChannelDownloadArtifactResp.base:type_name -> common.RespBase
+	252, // 235: core.ChannelDownloadArtifactResp.data:type_name -> core.ChannelDownloadArtifact
+	3,   // 236: core.ReportBuildProgressReq.status:type_name -> core.BuildTaskStatus
+	55,  // 237: core.BuildExecutionContext.task:type_name -> core.BuildTask
+	56,  // 238: core.BuildExecutionContext.source_apk:type_name -> core.StorageObject
+	56,  // 239: core.BuildExecutionContext.keystore:type_name -> core.StorageObject
+	56,  // 240: core.BuildExecutionContext.brand_logo:type_name -> core.StorageObject
+	56,  // 241: core.BuildExecutionContext.brand_splash:type_name -> core.StorageObject
+	56,  // 242: core.BuildExecutionContext.template_files:type_name -> core.StorageObject
+	49,  // 243: core.BuildExecutionContext.signing_mode:type_name -> core.SigningMode
+	322, // 244: core.BuildExecutionContextResp.base:type_name -> common.RespBase
+	260, // 245: core.BuildExecutionContextResp.data:type_name -> core.BuildExecutionContext
+	24,  // 246: core.BillingPlan.billing_cycle:type_name -> core.BillingCycle
+	25,  // 247: core.BillingPlan.status:type_name -> core.BillingPlanStatus
+	24,  // 248: core.CreateBillingPlanReq.billing_cycle:type_name -> core.BillingCycle
+	25,  // 249: core.BillingPlanListReq.status:type_name -> core.BillingPlanStatus
+	322, // 250: core.BillingPlanResp.base:type_name -> common.RespBase
+	262, // 251: core.BillingPlanResp.data:type_name -> core.BillingPlan
+	322, // 252: core.BillingPlanListResp.base:type_name -> common.RespBase
+	262, // 253: core.BillingPlanListResp.data:type_name -> core.BillingPlan
+	26,  // 254: core.TenantSubscription.status:type_name -> core.TenantSubscriptionStatus
+	27,  // 255: core.TenantSubscription.source:type_name -> core.TenantSubscriptionSource
+	28,  // 256: core.TenantEntitlement.status:type_name -> core.TenantEntitlementStatus
+	322, // 257: core.TenantBillingResp.base:type_name -> common.RespBase
+	268, // 258: core.TenantBillingResp.subscription:type_name -> core.TenantSubscription
+	269, // 259: core.TenantBillingResp.entitlement:type_name -> core.TenantEntitlement
+	262, // 260: core.TenantBillingResp.plan:type_name -> core.BillingPlan
+	32,  // 261: core.ChangeTenantSubscriptionReq.mode:type_name -> core.SubscriptionChangeMode
+	30,  // 262: core.ReserveQuotaReq.metric:type_name -> core.QuotaMetric
+	30,  // 263: core.QuotaReservation.metric:type_name -> core.QuotaMetric
+	31,  // 264: core.QuotaReservation.status:type_name -> core.QuotaReservationStatus
+	322, // 265: core.QuotaReservationResp.base:type_name -> common.RespBase
+	276, // 266: core.QuotaReservationResp.data:type_name -> core.QuotaReservation
+	30,  // 267: core.QuotaReservationActionReq.metric:type_name -> core.QuotaMetric
+	29,  // 268: core.QuotaReservationActionReq.usage_metric:type_name -> core.BillingUsageMetric
+	29,  // 269: core.RecordUsageReq.metric:type_name -> core.BillingUsageMetric
+	29,  // 270: core.UsageMetricSummary.metric:type_name -> core.BillingUsageMetric
+	322, // 271: core.BillingUsageResp.base:type_name -> common.RespBase
+	280, // 272: core.BillingUsageResp.data:type_name -> core.UsageMetricSummary
+	29,  // 273: core.InvoiceItem.metric:type_name -> core.BillingUsageMetric
+	33,  // 274: core.Invoice.status:type_name -> core.InvoiceStatus
+	283, // 275: core.Invoice.items:type_name -> core.InvoiceItem
+	33,  // 276: core.InvoiceListReq.status:type_name -> core.InvoiceStatus
+	322, // 277: core.InvoiceListResp.base:type_name -> common.RespBase
+	284, // 278: core.InvoiceListResp.data:type_name -> core.Invoice
+	39,  // 279: core.LocalAgentCertificate.status:type_name -> core.LocalAgentCertificateStatus
+	36,  // 280: core.LocalAgent.status:type_name -> core.LocalAgentStatus
+	37,  // 281: core.LocalAgent.drain_status:type_name -> core.LocalAgentDrainStatus
+	38,  // 282: core.LocalAgent.artifact_mode:type_name -> core.HybridArtifactMode
+	288, // 283: core.LocalAgent.capabilities:type_name -> core.LocalAgentCapability
+	38,  // 284: core.CreateLocalAgentRegistrationReq.artifact_mode:type_name -> core.HybridArtifactMode
+	288, // 285: core.CreateLocalAgentRegistrationReq.capabilities:type_name -> core.LocalAgentCapability
+	322, // 286: core.LocalAgentRegistrationResp.base:type_name -> common.RespBase
+	290, // 287: core.LocalAgentRegistrationResp.data:type_name -> core.LocalAgent
+	322, // 288: core.RegisterLocalAgentResp.base:type_name -> common.RespBase
+	290, // 289: core.RegisterLocalAgentResp.data:type_name -> core.LocalAgent
+	289, // 290: core.RegisterLocalAgentResp.certificate:type_name -> core.LocalAgentCertificate
+	322, // 291: core.LocalAgentResp.base:type_name -> common.RespBase
+	290, // 292: core.LocalAgentResp.data:type_name -> core.LocalAgent
+	36,  // 293: core.LocalAgentListReq.status:type_name -> core.LocalAgentStatus
+	322, // 294: core.LocalAgentListResp.base:type_name -> common.RespBase
+	290, // 295: core.LocalAgentListResp.data:type_name -> core.LocalAgent
+	299, // 296: core.HeartbeatLocalAgentReq.auth:type_name -> core.LocalAgentAuth
+	288, // 297: core.HeartbeatLocalAgentReq.capabilities:type_name -> core.LocalAgentCapability
+	37,  // 298: core.DrainLocalAgentReq.drain_status:type_name -> core.LocalAgentDrainStatus
+	299, // 299: core.RotateLocalAgentCertificateReq.auth:type_name -> core.LocalAgentAuth
+	299, // 300: core.ClaimLocalAgentBuildTaskReq.auth:type_name -> core.LocalAgentAuth
+	322, // 301: core.LocalAgentBuildTaskResp.base:type_name -> common.RespBase
+	55,  // 302: core.LocalAgentBuildTaskResp.task:type_name -> core.BuildTask
+	38,  // 303: core.LocalAgentBuildTaskResp.artifact_mode:type_name -> core.HybridArtifactMode
+	299, // 304: core.RegisterCustomerStorageInputReq.auth:type_name -> core.LocalAgentAuth
+	4,   // 305: core.RegisterCustomerStorageInputReq.object_type:type_name -> core.StorageObjectType
+	299, // 306: core.RenewLocalAgentTaskLeaseReq.auth:type_name -> core.LocalAgentAuth
+	299, // 307: core.ReportLocalAgentBuildProgressReq.auth:type_name -> core.LocalAgentAuth
+	3,   // 308: core.ReportLocalAgentBuildProgressReq.status:type_name -> core.BuildTaskStatus
+	299, // 309: core.CompleteLocalAgentBuildTaskReq.auth:type_name -> core.LocalAgentAuth
+	299, // 310: core.FailLocalAgentBuildTaskReq.auth:type_name -> core.LocalAgentAuth
+	299, // 311: core.VerifyHybridArtifactReq.auth:type_name -> core.LocalAgentAuth
+	40,  // 312: core.VerifyHybridArtifactReq.artifact_type:type_name -> core.HybridArtifactType
+	38,  // 313: core.VerifyHybridArtifactReq.storage_mode:type_name -> core.HybridArtifactMode
+	41,  // 314: core.AirGappedPackage.status:type_name -> core.AirGappedPackageStatus
+	322, // 315: core.PrepareAirGappedExportResp.base:type_name -> common.RespBase
+	312, // 316: core.PrepareAirGappedExportResp.package:type_name -> core.AirGappedPackage
+	260, // 317: core.PrepareAirGappedExportResp.execution:type_name -> core.BuildExecutionContext
+	322, // 318: core.SignAirGappedManifestResp.base:type_name -> common.RespBase
+	322, // 319: core.AirGappedPackageResp.base:type_name -> common.RespBase
+	312, // 320: core.AirGappedPackageResp.data:type_name -> core.AirGappedPackage
+	195, // 321: core.Core.CreateApplication:input_type -> core.CreateApplicationReq
+	70,  // 322: core.Core.GetApplication:input_type -> core.ApplicationIdReq
+	187, // 323: core.Core.ListApplications:input_type -> core.ApplicationListReq
+	200, // 324: core.Core.CreateStorageObject:input_type -> core.CreateStorageObjectReq
+	207, // 325: core.Core.GetStorageObject:input_type -> core.StorageObjectIdReq
+	201, // 326: core.Core.CompleteStorageObject:input_type -> core.CompleteStorageObjectReq
+	202, // 327: core.Core.FailStorageObject:input_type -> core.FailStorageObjectReq
+	204, // 328: core.Core.ClaimExpiredStorageObjects:input_type -> core.ClaimExpiredStorageObjectsReq
+	206, // 329: core.Core.MarkStorageObjectDeleted:input_type -> core.MarkStorageObjectDeletedReq
+	196, // 330: core.Core.CreateVersion:input_type -> core.CreateVersionReq
+	71,  // 331: core.Core.GetVersion:input_type -> core.VersionIdReq
+	189, // 332: core.Core.ListVersions:input_type -> core.VersionListReq
+	197, // 333: core.Core.CreateChannel:input_type -> core.CreateChannelReq
+	72,  // 334: core.Core.GetChannel:input_type -> core.ChannelIdReq
+	191, // 335: core.Core.ListChannels:input_type -> core.ChannelListReq
+	199, // 336: core.Core.CreateSigningConfig:input_type -> core.CreateSigningConfigReq
+	198, // 337: core.Core.GetSigningConfig:input_type -> core.SigningConfigIdReq
+	83,  // 338: core.Core.ListSigningConfigs:input_type -> core.SigningConfigListReq
+	238, // 339: core.Core.CreateBrandingProfile:input_type -> core.CreateBrandingProfileReq
+	239, // 340: core.Core.UpdateBrandingProfile:input_type -> core.UpdateBrandingProfileReq
+	74,  // 341: core.Core.GetBrandingProfile:input_type -> core.BrandingProfileIdReq
+	172, // 342: core.Core.ListBrandingProfiles:input_type -> core.BrandingProfileListReq
+	240, // 343: core.Core.ChangeBrandingProfileStatus:input_type -> core.ChangeBrandingProfileStatusReq
+	241, // 344: core.Core.CreateBrandingPreflight:input_type -> core.CreateBrandingPreflightReq
+	75,  // 345: core.Core.GetBrandingPreflight:input_type -> core.BrandingPreflightIdReq
+	175, // 346: core.Core.ListBrandingPreflights:input_type -> core.BrandingPreflightListReq
+	243, // 347: core.Core.ClaimBrandingPreflight:input_type -> core.ClaimBrandingPreflightReq
+	242, // 348: core.Core.CompleteBrandingPreflight:input_type -> core.CompleteBrandingPreflightReq
+	228, // 349: core.Core.CreateWhiteLabelTemplate:input_type -> core.CreateWhiteLabelTemplateReq
+	229, // 350: core.Core.UpdateWhiteLabelTemplate:input_type -> core.UpdateWhiteLabelTemplateReq
+	230, // 351: core.Core.CopyWhiteLabelTemplate:input_type -> core.CopyWhiteLabelTemplateReq
+	76,  // 352: core.Core.DeleteWhiteLabelTemplate:input_type -> core.WhiteLabelTemplateIdReq
+	76,  // 353: core.Core.GetWhiteLabelTemplate:input_type -> core.WhiteLabelTemplateIdReq
+	178, // 354: core.Core.ListWhiteLabelTemplates:input_type -> core.WhiteLabelTemplateListReq
+	231, // 355: core.Core.CreateWhiteLabelTemplateRevision:input_type -> core.CreateWhiteLabelTemplateRevisionReq
+	77,  // 356: core.Core.GetWhiteLabelTemplateRevision:input_type -> core.WhiteLabelTemplateRevisionIdReq
+	232, // 357: core.Core.UpdateWhiteLabelTemplateRevision:input_type -> core.UpdateWhiteLabelTemplateRevisionReq
+	77,  // 358: core.Core.DeleteWhiteLabelTemplateRevision:input_type -> core.WhiteLabelTemplateRevisionIdReq
+	181, // 359: core.Core.ListWhiteLabelTemplateRevisions:input_type -> core.WhiteLabelTemplateRevisionListReq
+	233, // 360: core.Core.PublishWhiteLabelTemplate:input_type -> core.PublishWhiteLabelTemplateReq
+	236, // 361: core.Core.ChangeWhiteLabelTemplateStatus:input_type -> core.ChangeWhiteLabelTemplateStatusReq
+	234, // 362: core.Core.CreateWhiteLabelProduct:input_type -> core.CreateWhiteLabelProductReq
+	235, // 363: core.Core.UpdateWhiteLabelProduct:input_type -> core.UpdateWhiteLabelProductReq
+	78,  // 364: core.Core.DeleteWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
+	78,  // 365: core.Core.GetWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
+	184, // 366: core.Core.ListWhiteLabelProducts:input_type -> core.WhiteLabelProductListReq
+	237, // 367: core.Core.ChangeWhiteLabelProductStatus:input_type -> core.ChangeWhiteLabelProductStatusReq
+	78,  // 368: core.Core.PreflightWhiteLabelProduct:input_type -> core.WhiteLabelProductIdReq
+	209, // 369: core.Core.CreateBuildTask:input_type -> core.CreateBuildTaskReq
+	73,  // 370: core.Core.GetBuildTask:input_type -> core.BuildTaskIdReq
+	193, // 371: core.Core.ListBuildTasks:input_type -> core.BuildTaskListReq
+	216, // 372: core.Core.CancelBuildTask:input_type -> core.CancelBuildTaskReq
+	217, // 373: core.Core.RetryBuildTask:input_type -> core.RetryBuildTaskReq
+	210, // 374: core.Core.GetBuilderNode:input_type -> core.BuilderNodeIdReq
+	87,  // 375: core.Core.ListBuilderNodes:input_type -> core.BuilderNodeListReq
+	213, // 376: core.Core.DrainBuilderNode:input_type -> core.DrainBuilderNodeReq
+	214, // 377: core.Core.RecoverBuilderNode:input_type -> core.RecoverBuilderNodeReq
+	218, // 378: core.Core.UpsertBuildConcurrencyPolicy:input_type -> core.UpsertBuildConcurrencyPolicyReq
+	90,  // 379: core.Core.ListBuildConcurrencyPolicies:input_type -> core.BuildConcurrencyPolicyListReq
+	93,  // 380: core.Core.ListBuildCacheEntries:input_type -> core.BuildCacheEntryListReq
+	224, // 381: core.Core.InvalidateBuildCache:input_type -> core.InvalidateBuildCacheReq
+	95,  // 382: core.Core.ListBuildSchedulerEvents:input_type -> core.BuildSchedulerEventListReq
+	97,  // 383: core.Core.GetBuildClusterMetrics:input_type -> core.BuildClusterMetricsReq
+	103, // 384: core.Core.CreateOpenApiCredential:input_type -> core.CreateOpenApiCredentialReq
+	99,  // 385: core.Core.ListOpenApiCredentials:input_type -> core.OpenApiCredentialListReq
+	105, // 386: core.Core.RotateOpenApiCredential:input_type -> core.RotateOpenApiCredentialReq
+	104, // 387: core.Core.RevokeOpenApiCredential:input_type -> core.OpenApiCredentialIdReq
+	106, // 388: core.Core.AuthenticateOpenApiCredential:input_type -> core.AuthenticateOpenApiCredentialReq
+	108, // 389: core.Core.BeginOpenApiIdempotency:input_type -> core.BeginOpenApiIdempotencyReq
+	111, // 390: core.Core.CompleteOpenApiIdempotency:input_type -> core.CompleteOpenApiIdempotencyReq
+	112, // 391: core.Core.RecordOpenApiAudit:input_type -> core.RecordOpenApiAuditReq
+	116, // 392: core.Core.CreateWebhookEndpoint:input_type -> core.CreateWebhookEndpointReq
+	117, // 393: core.Core.UpdateWebhookEndpoint:input_type -> core.UpdateWebhookEndpointReq
+	118, // 394: core.Core.GetWebhookEndpoint:input_type -> core.WebhookEndpointIdReq
+	119, // 395: core.Core.ListWebhookEndpoints:input_type -> core.WebhookEndpointListReq
+	118, // 396: core.Core.RotateWebhookEndpointSecret:input_type -> core.WebhookEndpointIdReq
+	123, // 397: core.Core.ListWebhookDeliveries:input_type -> core.WebhookDeliveryListReq
+	126, // 398: core.Core.ReplayWebhookDelivery:input_type -> core.WebhookDeliveryIdReq
+	127, // 399: core.Core.CreateTestWebhookEvent:input_type -> core.CreateTestWebhookEventReq
+	129, // 400: core.Core.CompleteSourceIntegration:input_type -> core.CompleteSourceIntegrationReq
+	130, // 401: core.Core.GetSourceIntegration:input_type -> core.SourceIntegrationIdReq
+	131, // 402: core.Core.ListSourceIntegrations:input_type -> core.SourceIntegrationListReq
+	130, // 403: core.Core.GetSourceIntegrationCredential:input_type -> core.SourceIntegrationIdReq
+	130, // 404: core.Core.DisconnectSourceIntegration:input_type -> core.SourceIntegrationIdReq
+	137, // 405: core.Core.AuthorizeSourceRepository:input_type -> core.AuthorizeSourceRepositoryReq
+	138, // 406: core.Core.GetSourceRepository:input_type -> core.SourceRepositoryIdReq
+	139, // 407: core.Core.ListSourceRepositories:input_type -> core.SourceRepositoryListReq
+	138, // 408: core.Core.RevokeSourceRepository:input_type -> core.SourceRepositoryIdReq
+	143, // 409: core.Core.RecordSourceArtifact:input_type -> core.RecordSourceArtifactReq
+	145, // 410: core.Core.ImportSourceArtifact:input_type -> core.ImportSourceArtifactReq
+	149, // 411: core.Core.CreateSourceBuildTrigger:input_type -> core.CreateSourceBuildTriggerReq
+	150, // 412: core.Core.UpdateSourceBuildTrigger:input_type -> core.UpdateSourceBuildTriggerReq
+	151, // 413: core.Core.GetSourceBuildTrigger:input_type -> core.SourceBuildTriggerIdReq
+	152, // 414: core.Core.ListSourceBuildTriggers:input_type -> core.SourceBuildTriggerListReq
+	151, // 415: core.Core.RotateSourceBuildTriggerSecret:input_type -> core.SourceBuildTriggerIdReq
+	157, // 416: core.Core.ResolveSourceBuildTrigger:input_type -> core.ResolveSourceBuildTriggerReq
+	161, // 417: core.Core.EnqueueSourceWebhookEvent:input_type -> core.EnqueueSourceWebhookEventReq
+	164, // 418: core.Core.ClaimSourceWebhookEvent:input_type -> core.ClaimSourceWebhookEventReq
+	167, // 419: core.Core.CompleteSourceWebhookEvent:input_type -> core.CompleteSourceWebhookEventReq
+	168, // 420: core.Core.FailSourceWebhookEvent:input_type -> core.FailSourceWebhookEventReq
+	169, // 421: core.Core.ListSourceWebhookEvents:input_type -> core.SourceWebhookEventListReq
+	263, // 422: core.Core.CreateBillingPlan:input_type -> core.CreateBillingPlanReq
+	264, // 423: core.Core.GetBillingPlan:input_type -> core.BillingPlanIdReq
+	265, // 424: core.Core.ListBillingPlans:input_type -> core.BillingPlanListReq
+	264, // 425: core.Core.RetireBillingPlan:input_type -> core.BillingPlanIdReq
+	270, // 426: core.Core.GetTenantBilling:input_type -> core.TenantBillingReq
+	272, // 427: core.Core.UpsertManualSubscription:input_type -> core.UpsertManualSubscriptionReq
+	273, // 428: core.Core.ChangeTenantSubscription:input_type -> core.ChangeTenantSubscriptionReq
+	274, // 429: core.Core.CancelTenantSubscription:input_type -> core.CancelTenantSubscriptionReq
+	275, // 430: core.Core.ReserveQuota:input_type -> core.ReserveQuotaReq
+	278, // 431: core.Core.ConfirmQuota:input_type -> core.QuotaReservationActionReq
+	278, // 432: core.Core.ReleaseQuota:input_type -> core.QuotaReservationActionReq
+	279, // 433: core.Core.RecordUsage:input_type -> core.RecordUsageReq
+	281, // 434: core.Core.GetBillingUsage:input_type -> core.BillingUsageReq
+	285, // 435: core.Core.ListInvoices:input_type -> core.InvoiceListReq
+	287, // 436: core.Core.ApplyBillingWebhook:input_type -> core.ApplyBillingWebhookReq
+	291, // 437: core.Core.CreateLocalAgentRegistration:input_type -> core.CreateLocalAgentRegistrationReq
+	293, // 438: core.Core.RegisterLocalAgent:input_type -> core.RegisterLocalAgentReq
+	295, // 439: core.Core.GetLocalAgent:input_type -> core.LocalAgentIdReq
+	297, // 440: core.Core.ListLocalAgents:input_type -> core.LocalAgentListReq
+	300, // 441: core.Core.HeartbeatLocalAgent:input_type -> core.HeartbeatLocalAgentReq
+	301, // 442: core.Core.DrainLocalAgent:input_type -> core.DrainLocalAgentReq
+	302, // 443: core.Core.RevokeLocalAgent:input_type -> core.RevokeLocalAgentReq
+	303, // 444: core.Core.RotateLocalAgentCertificate:input_type -> core.RotateLocalAgentCertificateReq
+	304, // 445: core.Core.ClaimLocalAgentBuildTask:input_type -> core.ClaimLocalAgentBuildTaskReq
+	306, // 446: core.Core.RegisterCustomerStorageInput:input_type -> core.RegisterCustomerStorageInputReq
+	307, // 447: core.Core.RenewLocalAgentTaskLease:input_type -> core.RenewLocalAgentTaskLeaseReq
+	308, // 448: core.Core.ReportLocalAgentBuildProgress:input_type -> core.ReportLocalAgentBuildProgressReq
+	309, // 449: core.Core.CompleteLocalAgentBuildTask:input_type -> core.CompleteLocalAgentBuildTaskReq
+	310, // 450: core.Core.FailLocalAgentBuildTask:input_type -> core.FailLocalAgentBuildTaskReq
+	311, // 451: core.Core.VerifyHybridArtifact:input_type -> core.VerifyHybridArtifactReq
+	313, // 452: core.Core.PrepareAirGappedExport:input_type -> core.PrepareAirGappedExportReq
+	315, // 453: core.Core.SignAirGappedManifest:input_type -> core.SignAirGappedManifestReq
+	317, // 454: core.Core.FinalizeAirGappedExport:input_type -> core.FinalizeAirGappedExportReq
+	318, // 455: core.Core.AbortAirGappedExport:input_type -> core.AbortAirGappedExportReq
+	319, // 456: core.Core.GetAirGappedPackage:input_type -> core.AirGappedPackageReq
+	321, // 457: core.Core.ImportAirGappedResult:input_type -> core.ImportAirGappedResultReq
+	246, // 458: core.Core.ReportInstall:input_type -> core.InstallReportReq
+	250, // 459: core.Core.ReportChannelEvent:input_type -> core.ReportChannelEventReq
+	247, // 460: core.Core.GetChannelStats:input_type -> core.ChannelStatsReq
+	251, // 461: core.Core.ResolveChannelDownload:input_type -> core.ResolveChannelDownloadReq
+	254, // 462: core.Core.ClaimBuildTask:input_type -> core.ClaimBuildTaskReq
+	211, // 463: core.Core.RegisterBuilderNode:input_type -> core.RegisterBuilderNodeReq
+	212, // 464: core.Core.BuilderNodeHeartbeat:input_type -> core.BuilderNodeHeartbeatReq
+	215, // 465: core.Core.ClaimScheduledBuildTask:input_type -> core.ClaimScheduledBuildTaskReq
+	220, // 466: core.Core.ResolveBuildCache:input_type -> core.ResolveBuildCacheReq
+	223, // 467: core.Core.PublishBuildCache:input_type -> core.PublishBuildCacheReq
+	225, // 468: core.Core.CleanupBuildCache:input_type -> core.CleanupBuildCacheReq
+	259, // 469: core.Core.GetBuildExecutionContext:input_type -> core.GetBuildExecutionContextReq
+	255, // 470: core.Core.HeartbeatBuildTask:input_type -> core.HeartbeatBuildTaskReq
+	256, // 471: core.Core.ReportBuildProgress:input_type -> core.ReportBuildProgressReq
+	257, // 472: core.Core.CompleteBuildTask:input_type -> core.CompleteBuildTaskReq
+	258, // 473: core.Core.FailBuildTask:input_type -> core.FailBuildTaskReq
+	79,  // 474: core.Core.CreateApplication:output_type -> core.ApplicationResp
+	79,  // 475: core.Core.GetApplication:output_type -> core.ApplicationResp
+	188, // 476: core.Core.ListApplications:output_type -> core.ApplicationListResp
+	208, // 477: core.Core.CreateStorageObject:output_type -> core.StorageObjectResp
+	208, // 478: core.Core.GetStorageObject:output_type -> core.StorageObjectResp
+	208, // 479: core.Core.CompleteStorageObject:output_type -> core.StorageObjectResp
+	50,  // 480: core.Core.FailStorageObject:output_type -> core.RespBase
+	205, // 481: core.Core.ClaimExpiredStorageObjects:output_type -> core.ClaimExpiredStorageObjectsResp
+	50,  // 482: core.Core.MarkStorageObjectDeleted:output_type -> core.RespBase
+	80,  // 483: core.Core.CreateVersion:output_type -> core.VersionResp
+	80,  // 484: core.Core.GetVersion:output_type -> core.VersionResp
+	190, // 485: core.Core.ListVersions:output_type -> core.VersionListResp
+	81,  // 486: core.Core.CreateChannel:output_type -> core.ChannelResp
+	81,  // 487: core.Core.GetChannel:output_type -> core.ChannelResp
+	192, // 488: core.Core.ListChannels:output_type -> core.ChannelListResp
+	82,  // 489: core.Core.CreateSigningConfig:output_type -> core.SigningConfigResp
+	82,  // 490: core.Core.GetSigningConfig:output_type -> core.SigningConfigResp
+	84,  // 491: core.Core.ListSigningConfigs:output_type -> core.SigningConfigListResp
+	171, // 492: core.Core.CreateBrandingProfile:output_type -> core.BrandingProfileResp
+	171, // 493: core.Core.UpdateBrandingProfile:output_type -> core.BrandingProfileResp
+	171, // 494: core.Core.GetBrandingProfile:output_type -> core.BrandingProfileResp
+	173, // 495: core.Core.ListBrandingProfiles:output_type -> core.BrandingProfileListResp
+	171, // 496: core.Core.ChangeBrandingProfileStatus:output_type -> core.BrandingProfileResp
+	174, // 497: core.Core.CreateBrandingPreflight:output_type -> core.BrandingPreflightResp
+	174, // 498: core.Core.GetBrandingPreflight:output_type -> core.BrandingPreflightResp
+	176, // 499: core.Core.ListBrandingPreflights:output_type -> core.BrandingPreflightListResp
+	245, // 500: core.Core.ClaimBrandingPreflight:output_type -> core.BrandingPreflightExecutionContextResp
+	174, // 501: core.Core.CompleteBrandingPreflight:output_type -> core.BrandingPreflightResp
+	177, // 502: core.Core.CreateWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
+	177, // 503: core.Core.UpdateWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
+	177, // 504: core.Core.CopyWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
+	50,  // 505: core.Core.DeleteWhiteLabelTemplate:output_type -> core.RespBase
+	177, // 506: core.Core.GetWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
+	179, // 507: core.Core.ListWhiteLabelTemplates:output_type -> core.WhiteLabelTemplateListResp
+	180, // 508: core.Core.CreateWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
+	180, // 509: core.Core.GetWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
+	180, // 510: core.Core.UpdateWhiteLabelTemplateRevision:output_type -> core.WhiteLabelTemplateRevisionResp
+	50,  // 511: core.Core.DeleteWhiteLabelTemplateRevision:output_type -> core.RespBase
+	182, // 512: core.Core.ListWhiteLabelTemplateRevisions:output_type -> core.WhiteLabelTemplateRevisionListResp
+	177, // 513: core.Core.PublishWhiteLabelTemplate:output_type -> core.WhiteLabelTemplateResp
+	177, // 514: core.Core.ChangeWhiteLabelTemplateStatus:output_type -> core.WhiteLabelTemplateResp
+	183, // 515: core.Core.CreateWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
+	183, // 516: core.Core.UpdateWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
+	50,  // 517: core.Core.DeleteWhiteLabelProduct:output_type -> core.RespBase
+	183, // 518: core.Core.GetWhiteLabelProduct:output_type -> core.WhiteLabelProductResp
+	185, // 519: core.Core.ListWhiteLabelProducts:output_type -> core.WhiteLabelProductListResp
+	183, // 520: core.Core.ChangeWhiteLabelProductStatus:output_type -> core.WhiteLabelProductResp
+	186, // 521: core.Core.PreflightWhiteLabelProduct:output_type -> core.WhiteLabelProductPreflightResp
+	85,  // 522: core.Core.CreateBuildTask:output_type -> core.BuildTaskResp
+	85,  // 523: core.Core.GetBuildTask:output_type -> core.BuildTaskResp
+	194, // 524: core.Core.ListBuildTasks:output_type -> core.BuildTaskListResp
+	85,  // 525: core.Core.CancelBuildTask:output_type -> core.BuildTaskResp
+	85,  // 526: core.Core.RetryBuildTask:output_type -> core.BuildTaskResp
+	86,  // 527: core.Core.GetBuilderNode:output_type -> core.BuilderNodeResp
+	88,  // 528: core.Core.ListBuilderNodes:output_type -> core.BuilderNodeListResp
+	86,  // 529: core.Core.DrainBuilderNode:output_type -> core.BuilderNodeResp
+	86,  // 530: core.Core.RecoverBuilderNode:output_type -> core.BuilderNodeResp
+	89,  // 531: core.Core.UpsertBuildConcurrencyPolicy:output_type -> core.BuildConcurrencyPolicyResp
+	91,  // 532: core.Core.ListBuildConcurrencyPolicies:output_type -> core.BuildConcurrencyPolicyListResp
+	94,  // 533: core.Core.ListBuildCacheEntries:output_type -> core.BuildCacheEntryListResp
+	92,  // 534: core.Core.InvalidateBuildCache:output_type -> core.BuildCacheEntryResp
+	96,  // 535: core.Core.ListBuildSchedulerEvents:output_type -> core.BuildSchedulerEventListResp
+	98,  // 536: core.Core.GetBuildClusterMetrics:output_type -> core.BuildClusterMetricsResp
+	102, // 537: core.Core.CreateOpenApiCredential:output_type -> core.OpenApiCredentialSecretResp
+	100, // 538: core.Core.ListOpenApiCredentials:output_type -> core.OpenApiCredentialListResp
+	102, // 539: core.Core.RotateOpenApiCredential:output_type -> core.OpenApiCredentialSecretResp
+	101, // 540: core.Core.RevokeOpenApiCredential:output_type -> core.OpenApiCredentialResp
+	107, // 541: core.Core.AuthenticateOpenApiCredential:output_type -> core.OpenApiAuthContextResp
+	110, // 542: core.Core.BeginOpenApiIdempotency:output_type -> core.OpenApiIdempotencyResp
+	50,  // 543: core.Core.CompleteOpenApiIdempotency:output_type -> core.RespBase
+	50,  // 544: core.Core.RecordOpenApiAudit:output_type -> core.RespBase
+	122, // 545: core.Core.CreateWebhookEndpoint:output_type -> core.WebhookEndpointSecretResp
+	120, // 546: core.Core.UpdateWebhookEndpoint:output_type -> core.WebhookEndpointResp
+	120, // 547: core.Core.GetWebhookEndpoint:output_type -> core.WebhookEndpointResp
+	121, // 548: core.Core.ListWebhookEndpoints:output_type -> core.WebhookEndpointListResp
+	122, // 549: core.Core.RotateWebhookEndpointSecret:output_type -> core.WebhookEndpointSecretResp
+	124, // 550: core.Core.ListWebhookDeliveries:output_type -> core.WebhookDeliveryListResp
+	125, // 551: core.Core.ReplayWebhookDelivery:output_type -> core.WebhookDeliveryResp
+	50,  // 552: core.Core.CreateTestWebhookEvent:output_type -> core.RespBase
+	132, // 553: core.Core.CompleteSourceIntegration:output_type -> core.SourceIntegrationResp
+	132, // 554: core.Core.GetSourceIntegration:output_type -> core.SourceIntegrationResp
+	133, // 555: core.Core.ListSourceIntegrations:output_type -> core.SourceIntegrationListResp
+	135, // 556: core.Core.GetSourceIntegrationCredential:output_type -> core.SourceIntegrationCredentialResp
+	132, // 557: core.Core.DisconnectSourceIntegration:output_type -> core.SourceIntegrationResp
+	140, // 558: core.Core.AuthorizeSourceRepository:output_type -> core.SourceRepositoryResp
+	140, // 559: core.Core.GetSourceRepository:output_type -> core.SourceRepositoryResp
+	141, // 560: core.Core.ListSourceRepositories:output_type -> core.SourceRepositoryListResp
+	140, // 561: core.Core.RevokeSourceRepository:output_type -> core.SourceRepositoryResp
+	144, // 562: core.Core.RecordSourceArtifact:output_type -> core.SourceArtifactResp
+	147, // 563: core.Core.ImportSourceArtifact:output_type -> core.SourceArtifactImportResp
+	156, // 564: core.Core.CreateSourceBuildTrigger:output_type -> core.SourceBuildTriggerSecretResp
+	153, // 565: core.Core.UpdateSourceBuildTrigger:output_type -> core.SourceBuildTriggerResp
+	153, // 566: core.Core.GetSourceBuildTrigger:output_type -> core.SourceBuildTriggerResp
+	154, // 567: core.Core.ListSourceBuildTriggers:output_type -> core.SourceBuildTriggerListResp
+	156, // 568: core.Core.RotateSourceBuildTriggerSecret:output_type -> core.SourceBuildTriggerSecretResp
+	159, // 569: core.Core.ResolveSourceBuildTrigger:output_type -> core.SourceBuildTriggerCredentialResp
+	163, // 570: core.Core.EnqueueSourceWebhookEvent:output_type -> core.EnqueueSourceWebhookEventResp
+	166, // 571: core.Core.ClaimSourceWebhookEvent:output_type -> core.ClaimSourceWebhookEventResp
+	50,  // 572: core.Core.CompleteSourceWebhookEvent:output_type -> core.RespBase
+	50,  // 573: core.Core.FailSourceWebhookEvent:output_type -> core.RespBase
+	170, // 574: core.Core.ListSourceWebhookEvents:output_type -> core.SourceWebhookEventListResp
+	266, // 575: core.Core.CreateBillingPlan:output_type -> core.BillingPlanResp
+	266, // 576: core.Core.GetBillingPlan:output_type -> core.BillingPlanResp
+	267, // 577: core.Core.ListBillingPlans:output_type -> core.BillingPlanListResp
+	266, // 578: core.Core.RetireBillingPlan:output_type -> core.BillingPlanResp
+	271, // 579: core.Core.GetTenantBilling:output_type -> core.TenantBillingResp
+	271, // 580: core.Core.UpsertManualSubscription:output_type -> core.TenantBillingResp
+	271, // 581: core.Core.ChangeTenantSubscription:output_type -> core.TenantBillingResp
+	271, // 582: core.Core.CancelTenantSubscription:output_type -> core.TenantBillingResp
+	277, // 583: core.Core.ReserveQuota:output_type -> core.QuotaReservationResp
+	277, // 584: core.Core.ConfirmQuota:output_type -> core.QuotaReservationResp
+	277, // 585: core.Core.ReleaseQuota:output_type -> core.QuotaReservationResp
+	50,  // 586: core.Core.RecordUsage:output_type -> core.RespBase
+	282, // 587: core.Core.GetBillingUsage:output_type -> core.BillingUsageResp
+	286, // 588: core.Core.ListInvoices:output_type -> core.InvoiceListResp
+	50,  // 589: core.Core.ApplyBillingWebhook:output_type -> core.RespBase
+	292, // 590: core.Core.CreateLocalAgentRegistration:output_type -> core.LocalAgentRegistrationResp
+	294, // 591: core.Core.RegisterLocalAgent:output_type -> core.RegisterLocalAgentResp
+	296, // 592: core.Core.GetLocalAgent:output_type -> core.LocalAgentResp
+	298, // 593: core.Core.ListLocalAgents:output_type -> core.LocalAgentListResp
+	296, // 594: core.Core.HeartbeatLocalAgent:output_type -> core.LocalAgentResp
+	296, // 595: core.Core.DrainLocalAgent:output_type -> core.LocalAgentResp
+	296, // 596: core.Core.RevokeLocalAgent:output_type -> core.LocalAgentResp
+	294, // 597: core.Core.RotateLocalAgentCertificate:output_type -> core.RegisterLocalAgentResp
+	305, // 598: core.Core.ClaimLocalAgentBuildTask:output_type -> core.LocalAgentBuildTaskResp
+	208, // 599: core.Core.RegisterCustomerStorageInput:output_type -> core.StorageObjectResp
+	50,  // 600: core.Core.RenewLocalAgentTaskLease:output_type -> core.RespBase
+	50,  // 601: core.Core.ReportLocalAgentBuildProgress:output_type -> core.RespBase
+	50,  // 602: core.Core.CompleteLocalAgentBuildTask:output_type -> core.RespBase
+	50,  // 603: core.Core.FailLocalAgentBuildTask:output_type -> core.RespBase
+	50,  // 604: core.Core.VerifyHybridArtifact:output_type -> core.RespBase
+	314, // 605: core.Core.PrepareAirGappedExport:output_type -> core.PrepareAirGappedExportResp
+	316, // 606: core.Core.SignAirGappedManifest:output_type -> core.SignAirGappedManifestResp
+	320, // 607: core.Core.FinalizeAirGappedExport:output_type -> core.AirGappedPackageResp
+	320, // 608: core.Core.AbortAirGappedExport:output_type -> core.AirGappedPackageResp
+	320, // 609: core.Core.GetAirGappedPackage:output_type -> core.AirGappedPackageResp
+	320, // 610: core.Core.ImportAirGappedResult:output_type -> core.AirGappedPackageResp
+	50,  // 611: core.Core.ReportInstall:output_type -> core.RespBase
+	50,  // 612: core.Core.ReportChannelEvent:output_type -> core.RespBase
+	249, // 613: core.Core.GetChannelStats:output_type -> core.ChannelStatsResp
+	253, // 614: core.Core.ResolveChannelDownload:output_type -> core.ChannelDownloadArtifactResp
+	85,  // 615: core.Core.ClaimBuildTask:output_type -> core.BuildTaskResp
+	86,  // 616: core.Core.RegisterBuilderNode:output_type -> core.BuilderNodeResp
+	86,  // 617: core.Core.BuilderNodeHeartbeat:output_type -> core.BuilderNodeResp
+	85,  // 618: core.Core.ClaimScheduledBuildTask:output_type -> core.BuildTaskResp
+	222, // 619: core.Core.ResolveBuildCache:output_type -> core.BuildCacheResolutionResp
+	92,  // 620: core.Core.PublishBuildCache:output_type -> core.BuildCacheEntryResp
+	227, // 621: core.Core.CleanupBuildCache:output_type -> core.CleanupBuildCacheResp
+	261, // 622: core.Core.GetBuildExecutionContext:output_type -> core.BuildExecutionContextResp
+	50,  // 623: core.Core.HeartbeatBuildTask:output_type -> core.RespBase
+	50,  // 624: core.Core.ReportBuildProgress:output_type -> core.RespBase
+	50,  // 625: core.Core.CompleteBuildTask:output_type -> core.RespBase
+	50,  // 626: core.Core.FailBuildTask:output_type -> core.RespBase
+	474, // [474:627] is the sub-list for method output_type
+	321, // [321:474] is the sub-list for method input_type
+	321, // [321:321] is the sub-list for extension type_name
+	321, // [321:321] is the sub-list for extension extendee
+	0,   // [0:321] is the sub-list for field type_name
 }
 
 func init() { file_proto_core_core_proto_init() }
@@ -26703,8 +27958,8 @@ func file_proto_core_core_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_core_core_proto_rawDesc), len(file_proto_core_core_proto_rawDesc)),
-			NumEnums:      48,
-			NumMessages:   261,
+			NumEnums:      50,
+			NumMessages:   272,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -1218,9 +1218,6 @@ onMounted(() => {
         </el-form>
       </el-card>
       <el-card shadow="never" class="table-card">
-        <template #header>
-          预定义源码构建触发策略
-        </template>
         <el-table v-loading="sourceTriggerLoading" :data="sourceTriggerRows" stripe>
           <el-table-column prop="triggerName" label="策略" min-width="150" />
           <el-table-column prop="repositoryFullName" label="授权仓库" min-width="220" />
@@ -1321,9 +1318,6 @@ onMounted(() => {
         </el-form>
       </el-card>
       <el-card shadow="never" class="table-card">
-        <template #header>
-          源码平台入站 Webhook 事件
-        </template>
         <el-table v-loading="sourceEventLoading" :data="sourceEventRows" stripe>
           <el-table-column prop="id" label="事件 ID" width="100" />
           <el-table-column prop="triggerId" label="策略 ID" width="100" />

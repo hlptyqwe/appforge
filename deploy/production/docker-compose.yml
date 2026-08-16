@@ -10,10 +10,44 @@ x-appforge-service: &appforge-service
     - ALL
   tmpfs:
     - /tmp:size=512m,mode=1770,uid=65532,gid=65532
+  expose:
+    - "${APPFORGE_PROMETHEUS_PORT:-9101}"
+  environment:
+    APPFORGE_PROMETHEUS_ENABLED: ${APPFORGE_PROMETHEUS_ENABLED:-true}
+    APPFORGE_PROMETHEUS_HOST: 0.0.0.0
+    APPFORGE_PROMETHEUS_PORT: ${APPFORGE_PROMETHEUS_PORT:-9101}
+    APPFORGE_PROMETHEUS_PATH: ${APPFORGE_PROMETHEUS_PATH:-/metrics}
+    APPFORGE_OTLP_ENDPOINT: ${APPFORGE_OTLP_ENDPOINT:-}
+    APPFORGE_OTLP_SAMPLER: ${APPFORGE_OTLP_SAMPLER:-0.1}
+    HTTP_PROXY: ${APPFORGE_EGRESS_PROXY_URL:-}
+    HTTPS_PROXY: ${APPFORGE_EGRESS_PROXY_URL:-}
+    NO_PROXY: ${APPFORGE_EGRESS_NO_PROXY:-localhost,127.0.0.1,mysql,redis,etcd,minio,system-rpc,core-rpc,builder-rpc}
   networks:
     - appforge-backend
 
 services:
+  egress-proxy:
+    profiles: ["egress"]
+    image: ${APPFORGE_IMAGE_REGISTRY:?required}/egress-proxy:${APPFORGE_VERSION:?required}
+    restart: unless-stopped
+    read_only: true
+    user: "65532:65532"
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    environment:
+      APPFORGE_EGRESS_PROXY_LISTEN: :3128
+      APPFORGE_EGRESS_PROXY_ALLOWLIST_FILE: /etc/appforge/egress/allowlist.txt
+      APPFORGE_EGRESS_PROXY_MAX_CONNECTIONS: ${APPFORGE_EGRESS_PROXY_MAX_CONNECTIONS:-256}
+    volumes:
+      - ${APPFORGE_EGRESS_PROXY_ALLOWLIST_FILE:-./egress-allowlist.example}:/etc/appforge/egress/allowlist.txt:ro
+    expose: ["3128"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3128/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks: [appforge-backend, appforge-egress]
+
   mysql:
     image: mysql:8.4
     restart: unless-stopped
@@ -22,7 +56,7 @@ services:
       MYSQL_USER: ${APPFORGE_MYSQL_USER:?required}
       MYSQL_PASSWORD: ${APPFORGE_MYSQL_PASSWORD:?required}
       MYSQL_ROOT_PASSWORD: ${APPFORGE_MYSQL_ROOT_PASSWORD:?required}
-    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci", "--log-bin=mysql-bin", "--binlog-expire-logs-seconds=604800"]
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci", "--log-bin=mysql-bin", "--server-id=1", "--binlog-format=ROW", "--binlog-row-image=FULL", "--binlog-expire-logs-seconds=604800"]
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
@@ -91,6 +125,12 @@ services:
       MC_CONFIG_DIR: /tmp/mc
       MINIO_ACCESS_KEY: ${APPFORGE_MINIO_ACCESS_KEY:?required}
       MINIO_SECRET_KEY: ${APPFORGE_MINIO_SECRET_KEY:?required}
+      REPLICA_ENDPOINT: ${APPFORGE_REPLICA_ENDPOINT:-}
+      REPLICA_ACCESS_KEY: ${APPFORGE_REPLICA_ACCESS_KEY:-}
+      REPLICA_SECRET_KEY: ${APPFORGE_REPLICA_SECRET_KEY:-}
+      REPLICA_BUCKET: ${APPFORGE_REPLICA_BUCKET:-appforge}
+      REPLICA_RULE_ID: ${APPFORGE_REPLICA_RULE_ID:-appforge-dr}
+      REPLICA_SYNC: ${APPFORGE_REPLICA_SYNC:-false}
     tmpfs:
       - /tmp:size=16m,mode=0700,uid=65532,gid=65532
     entrypoint: ["/bin/sh", "-ec"]
@@ -98,6 +138,7 @@ services:
       - |
         until mc alias set appforge http://minio:9000 "$$MINIO_ACCESS_KEY" "$$MINIO_SECRET_KEY" >/dev/null; do sleep 2; done
         mc mb --ignore-existing appforge/appforge
+        mc version enable appforge/appforge
         mc anonymous set none appforge/appforge
     depends_on:
       minio: {condition: service_started}
@@ -115,6 +156,21 @@ services:
       - etcd-data:/etcd-data
     networks: [appforge-backend]
 
+  binlog-tools:
+    image: ${APPFORGE_IMAGE_REGISTRY:?required}/mysql-binlog-tools:${APPFORGE_VERSION:?required}
+    profiles: [tools]
+    restart: "no"
+    read_only: true
+    user: "65532:65532"
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    environment:
+      MYSQL_DATABASE: ${APPFORGE_MYSQL_DATABASE:?required}
+      MYSQL_ROOT_PASSWORD: ${APPFORGE_MYSQL_ROOT_PASSWORD:?required}
+    tmpfs:
+      - /tmp:size=16m,mode=0700,uid=65532,gid=65532
+    networks: [appforge-backend]
+
   migrate:
     image: ${APPFORGE_IMAGE_REGISTRY:?required}/migrate:${APPFORGE_VERSION:?required}
     restart: "no"
@@ -128,7 +184,7 @@ services:
       APPFORGE_PUBLIC_ORIGIN: ${APPFORGE_PUBLIC_ORIGIN:?required}
       APPFORGE_MINIO_ACCESS_KEY: ${APPFORGE_MINIO_ACCESS_KEY:?required}
       APPFORGE_MINIO_SECRET_KEY: ${APPFORGE_MINIO_SECRET_KEY:?required}
-    command: ["--expected=20260815_111_v7_deployment_console"]
+    command: ["--expected=20260815_113_v7_air_gapped"]
     depends_on:
       mysql:
         condition: service_healthy
@@ -165,6 +221,15 @@ services:
     image: ${APPFORGE_IMAGE_REGISTRY:?required}/builder-worker:${APPFORGE_VERSION:?required}
     command: ["-etcd", "etcd:2379"]
     environment:
+      APPFORGE_PROMETHEUS_ENABLED: ${APPFORGE_PROMETHEUS_ENABLED:-true}
+      APPFORGE_PROMETHEUS_HOST: 0.0.0.0
+      APPFORGE_PROMETHEUS_PORT: ${APPFORGE_PROMETHEUS_PORT:-9101}
+      APPFORGE_PROMETHEUS_PATH: ${APPFORGE_PROMETHEUS_PATH:-/metrics}
+      APPFORGE_OTLP_ENDPOINT: ${APPFORGE_OTLP_ENDPOINT:-}
+      APPFORGE_OTLP_SAMPLER: ${APPFORGE_OTLP_SAMPLER:-0.1}
+      HTTP_PROXY: ${APPFORGE_EGRESS_PROXY_URL:-}
+      HTTPS_PROXY: ${APPFORGE_EGRESS_PROXY_URL:-}
+      NO_PROXY: ${APPFORGE_EGRESS_NO_PROXY:-localhost,127.0.0.1,mysql,redis,etcd,minio,system-rpc,core-rpc,builder-rpc}
       APPFORGE_BUILDER_ID: builder-production-1
       APPFORGE_BUILDER_ENDPOINT: builder-worker
     depends_on:
@@ -208,14 +273,24 @@ services:
     ports:
       - "${APPFORGE_LOCAL_AGENT_GATEWAY_PORT:-9443}:9443"
     environment:
+      APPFORGE_PROMETHEUS_ENABLED: ${APPFORGE_PROMETHEUS_ENABLED:-true}
+      APPFORGE_PROMETHEUS_HOST: 0.0.0.0
+      APPFORGE_PROMETHEUS_PORT: ${APPFORGE_PROMETHEUS_PORT:-9101}
+      APPFORGE_PROMETHEUS_PATH: ${APPFORGE_PROMETHEUS_PATH:-/metrics}
+      APPFORGE_OTLP_ENDPOINT: ${APPFORGE_OTLP_ENDPOINT:-}
+      APPFORGE_OTLP_SAMPLER: ${APPFORGE_OTLP_SAMPLER:-0.1}
+      HTTP_PROXY: ${APPFORGE_EGRESS_PROXY_URL:-}
+      HTTPS_PROXY: ${APPFORGE_EGRESS_PROXY_URL:-}
+      NO_PROXY: ${APPFORGE_EGRESS_NO_PROXY:-localhost,127.0.0.1,mysql,redis,etcd,minio,system-rpc,core-rpc,builder-rpc}
       APPFORGE_SIEM_ENDPOINT: ${APPFORGE_SIEM_ENDPOINT:?required}
       APPFORGE_SIEM_TOKEN_FILE: /etc/appforge/siem/token
       APPFORGE_SIEM_CA_FILE: /etc/appforge/siem/ca.crt
       APPFORGE_DEPLOYMENT_ID: ${APPFORGE_DEPLOYMENT_ID:?required}
       APPFORGE_DEPLOYMENT_MODE: ${APPFORGE_DEPLOYMENT_MODE:?required}
       APPFORGE_VERSION: ${APPFORGE_VERSION:?required}
-      APPFORGE_SCHEMA_VERSION: ${APPFORGE_SCHEMA_VERSION:-20260815_111_v7_deployment_console}
+      APPFORGE_SCHEMA_VERSION: ${APPFORGE_SCHEMA_VERSION:-20260815_113_v7_air_gapped}
       APPFORGE_MAX_VERSION_SKEW: ${APPFORGE_MAX_VERSION_SKEW:-1}
+      APPFORGE_REDIS_PASSWORD: ${APPFORGE_REDIS_PASSWORD:?required}
     volumes:
       - ${APPFORGE_TLS_CERT_FILE:?required}:/etc/appforge/tls/tls.crt:ro
       - ${APPFORGE_TLS_KEY_FILE:?required}:/etc/appforge/tls/tls.key:ro
@@ -287,6 +362,7 @@ networks:
   appforge-frontend: {}
   appforge-backend:
     internal: true
+  appforge-egress: {}
 
 volumes:
   mysql-data: {}

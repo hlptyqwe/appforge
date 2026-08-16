@@ -19,6 +19,7 @@ replicas:
   worker: 2
   sourceWorker: 1
   ui: 2
+  egressProxy: 2
 
 external:
   etcdEndpoints: https://etcd-client.database.svc:2379
@@ -71,11 +72,26 @@ networkPolicy:
   # 集群外依赖必须同时限定使用组件、CIDR 和端口；客户交付时按实际网络填写。
   externalEgressRules: []
 
+# 可选内置 HTTPS CONNECT-only 出口代理。启用时通用 HTTPS 客户端流量只经该
+# Service 出站；远程 APK 签名和 Webhook 继续显式绕过通用代理。
+# 同时必须为 component=egress-proxy 配置按目标 IP/端口限定的出口规则。
+egressProxy:
+  enabled: false
+  url: http://appforge-egress-proxy:3128
+  noProxy: localhost,127.0.0.1,.svc,.cluster.local
+  maximumConnections: 256
+  allowlist: []
+
 observability:
   prometheus: true
+  metricsPort: 9101
+  metricsPath: /metrics
+  prometheusNamespaceLabels:
+    kubernetes.io/metadata.name: monitoring
   otlpEndpoint: ""
+  otlpSampler: 0.1
   siemWebhook: ""
 
 upgrade:
-  schemaVersion: "20260815_111_v7_deployment_console"
+  schemaVersion: "20260815_113_v7_air_gapped"
   maxVersionSkew: 1

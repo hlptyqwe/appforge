@@ -62,6 +62,7 @@ type PlatformSigningConfig {
 	createTime        int64  `json:"createTime"`
 	updateTime        int64  `json:"updateTime"`
 	certificateSha256 string `json:"certificateSha256,optional"`
+	signingMode       int32  `json:"signingMode"`
 }
 
 type PlatformBuildTask {
@@ -756,6 +757,7 @@ type CreatePlatformSigningConfigReq {
 	keyPassword      string `json:"keyPassword,optional"`
 	secretRef        string `json:"secretRef,optional"`
 	keystoreObjectId int64  `json:"keystoreObjectId"`
+	signingMode      int32  `json:"signingMode,optional"`
 }
 
 // 私有对象上传类型：1原始APK，2签名文件，5品牌Logo，6品牌启动图，7模板受控文件。
@@ -786,6 +788,8 @@ type PlatformStorageObject {
 	sizeBytes    int64  `json:"sizeBytes"`
 	sha256       string `json:"sha256"`
 	status       int32  `json:"status"`
+	storageMode  int32  `json:"storageMode"`
+	ownerAgentId int64  `json:"ownerAgentId"`
 }
 
 type CompletePlatformUploadReq {
@@ -1626,6 +1630,61 @@ type RevokePlatformLocalAgentReq {
 	reason   string `json:"reason"`
 }
 
+// V7 AIR_GAPPED离线包状态。
+type PlatformAirGappedPackage {
+	id                     int64  `json:"id"`
+	tenantId               int64  `json:"tenantId"`
+	appId                  int64  `json:"appId"`
+	packageCode            string `json:"packageCode"`
+	agentId                int64  `json:"agentId"`
+	taskId                 int64  `json:"taskId"`
+	builderAttempt         int32  `json:"builderAttempt"`
+	agentCertificateSerial string `json:"agentCertificateSerial"`
+	status                 int32  `json:"status"`
+	exportObjectId         int64  `json:"exportObjectId,optional"`
+	exportSha256           string `json:"exportSha256,optional"`
+	exportSizeBytes        int64  `json:"exportSizeBytes,optional"`
+	resultObjectId         int64  `json:"resultObjectId,optional"`
+	resultSha256           string `json:"resultSha256,optional"`
+	resultSizeBytes        int64  `json:"resultSizeBytes,optional"`
+	issuedAt               int64  `json:"issuedAt"`
+	expiresAt              int64  `json:"expiresAt"`
+	importedAt             int64  `json:"importedAt,optional"`
+	createTime             int64  `json:"createTime"`
+	updateTime             int64  `json:"updateTime"`
+}
+
+type PreparePlatformAirGappedExportReq {
+	agentId        int64 `json:"agentId"`
+	taskId         int64 `json:"taskId"`
+	expiresSeconds int64 `json:"expiresSeconds,optional"`
+}
+
+type PlatformAirGappedExport {
+	packageData PlatformAirGappedPackage `json:"package"`
+	downloadUrl string                   `json:"downloadUrl"`
+	expiresAt   int64                    `json:"expiresAt"`
+}
+
+type PlatformAirGappedExportResp {
+	RespBase
+	data PlatformAirGappedExport `json:"data"`
+}
+
+type ImportPlatformAirGappedResultReq {
+	packageCode    string `json:"packageCode"`
+	resultObjectId int64  `json:"resultObjectId"`
+}
+
+type PlatformAirGappedPackageReq {
+	packageCode string `path:"packageCode"`
+}
+
+type PlatformAirGappedPackageResp {
+	RespBase
+	data PlatformAirGappedPackage `json:"data"`
+}
+
 @server (
 	group: platform_public
 )
@@ -1952,6 +2011,15 @@ service admin {
 
 	@handler RevokePlatformLocalAgent
 	post /enterprise/local-agents/:id/revoke (RevokePlatformLocalAgentReq) returns (PlatformLocalAgentResp)
+
+	@handler PreparePlatformAirGappedExport
+	post /enterprise/air-gapped/exports (PreparePlatformAirGappedExportReq) returns (PlatformAirGappedExportResp)
+
+	@handler ImportPlatformAirGappedResult
+	post /enterprise/air-gapped/imports (ImportPlatformAirGappedResultReq) returns (PlatformAirGappedPackageResp)
+
+	@handler GetPlatformAirGappedPackage
+	get /enterprise/air-gapped/packages/:packageCode (PlatformAirGappedPackageReq) returns (PlatformAirGappedPackageResp)
 
 	@handler GetPlatformDeploymentStatus
 	get /enterprise/deployment returns (PlatformDeploymentStatusResp)

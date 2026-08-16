@@ -758,6 +758,12 @@ func (s *CoreServer) ClaimLocalAgentBuildTask(ctx context.Context, in *core.Clai
 	return l.ClaimLocalAgentBuildTask(in)
 }
 
+// Agent登记已上传并重新校验的客户存储输入对象。
+func (s *CoreServer) RegisterCustomerStorageInput(ctx context.Context, in *core.RegisterCustomerStorageInputReq) (*core.StorageObjectResp, error) {
+	l := logic.NewRegisterCustomerStorageInputLogic(ctx, s.svcCtx)
+	return l.RegisterCustomerStorageInput(in)
+}
+
 // Agent按任务attempt续租，旧进程不能回写。
 func (s *CoreServer) RenewLocalAgentTaskLease(ctx context.Context, in *core.RenewLocalAgentTaskLeaseReq) (*core.RespBase, error) {
 	l := logic.NewRenewLocalAgentTaskLeaseLogic(ctx, s.svcCtx)
@@ -786,6 +792,42 @@ func (s *CoreServer) FailLocalAgentBuildTask(ctx context.Context, in *core.FailL
 func (s *CoreServer) VerifyHybridArtifact(ctx context.Context, in *core.VerifyHybridArtifactReq) (*core.RespBase, error) {
 	l := logic.NewVerifyHybridArtifactLogic(ctx, s.svcCtx)
 	return l.VerifyHybridArtifact(in)
+}
+
+// 管理端锁定指定任务并准备AIR_GAPPED离线任务包。
+func (s *CoreServer) PrepareAirGappedExport(ctx context.Context, in *core.PrepareAirGappedExportReq) (*core.PrepareAirGappedExportResp, error) {
+	l := logic.NewPrepareAirGappedExportLogic(ctx, s.svcCtx)
+	return l.PrepareAirGappedExport(in)
+}
+
+// 使用控制面Agent CA签署严格规范化任务Manifest。
+func (s *CoreServer) SignAirGappedManifest(ctx context.Context, in *core.SignAirGappedManifestReq) (*core.SignAirGappedManifestResp, error) {
+	l := logic.NewSignAirGappedManifestLogic(ctx, s.svcCtx)
+	return l.SignAirGappedManifest(in)
+}
+
+// 绑定已复验的离线任务ZIP并开放结果导入。
+func (s *CoreServer) FinalizeAirGappedExport(ctx context.Context, in *core.FinalizeAirGappedExportReq) (*core.AirGappedPackageResp, error) {
+	l := logic.NewFinalizeAirGappedExportLogic(ctx, s.svcCtx)
+	return l.FinalizeAirGappedExport(in)
+}
+
+// 撤销离线包并以失败状态关闭当前任务attempt。
+func (s *CoreServer) AbortAirGappedExport(ctx context.Context, in *core.AbortAirGappedExportReq) (*core.AirGappedPackageResp, error) {
+	l := logic.NewAbortAirGappedExportLogic(ctx, s.svcCtx)
+	return l.AbortAirGappedExport(in)
+}
+
+// 查询当前租户AIR_GAPPED离线包状态。
+func (s *CoreServer) GetAirGappedPackage(ctx context.Context, in *core.AirGappedPackageReq) (*core.AirGappedPackageResp, error) {
+	l := logic.NewGetAirGappedPackageLogic(ctx, s.svcCtx)
+	return l.GetAirGappedPackage(in)
+}
+
+// 校验Agent证书、签名、Nonce和attempt后导入离线结果。
+func (s *CoreServer) ImportAirGappedResult(ctx context.Context, in *core.ImportAirGappedResultReq) (*core.AirGappedPackageResp, error) {
+	l := logic.NewImportAirGappedResultLogic(ctx, s.svcCtx)
+	return l.ImportAirGappedResult(in)
 }
 
 func (s *CoreServer) ReportInstall(ctx context.Context, in *core.InstallReportReq) (*core.RespBase, error) {

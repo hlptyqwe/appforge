@@ -33,7 +33,7 @@ const schedulerEventSelect = `SELECT id, tenant_id, app_id, task_id, node_code, 
 event_type, reason_code, decision_json, create_time FROM t_build_scheduler_event`
 
 const storageObjectSelect = `SELECT id, tenant_id, app_id, object_type, object_key, original_name,
-content_type, size_bytes, sha256, status, create_by, create_time, update_time FROM t_storage_object`
+content_type, size_bytes, sha256, status, storage_mode, owner_agent_id, create_by, create_time, update_time FROM t_storage_object`
 
 func validSHA256(value string) bool {
 	value = strings.TrimSpace(value)
@@ -218,7 +218,8 @@ AND object_type = ? AND status IN (?, ?) FOR UPDATE`, in.ArtifactObjectId, task.
 			artifact = models.TStorageObject{Id: artifactID, TenantId: task.TenantId, AppId: task.AppId,
 				ObjectType: cacheArtifact.ObjectType, ObjectKey: cacheArtifact.ObjectKey,
 				OriginalName: cacheArtifact.OriginalName, ContentType: cacheArtifact.ContentType,
-				SizeBytes: cacheArtifact.Size, Sha256: nullString(cacheArtifact.SHA256), Status: storageStatusBound}
+				SizeBytes: cacheArtifact.Size, Sha256: nullString(cacheArtifact.SHA256), Status: storageStatusBound,
+				StorageMode: int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_CONTROL_PLANE_STORAGE)}
 		}
 		if stringValue(artifact.Sha256) != strings.TrimSpace(in.ArtifactSha256) || artifact.SizeBytes != in.SizeBytes {
 			return status.Error(codes.FailedPrecondition, "cache artifact metadata does not match storage object")

@@ -1,0 +1,6 @@
+# 仅填写经客户网络与安全团队批准的 HTTPS CONNECT 目标。
+# 每行必须为精确 host:port，或仅左侧标签使用通配符的 *.domain:port。
+# 不允许 URL、路径、凭据或全局通配符。以下内容仅为示例，生产预检会拒绝 example.com。
+siem.example.com:443
+collector.example.com:443
+*.s3.example.com:443

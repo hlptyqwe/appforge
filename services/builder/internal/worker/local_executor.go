@@ -95,6 +95,9 @@ func ExecuteLocalTask(ctx context.Context, taskFile, resultFile string) error {
 	if executeErr == nil {
 		executeErr = closeErr
 	}
+	if privateErr := secureLocalExecutorOutput(logPath); executeErr == nil {
+		executeErr = privateErr
+	}
 	if logSize, logSHA, digestErr := fileDigest(logPath); digestErr == nil {
 		result.LogPath, result.LogSize, result.LogSHA256 = logPath, logSize, logSHA
 	}
@@ -145,7 +148,8 @@ func readLocalExecutorTask(taskFile, resultFile string) (*localExecutorEnvelope,
 		return nil, root, errors.New("task bundle contains trailing data")
 	}
 	if envelope.Task == nil || envelope.Bundle == nil || envelope.Bundle.Task == nil ||
-		envelope.Bundle.SchemaVersion != localExecutorSchemaVersion || envelope.ArtifactMode != 1 ||
+		envelope.Bundle.SchemaVersion != localExecutorSchemaVersion ||
+		(envelope.ArtifactMode != 1 && envelope.ArtifactMode != 2 && envelope.ArtifactMode != 3) ||
 		envelope.Task.ID <= 0 || envelope.Task.TenantID <= 0 || envelope.Task.AppID <= 0 || envelope.Task.BuilderAttempt <= 0 ||
 		envelope.Bundle.Task.ID != envelope.Task.ID || envelope.Bundle.Task.TenantID != envelope.Task.TenantID ||
 		envelope.Bundle.Task.AppID != envelope.Task.AppID || envelope.Bundle.Task.BuilderAttempt != envelope.Task.BuilderAttempt {
@@ -261,11 +265,32 @@ func executeLocalPipeline(ctx context.Context, root string, logFile io.Writer, e
 			return &localExecutorResult{}, err
 		}
 	}
+	if err := secureLocalExecutorOutput(signedPath); err != nil {
+		return &localExecutorResult{}, fmt.Errorf("secure signed APK: %w", err)
+	}
 	size, digest, err := fileDigest(signedPath)
 	if err != nil {
 		return &localExecutorResult{}, err
 	}
 	return &localExecutorResult{APKPath: signedPath, APKSize: size, APKSHA256: digest}, nil
+}
+
+func secureLocalExecutorOutput(path string) error {
+	info, err := os.Lstat(path)
+	if err != nil {
+		return err
+	}
+	if info.Mode()&os.ModeSymlink != 0 || !info.Mode().IsRegular() || info.Size() <= 0 {
+		return errors.New("executor output must be a non-empty regular file")
+	}
+	if err := os.Chmod(path, 0o600); err != nil {
+		return err
+	}
+	info, err = os.Lstat(path)
+	if err != nil || info.Mode()&os.ModeSymlink != 0 || !info.Mode().IsRegular() || info.Mode().Perm() != 0o600 {
+		return errors.New("executor output permissions are not private")
+	}
+	return nil
 }
 
 func verifyLocalExecutorInput(root string, input localExecutorInput) error {

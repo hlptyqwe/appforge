@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -19,12 +20,14 @@ import (
 	"syscall"
 	"time"
 
+	"appforge/common/remotesigner"
 	"appforge/common/secretbox"
 	"appforge/common/secretprovider"
 	"appforge/common/storage"
 	"appforge/proto/builder"
 	"appforge/proto/core"
 	"appforge/services/builder/internal/config"
+	"appforge/services/builder/internal/secretresolver"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -71,6 +74,9 @@ func New(c config.Config, builderClient builder.BuilderClient, coreClient core.C
 	if strings.TrimSpace(c.Builder.CapabilityJson) == "" {
 		c.Builder.CapabilityJson = `{"apk":true,"branding":true,"whiteLabel":true,"cache":true}`
 	}
+	if err := validateRemoteSigningCapability(c); err != nil {
+		return nil, err
+	}
 	if c.Builder.CacheTtl <= 0 {
 		c.Builder.CacheTtl = 7 * 24 * time.Hour
 	}
@@ -94,42 +100,35 @@ func New(c config.Config, builderClient builder.BuilderClient, coreClient core.C
 	if err != nil {
 		return nil, fmt.Errorf("initialize signing secrets: %w", err)
 	}
-	providers := make([]secretprovider.Provider, 0, 3)
-	if strings.TrimSpace(c.SecretProviders.LocalRoot) != "" {
-		provider, providerErr := secretprovider.NewLocalFileProvider(c.SecretProviders.LocalRoot)
-		if providerErr != nil {
-			return nil, fmt.Errorf("initialize local Secret provider: %w", providerErr)
-		}
-		providers = append(providers, provider)
-	}
-	if strings.TrimSpace(c.SecretProviders.KubernetesRoot) != "" {
-		provider, providerErr := secretprovider.NewKubernetesFileProvider(c.SecretProviders.KubernetesRoot)
-		if providerErr != nil {
-			return nil, fmt.Errorf("initialize Kubernetes Secret provider: %w", providerErr)
-		}
-		providers = append(providers, provider)
-	}
-	if strings.TrimSpace(c.SecretProviders.Vault.Address) != "" {
-		provider, providerErr := secretprovider.NewVaultProvider(c.SecretProviders.Vault.Address,
-			c.SecretProviders.Vault.TokenFile, c.SecretProviders.Vault.Namespace, nil, c.SecretProviders.Vault.AllowHTTP)
-		if providerErr != nil {
-			return nil, fmt.Errorf("initialize Vault Secret provider: %w", providerErr)
-		}
-		providers = append(providers, provider)
-	}
-	if strings.TrimSpace(c.SecretProviders.AWS.Region) != "" {
-		provider, providerErr := secretprovider.NewAWSSecretsManagerProvider(context.Background(),
-			c.SecretProviders.AWS.Region, c.SecretProviders.AWS.Endpoint)
-		if providerErr != nil {
-			return nil, fmt.Errorf("initialize AWS Secrets Manager provider: %w", providerErr)
-		}
-		providers = append(providers, provider)
-	}
-	resolver, err := secretprovider.New(c.SecretProviders.MaxSecretBytes, providers...)
+	resolver, err := secretresolver.New(context.Background(), c)
 	if err != nil {
-		return nil, fmt.Errorf("initialize enterprise Secret resolver: %w", err)
+		return nil, err
 	}
 	return &Worker{config: c, builder: builderClient, core: coreClient, store: store, secrets: secrets, provider: resolver, active: make(map[int64]struct{})}, nil
+}
+
+func validateRemoteSigningCapability(c config.Config) error {
+	var capabilities map[string]any
+	if err := json.Unmarshal([]byte(c.Builder.CapabilityJson), &capabilities); err != nil || capabilities == nil {
+		return errors.New("builder capability JSON must be an object")
+	}
+	value, declared := capabilities["remoteSigning"]
+	if !declared {
+		return nil
+	}
+	enabled, ok := value.(bool)
+	if !ok {
+		return errors.New("builder remoteSigning capability must be a boolean")
+	}
+	if !enabled {
+		return nil
+	}
+	providers := c.SecretProviders
+	if strings.TrimSpace(providers.LocalRoot) == "" && strings.TrimSpace(providers.KubernetesRoot) == "" &&
+		strings.TrimSpace(providers.Vault.Address) == "" && strings.TrimSpace(providers.AWS.Region) == "" {
+		return errors.New("builder remoteSigning capability requires a configured Secret provider")
+	}
+	return nil
 }
 
 // Run blocks until ctx is cancelled.
@@ -452,13 +451,22 @@ func (w *Worker) execute(parent context.Context, task *builder.BuildTask) error 
 	data := execution.Data
 	sourcePath := filepath.Join(workDir, "source.apk")
 	keystorePath := filepath.Join(workDir, "signing.keystore")
+	signingMode := data.SigningMode
+	if signingMode == core.SigningMode_SIGNING_MODE_UNSPECIFIED {
+		signingMode = core.SigningMode_SIGNING_MODE_LOCAL_KEYSTORE
+	}
 	if err := w.downloadVerified(ctx, data.SourceApk, sourcePath); err != nil {
 		closeLog()
 		return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("download source APK: %w", err))
 	}
-	if err := w.downloadVerified(ctx, data.Keystore, keystorePath); err != nil {
+	if signingMode == core.SigningMode_SIGNING_MODE_LOCAL_KEYSTORE {
+		if err := w.downloadVerified(ctx, data.Keystore, keystorePath); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("download keystore: %w", err))
+		}
+	} else if signingMode != core.SigningMode_SIGNING_MODE_REMOTE_APK_SIGNER {
 		closeLog()
-		return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("download keystore: %w", err))
+		return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("unsupported signing mode"))
 	}
 	branding, err := decodeBuildBrandingSnapshot(data.BrandingSnapshotJson)
 	if err != nil {
@@ -618,52 +626,92 @@ func (w *Worker) execute(parent context.Context, task *builder.BuildTask) error 
 		closeLog()
 		return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("zipalign APK: %w", err))
 	}
-	var keystorePassword, keyPassword string
-	if strings.TrimSpace(data.SecretRef) != "" {
-		resolved, resolveErr := w.provider.ResolveSigningSecret(ctx, data.SecretRef)
+	if signingMode == core.SigningMode_SIGNING_MODE_REMOTE_APK_SIGNER {
+		raw, resolveErr := w.provider.Resolve(ctx, data.SecretRef)
 		if resolveErr != nil {
 			closeLog()
-			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("resolve external signing secret failed"))
+			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("resolve remote signer secret failed"))
 		}
-		keystorePassword, keyPassword = resolved.KeystorePassword, resolved.KeyPassword
-		defer resolved.Erase()
+		remoteSecret, parseErr := remotesigner.ParseSecret(raw)
+		secretprovider.Zero(raw)
+		if parseErr != nil || remoteSecret.KeyID != data.KeyAlias {
+			if remoteSecret != nil {
+				remoteSecret.Erase()
+			}
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("remote signer secret identity is invalid"))
+		}
+		remoteClient, clientErr := remotesigner.NewClient(remoteSecret, 1<<30)
+		remoteSecret.Erase()
+		if clientErr != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("remote signer mTLS configuration is invalid"))
+		}
+		remoteInfo, infoErr := remoteClient.Info(ctx)
+		if infoErr != nil || !strings.EqualFold(remoteInfo.CertificateSHA256, data.SignerCertificateSha256) {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("remote signer certificate identity mismatch"))
+		}
+		if _, err := remoteClient.SignFile(ctx, remotesigner.SignRequest{
+			TaskID: task.Id, BuilderAttempt: task.BuilderAttempt, UnsignedAPKPath: alignedPath,
+			SignedAPKPath: signedPath, CertificateSHA256: data.SignerCertificateSha256,
+		}); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("remote APK signing failed: %w", err))
+		}
+		w.writeLog(logFile, "remote APK signer completed: key_id=%s", data.KeyAlias)
 	} else {
-		keystorePassword, err = w.secrets.Open(data.KeystorePasswordCiphertext)
-		if err != nil {
-			closeLog()
-			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("decrypt keystore password failed"))
+		var keystorePassword, keyPassword string
+		if strings.TrimSpace(data.SecretRef) != "" {
+			resolved, resolveErr := w.provider.ResolveSigningSecret(ctx, data.SecretRef)
+			if resolveErr != nil {
+				closeLog()
+				return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("resolve external signing secret failed"))
+			}
+			keystorePassword, keyPassword = resolved.KeystorePassword, resolved.KeyPassword
+			defer resolved.Erase()
+		} else {
+			keystorePassword, err = w.secrets.Open(data.KeystorePasswordCiphertext)
+			if err != nil {
+				closeLog()
+				return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("decrypt keystore password failed"))
+			}
+			keyPassword, err = w.secrets.Open(data.KeyPasswordCiphertext)
+			if err != nil {
+				closeLog()
+				return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("decrypt key password failed"))
+			}
 		}
-		keyPassword, err = w.secrets.Open(data.KeyPasswordCiphertext)
-		if err != nil {
-			closeLog()
-			return w.fail(ctx, task, logPath, data.Task.TenantId, errors.New("decrypt key password failed"))
+		secretEnv := []string{
+			"APPFORGE_KEYSTORE_PASSWORD=" + keystorePassword,
+			"APPFORGE_KEY_PASSWORD=" + keyPassword,
 		}
+		if err := runAndLog(ctx, logFile, secretEnv, "keytool", "-list", "-keystore", keystorePath,
+			"-storepass:env", "APPFORGE_KEYSTORE_PASSWORD", "-alias", data.KeyAlias); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("validate keystore alias or password: %w", err))
+		}
+		if err := verifyKeystoreCertificate(ctx, keystorePath, data.KeyAlias, keystorePassword, data.SignerCertificateSha256); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, err)
+		}
+		if err := runAndLog(ctx, logFile, secretEnv, "apksigner", "sign", "--ks", keystorePath,
+			"--ks-key-alias", data.KeyAlias, "--ks-pass", "env:APPFORGE_KEYSTORE_PASSWORD",
+			"--key-pass", "env:APPFORGE_KEY_PASSWORD", "--out", signedPath, alignedPath); err != nil {
+			closeLog()
+			return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("sign APK: %w", err))
+		}
+		keystorePassword = ""
+		keyPassword = ""
+		secretEnv = nil
 	}
-	secretEnv := []string{
-		"APPFORGE_KEYSTORE_PASSWORD=" + keystorePassword,
-		"APPFORGE_KEY_PASSWORD=" + keyPassword,
-	}
-	if err := runAndLog(ctx, logFile, secretEnv, "keytool", "-list", "-keystore", keystorePath,
-		"-storepass:env", "APPFORGE_KEYSTORE_PASSWORD", "-alias", data.KeyAlias); err != nil {
-		closeLog()
-		return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("validate keystore alias or password: %w", err))
-	}
-	if err := verifyKeystoreCertificate(ctx, keystorePath, data.KeyAlias, keystorePassword, data.SignerCertificateSha256); err != nil {
-		closeLog()
-		return w.fail(ctx, task, logPath, data.Task.TenantId, err)
-	}
-	if err := runAndLog(ctx, logFile, secretEnv, "apksigner", "sign", "--ks", keystorePath,
-		"--ks-key-alias", data.KeyAlias, "--ks-pass", "env:APPFORGE_KEYSTORE_PASSWORD",
-		"--key-pass", "env:APPFORGE_KEY_PASSWORD", "--out", signedPath, alignedPath); err != nil {
-		closeLog()
-		return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("sign APK: %w", err))
-	}
-	keystorePassword = ""
-	keyPassword = ""
-	secretEnv = nil
 	if err := runAndLog(ctx, logFile, nil, "apksigner", "verify", "--verbose", "--print-certs", signedPath); err != nil {
 		closeLog()
 		return w.fail(ctx, task, logPath, data.Task.TenantId, fmt.Errorf("verify APK signature: %w", err))
+	}
+	if err := verifySignedAPKCertificate(ctx, signedPath, data.SignerCertificateSha256); err != nil {
+		closeLog()
+		return w.fail(ctx, task, logPath, data.Task.TenantId, err)
 	}
 	if err := verifyPackageName(ctx, logFile, signedPath, data.PackageName); err != nil {
 		closeLog()

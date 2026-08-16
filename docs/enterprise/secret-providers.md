@@ -17,4 +17,4 @@ Secret 内容格式：
 
 `MaxSecretBytes` 默认限制为 64 KiB。解析失败时，构建只返回通用错误，不把 Secret 内容写入日志、数据库或控制面事件。
 
-Local Agent 已实现 `local-file://` 本地 Secret Store：客户通过受限 `secret-import` 命令把固定 JSON 从标准输入写入 Docker 私有卷，运行容器只读挂载；解析时继续校验根目录、拒绝符号链接、限制私有权限和大小。当前没有实现 Keychain、TPM、HSM 或远程签名 Provider，不能使用 `remote-sign://`。真实 Vault 临时实例与文件 Provider 已通过运行验收；AWS Provider 已完成单元测试，但仍需客户测试账户和工作负载身份完成真实验收。
+Local Agent 已实现 `local-file://` 本地 Secret Store：客户通过受限 `secret-import` 命令把固定 JSON 从标准输入写入 Docker 私有卷，运行容器只读挂载；解析时继续校验根目录、拒绝符号链接、限制私有权限和大小。远程 APK 签名已有独立的 [mTLS 固定协议](./remote-apk-signing-contract.md) 和严格客户端；它不是 `remote-sign://` Secret Provider，Secret Resolver 只向 Builder 提供短期远程端点、keyId、mTLS 身份和预期签名证书信息。该模式已接入显式 API/RPC 枚举、兼容 Schema 112/113 的持久化、创建时身份校验、Core 任务快照、Builder 任务分支和 `remoteSigning` 节点调度门禁；协议级与完整任务级合成 E2E 已验证最终 APK、零 Keystore/零密码、字段绑定、防篡改、防重放、超时和 Secret 日志扫描。Keychain、TPM 及真实 HSM 尚未实现或验收。真实 Vault 临时实例与文件 Provider 已通过运行验收；AWS Provider 已完成单元测试，但仍需客户测试账户和工作负载身份完成真实验收。

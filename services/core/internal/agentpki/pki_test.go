@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"appforge/common/airgap"
 )
 
 func TestSignCSRProducesScopedClientCertificate(t *testing.T) {
@@ -68,5 +70,61 @@ func TestSignCSRRejectsInvalidIdentityAndKeyType(t *testing.T) {
 	}
 	if _, err := signer.SignCSR("invalid", 0, 1); err == nil {
 		t.Fatal("expected tenant identity rejection")
+	}
+}
+
+func TestSignManifestUsesAgentCAKey(t *testing.T) {
+	signer, err := New("", "", time.Hour)
+	if err != nil {
+		t.Fatal(err)
+	}
+	payload := []byte(`{"schema_version":1}`)
+	signature, err := signer.SignManifest(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	block, _ := pem.Decode([]byte(signer.CAPEM()))
+	certificate, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		t.Fatal(err)
+	}
+	publicKey, ok := certificate.PublicKey.(*ecdsa.PublicKey)
+	if !ok {
+		t.Fatal("Agent CA key is not ECDSA")
+	}
+	if err := airgap.Verify(publicKey, payload, signature); err != nil {
+		t.Fatalf("verify manifest signature: %v", err)
+	}
+	if err := airgap.Verify(publicKey, append(payload, ' '), signature); err == nil {
+		t.Fatal("tampered manifest signature was accepted")
+	}
+}
+
+func TestVerifyClientCertificateChecksScopedIdentityAndTime(t *testing.T) {
+	signer, err := New("", "", 2*time.Hour)
+	if err != nil {
+		t.Fatal(err)
+	}
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	csrDER, err := x509.CreateCertificateRequest(rand.Reader, &x509.CertificateRequest{}, key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	issued, err := signer.SignCSR(string(pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE REQUEST", Bytes: csrDER})), 31, 47)
+	if err != nil {
+		t.Fatal(err)
+	}
+	verified, err := signer.VerifyClientCertificate(issued.PEM, 31, 47, time.Now().UTC())
+	if err != nil || verified.SerialNumber.Text(16) != issued.Serial {
+		t.Fatalf("verify scoped certificate: certificate=%v err=%v", verified, err)
+	}
+	if _, err := signer.VerifyClientCertificate(issued.PEM, 31, 48, time.Now().UTC()); err == nil {
+		t.Fatal("mismatched Agent identity was accepted")
+	}
+	if _, err := signer.VerifyClientCertificate(issued.PEM, 31, 47, issued.NotAfter.Add(time.Second)); err == nil {
+		t.Fatal("expired Agent certificate was accepted")
 	}
 }

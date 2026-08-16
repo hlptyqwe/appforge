@@ -3,6 +3,7 @@ syntax = "proto3";
 package builder;
 
 import "proto/common/common.proto";
+import "proto/core/core.proto";
 
 option go_package = "appforge/proto/builder;builder";
 
@@ -285,11 +286,14 @@ message ValidateSigningMaterialReq {
   string key_alias = 2; // 待校验的签名别名
   string keystore_password_ciphertext = 3; // Keystore密码密文
   string key_password_ciphertext = 4; // Key密码密文
+  core.SigningMode signing_mode = 5; // 待校验的签名模式
+  string secret_ref = 6; // 远程签名连接Secret引用
 }
 
 // 签名材料校验结果。
 message SigningMaterialValidation {
   string certificate_sha256 = 1; // 签名证书SHA-256指纹，小写十六进制
+  string key_id = 2; // 远程签名密钥ID，本地Keystore模式为空
 }
 
 // 签名材料校验响应。

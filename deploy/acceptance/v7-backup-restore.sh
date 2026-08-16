@@ -30,6 +30,7 @@ cat >"$delivery/docker-compose.yml" <<'YAML'
 services:
   mysql:
     image: mysql:8.4
+    command: ["--log-bin=mysql-bin", "--server-id=1", "--binlog-format=ROW", "--binlog-row-image=FULL"]
     environment:
       MYSQL_DATABASE: appforge
       MYSQL_USER: appforge

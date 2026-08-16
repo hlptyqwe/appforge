@@ -8,6 +8,7 @@ package builder
 
 import (
 	common "appforge/proto/common"
+	core "appforge/proto/core"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -2340,6 +2341,8 @@ type ValidateSigningMaterialReq struct {
 	KeyAlias                   string                 `protobuf:"bytes,2,opt,name=key_alias,json=keyAlias,proto3" json:"key_alias,omitempty"`                                                         // 待校验的签名别名
 	KeystorePasswordCiphertext string                 `protobuf:"bytes,3,opt,name=keystore_password_ciphertext,json=keystorePasswordCiphertext,proto3" json:"keystore_password_ciphertext,omitempty"` // Keystore密码密文
 	KeyPasswordCiphertext      string                 `protobuf:"bytes,4,opt,name=key_password_ciphertext,json=keyPasswordCiphertext,proto3" json:"key_password_ciphertext,omitempty"`                // Key密码密文
+	SigningMode                core.SigningMode       `protobuf:"varint,5,opt,name=signing_mode,json=signingMode,proto3,enum=core.SigningMode" json:"signing_mode,omitempty"`                         // 待校验的签名模式
+	SecretRef                  string                 `protobuf:"bytes,6,opt,name=secret_ref,json=secretRef,proto3" json:"secret_ref,omitempty"`                                                      // 远程签名连接Secret引用
 	unknownFields              protoimpl.UnknownFields
 	sizeCache                  protoimpl.SizeCache
 }
@@ -2402,10 +2405,25 @@ func (x *ValidateSigningMaterialReq) GetKeyPasswordCiphertext() string {
 	return ""
 }
 
+func (x *ValidateSigningMaterialReq) GetSigningMode() core.SigningMode {
+	if x != nil {
+		return x.SigningMode
+	}
+	return core.SigningMode(0)
+}
+
+func (x *ValidateSigningMaterialReq) GetSecretRef() string {
+	if x != nil {
+		return x.SecretRef
+	}
+	return ""
+}
+
 // 签名材料校验结果。
 type SigningMaterialValidation struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	CertificateSha256 string                 `protobuf:"bytes,1,opt,name=certificate_sha256,json=certificateSha256,proto3" json:"certificate_sha256,omitempty"` // 签名证书SHA-256指纹，小写十六进制
+	KeyId             string                 `protobuf:"bytes,2,opt,name=key_id,json=keyId,proto3" json:"key_id,omitempty"`                                     // 远程签名密钥ID，本地Keystore模式为空
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -2443,6 +2461,13 @@ func (*SigningMaterialValidation) Descriptor() ([]byte, []int) {
 func (x *SigningMaterialValidation) GetCertificateSha256() string {
 	if x != nil {
 		return x.CertificateSha256
+	}
+	return ""
+}
+
+func (x *SigningMaterialValidation) GetKeyId() string {
+	if x != nil {
+		return x.KeyId
 	}
 	return ""
 }
@@ -2504,7 +2529,7 @@ var File_proto_builder_builder_proto protoreflect.FileDescriptor
 
 const file_proto_builder_builder_proto_rawDesc = "" +
 	"\n" +
-	"\x1bproto/builder/builder.proto\x12\abuilder\x1a\x19proto/common/common.proto\"0\n" +
+	"\x1bproto/builder/builder.proto\x12\abuilder\x1a\x19proto/common/common.proto\x1a\x15proto/core/core.proto\"0\n" +
 	"\bRespBase\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\"\xc2\x05\n" +
 	"\tBuildTask\x12\x0e\n" +
@@ -2696,14 +2721,18 @@ const file_proto_builder_builder_proto_rawDesc = "" +
 	"\n" +
 	"log_sha256\x18\x06 \x01(\tR\tlogSha256\x12\x19\n" +
 	"\blog_size\x18\a \x01(\x03R\alogSize\x12'\n" +
-	"\x0fbuilder_attempt\x18\b \x01(\x05R\x0ebuilderAttempt\"\xe3\x01\n" +
+	"\x0fbuilder_attempt\x18\b \x01(\x05R\x0ebuilderAttempt\"\xb8\x02\n" +
 	"\x1aValidateSigningMaterialReq\x12.\n" +
 	"\x13keystore_object_key\x18\x01 \x01(\tR\x11keystoreObjectKey\x12\x1b\n" +
 	"\tkey_alias\x18\x02 \x01(\tR\bkeyAlias\x12@\n" +
 	"\x1ckeystore_password_ciphertext\x18\x03 \x01(\tR\x1akeystorePasswordCiphertext\x126\n" +
-	"\x17key_password_ciphertext\x18\x04 \x01(\tR\x15keyPasswordCiphertext\"J\n" +
+	"\x17key_password_ciphertext\x18\x04 \x01(\tR\x15keyPasswordCiphertext\x124\n" +
+	"\fsigning_mode\x18\x05 \x01(\x0e2\x11.core.SigningModeR\vsigningMode\x12\x1d\n" +
+	"\n" +
+	"secret_ref\x18\x06 \x01(\tR\tsecretRef\"a\n" +
 	"\x19SigningMaterialValidation\x12-\n" +
-	"\x12certificate_sha256\x18\x01 \x01(\tR\x11certificateSha256\"{\n" +
+	"\x12certificate_sha256\x18\x01 \x01(\tR\x11certificateSha256\x12\x15\n" +
+	"\x06key_id\x18\x02 \x01(\tR\x05keyId\"{\n" +
 	"\x1bValidateSigningMaterialResp\x12$\n" +
 	"\x04base\x18\x01 \x01(\v2\x10.common.RespBaseR\x04base\x126\n" +
 	"\x04data\x18\x02 \x01(\v2\".builder.SigningMaterialValidationR\x04data*\x8d\x02\n" +
@@ -2796,6 +2825,7 @@ var file_proto_builder_builder_proto_goTypes = []any{
 	(*SigningMaterialValidation)(nil),   // 31: builder.SigningMaterialValidation
 	(*ValidateSigningMaterialResp)(nil), // 32: builder.ValidateSigningMaterialResp
 	(*common.RespBase)(nil),             // 33: common.RespBase
+	(core.SigningMode)(0),               // 34: core.SigningMode
 }
 var file_proto_builder_builder_proto_depIdxs = []int32{
 	33, // 0: builder.RespBase.base:type_name -> common.RespBase
@@ -2817,43 +2847,44 @@ var file_proto_builder_builder_proto_depIdxs = []int32{
 	33, // 16: builder.BuildTaskResp.base:type_name -> common.RespBase
 	5,  // 17: builder.BuildTaskResp.data:type_name -> builder.BuildTask
 	0,  // 18: builder.ReportBuildProgressReq.status:type_name -> builder.BuildTaskStatus
-	33, // 19: builder.ValidateSigningMaterialResp.base:type_name -> common.RespBase
-	31, // 20: builder.ValidateSigningMaterialResp.data:type_name -> builder.SigningMaterialValidation
-	30, // 21: builder.Builder.ValidateSigningMaterial:input_type -> builder.ValidateSigningMaterialReq
-	24, // 22: builder.Builder.ClaimBuildTask:input_type -> builder.ClaimBuildTaskReq
-	26, // 23: builder.Builder.HeartbeatBuildTask:input_type -> builder.HeartbeatBuildTaskReq
-	27, // 24: builder.Builder.ReportBuildProgress:input_type -> builder.ReportBuildProgressReq
-	28, // 25: builder.Builder.CompleteBuildTask:input_type -> builder.CompleteBuildTaskReq
-	29, // 26: builder.Builder.FailBuildTask:input_type -> builder.FailBuildTaskReq
-	15, // 27: builder.Builder.RegisterBuilderNode:input_type -> builder.RegisterBuilderNodeReq
-	16, // 28: builder.Builder.BuilderNodeHeartbeat:input_type -> builder.BuilderNodeHeartbeatReq
-	17, // 29: builder.Builder.ClaimScheduledBuildTask:input_type -> builder.ClaimScheduledBuildTaskReq
-	18, // 30: builder.Builder.DrainBuilderNode:input_type -> builder.DrainBuilderNodeReq
-	19, // 31: builder.Builder.CancelBuildExecution:input_type -> builder.CancelBuildExecutionReq
-	20, // 32: builder.Builder.ResolveBuildCache:input_type -> builder.ResolveBuildCacheReq
-	21, // 33: builder.Builder.PublishBuildCache:input_type -> builder.PublishBuildCacheReq
-	22, // 34: builder.Builder.InvalidateBuildCache:input_type -> builder.InvalidateBuildCacheReq
-	23, // 35: builder.Builder.CleanupBuildCache:input_type -> builder.CleanupBuildCacheReq
-	32, // 36: builder.Builder.ValidateSigningMaterial:output_type -> builder.ValidateSigningMaterialResp
-	25, // 37: builder.Builder.ClaimBuildTask:output_type -> builder.BuildTaskResp
-	4,  // 38: builder.Builder.HeartbeatBuildTask:output_type -> builder.RespBase
-	4,  // 39: builder.Builder.ReportBuildProgress:output_type -> builder.RespBase
-	4,  // 40: builder.Builder.CompleteBuildTask:output_type -> builder.RespBase
-	4,  // 41: builder.Builder.FailBuildTask:output_type -> builder.RespBase
-	7,  // 42: builder.Builder.RegisterBuilderNode:output_type -> builder.BuilderNodeResp
-	7,  // 43: builder.Builder.BuilderNodeHeartbeat:output_type -> builder.BuilderNodeResp
-	25, // 44: builder.Builder.ClaimScheduledBuildTask:output_type -> builder.BuildTaskResp
-	7,  // 45: builder.Builder.DrainBuilderNode:output_type -> builder.BuilderNodeResp
-	25, // 46: builder.Builder.CancelBuildExecution:output_type -> builder.BuildTaskResp
-	12, // 47: builder.Builder.ResolveBuildCache:output_type -> builder.BuildCacheResolutionResp
-	9,  // 48: builder.Builder.PublishBuildCache:output_type -> builder.BuildCacheEntryResp
-	9,  // 49: builder.Builder.InvalidateBuildCache:output_type -> builder.BuildCacheEntryResp
-	14, // 50: builder.Builder.CleanupBuildCache:output_type -> builder.CleanupBuildCacheResp
-	36, // [36:51] is the sub-list for method output_type
-	21, // [21:36] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	34, // 19: builder.ValidateSigningMaterialReq.signing_mode:type_name -> core.SigningMode
+	33, // 20: builder.ValidateSigningMaterialResp.base:type_name -> common.RespBase
+	31, // 21: builder.ValidateSigningMaterialResp.data:type_name -> builder.SigningMaterialValidation
+	30, // 22: builder.Builder.ValidateSigningMaterial:input_type -> builder.ValidateSigningMaterialReq
+	24, // 23: builder.Builder.ClaimBuildTask:input_type -> builder.ClaimBuildTaskReq
+	26, // 24: builder.Builder.HeartbeatBuildTask:input_type -> builder.HeartbeatBuildTaskReq
+	27, // 25: builder.Builder.ReportBuildProgress:input_type -> builder.ReportBuildProgressReq
+	28, // 26: builder.Builder.CompleteBuildTask:input_type -> builder.CompleteBuildTaskReq
+	29, // 27: builder.Builder.FailBuildTask:input_type -> builder.FailBuildTaskReq
+	15, // 28: builder.Builder.RegisterBuilderNode:input_type -> builder.RegisterBuilderNodeReq
+	16, // 29: builder.Builder.BuilderNodeHeartbeat:input_type -> builder.BuilderNodeHeartbeatReq
+	17, // 30: builder.Builder.ClaimScheduledBuildTask:input_type -> builder.ClaimScheduledBuildTaskReq
+	18, // 31: builder.Builder.DrainBuilderNode:input_type -> builder.DrainBuilderNodeReq
+	19, // 32: builder.Builder.CancelBuildExecution:input_type -> builder.CancelBuildExecutionReq
+	20, // 33: builder.Builder.ResolveBuildCache:input_type -> builder.ResolveBuildCacheReq
+	21, // 34: builder.Builder.PublishBuildCache:input_type -> builder.PublishBuildCacheReq
+	22, // 35: builder.Builder.InvalidateBuildCache:input_type -> builder.InvalidateBuildCacheReq
+	23, // 36: builder.Builder.CleanupBuildCache:input_type -> builder.CleanupBuildCacheReq
+	32, // 37: builder.Builder.ValidateSigningMaterial:output_type -> builder.ValidateSigningMaterialResp
+	25, // 38: builder.Builder.ClaimBuildTask:output_type -> builder.BuildTaskResp
+	4,  // 39: builder.Builder.HeartbeatBuildTask:output_type -> builder.RespBase
+	4,  // 40: builder.Builder.ReportBuildProgress:output_type -> builder.RespBase
+	4,  // 41: builder.Builder.CompleteBuildTask:output_type -> builder.RespBase
+	4,  // 42: builder.Builder.FailBuildTask:output_type -> builder.RespBase
+	7,  // 43: builder.Builder.RegisterBuilderNode:output_type -> builder.BuilderNodeResp
+	7,  // 44: builder.Builder.BuilderNodeHeartbeat:output_type -> builder.BuilderNodeResp
+	25, // 45: builder.Builder.ClaimScheduledBuildTask:output_type -> builder.BuildTaskResp
+	7,  // 46: builder.Builder.DrainBuilderNode:output_type -> builder.BuilderNodeResp
+	25, // 47: builder.Builder.CancelBuildExecution:output_type -> builder.BuildTaskResp
+	12, // 48: builder.Builder.ResolveBuildCache:output_type -> builder.BuildCacheResolutionResp
+	9,  // 49: builder.Builder.PublishBuildCache:output_type -> builder.BuildCacheEntryResp
+	9,  // 50: builder.Builder.InvalidateBuildCache:output_type -> builder.BuildCacheEntryResp
+	14, // 51: builder.Builder.CleanupBuildCache:output_type -> builder.CleanupBuildCacheResp
+	37, // [37:52] is the sub-list for method output_type
+	22, // [22:37] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_proto_builder_builder_proto_init() }
