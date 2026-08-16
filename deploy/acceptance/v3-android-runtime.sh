@@ -14,6 +14,28 @@ expected_activity=$4
 old_version_code=$5
 new_version_code=$6
 expected_certificate=$(tr '[:upper:]' '[:lower:]' <<<"$7")
+report_file=${APPFORGE_V3_ANDROID_REPORT_FILE:-}
+expected_device_kind=${APPFORGE_V3_ANDROID_EXPECTED_DEVICE_KIND:-any}
+expected_ui_text=${APPFORGE_V3_ANDROID_EXPECTED_UI_TEXT:-}
+evidence_source=${APPFORGE_V3_ANDROID_EVIDENCE_SOURCE:-provided-apks}
+git_commit=${APPFORGE_V3_ANDROID_GIT_COMMIT:-}
+
+case "$expected_device_kind" in any|emulator|authorized-device) ;; *)
+  echo "APPFORGE_V3_ANDROID_EXPECTED_DEVICE_KIND 只能是 any、emulator 或 authorized-device" >&2
+  exit 2
+esac
+if [[ -n $report_file && $report_file != /* ]]; then
+  echo "APPFORGE_V3_ANDROID_REPORT_FILE 必须是绝对路径" >&2
+  exit 2
+fi
+[[ $evidence_source =~ ^[A-Za-z0-9._-]{1,128}$ ]] || {
+  echo "APPFORGE_V3_ANDROID_EVIDENCE_SOURCE 格式不安全" >&2
+  exit 2
+}
+[[ -z $git_commit || $git_commit =~ ^[0-9a-f]{40}$ ]] || {
+  echo "APPFORGE_V3_ANDROID_GIT_COMMIT 必须是完整小写 Git SHA" >&2
+  exit 2
+}
 
 for apk_file in "$old_apk" "$new_apk"; do
   if [[ ! -f "$apk_file" ]]; then
@@ -21,6 +43,22 @@ for apk_file in "$old_apk" "$new_apk"; do
     exit 2
   fi
 done
+command -v python3 >/dev/null || { echo "未找到工具: python3" >&2; exit 2; }
+sha256_file() {
+  python3 - "$1" <<'PY'
+import hashlib
+import pathlib
+import sys
+
+digest = hashlib.sha256()
+with pathlib.Path(sys.argv[1]).open("rb") as source:
+    for block in iter(lambda: source.read(1024 * 1024), b""):
+        digest.update(block)
+print(digest.hexdigest())
+PY
+}
+old_apk_sha256=$(sha256_file "$old_apk")
+new_apk_sha256=$(sha256_file "$new_apk")
 
 resolve_android_tool() {
   local tool_name=$1
@@ -58,6 +96,25 @@ if [[ "$device_count" -ne 1 ]]; then
   "$adb_bin" devices -l >&2
   exit 3
 fi
+device_serial=$("$adb_bin" devices | awk 'NR > 1 && $2 == "device" { print $1; exit }')
+device_serial_sha256=$(APPFORGE_ANDROID_DEVICE_SERIAL="$device_serial" python3 -c \
+  'import hashlib,os; print(hashlib.sha256(os.environ["APPFORGE_ANDROID_DEVICE_SERIAL"].encode()).hexdigest())')
+device_qemu=$("$adb_bin" -s "$device_serial" shell getprop ro.kernel.qemu | tr -d '\r')
+if [[ $device_qemu == 1 ]]; then
+  device_kind=emulator
+else
+  device_kind=authorized-device
+fi
+if [[ $expected_device_kind != any && $device_kind != "$expected_device_kind" ]]; then
+  echo "Android 设备类型不符合约束: actual=$device_kind expected=$expected_device_kind" >&2
+  exit 3
+fi
+device_api_level=$("$adb_bin" -s "$device_serial" shell getprop ro.build.version.sdk | tr -d '\r')
+device_abi=$("$adb_bin" -s "$device_serial" shell getprop ro.product.cpu.abi | tr -d '\r')
+[[ $device_api_level =~ ^[0-9]+$ && $device_abi =~ ^[A-Za-z0-9._-]+$ ]] || {
+  echo "Android 设备元数据无效" >&2
+  exit 3
+}
 
 aapt_bin=$(resolve_android_tool aapt false || true)
 apksigner_bin=$(resolve_android_tool apksigner false || true)
@@ -95,6 +152,7 @@ if (( new_version_code <= old_version_code )); then
   exit 4
 fi
 
+static_metadata_checked=false
 if [[ -n "$aapt_bin" ]]; then
 	old_package=$(apk_field "$old_apk" name)
 	new_package=$(apk_field "$new_apk" name)
@@ -114,10 +172,12 @@ if [[ -n "$aapt_bin" ]]; then
 		echo "APK版本号不一致: old=$old_apk_version_code/$old_version_code new=$new_apk_version_code/$new_version_code" >&2
 		exit 4
 	fi
+	static_metadata_checked=true
 else
 	echo "未找到aapt，跳过APK静态元数据复核；安装后仍会通过PackageManager校验"
 fi
 
+signature_checked=false
 if [[ -n "$apksigner_bin" ]]; then
 	old_certificate=$(apk_certificate "$old_apk")
 	new_certificate=$(apk_certificate "$new_apk")
@@ -125,13 +185,14 @@ if [[ -n "$apksigner_bin" ]]; then
 		echo "签名证书不一致: old=$old_certificate new=$new_certificate expected=$expected_certificate" >&2
 		exit 4
 	fi
+	signature_checked=true
 else
 	echo "未找到apksigner，跳过证书静态复核；覆盖安装仍会由Android强制校验签名一致"
 fi
 
 launch_and_verify() {
   local phase=$1
-  local launch_output
+  local launch_output ui_dump
 
   "$adb_bin" shell am force-stop "$expected_package"
   launch_output=$("$adb_bin" shell am start -W -n "$expected_package/$expected_activity" 2>&1)
@@ -143,6 +204,16 @@ launch_and_verify() {
   if ! "$adb_bin" shell pidof "$expected_package" | grep -q '[0-9]'; then
     echo "$phase 启动后未发现应用进程" >&2
     exit 5
+  fi
+  if [[ -n $expected_ui_text ]]; then
+    "$adb_bin" shell uiautomator dump /sdcard/appforge-v3-runtime.xml >/dev/null
+    ui_dump=$("$adb_bin" exec-out cat /sdcard/appforge-v3-runtime.xml)
+    if ! grep -Fq -- "$expected_ui_text" <<<"$ui_dump"; then
+      "$adb_bin" shell rm -f /sdcard/appforge-v3-runtime.xml >/dev/null 2>&1 || true
+      echo "$phase 启动后未找到期望界面文本" >&2
+      exit 5
+    fi
+    "$adb_bin" shell rm -f /sdcard/appforge-v3-runtime.xml >/dev/null
   fi
 }
 
@@ -180,3 +251,82 @@ echo "activity=$expected_activity"
 echo "versionCode=$old_version_code->$new_version_code"
 echo "certificateSha256=$expected_certificate"
 echo "firstInstallTime=$first_install_time"
+echo "deviceKind=$device_kind"
+echo "deviceApiLevel=$device_api_level"
+echo "deviceAbi=$device_abi"
+
+if [[ -n $report_file ]]; then
+  mkdir -p "$(dirname "$report_file")"
+  umask 077
+  APPFORGE_V3_ANDROID_ACCEPTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  APPFORGE_V3_ANDROID_DEVICE_KIND="$device_kind" \
+  APPFORGE_V3_ANDROID_DEVICE_SERIAL_SHA256="$device_serial_sha256" \
+  APPFORGE_V3_ANDROID_DEVICE_API_LEVEL="$device_api_level" \
+  APPFORGE_V3_ANDROID_DEVICE_ABI="$device_abi" \
+  APPFORGE_V3_ANDROID_PACKAGE="$expected_package" \
+  APPFORGE_V3_ANDROID_ACTIVITY="$expected_activity" \
+  APPFORGE_V3_ANDROID_OLD_VERSION_CODE="$old_version_code" \
+  APPFORGE_V3_ANDROID_NEW_VERSION_CODE="$new_version_code" \
+  APPFORGE_V3_ANDROID_CERTIFICATE_SHA256="$expected_certificate" \
+  APPFORGE_V3_ANDROID_OLD_APK_SHA256="$old_apk_sha256" \
+  APPFORGE_V3_ANDROID_NEW_APK_SHA256="$new_apk_sha256" \
+  APPFORGE_V3_ANDROID_FIRST_INSTALL_TIME="$first_install_time" \
+  APPFORGE_V3_ANDROID_STATIC_METADATA_CHECKED="$static_metadata_checked" \
+  APPFORGE_V3_ANDROID_SIGNATURE_CHECKED="$signature_checked" \
+  APPFORGE_V3_ANDROID_UI_TEXT_CHECKED="$([[ -n $expected_ui_text ]] && echo true || echo false)" \
+  APPFORGE_V3_ANDROID_EVIDENCE_SOURCE="$evidence_source" \
+  APPFORGE_V3_ANDROID_GIT_COMMIT="$git_commit" \
+  python3 <<'PY' >"$report_file"
+import json
+import os
+import sys
+
+device_kind = os.environ["APPFORGE_V3_ANDROID_DEVICE_KIND"]
+json.dump({
+    "schemaVersion": 1,
+    "evidenceType": "v3-android-runtime-current",
+    "acceptedAt": os.environ["APPFORGE_V3_ANDROID_ACCEPTED_AT"],
+    "result": "passed",
+    "source": {
+        "artifactSet": os.environ["APPFORGE_V3_ANDROID_EVIDENCE_SOURCE"],
+        "gitCommit": os.environ["APPFORGE_V3_ANDROID_GIT_COMMIT"] or None,
+    },
+    "device": {
+        "kind": device_kind,
+        "serialSha256": os.environ["APPFORGE_V3_ANDROID_DEVICE_SERIAL_SHA256"],
+        "apiLevel": int(os.environ["APPFORGE_V3_ANDROID_DEVICE_API_LEVEL"]),
+        "abi": os.environ["APPFORGE_V3_ANDROID_DEVICE_ABI"],
+    },
+    "application": {
+        "packageName": os.environ["APPFORGE_V3_ANDROID_PACKAGE"],
+        "launchActivity": os.environ["APPFORGE_V3_ANDROID_ACTIVITY"],
+        "oldVersionCode": int(os.environ["APPFORGE_V3_ANDROID_OLD_VERSION_CODE"]),
+        "newVersionCode": int(os.environ["APPFORGE_V3_ANDROID_NEW_VERSION_CODE"]),
+        "certificateSha256": os.environ["APPFORGE_V3_ANDROID_CERTIFICATE_SHA256"],
+        "oldApkSha256": os.environ["APPFORGE_V3_ANDROID_OLD_APK_SHA256"],
+        "newApkSha256": os.environ["APPFORGE_V3_ANDROID_NEW_APK_SHA256"],
+        "firstInstallTimePreserved": True,
+        "firstInstallTime": os.environ["APPFORGE_V3_ANDROID_FIRST_INSTALL_TIME"],
+    },
+    "checks": {
+        "singleAuthorizedADBDevice": "passed",
+        "deviceKindConstraint": "passed",
+        "oldApkStaticMetadata": "passed" if os.environ["APPFORGE_V3_ANDROID_STATIC_METADATA_CHECKED"] == "true" else "not-available",
+        "newApkStaticMetadata": "passed" if os.environ["APPFORGE_V3_ANDROID_STATIC_METADATA_CHECKED"] == "true" else "not-available",
+        "sameSigningCertificate": "passed" if os.environ["APPFORGE_V3_ANDROID_SIGNATURE_CHECKED"] == "true" else "enforced-by-in-place-upgrade",
+        "oldInstallAndLaunch": "passed",
+        "newInPlaceUpgradeAndLaunch": "passed",
+        "applicationProcessAfterLaunch": "passed",
+        "uiText": "passed" if os.environ["APPFORGE_V3_ANDROID_UI_TEXT_CHECKED"] == "true" else "not-requested",
+    },
+    "limitations": [
+        "synthetic-v3-acceptance-application-only",
+        "emulator-does-not-replace-authorized-physical-device" if device_kind == "emulator" else "single-authorized-device-only",
+        "does-not-access-customer-or-production-data",
+    ],
+}, sys.stdout, ensure_ascii=False, indent=2)
+sys.stdout.write("\n")
+PY
+  chmod 0600 "$report_file"
+  echo "证据: $report_file"
+fi
