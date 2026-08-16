@@ -168,6 +168,7 @@ bash -n "$repo_root/deploy/production/"*.sh "$repo_root/deploy/local-agent/"*.sh
 bash -n "$repo_root/deploy/acceptance/v7-local-agent-recovery.sh" \
   "$repo_root/deploy/acceptance/v7-customer-storage-site-probe.sh" \
   "$repo_root/deploy/acceptance/v7-api-soak.sh" \
+  "$repo_root/deploy/acceptance/v7-artifact-soak.sh" \
   "$repo_root/deploy/acceptance/v7-syslog-tls.sh" \
   "$repo_root/deploy/acceptance/v7-formal-kubernetes-upgrade.sh" \
   "$repo_root/deploy/acceptance/v7-kubernetes-upgrade.sh" \

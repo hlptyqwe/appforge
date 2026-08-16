@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/hourly-api-soak.yml
       - deploy/acceptance/v7-api-soak.sh
+      - deploy/acceptance/v7-artifact-soak.sh
       - deploy/acceptance/fixtures/soak-api.go
       - deploy/docker-compose.dev.yml
       - deploy/docker/**
@@ -96,6 +97,11 @@ jobs:
           docker compose -f deploy/docker-compose.dev.yml build \
             admin-api builder-rpc system-rpc core-rpc etcd-init \
             2>&1 | tee "${{ runner.temp }}/compose-build.log"
+          docker build \
+            --build-arg APPFORGE_VERSION=0.0.0-dev \
+            -f deploy/docker/local-agent.Dockerfile \
+            -t appforge-local-agent:soak \
+            . 2>&1 | tee "${{ runner.temp }}/local-agent-build.log"
           docker builder prune --all --force | tee "${{ runner.temp }}/builder-prune.log"
           docker image prune --force | tee "${{ runner.temp }}/image-prune.log"
           available_bytes=$(df --block-size=1 --output=avail / | tail -1 | tr -d ' ')
@@ -122,7 +128,7 @@ jobs:
           diagnostic_payload=$(gzip -c "${{ runner.temp }}/startup-admin-api-diagnostics.txt" | base64 -w0)
           printf '::error title=Admin API startup diagnostics (gzip+base64)::%s\n' "$diagnostic_payload"
           exit 1
-      - name: Run authenticated one-hour API soak
+      - name: Run one-hour API and artifact mixed soak
         env:
           APPFORGE_SOAK_API_URL: http://127.0.0.1:8888
           APPFORGE_SOAK_ADMIN_USERNAME: appforge
@@ -138,14 +144,47 @@ jobs:
           APPFORGE_SOAK_MAX_CONSECUTIVE_ERRORS: "0"
           APPFORGE_SOAK_REPORT_FILE: ${{ runner.temp }}/v7-api-soak-hour.json
           APPFORGE_SOAK_ENVIRONMENT_KIND: fixture
+          APPFORGE_ARTIFACT_SOAK_DURATION_SECONDS: "3600"
+          APPFORGE_ARTIFACT_SOAK_BUILD_CONCURRENCY: "1"
+          APPFORGE_ARTIFACT_SOAK_BUILD_INTERVAL_SECONDS: "10"
+          APPFORGE_ARTIFACT_SOAK_MIN_BUILDS: "120"
+          APPFORGE_ARTIFACT_SOAK_OBJECT_CONCURRENCY: "1"
+          APPFORGE_ARTIFACT_SOAK_OBJECT_INTERVAL_SECONDS: "1"
+          APPFORGE_ARTIFACT_SOAK_OBJECT_MIB: "1"
+          APPFORGE_ARTIFACT_SOAK_MIN_OBJECT_ROUND_TRIPS: "600"
+          APPFORGE_ARTIFACT_SOAK_AGENT_IMAGE: appforge-local-agent:soak
+          APPFORGE_ARTIFACT_SOAK_MINIO_ACCESS_KEY_FILE: ${{ runner.temp }}/soak-minio-access-key
+          APPFORGE_ARTIFACT_SOAK_MINIO_SECRET_KEY_FILE: ${{ runner.temp }}/soak-minio-secret-key
+          APPFORGE_ARTIFACT_SOAK_REPORT_FILE: ${{ runner.temp }}/v7-artifact-soak-hour.json
+          APPFORGE_ARTIFACT_SOAK_ENVIRONMENT_KIND: fixture
         run: |
           set -euo pipefail
           install -m 0600 /dev/null "$APPFORGE_SOAK_ADMIN_PASSWORD_FILE"
+          install -m 0600 /dev/null "$APPFORGE_ARTIFACT_SOAK_MINIO_ACCESS_KEY_FILE"
+          install -m 0600 /dev/null "$APPFORGE_ARTIFACT_SOAK_MINIO_SECRET_KEY_FILE"
           printf '%s\n' 'AppForge@123' >"$APPFORGE_SOAK_ADMIN_PASSWORD_FILE"
-          deploy/acceptance/v7-api-soak.sh
+          printf '%s\n' 'appforge' >"$APPFORGE_ARTIFACT_SOAK_MINIO_ACCESS_KEY_FILE"
+          printf '%s\n' 'appforge_dev_minio' >"$APPFORGE_ARTIFACT_SOAK_MINIO_SECRET_KEY_FILE"
+          deploy/acceptance/v7-api-soak.sh &
+          api_soak_pid=$!
+          deploy/acceptance/v7-artifact-soak.sh &
+          artifact_soak_pid=$!
+          stop_soaks() {
+            kill "$api_soak_pid" "$artifact_soak_pid" 2>/dev/null || true
+            wait "$api_soak_pid" "$artifact_soak_pid" 2>/dev/null || true
+          }
+          trap stop_soaks INT TERM
+          set +e
+          wait "$api_soak_pid"
+          api_soak_status=$?
+          wait "$artifact_soak_pid"
+          artifact_soak_status=$?
+          set -e
+          ((api_soak_status == 0 && artifact_soak_status == 0))
       - name: Verify hour evidence and zero restarts
         env:
-          REPORT: ${{ runner.temp }}/v7-api-soak-hour.json
+          API_REPORT: ${{ runner.temp }}/v7-api-soak-hour.json
+          ARTIFACT_REPORT: ${{ runner.temp }}/v7-artifact-soak-hour.json
         run: |
           set -euo pipefail
           jq -e '
@@ -157,7 +196,21 @@ jobs:
             ([.probes[].errors] | add) == 0 and
             ([.probes[].maxConsecutiveErrors] | max) == 0 and
             ([.probes[] | (.requests >= .minimumRequests)] | all)
-          ' "$REPORT"
+          ' "$API_REPORT"
+          jq -e '
+            .result == "passed" and
+            .runClass == "hour" and
+            .qualifiesHourLevel == true and
+            .qualifiesDayLevel == false and
+            .actualDurationSeconds >= 3600 and
+            .apkBuild.failed == 0 and
+            .apkBuild.completed >= .apkBuild.minimumCompleted and
+            .objectStorage.failed == 0 and
+            .objectStorage.roundTrips >= .objectStorage.minimumRoundTrips and
+            .objectStorage.sha256Verified == true and
+            .objectStorage.deleteNotFoundVerified == true and
+            .objectStorage.temporaryPrefixRemoved == true
+          ' "$ARTIFACT_REPORT"
           for container in \
             appforge-mysql appforge-redis appforge-etcd appforge-minio \
             appforge-system-rpc appforge-core-rpc appforge-builder-rpc appforge-admin-api; do
@@ -178,10 +231,12 @@ jobs:
           name: hourly-api-soak-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/v7-api-soak-hour.json
+            ${{ runner.temp }}/v7-artifact-soak-hour.json
             ${{ runner.temp }}/compose-ps.json
             ${{ runner.temp }}/docker-stats.jsonl
             ${{ runner.temp }}/compose.log
             ${{ runner.temp }}/compose-build.log
+            ${{ runner.temp }}/local-agent-build.log
             ${{ runner.temp }}/builder-prune.log
             ${{ runner.temp }}/image-prune.log
             ${{ runner.temp }}/docker-system-df.txt
