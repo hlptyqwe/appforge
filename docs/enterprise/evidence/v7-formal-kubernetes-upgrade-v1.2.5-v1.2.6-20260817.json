@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "kind": "appforge-v7-formal-kubernetes-upgrade-acceptance",
+  "acceptedAt": "2026-08-16T17:38:11Z",
+  "result": "passed",
+  "registry": "ghcr.io/hlptyqwe/appforge",
+  "platform": "linux/amd64",
+  "upgradePath": {
+    "baseVersion": "1.2.5",
+    "targetVersion": "1.2.6",
+    "rollbackVersion": "1.2.5",
+    "baseGitCommit": "3f9420b2f53e8fa13651e519bd74aa95dca8ff61",
+    "targetGitCommit": "3d1fde742b7cb206b26a24b47b3c27e612c9b34e",
+    "commitsDifferent": true
+  },
+  "releaseEvidence": {
+    "aggregateSigstoreVerified": true,
+    "liveCosignVerifiedImageCount": 21,
+    "baseCertificateIdentity": "https://github.com/hlptyqwe/appforge/.github/workflows/release-security.yml@refs/tags/v1.2.5",
+    "targetCertificateIdentity": "https://github.com/hlptyqwe/appforge/.github/workflows/release-security.yml@refs/tags/v1.2.6",
+    "certificateIssuer": "https://token.actions.githubusercontent.com",
+    "baseSha256SumsFileSha256": "1f9828ad7ce1ef42b61e406b6776eaf0d4b62832edcb06f9fe0de4851cf98482",
+    "targetSha256SumsFileSha256": "7185ec6acf43dfd59e99e8750a0074a971479a07a93ddd6926750b85869abf5e"
+  },
+  "runtimeInputs": {
+    "redisDigestRef": "redis@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2",
+    "alpineDigestRef": "alpine@sha256:14358309a308569c32bdc37e2e0e9694be33a9d99e68afb0f5ff33cc1f695dce",
+    "kindNodeImageDigest": "kindest/node@sha256:142f543559cc55d64e1ab9341df08e5ced84bd2e893736da8f51320f26f5950b"
+  },
+  "runtime": {
+    "schemaVersion": 1,
+    "scenario": "formal-release-kind-rolling-upgrade-and-application-rollback",
+    "acceptanceScript": "deploy/acceptance/v7-kubernetes-upgrade.sh",
+    "oldVersion": "1.2.5",
+    "newVersion": "1.2.6",
+    "kindNodeImage": "kindest/node:v1.32.2",
+    "kindNodeArchitecture": "amd64",
+    "formalReleaseImages": true,
+    "distinctAppImageCount": 9,
+    "appImageDifferences": [
+      {
+        "component": "system",
+        "baseImageId": "sha256:4ebf8f3fd1a03be9309a87aebfb043825bd24d9661e02fd6c397dde661c5fdc7",
+        "targetImageId": "sha256:25902e92422f0921ebf630facf60744e2ce7b242ac27ea90bf4f6258bef77551",
+        "different": true
+      },
+      {
+        "component": "core",
+        "baseImageId": "sha256:6c98cadb96a75dacd68ea53559b50411b6c77639d0c13d322c16a985ad0030fc",
+        "targetImageId": "sha256:77386ff05c64eb9be2d256c5b94e924864d7f16c0e3020c9b7117a4e23d026b7",
+        "different": true
+      },
+      {
+        "component": "builder",
+        "baseImageId": "sha256:2e7a986dfce431421c4d84a22090e56ba214863d8a2a38d4424c9f0883f3b0fe",
+        "targetImageId": "sha256:2bfb59287bfafe089425f8610f3a651924efa46f70678ead279d08969b9eaeb3",
+        "different": true
+      },
+      {
+        "component": "builder-worker",
+        "baseImageId": "sha256:89db7a4e56e443d21da9dbbf97d4d403565f671ddd7e04e3013c677cbf5a5354",
+        "targetImageId": "sha256:1971c987d889c8eb6bf1d92dab7dfe1cc9e1c8b92446c4f9dee17f85704ac1c3",
+        "different": true
+      },
+      {
+        "component": "api",
+        "baseImageId": "sha256:895cacfb32c50d6bf8ecc57274e8df8ccc1ef40e67706123e1939fc603af0d58",
+        "targetImageId": "sha256:be1b96a0d4c84e3804c6e717405b46b7757b11885295ba56573b791811e9b276",
+        "different": true
+      },
+      {
+        "component": "admin-ui",
+        "baseImageId": "sha256:45bbf773accff1931ec5496ebe7effc396a8fe416447165a7a3177c5d248ecdd",
+        "targetImageId": "sha256:ecec384711f13740965729a97d0ccd6d12ab8d3dd8b05390d8071336f8aed678",
+        "different": true
+      },
+      {
+        "component": "agent-ui",
+        "baseImageId": "sha256:986db5f27fd1b08b969262e6c8825c89c51aa569b870fef68d510f98f2f8083a",
+        "targetImageId": "sha256:0b7660a42df8f82ef20b31ab718f7303c1888ee4dcca37544c245ebea96fd052",
+        "different": true
+      },
+      {
+        "component": "etcd-init",
+        "baseImageId": "sha256:6c1e28fa2df4893f1a65a44d79095e46a6db8702566f19db921bfa0bff319bad",
+        "targetImageId": "sha256:ccf987e4fc581bf9e4170b9ca812e29263ef7a90cfb7f73e89ffa7391e0c6ec0",
+        "different": true
+      },
+      {
+        "component": "migrate",
+        "baseImageId": "sha256:33fc87484912687a3611d7c37737fb32e95f53df66c3e606ff1d00b8478e9d10",
+        "targetImageId": "sha256:4965a20737a6991ea465d86443f1b0af3242b37a40974017b9c5842cd332143d",
+        "different": true
+      }
+    ],
+    "targetDatabaseSchema": "20260815_113_v7_air_gapped",
+    "upgradeSuccessfulHealthProbes": 205,
+    "rollbackSuccessfulHealthProbes": 366,
+    "failedHealthProbes": 0,
+    "verified": [
+      "atomic-helm-install",
+      "rolling-update-with-continuous-api-health",
+      "helm-application-rollback",
+      "schema-113-retained-after-rollback",
+      "air-gapped-table-retained-after-rollback",
+      "two-api-replicas-available-after-rollback",
+      "all-nine-kubernetes-release-images-have-distinct-image-ids",
+      "native-node-architecture-validated"
+    ],
+    "limitations": [
+      "local-kind-not-customer-target-kubernetes",
+      "customer-csi-ingress-and-registry-not-validated"
+    ]
+  },
+  "boundary": "使用公开正式 tag 的签名 linux/amd64 镜像和原生 amd64 kind 完成滚动升级与应用回滚；不替代客户目标 Kubernetes、CSI、Ingress、私有镜像仓库和现场交付验收。"
+}

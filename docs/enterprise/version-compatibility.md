@@ -21,4 +21,6 @@
 
 本地 kind v1.32.2 已验证应用镜像 `1.2.0 → 1.2.1` 滚动升级后回滚到 revision 1，回滚期间不回退数据库；累计 350 次集群内 API 健康探测零失败，回滚后 `1.2.0` 双副本继续使用 Schema 113，AIR_GAPPED 表保留。机器证据见 `evidence/v7-kubernetes-upgrade-20260816.json`。本地新旧标签使用同一发布镜像摘要，因此该证据验证 Helm 编排、可用性和 Schema 兼容边界，不证明真实版本二进制差异，也不替代客户目标 Kubernetes、CSI 和 Ingress 的交付复验。
 
+正式 Kubernetes 门禁已在原生 `linux/amd64` GitHub Runner 使用公开正式 tag 完成 `v1.2.5 → v1.2.6 → v1.2.5`：双版本聚合 Sigstore 身份和 21 个镜像实时 Cosign 均通过，9/9 个 Helm 应用镜像 Image ID 不同；升级 205 次、回滚 366 次集群内 API 探测全部成功且失败 0 次，回滚后 Schema 113、AIR_GAPPED 表和两个 API 副本保持。机器证据见 `evidence/v7-formal-kubernetes-upgrade-v1.2.5-v1.2.6-20260817.json`。该证据补齐真实版本二进制差异，但仍不替代客户目标 CSI、Ingress、私有仓库和现场升级记录。
+
 本地 Compose 双 internal 网络先使用预载同摘要开发镜像完成 `1.2.0 → 1.2.1 → 1.2.0` 离线应用升级与回滚，作为快速编排回归。随后使用两个公开正式 tag 的签名介质完成 `1.2.5 → 1.2.6 → 1.2.5`：两个 Release 对应不同 Git commit，16/16 个 AppForge `linux/amd64` 平台镜像摘要不同；目标版本迁移镜像、应用服务和 MySQL/etcd/MinIO 均实际切换后回滚，发布部署文件同步切换，数据库与对象标记保持，Schema 始终为 113。261 次连续探针失败 6 次，最大连续失败 3/门禁 10；证据见 `evidence/v7-formal-offline-upgrade-v1.2.5-v1.2.6-20260817.json`。112→113 Schema 跨版本升级另由生产迁移验收覆盖。该证据证明正式版本差异的本地禁拉取升级/回滚，但不替代客户物理断网、正式介质交接、客户硬件或目标环境验收。
