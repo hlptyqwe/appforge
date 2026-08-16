@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-customer-storage-probe-formal-release",
+  "acceptedAt": "2026-08-16T18:14:30Z",
+  "result": "passed",
+  "source": {
+    "repository": "hlptyqwe/appforge",
+    "gitCommit": "4d61e028bbee4532ab8fbca454fc26a45d0e38bc",
+    "tag": "v1.2.7"
+  },
+  "customerStorageProbeCI": {
+    "runId": 31963411532,
+    "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31963411532",
+    "result": "success",
+    "jobCount": 1,
+    "artifactId": 9267855550,
+    "artifactName": "customer-storage-probe-31963411532",
+    "runtime": "linux/amd64",
+    "embeddedAgentVersion": "1.2.7-ci"
+  },
+  "formalRelease": {
+    "runId": 31963633354,
+    "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31963633354",
+    "result": "success",
+    "successfulJobs": 22,
+    "failedJobs": 0,
+    "releaseUrl": "https://github.com/hlptyqwe/appforge/releases/tag/v1.2.7",
+    "releaseAssetCount": 4,
+    "localAgentImage": "ghcr.io/hlptyqwe/appforge/local-agent@sha256:8f5a4f564cef27b3c3ad0fbae9ee115e643d2fd9ba9102abd68ed5d377b35c16",
+    "embeddedVersionOutput": "appforge-local-agent 1.2.7 protocol=3",
+    "releaseAssets": [
+      {
+        "name": "appforge-release-security-v1.2.7.tar.gz",
+        "sha256": "2346814ae252494613e90580f25f3a11f9167507fa4f22bf7136cdf65cb01abe"
+      },
+      {
+        "name": "appforge-delivery-tools-v1.2.7.tar.gz",
+        "sha256": "774ab20b0d1ad8397fbbaf028f58f28336f461f8208dd830e0aa0b1bc2279a91"
+      }
+    ]
+  },
+  "verified": [
+    "public-native-amd64-minio-provider-e2e",
+    "existing-fixture-object-unchanged",
+    "synthetic-probe-object-deleted",
+    "temporary-docker-resources-zero",
+    "formal-local-agent-digest-version-check",
+    "anonymous-public-release-download",
+    "public-release-sha256-manifest-check"
+  ],
+  "limitations": [
+    "synthetic-fixture-only",
+    "does-not-represent-real-customer-s3-or-oss",
+    "does-not-close-customer-site-kubernetes-air-gap-hsm-dr-or-soak-gates",
+    "formal-container-platform-linux-amd64-only"
+  ]
+}

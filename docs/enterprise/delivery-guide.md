@@ -46,7 +46,7 @@ Hybrid/Private 客户构建节点使用 `deploy/local-agent` 交付包。该包�
 
 Local Agent 的 `version` 输出必须与交付镜像语义化 tag 一致；正式发布由 tag metadata 注入二进制，并在流水线中实际启动 digest 镜像核对版本与协议。客户安装或升级前运行 `docker run --rm IMAGE version`，只接受 `appforge-local-agent <expected-version> protocol=3`，不得交付默认 `0.0.0-dev` 或与镜像 tag 不一致的 Agent。
 
-Hybrid 的客户 APK/Keystore 上传不需要第二套代理前端：Local Agent 本地导入命令直接写客户 S3/MinIO/OSS，再通过 mTLS 只登记引用、大小、SHA 和对象 ID。接口、显式存储归属、前缀隔离和验收门禁以 [CUSTOMER_STORAGE 实施契约](./customer-storage-contract.md) 为准；临时 MinIO 合成数据完整任务 E2E 已通过。客户测试存储接入后先运行 `deploy/local-agent/customer-storage-probe.sh ABSOLUTE_REPORT.json`：它只在已登记前缀创建一个随机合成对象，完成 Put、Stat、完整回读 SHA-256、Delete 和权威 NotFound 确认，不 List/读取既有对象或修改桶/策略，输出只包含目标 SHA-256 指纹。临时 MinIO 已验证该探针、既有对象不变和零残留；真实 S3/阿里云 OSS 仍需客户环境归档 `environmentKind=customer-test` 证据。
+Hybrid 的客户 APK/Keystore 上传不需要第二套代理前端：Local Agent 本地导入命令直接写客户 S3/MinIO/OSS，再通过 mTLS 只登记引用、大小、SHA 和对象 ID。接口、显式存储归属、前缀隔离和验收门禁以 [CUSTOMER_STORAGE 实施契约](./customer-storage-contract.md) 为准；临时 MinIO 合成数据完整任务 E2E 已通过。客户测试存储接入后先运行 `deploy/local-agent/customer-storage-probe.sh ABSOLUTE_REPORT.json`：它只在已登记前缀创建一个随机合成对象，完成 Put、Stat、完整回读 SHA-256、Delete 和权威 NotFound 确认，不 List/读取既有对象或修改桶/策略，输出只包含目标 SHA-256 指纹。临时 MinIO 和公开原生 `linux/amd64` CI 已验证该探针、既有对象不变和零残留；`v1.2.7` 正式 Local Agent digest 已通过版本启动核验，证据见 `evidence/v7-customer-storage-probe-release-v1.2.7-20260817.json`。真实 S3/阿里云 OSS 仍需客户环境归档 `environmentKind=customer-test` 证据。
 
 完全断网的客户构建节点使用签名任务包和结果包，不启动在线 Agent loop。控制面导出、离线固定构建、双向签名、防重放和结果导入必须遵守 [AIR_GAPPED Artifact 实施契约](./air-gapped-artifact-contract.md)。Local Agent 管理页按权限提供“锁定任务并导出 ZIP、查询包状态、上传并导入结果 ZIP”，浏览器不会连接离线 Agent；介质搬运和 Agent 端构建仍由受控离线流程完成。平台端与租户端导出/导入/查询使用独立权限，导入角色还需现有 `core:storage:upload`；迁移不会给已有角色自动授权，交付方必须创建专用角色。Schema 113 已是 1.2.x 生产默认，并通过空库、112→113、幂等和已有角色零自动授权验收。
 
