@@ -6,9 +6,9 @@ set -euo pipefail
 evidence=$1
 version=$2
 registry=${3%/}
-components=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy etcd-init migrate mysql-binlog-tools)
-third_party_components=(mysql redis etcd minio minio-mc alpine)
-third_party_repositories=(mysql redis quay.io/coreos/etcd minio/minio minio/mc alpine)
+components=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy mysql etcd minio minio-mc etcd-init migrate mysql-binlog-tools)
+third_party_components=(redis alpine)
+third_party_repositories=(redis alpine)
 
 [[ -d $evidence && ! -L $evidence ]] || { echo "证据目录不存在或为符号链接: $evidence" >&2; exit 1; }
 [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "版本必须是无 v 的语义化版本" >&2; exit 1; }
@@ -41,12 +41,13 @@ actual_directory_names=$(find "$evidence" -mindepth 1 -maxdepth 1 -type f -print
 [[ $actual_directory_names == "$expected_directory_names" ]] || { echo "发布证据目录包含缺失或未登记文件" >&2; exit 1; }
 (cd "$evidence" && sha256sum -c SHA256SUMS >/dev/null) || { echo "发布证据 SHA 校验失败" >&2; exit 1; }
 
-jq -e --arg version "$version" --arg registry "$registry" --argjson count "${#components[@]}" '
+jq -e --arg version "$version" --arg registry "$registry" \
+  --argjson count "${#components[@]}" --argjson thirdPartyCount "${#third_party_components[@]}" '
   .schemaVersion == 1 and .version == $version and .registry == $registry and
   (.gitRef == ("refs/tags/v" + $version)) and
   (.gitCommit | test("^[0-9a-f]{40}$")) and
   (.components | type == "array" and length == $count) and
-  (.thirdPartyImages | type == "array" and length == 6) and
+  (.thirdPartyImages | type == "array" and length == $thirdPartyCount) and
   .sourceDependencyGate == {
     status: "passed",
     scanner: "trivy-fs",

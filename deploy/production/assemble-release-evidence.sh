@@ -13,9 +13,9 @@ repository=$4
 git_ref=$5
 git_commit=$6
 source_dependency_gate=${APPFORGE_SOURCE_DEPENDENCY_GATE:?APPFORGE_SOURCE_DEPENDENCY_GATE required}
-components=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy etcd-init migrate mysql-binlog-tools)
-third_party_components=(mysql redis etcd minio minio-mc alpine)
-third_party_repositories=(mysql redis quay.io/coreos/etcd minio/minio minio/mc alpine)
+components=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy mysql etcd minio minio-mc etcd-init migrate mysql-binlog-tools)
+third_party_components=(redis alpine)
+third_party_repositories=(redis alpine)
 
 [[ -d $input && ! -L $input ]] || { echo "输入目录不存在或为符号链接: $input" >&2; exit 1; }
 [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "版本必须是无 v 的语义化版本: $version" >&2; exit 1; }

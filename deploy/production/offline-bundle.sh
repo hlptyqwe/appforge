@@ -28,7 +28,7 @@ APPFORGE_COSIGN_BINARY="$cosign" \
 APPFORGE_RELEASE_CERTIFICATE_IDENTITY="$certificate_identity" \
 APPFORGE_RELEASE_OIDC_ISSUER="$certificate_issuer" \
   "$delivery_dir/validate-release-evidence.sh" "$security_evidence" "$version" "$registry"
-images=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy etcd-init migrate mysql-binlog-tools)
+images=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy mysql etcd minio minio-mc etcd-init migrate mysql-binlog-tools)
 refs=()
 for image in "${images[@]}"; do
   digest_ref=$(tr -d '\r\n' <"$security_evidence/$image.image.txt")
@@ -37,8 +37,8 @@ for image in "${images[@]}"; do
   "$docker_bin" tag "$digest_ref" "$tag_ref"
   refs+=("$tag_ref")
 done
-third_party_components=(mysql redis etcd minio minio-mc alpine)
-third_party_tags=(mysql:8.4 redis:7.4-alpine quay.io/coreos/etcd:v3.6.12 minio/minio:RELEASE.2025-04-22T22-12-26Z minio/mc:RELEASE.2025-04-16T18-13-26Z alpine:3.22)
+third_party_components=(redis alpine)
+third_party_tags=(redis:7.4-alpine alpine:3.22)
 for index in "${!third_party_components[@]}"; do
   component=${third_party_components[$index]}
   tag_ref=${third_party_tags[$index]}

@@ -35,6 +35,10 @@ grep -q 'licensectl-linux-' "$workflow"
 grep -q 'appforgectl-linux-' "$workflow"
 grep -q 'component: egress-proxy' "$workflow"
 grep -q 'MODULE_DIR=common/cmd/egress-proxy' "$workflow"
+for component in mysql etcd minio minio-mc; do
+  grep -q "component: $component" "$workflow"
+  grep -q "dockerfile: deploy/docker/hardened-$component.Dockerfile" "$workflow"
+done
 if grep -q 'workflow_dispatch' "$workflow"; then
   echo "验收失败: 发布工作流存在未受 tag 约束的手动发布入口" >&2
   exit 1
@@ -58,7 +62,7 @@ done
 fixture_input="$temporary/release-input"
 fixture_output="$temporary/release-security"
 mkdir -p "$fixture_input"
-components=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy etcd-init migrate mysql-binlog-tools)
+components=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy mysql etcd minio minio-mc etcd-init migrate mysql-binlog-tools)
 for component in "${components[@]}"; do
   digest=$(printf '%s' "$component" | sha256sum | awk '{print $1}')
   jq -n --arg component "$component" '{
@@ -75,8 +79,8 @@ for component in "${components[@]}"; do
   printf 'ghcr.io/appforge-acceptance/appforge/%s@sha256:%s\n' "$component" "$digest" \
     >"$fixture_input/$component.image.txt"
 done
-third_party_components=(mysql redis etcd minio minio-mc alpine)
-third_party_repositories=(mysql redis quay.io/coreos/etcd minio/minio minio/mc alpine)
+third_party_components=(redis alpine)
+third_party_repositories=(redis alpine)
 for index in "${!third_party_components[@]}"; do
   component=${third_party_components[$index]}
   repository_name=${third_party_repositories[$index]}
@@ -158,10 +162,10 @@ jq -n \
       tamperRejected: true,
       dualArchitectureCliBuild: true
     },
-    thirdPartyImages: ["mysql", "redis", "etcd", "minio", "minio-mc", "alpine"],
+    thirdPartyImages: ["redis", "alpine"],
     boundary: "本地验收验证发布证据结构、聚合、防篡改和源码依赖门禁结果绑定；源码门禁状态与 Sigstore 包均为合成输入，不代表真实 tag、Trivy 漏洞数据库、OIDC 或镜像签名运行证据。"
   }' >"$report_file"
 chmod 0600 "$report_file"
 
-echo "通过: tag限定发布、源码依赖无明细导出门禁、12个自研与6个第三方镜像digest扫描、许可证清单、聚合签名契约、防篡改和双架构CLI构建"
+echo "通过: tag限定发布、源码依赖无明细导出门禁、16个自建签名与2个第三方镜像digest扫描、许可证清单、聚合签名契约、防篡改和双架构CLI构建"
 echo "证据: $report_file"

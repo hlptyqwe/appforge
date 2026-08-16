@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-ARG GO_VERSION=1.26.4
+ARG GO_VERSION=1.26.6
 FROM golang:${GO_VERSION}-bookworm AS builder
 
 WORKDIR /src
@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/appforge .
 
-FROM alpine:3.21
+FROM alpine:3.23
 
 RUN apk add --no-cache tzdata \
     && addgroup -S -g 65532 appforge \

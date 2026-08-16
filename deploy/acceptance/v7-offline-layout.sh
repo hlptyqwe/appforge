@@ -10,7 +10,7 @@ package_root="$temporary/package"
 install_root="$temporary/install"
 fixture_image=${APPFORGE_OFFLINE_ACCEPTANCE_IMAGE:-appforge-dev-etcd-init:latest}
 
-grep -q 'minio/mc:RELEASE.2025-04-16T18-13-26Z' "$repo_root/deploy/production/offline-bundle.sh" || {
+grep -q 'images=.*minio-mc' "$repo_root/deploy/production/offline-bundle.sh" || {
   echo "验收失败: 离线包未包含MinIO Bucket初始化镜像" >&2
   exit 1
 }
@@ -34,7 +34,7 @@ chmod 0755 "$package_root/bin/licensectl" "$package_root/bin/appforgectl" "$pack
 
 fixture_security_input="$temporary/security-input"
 mkdir -p "$fixture_security_input"
-components=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy etcd-init migrate mysql-binlog-tools)
+components=(system core builder builder-worker api admin-ui agent-ui local-agent egress-proxy mysql etcd minio minio-mc etcd-init migrate mysql-binlog-tools)
 for component in "${components[@]}"; do
   digest=$(printf '%s' "$component" | sha256sum | awk '{print $1}')
   jq -n --arg component "$component" '{
@@ -51,8 +51,8 @@ for component in "${components[@]}"; do
   printf 'ghcr.io/appforge-acceptance/appforge/%s@sha256:%s\n' "$component" "$digest" \
     >"$fixture_security_input/$component.image.txt"
 done
-third_party_components=(mysql redis etcd minio minio-mc alpine)
-third_party_repositories=(mysql redis quay.io/coreos/etcd minio/minio minio/mc alpine)
+third_party_components=(redis alpine)
+third_party_repositories=(redis alpine)
 for index in "${!third_party_components[@]}"; do
   component=${third_party_components[$index]}
   repository_name=${third_party_repositories[$index]}
@@ -130,7 +130,8 @@ for required in diagnostics.sh archive-binlogs.sh pitr-restore.sh configure-obje
 done
 for required in security/RELEASE-MANIFEST.json security/SHA256SUMS security/SHA256SUMS.sigstore.json \
   security/api.spdx.json security/api.licenses.json security/api.trivy.sarif security/api.cosign.json \
-  security/third-party-mysql.spdx.json security/third-party-mysql.licenses.json security/third-party-mysql.trivy.sarif \
+  security/mysql.spdx.json security/mysql.licenses.json security/mysql.trivy.sarif security/mysql.cosign.json \
+  security/third-party-redis.spdx.json security/third-party-redis.licenses.json security/third-party-redis.trivy.sarif \
   bin/validate-release-evidence; do
   [[ -f "$install_root/$required" ]] || { echo "验收失败: 离线安装缺少发布安全证据 $required" >&2; exit 1; }
 done

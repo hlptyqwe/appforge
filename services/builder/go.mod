@@ -1,6 +1,6 @@
 module appforge/services/builder
 
-go 1.26.4
+go 1.26.6
 
 require (
 	appforge/common v0.0.0-00010101000000-000000000000

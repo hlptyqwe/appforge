@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 ARG GO_VERSION=1.26.6
-FROM golang:${GO_VERSION}-bookworm AS etcd-builder
+FROM golang:${GO_VERSION}-bookworm AS builder
 
 ARG ETCD_COMMIT=5e7fd0de9a57db03ecc11794dc40403a734c07bb
 WORKDIR /src/etcd
@@ -19,7 +19,8 @@ FROM alpine:3.23
 ARG ETCD_COMMIT=5e7fd0de9a57db03ecc11794dc40403a734c07bb
 LABEL io.appforge.upstream.repository="https://github.com/etcd-io/etcd" \
       io.appforge.upstream.commit="$ETCD_COMMIT"
-COPY --from=etcd-builder /src/etcd/bin/etcdctl /usr/local/bin/etcdctl
-COPY deploy/etcd/init-etcd.sh /init/init-etcd.sh
-
-ENTRYPOINT ["/bin/sh", "/init/init-etcd.sh"]
+RUN apk add --no-cache ca-certificates
+COPY --from=builder /src/etcd/bin/etcd /usr/local/bin/etcd
+COPY --from=builder /src/etcd/bin/etcdctl /usr/local/bin/etcdctl
+COPY --from=builder /src/etcd/bin/etcdutl /usr/local/bin/etcdutl
+ENTRYPOINT ["/usr/local/bin/etcd"]

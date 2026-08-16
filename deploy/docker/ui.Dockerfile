@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 ARG VITE_APP_MODE=admin
 ARG VITE_APP_NAME=AppForge
@@ -12,7 +12,7 @@ RUN npm ci
 COPY appforge-ui ./
 RUN npm run build
 
-FROM nginx:1.27-alpine
+FROM nginx:1.30.4-alpine
 COPY deploy/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /src/dist /usr/share/nginx/html
 

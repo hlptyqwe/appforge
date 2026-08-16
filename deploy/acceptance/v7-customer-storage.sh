@@ -174,7 +174,7 @@ sed \
   -e '/^LocalAgentGateway:/,/^OfflineLicense:/ s#^  ClientCACertificate:.*#  ClientCACertificate: /etc/appforge-acceptance/ca.crt#' \
   "$repo_root/deploy/etcd/admin-api.yaml" >"$temporary/admin-api.yaml"
 docker volume create "$tls_volume" >/dev/null
-docker run --rm --user 0 -v "$tls_volume:/target" -v "$temporary/tls:/source:ro" alpine:3.21 sh -lc \
+docker run --rm --user 0 -v "$tls_volume:/target" -v "$temporary/tls:/source:ro" alpine:3.23 sh -lc \
   'cp /source/ca.crt /source/server.crt /source/server.key /target/; chown -R 65532:65532 /target; chmod 0700 /target; chmod 0600 /target/*'
 docker exec -i appforge-etcd etcdctl --endpoints=http://127.0.0.1:2379 put "$config_key" <"$temporary/admin-api.yaml" >/dev/null
 docker run -d --name "$api_container" --network "$network" -p "$gateway_port:9443" \
@@ -200,7 +200,7 @@ EOF
 cat >"$temporary/signing.json" <<'EOF'
 {"keystorePassword":"changeit","keyPassword":"changeit"}
 EOF
-docker run --rm --user 0 -v "$agent_state_volume:/state" -v "$agent_secret_volume:/secrets" -v "$fixture_volume:/fixture" -v "$temporary:/source:ro" alpine:3.21 sh -lc '
+docker run --rm --user 0 -v "$agent_state_volume:/state" -v "$agent_secret_volume:/secrets" -v "$fixture_volume:/fixture" -v "$temporary:/source:ro" alpine:3.23 sh -lc '
 cp /source/state.json /source/tls/agent.crt /source/tls/agent.key /source/tls/ca.crt /state/
 cp /source/customer-storage.json /source/signing.json /secrets/
 cp /source/fixture/source.apk /source/fixture/release.jks /fixture/

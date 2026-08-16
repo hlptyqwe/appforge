@@ -153,7 +153,7 @@ registration_token=$(printf '%s' "$registration_response" | python3 -c 'import j
 
 for volume in "$state_volume" "$wrong_state_volume" "$secret_volume" "$media_volume"; do
   docker volume create "$volume" >/dev/null
-  docker run --rm --user 0 -v "$volume:/target" alpine:3.21 sh -c 'chown 65532:65532 /target; chmod 0700 /target'
+  docker run --rm --user 0 -v "$volume:/target" alpine:3.23 sh -c 'chown 65532:65532 /target; chmod 0700 /target'
 done
 printf '%s' "$registration_token" | docker run --rm -i --network "$network" -v "$state_volume:/var/lib/appforge-agent" "$agent_image" register \
   --control-url http://admin-api:8888 --gateway-url https://offline.invalid:9443 --token-stdin --state-dir /var/lib/appforge-agent >/dev/null
@@ -191,7 +191,7 @@ data[offset + len(source)//2] ^= 1
 open(os.environ['TAMPERED_ZIP'],'wb').write(data)
 PY
 chmod 0600 "$temporary/result/tampered-task.zip"
-docker run --rm --user 0 -v "$media_volume:/target" -v "$temporary/result:/source:ro" alpine:3.21 sh -c '
+docker run --rm --user 0 -v "$media_volume:/target" -v "$temporary/result:/source:ro" alpine:3.23 sh -c '
 cp /source/task.zip /target/task.zip
 cp /source/tampered-task.zip /target/tampered-task.zip
 chown 65532:65532 /target/*.zip
@@ -233,7 +233,7 @@ if docker start -a "${build_container}-replay" >/dev/null 2>&1; then
   exit 1
 fi
 
-docker run --rm --user 0 -v "$media_volume:/source:ro" -v "$temporary/result:/target" alpine:3.21 sh -c 'cp /source/result.zip /target/result.zip; chmod 0600 /target/result.zip'
+docker run --rm --user 0 -v "$media_volume:/source:ro" -v "$temporary/result:/target" alpine:3.23 sh -c 'cp /source/result.zip /target/result.zip; chmod 0600 /target/result.zip'
 result_size=$(wc -c <"$temporary/result/result.zip" | tr -d ' ')
 result_sha=$(shasum -a 256 "$temporary/result/result.zip" | awk '{print $1}')
 
