@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceType": "v7-customer-site-evidence-contract",
-  "acceptedAt": "2026-08-17T00:52:22Z",
+  "acceptedAt": "2026-08-17T00:59:20Z",
   "result": "passed",
   "source": {
-    "gitCommit": "40fcb4d910d631e35bfc57abbebdc5ddb89ff4f9"
+    "gitCommit": "8fd22befce9aea4f3293eed6ff157aff70dd5271"
   },
   "runtime": {
     "os": "darwin",
