@@ -82,7 +82,7 @@ PITR 使用随正式发布和离线 OCI 包交付的同版本 `mysql-binlog-tool
 - API、RPC 和纯 Worker 统一通过 `APPFORGE_PROMETHEUS_*` 暴露独立指标端口，并通过 `APPFORGE_OTLP_ENDPOINT`/`APPFORGE_OTLP_SAMPLER` 导出 OTLP/HTTP Trace。生产 Compose 仅在后端网络暴露指标；Helm 默认只允许 `monitoring` Namespace 抓取，可通过 `observability.prometheusNamespaceLabels` 精确替换。生产 OTLP 必须使用无凭据的 HTTPS URL，认证 Header 只允许从受保护运行配置注入；本地合成验收证据见 `evidence/v7-observability-20260815.json`，客户 Collector、证书和容量仍需现场联调。
 - `deploy/production/diagnostics.sh` 提供最小脱敏诊断包：只收集组件镜像/状态、健康探针、迁移版本、Local Agent 聚合状态和部署文件哈希，不收集日志、`.env`、数据库业务内容、私钥、Keystore 或令牌；输出权限为 `0600`，包含 SHA 清单并执行敏感值扫描。仅系统管理员可见的“部署与升级”页面通过只读受 RBAC 和服务端用户类型双重保护的接口展示 API/System/Core/Builder gRPC 健康、数据库实际迁移、产品版本、部署模式和许可证公开状态；页面只复制诊断命令，不允许浏览器执行服务器 Shell。
 - Local Agent 不接收入站连接，也不提供 shell/任意命令 RPC；任务协议只有注册、心跳、领取、续租、进度、完成/失败、轮换和 Drain。
-- V7 客户现场验收统一使用 [客户现场验收与双签证据契约](./customer-site-acceptance.md)。正式离线介质携带 `bin/assemble-customer-site-evidence` 与 `bin/validate-customer-site-evidence`：前者只汇总固定 8 个门禁 JSON 和 SHA，后者强制客户/AppForge 双 detached signature、Schema 113、协议3、真实客户环境、敏感字段拒绝和门禁指标。私钥不进入介质或证据目录；双签不能替代原始现场记录。
+- V7 客户现场验收统一使用 [客户现场验收与双签证据契约](./customer-site-acceptance.md)。正式离线介质携带 `bin/init-customer-site-evidence`、`bin/assemble-customer-site-evidence` 与 `bin/validate-customer-site-evidence`：初始化器只生成无法汇总的 pending 模板，汇总器只接受固定 8 个已完成门禁并生成 SHA，校验器强制客户/AppForge 双 detached signature、Schema 113、协议3、真实客户环境、敏感字段拒绝和门禁指标。私钥不进入介质或证据目录；双签不能替代原始现场记录。
 
 ## 故障排查
 

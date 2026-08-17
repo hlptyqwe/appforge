@@ -31,10 +31,11 @@ done
 cp "$repo_root/deploy/production/preflight.sh" "$package_root/bin/licensectl"
 cp "$repo_root/deploy/production/preflight.sh" "$package_root/bin/appforgectl"
 cp "$repo_root/deploy/production/validate-release-evidence.sh" "$package_root/bin/validate-release-evidence"
+cp "$repo_root/deploy/production/init-customer-site-evidence.sh" "$package_root/bin/init-customer-site-evidence"
 cp "$repo_root/deploy/production/assemble-customer-site-evidence.sh" "$package_root/bin/assemble-customer-site-evidence"
 cp "$repo_root/deploy/production/validate-customer-site-evidence.sh" "$package_root/bin/validate-customer-site-evidence"
 chmod 0755 "$package_root/bin/licensectl" "$package_root/bin/appforgectl" "$package_root/bin/validate-release-evidence" \
-  "$package_root/bin/assemble-customer-site-evidence" "$package_root/bin/validate-customer-site-evidence"
+  "$package_root/bin/init-customer-site-evidence" "$package_root/bin/assemble-customer-site-evidence" "$package_root/bin/validate-customer-site-evidence"
 
 fixture_security_input="$temporary/security-input"
 mkdir -p "$fixture_security_input"
@@ -144,7 +145,7 @@ tar -C "$package_root" -cf "$temporary/offline.tar" .
 for required in diagnostics.sh archive-binlogs.sh pitr-restore.sh configure-object-replication.sh egress-allowlist.example local-agent/docker-compose.yml local-agent/register.sh local-agent/secret-import.sh \
   local-agent/customer-storage-secret-import.sh local-agent/customer-storage-import.sh \
   local-agent/upgrade.sh docs/delivery-guide.md docs/air-gapped-artifact-contract.md docs/remote-apk-signing-contract.md docs/restricted-egress-proxy.md docs/version-compatibility.md docs/customer-site-acceptance.md \
-  bin/assemble-customer-site-evidence bin/validate-customer-site-evidence; do
+  bin/init-customer-site-evidence bin/assemble-customer-site-evidence bin/validate-customer-site-evidence; do
   [[ -f "$install_root/$required" ]] || { echo "验收失败: 离线安装缺少 $required" >&2; exit 1; }
 done
 [[ -f "$install_root/admin-api.yaml.template" ]] || {
@@ -176,7 +177,7 @@ done
 [[ -x "$install_root/bin/validate-release-evidence" ]] || {
   echo "验收失败: 离线安装缺少可执行发布证据校验器" >&2; exit 1;
 }
-[[ -x "$install_root/bin/assemble-customer-site-evidence" && -x "$install_root/bin/validate-customer-site-evidence" ]] || {
-  echo "验收失败: 离线安装缺少客户现场证据汇总器或校验器" >&2; exit 1;
+[[ -x "$install_root/bin/init-customer-site-evidence" && -x "$install_root/bin/assemble-customer-site-evidence" && -x "$install_root/bin/validate-customer-site-evidence" ]] || {
+  echo "验收失败: 离线安装缺少客户现场证据模板、汇总或校验工具" >&2; exit 1;
 }
 echo "通过: 离线包SHA校验、OCI导入、签名发布安全证据、控制面文件、CLI、Local Agent安装包和企业文档落盘"

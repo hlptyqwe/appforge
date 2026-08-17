@@ -83,7 +83,18 @@ remote-signing-hsm.json
 
 ## 5. 汇总、签署和验证
 
-先把 8 个 JSON 放入一个只含门禁文件的私有目录，另建不含客户名称、URL或凭据的 `metadata.json`：
+先用离线介质中的初始化器生成权限为 `0700/0600` 的待执行模板。它只接受 1.2.x、40 位 Git commit、脱敏站点指纹和真实客户环境，输出 `metadata.json` 与 `gates/` 下固定 8 个 `result=pending` 文件；模板明确带有 `pending-customer-execution`，不能被汇总器接受：
+
+```bash
+bin/init-customer-site-evidence \
+  /secure/appforge-site-work \
+  1.2.7 \
+  0123456789abcdef0123456789abcdef01234567 \
+  0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef \
+  customer-test
+```
+
+在真实现场执行后，把 `gates/` 中每项的时间、精确指标和固定 `verified` 集合替换为实际结果，将 `result` 改为 `passed` 并清空 `openFindings`。不得仅修改状态而不保留原始运行记录。然后填写不含客户名称、URL或凭据的 `metadata.json`：
 
 ```json
 {
@@ -109,9 +120,9 @@ remote-signing-hsm.json
 
 ```bash
 bin/assemble-customer-site-evidence \
-  /secure/appforge-gates \
+  /secure/appforge-site-work/gates \
   /secure/appforge-site-evidence \
-  /secure/metadata.json \
+  /secure/appforge-site-work/metadata.json \
   /secure/customer-approval.pub.pem \
   /secure/appforge-approval.pub.pem
 ```
@@ -137,7 +148,7 @@ bin/validate-customer-site-evidence \
   /secure/appforge-approval.pub.pem
 ```
 
-验证器会拒绝文件缺失/多余、符号链接、摘要篡改、签名或公钥不匹配、版本/Schema/协议漂移、`fixture` 冒充客户环境、开放问题、敏感字段、未脱敏 URL、门禁缺项和指标不足。只有验证成功且原始现场记录完成组织归档后，才可逐项更新 V7 严格矩阵；不得仅凭总清单中的 `result` 修改项目状态。
+初始化器拒绝覆盖已有目录；汇总器会在签名前拒绝 pending、开放问题和上下文漂移，并在失败时原子清理新建的半成品目录。最终验证器会拒绝文件缺失/多余、符号链接、摘要篡改、签名或公钥不匹配、版本/Schema/协议漂移、`fixture` 冒充客户环境、开放问题、敏感字段、未脱敏 URL、门禁缺项和指标不足。只有验证成功且原始现场记录完成组织归档后，才可逐项更新 V7 严格矩阵；不得仅凭总清单中的 `result` 修改项目状态。
 
 ## 6. 已有执行入口
 

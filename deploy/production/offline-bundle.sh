@@ -96,11 +96,12 @@ mkdir -p "$tmp/security"
 cp "$licensectl" "$tmp/bin/licensectl"
 cp "$appforgectl" "$tmp/bin/appforgectl"
 cp "$delivery_dir/validate-release-evidence.sh" "$tmp/bin/validate-release-evidence"
+cp "$delivery_dir/init-customer-site-evidence.sh" "$tmp/bin/init-customer-site-evidence"
 cp "$delivery_dir/assemble-customer-site-evidence.sh" "$tmp/bin/assemble-customer-site-evidence"
 cp "$delivery_dir/validate-customer-site-evidence.sh" "$tmp/bin/validate-customer-site-evidence"
 cp "$security_evidence"/* "$tmp/security/"
 chmod 0755 "$tmp/bin/licensectl" "$tmp/bin/appforgectl" "$tmp/bin/validate-release-evidence" \
-  "$tmp/bin/assemble-customer-site-evidence" "$tmp/bin/validate-customer-site-evidence"
+  "$tmp/bin/init-customer-site-evidence" "$tmp/bin/assemble-customer-site-evidence" "$tmp/bin/validate-customer-site-evidence"
 for file in delivery-guide.md local-agent-artifact-protocol.md customer-storage-contract.md air-gapped-artifact-contract.md remote-apk-signing-contract.md restricted-egress-proxy.md secret-providers.md version-compatibility.md customer-site-acceptance.md; do
   cp "$repo_root/docs/enterprise/$file" "$tmp/docs/$file"
 done

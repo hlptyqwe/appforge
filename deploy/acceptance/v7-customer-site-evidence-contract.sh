@@ -5,6 +5,7 @@ set -euo pipefail
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 validator="$repo_root/deploy/production/validate-customer-site-evidence.sh"
 assembler="$repo_root/deploy/production/assemble-customer-site-evidence.sh"
+initializer="$repo_root/deploy/production/init-customer-site-evidence.sh"
 report_file=${APPFORGE_CUSTOMER_SITE_EVIDENCE_CONTRACT_REPORT_FILE:-$repo_root/docs/enterprise/evidence/v7-customer-site-evidence-contract-20260817.json}
 [[ $report_file == /* ]] || { echo "验收失败: 证据路径必须是绝对路径" >&2; exit 1; }
 temporary=$(mktemp -d)
@@ -18,10 +19,12 @@ umask 077
 for tool in jq sha256sum openssl; do
   command -v "$tool" >/dev/null 2>&1 || { echo "验收失败: 缺少 $tool" >&2; exit 1; }
 done
-bash -n "$validator" "$assembler"
+bash -n "$validator" "$assembler" "$initializer"
+grep -Fq 'init-customer-site-evidence.sh' "$repo_root/deploy/production/offline-bundle.sh"
 grep -Fq 'assemble-customer-site-evidence.sh' "$repo_root/deploy/production/offline-bundle.sh"
 grep -Fq 'validate-customer-site-evidence.sh' "$repo_root/deploy/production/offline-bundle.sh"
 grep -Fq 'docs/customer-site-acceptance.md' "$repo_root/deploy/acceptance/v7-offline-layout.sh"
+grep -Fq 'bin/init-customer-site-evidence' "$repo_root/deploy/acceptance/v7-offline-layout.sh"
 grep -Fq 'bin/validate-customer-site-evidence' "$repo_root/deploy/acceptance/v7-offline-layout.sh"
 
 openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$temporary/customer.key" >/dev/null 2>&1
@@ -35,6 +38,35 @@ release_version=1.2.7
 schema_version=20260815_113_v7_air_gapped
 started_at=2026-08-17T00:00:00Z
 finished_at=2026-08-18T00:00:01Z
+
+template_directory="$temporary/templates"
+"$initializer" "$template_directory" "$release_version" "$git_commit" "$site_fingerprint" customer-test >/dev/null
+[[ -f $template_directory/metadata.json && -d $template_directory/gates ]] || {
+  echo "验收失败: pending 模板缺少 metadata 或 gates 目录" >&2
+  exit 1
+}
+[[ $(find "$template_directory/gates" -mindepth 1 -maxdepth 1 -type f | wc -l | tr -d ' ') == 8 ]] || {
+  echo "验收失败: pending 模板不是固定 8 门禁" >&2
+  exit 1
+}
+for template in "$template_directory/metadata.json" "$template_directory/gates"/*.json; do
+  if [[ ${template##*/} == metadata.json ]]; then
+    jq -e '.environmentKind=="customer-test" and .releaseVersion=="1.2.7" and .agentProtocol==3' "$template" >/dev/null
+  else
+    jq -e '.result=="pending" and .verified==[] and .openFindings==["pending-customer-execution"]' "$template" >/dev/null
+  fi
+  if stat -c '%a' "$template" >/dev/null 2>&1; then
+    [[ $(stat -c '%a' "$template") == 600 ]] || { echo "验收失败: pending 模板权限不是0600" >&2; exit 1; }
+  else
+    [[ $(stat -f '%Lp' "$template") == 600 ]] || { echo "验收失败: pending 模板权限不是0600" >&2; exit 1; }
+  fi
+done
+if "$assembler" "$template_directory/gates" "$temporary/pending-assembly" "$template_directory/metadata.json" \
+  "$temporary/customer.pub" "$temporary/appforge.pub" >/dev/null 2>&1; then
+  echo "验收失败: 未执行的 pending 模板被汇总" >&2
+  exit 1
+fi
+[[ ! -e $temporary/pending-assembly ]] || { echo "验收失败: pending 汇总失败后遗留目录" >&2; exit 1; }
 
 write_gate() {
   local gate_id=$1 verified=$2 metrics=$3 metrics_json
@@ -259,6 +291,9 @@ jq -n \
       "customer-test-or-production-environment-only",
       "release-schema113-agent-protocol3-boundary",
       "exact-common-and-gate-specific-fields",
+      "private-pending-template-layout",
+      "pending-template-assembly-rejected",
+      "failed-assembly-removes-partial-output",
       "customer-and-appforge-detached-signatures",
       "sha256-tamper-rejected",
       "fixture-environment-rejected",
