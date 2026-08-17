@@ -117,12 +117,16 @@ assert_zero "Hybrid Artifact引用不包含常见URL凭证" \
 
 (
   cd "$repo_root/common"
-  GOMODCACHE="$go_mod_cache" GOCACHE="$go_cache" go test ./secretprovider ./offlinelicense -count=1
+  GOMODCACHE="$go_mod_cache" GOCACHE="$go_cache" go test ./agentprotocol ./secretprovider ./offlinelicense -count=1
   GOMODCACHE="$go_mod_cache" GOCACHE="$go_cache" go test -race ./siem ./remotesigner -count=1
 )
 (
   cd "$repo_root/local-agent"
   GOCACHE="$go_cache" go test -race ./... -count=1
+)
+(
+  cd "$repo_root/appforge-api"
+  GOCACHE="$go_cache" go test ./internal/config -count=1
 )
 (
   cd "$repo_root/services/core"
@@ -169,6 +173,7 @@ bash -n "$repo_root/deploy/acceptance/v7-local-agent-recovery.sh" \
   "$repo_root/deploy/acceptance/v7-customer-storage-site-probe.sh" \
   "$repo_root/deploy/acceptance/v7-api-soak.sh" \
   "$repo_root/deploy/acceptance/v7-artifact-soak.sh" \
+  "$repo_root/deploy/acceptance/v7-agent-protocol-window.sh" \
   "$repo_root/deploy/acceptance/v7-syslog-tls.sh" \
   "$repo_root/deploy/acceptance/v7-formal-kubernetes-upgrade.sh" \
   "$repo_root/deploy/acceptance/v7-kubernetes-upgrade.sh" \

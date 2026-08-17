@@ -17,6 +17,7 @@ import (
 	"strings"
 	"time"
 
+	"appforge/common/agentprotocol"
 	"appforge/proto/core"
 	"appforge/services/core/internal/agentpki"
 	"appforge/services/core/internal/svc"
@@ -41,11 +42,15 @@ const (
 	localRegistrationPending  = int64(1)
 	localRegistrationUsed     = int64(2)
 	localRegistrationRevoked  = int64(4)
-	localProtocolCurrent      = int32(3)
-	localProtocolMinimum      = int32(1)
-	localTaskBundleProtocol   = int64(3)
 	hybridArtifactVerified    = int64(2)
 )
+
+func localAgentStatusForProtocol(protocol int32) int64 {
+	if !agentprotocol.Supported(protocol) {
+		return localAgentUpgradeRequired
+	}
+	return localAgentOnline
+}
 
 var (
 	localAgentCodePattern    = regexp.MustCompile(`^[a-z][a-z0-9_-]{1,63}$`)
@@ -128,7 +133,7 @@ func createLocalAgentRegistration(ctx context.Context, svcCtx *svc.ServiceContex
 (tenant_id,agent_code,agent_name,pool_code,status,drain_status,protocol_version,agent_version,
 artifact_mode,customer_storage_ref,allowed_app_ids,create_by) VALUES (?,?,?,?,?,?,?,?,?,NULLIF(?,''),?,?)`,
 			tenant, code, strings.TrimSpace(in.AgentName), pool, localAgentPending, localAgentAccepting,
-			localProtocolCurrent, "", int64(in.ArtifactMode), strings.TrimSpace(in.CustomerStorageRef), appJSON, actorID(ctx))
+			agentprotocol.Current, "", int64(in.ArtifactMode), strings.TrimSpace(in.CustomerStorageRef), appJSON, actorID(ctx))
 		if err != nil {
 			return err
 		}
@@ -206,10 +211,7 @@ VALUES (?,?,?,?,?,?,?,?)`, registration.TenantID, registration.AgentID, certific
 			localCertificateActive, certificate.NotBefore, certificate.NotAfter); err != nil {
 			return err
 		}
-		newStatus := localAgentOnline
-		if in.ProtocolVersion < localProtocolMinimum || in.ProtocolVersion > localProtocolCurrent {
-			newStatus = localAgentUpgradeRequired
-		}
+		newStatus := localAgentStatusForProtocol(in.ProtocolVersion)
 		requestAt := timeFromMillis(in.Timestamp)
 		if _, err := session.ExecCtx(txCtx, `UPDATE t_local_agent SET status=?,protocol_version=?,agent_version=?,
 certificate_serial=?,last_nonce=?,last_request_at=?,last_heartbeat_at=CURRENT_TIMESTAMP(3) WHERE id=?`,
@@ -301,10 +303,7 @@ func heartbeatLocalAgent(ctx context.Context, svcCtx *svc.ServiceContext, in *co
 	if err != nil {
 		return nil, err
 	}
-	newStatus := localAgentOnline
-	if in.ProtocolVersion < localProtocolMinimum || in.ProtocolVersion > localProtocolCurrent {
-		newStatus = localAgentUpgradeRequired
-	}
+	newStatus := localAgentStatusForProtocol(in.ProtocolVersion)
 	err = svcCtx.DB.TransactCtx(ctx, func(txCtx context.Context, session sqlx.Session) error {
 		if err := replaceAgentCapabilities(txCtx, session, agent.TenantId, agent.Id, capabilities); err != nil {
 			return err
@@ -417,7 +416,7 @@ func claimLocalAgentBuildTask(ctx context.Context, svcCtx *svc.ServiceContext, i
 	if agent.Status != localAgentOnline || agent.DrainStatus != localAgentAccepting {
 		return &core.LocalAgentBuildTaskResp{Base: okBase(), ArtifactMode: core.HybridArtifactMode(agent.ArtifactMode), CustomerStorageRef: stringValue(agent.CustomerStorageRef)}, nil
 	}
-	if agent.ProtocolVersion < localTaskBundleProtocol {
+	if !agentprotocol.CanClaimTaskBundle(int32(agent.ProtocolVersion)) {
 		return &core.LocalAgentBuildTaskResp{Base: okBase(), ArtifactMode: core.HybridArtifactMode(agent.ArtifactMode), CustomerStorageRef: stringValue(agent.CustomerStorageRef)}, nil
 	}
 	apps := parseAppIDs(agent.AllowedAppIds)

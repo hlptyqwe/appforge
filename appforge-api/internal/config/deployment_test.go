@@ -59,3 +59,14 @@ func TestApplyDeploymentEnvironmentRejectsInvalidMetadata(t *testing.T) {
 		t.Fatal("unsupported deployment mode must fail")
 	}
 }
+
+func TestApplyDeploymentEnvironmentRejectsProtocolWindowDrift(t *testing.T) {
+	for _, window := range [][2]int32{{1, 3}, {2, 4}, {3, 3}} {
+		configured := Config{}
+		configured.Deployment.AgentProtocolMinimum = window[0]
+		configured.Deployment.AgentProtocolCurrent = window[1]
+		if err := ApplyDeploymentEnvironment(&configured); err == nil {
+			t.Fatalf("protocol window %v was accepted", window)
+		}
+	}
+}

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"appforge/common/agentprotocol"
 	"appforge/common/rpcauth"
 	"appforge/common/siem"
 
@@ -91,13 +92,13 @@ func ApplyDeploymentEnvironment(c *Config) error {
 		c.Deployment.MaxVersionSkew = 1
 	}
 	if c.Deployment.AgentProtocolCurrent <= 0 {
-		c.Deployment.AgentProtocolCurrent = 3
+		c.Deployment.AgentProtocolCurrent = agentprotocol.Current
 	}
 	if c.Deployment.AgentProtocolMinimum <= 0 {
-		c.Deployment.AgentProtocolMinimum = 2
+		c.Deployment.AgentProtocolMinimum = agentprotocol.Minimum
 	}
-	if c.Deployment.AgentProtocolMinimum > c.Deployment.AgentProtocolCurrent {
-		return fmt.Errorf("minimum Agent protocol cannot exceed current protocol")
+	if err := agentprotocol.ValidateReleaseWindow(c.Deployment.AgentProtocolMinimum, c.Deployment.AgentProtocolCurrent); err != nil {
+		return err
 	}
 	switch c.Deployment.DeploymentMode {
 	case "saas", "dedicated", "private", "hybrid":

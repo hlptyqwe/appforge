@@ -167,6 +167,67 @@ VALUES (?,'build.count',1,'build',?,CONCAT('build:',?),DATE_FORMAT(CURRENT_DATE,
 		application.TenantID, taskID, taskID); err != nil {
 		t.Fatal(err)
 	}
+	runtimeCapabilities := []*core.LocalAgentCapability{
+		{CapabilityKey: "apk", CapabilityValue: "true"},
+		{CapabilityKey: "max_concurrency", CapabilityValue: "1"},
+	}
+	protocolOne, err := heartbeatLocalAgent(context.Background(), svcCtx, &core.HeartbeatLocalAgentReq{
+		Auth: auth(rotated.Certificate), AgentVersion: "0.9.0", ProtocolVersion: 1, Capabilities: runtimeCapabilities,
+	})
+	if err != nil || protocolOne.Data.Status != core.LocalAgentStatus_LOCAL_AGENT_STATUS_UPGRADE_REQUIRED {
+		t.Fatalf("protocol 1 Agent was not marked upgrade-required: response=%#v err=%v", protocolOne, err)
+	}
+	_, upgradeCSR := acceptanceAgentCSR(t)
+	rotated, err = rotateLocalAgentCertificate(context.Background(), svcCtx, &core.RotateLocalAgentCertificateReq{
+		Auth: auth(rotated.Certificate), CsrPem: upgradeCSR,
+	})
+	if err != nil || rotated.Data.Status != core.LocalAgentStatus_LOCAL_AGENT_STATUS_UPGRADE_REQUIRED {
+		t.Fatalf("upgrade-required Agent could not rotate its certificate: response=%#v err=%v", rotated, err)
+	}
+	protocolOneClaim, err := claimLocalAgentBuildTask(context.Background(), svcCtx, &core.ClaimLocalAgentBuildTaskReq{
+		Auth: auth(rotated.Certificate), LeaseSeconds: 120,
+	})
+	if err != nil || protocolOneClaim.Task != nil {
+		t.Fatalf("protocol 1 Agent claimed a new task: response=%#v err=%v", protocolOneClaim, err)
+	}
+	protocolTwo, err := heartbeatLocalAgent(context.Background(), svcCtx, &core.HeartbeatLocalAgentReq{
+		Auth: auth(rotated.Certificate), AgentVersion: "1.1.0", ProtocolVersion: 2, Capabilities: runtimeCapabilities,
+	})
+	if err != nil || protocolTwo.Data.Status != core.LocalAgentStatus_LOCAL_AGENT_STATUS_ONLINE {
+		t.Fatalf("protocol 2 Agent was not accepted in the compatibility window: response=%#v err=%v", protocolTwo, err)
+	}
+	protocolTwoClaim, err := claimLocalAgentBuildTask(context.Background(), svcCtx, &core.ClaimLocalAgentBuildTaskReq{
+		Auth: auth(rotated.Certificate), LeaseSeconds: 120,
+	})
+	if err != nil || protocolTwoClaim.Task != nil {
+		t.Fatalf("protocol 2 Agent without Task Bundle support claimed a new task: response=%#v err=%v", protocolTwoClaim, err)
+	}
+	protocolFour, err := heartbeatLocalAgent(context.Background(), svcCtx, &core.HeartbeatLocalAgentReq{
+		Auth: auth(rotated.Certificate), AgentVersion: "2.0.0-future", ProtocolVersion: 4, Capabilities: runtimeCapabilities,
+	})
+	if err != nil || protocolFour.Data.Status != core.LocalAgentStatus_LOCAL_AGENT_STATUS_UPGRADE_REQUIRED {
+		t.Fatalf("future protocol Agent was not marked upgrade-required: response=%#v err=%v", protocolFour, err)
+	}
+	protocolFourClaim, err := claimLocalAgentBuildTask(context.Background(), svcCtx, &core.ClaimLocalAgentBuildTaskReq{
+		Auth: auth(rotated.Certificate), LeaseSeconds: 120,
+	})
+	if err != nil || protocolFourClaim.Task != nil {
+		t.Fatalf("future protocol Agent claimed a new task: response=%#v err=%v", protocolFourClaim, err)
+	}
+	var pendingTaskCount int64
+	if err := db.QueryRowCtx(context.Background(), &pendingTaskCount, `SELECT COUNT(*) FROM t_build_task
+WHERE id=? AND status='PENDING' AND builder_attempt=0 AND (builder_id IS NULL OR builder_id='')`, taskID); err != nil {
+		t.Fatal(err)
+	}
+	if pendingTaskCount != 1 {
+		t.Fatal("unsupported or legacy protocol mutated the pending task")
+	}
+	protocolThree, err := heartbeatLocalAgent(context.Background(), svcCtx, &core.HeartbeatLocalAgentReq{
+		Auth: auth(rotated.Certificate), AgentVersion: "1.2.0", ProtocolVersion: 3, Capabilities: runtimeCapabilities,
+	})
+	if err != nil || protocolThree.Data.Status != core.LocalAgentStatus_LOCAL_AGENT_STATUS_ONLINE {
+		t.Fatalf("protocol 3 Agent did not return online: response=%#v err=%v", protocolThree, err)
+	}
 	firstClaim, err := claimLocalAgentBuildTask(context.Background(), svcCtx, &core.ClaimLocalAgentBuildTaskReq{
 		Auth: auth(rotated.Certificate), LeaseSeconds: 120,
 	})

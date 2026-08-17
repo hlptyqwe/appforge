@@ -29,11 +29,13 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"appforge/common/agentprotocol"
 )
 
 var version = "0.0.0-dev"
 
-const protocolVersion int32 = 3
+const protocolVersion = agentprotocol.Current
 
 type state struct {
 	AgentID            int64  `json:"agentId"`

@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"appforge/common/agentprotocol"
 	"appforge/common/airgap"
 	"appforge/proto/core"
 	"appforge/services/core/internal/svc"
@@ -70,7 +71,7 @@ func prepareAirGappedExport(ctx context.Context, svcCtx *svc.ServiceContext, in 
 		}
 		if agent.ArtifactMode != int64(core.HybridArtifactMode_HYBRID_ARTIFACT_MODE_AIR_GAPPED) ||
 			agent.Status == localAgentPending || agent.Status == localAgentRevoked || agent.Status == localAgentUpgradeRequired ||
-			agent.DrainStatus != localAgentAccepting || agent.ProtocolVersion < localTaskBundleProtocol {
+			agent.DrainStatus != localAgentAccepting || !agentprotocol.CanClaimTaskBundle(int32(agent.ProtocolVersion)) {
 			return status.Error(codes.FailedPrecondition, "Local Agent is not eligible for AIR_GAPPED export")
 		}
 		var apkCapability string
@@ -392,7 +393,7 @@ func validateAirGappedBundle(raw json.RawMessage, item *models.TAirGappedPackage
 			BuilderAttempt int32 `json:"builder_attempt"`
 		} `json:"task"`
 	}
-	if err := json.Unmarshal(raw, &bundle); err != nil || bundle.SchemaVersion != localProtocolCurrent || bundle.Task.ID != item.TaskId ||
+	if err := json.Unmarshal(raw, &bundle); err != nil || bundle.SchemaVersion != agentprotocol.Current || bundle.Task.ID != item.TaskId ||
 		bundle.Task.TenantID != item.TenantId || bundle.Task.AppID != item.AppId || int64(bundle.Task.BuilderAttempt) != item.BuilderAttempt ||
 		bundle.BlockedReason != "" || !strings.HasPrefix(strings.ToLower(strings.TrimSpace(bundle.SigningSecretRef)), "local-file://") {
 		return status.Error(codes.FailedPrecondition, "AIR_GAPPED task bundle identity or local Secret reference is invalid")
