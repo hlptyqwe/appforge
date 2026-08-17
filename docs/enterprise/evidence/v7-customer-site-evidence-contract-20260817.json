@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-customer-site-evidence-contract",
+  "acceptedAt": "2026-08-17T00:52:22Z",
+  "result": "passed",
+  "source": {
+    "gitCommit": "40fcb4d910d631e35bfc57abbebdc5ddb89ff4f9"
+  },
+  "runtime": {
+    "os": "darwin",
+    "architecture": "arm64"
+  },
+  "verified": [
+    "fixed-eight-gate-file-set",
+    "customer-test-or-production-environment-only",
+    "release-schema113-agent-protocol3-boundary",
+    "exact-common-and-gate-specific-fields",
+    "customer-and-appforge-detached-signatures",
+    "sha256-tamper-rejected",
+    "fixture-environment-rejected",
+    "missing-hsm-non-exportable-key-rejected",
+    "unredacted-endpoint-rejected",
+    "customer-signature-tamper-rejected",
+    "offline-delivery-layout-contract-includes-assembler-validator-and-runbook"
+  ],
+  "dataPolicy": {
+    "syntheticContractDataOnly": true,
+    "customerDataAccessed": false,
+    "productionCredentialsAccessed": false,
+    "privateSigningKeysPersisted": false
+  },
+  "limitations": [
+    "contract-fixture-not-customer-site-acceptance",
+    "does-not-close-any-of-the-eight-customer-gates",
+    "organizational-records-and-key-custody-require-customer-process"
+  ]
+}
