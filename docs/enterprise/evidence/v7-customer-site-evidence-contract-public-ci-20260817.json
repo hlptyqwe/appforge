@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-customer-site-evidence-contract-public-ci",
+  "observedAt": "2026-08-17T00:54:26Z",
+  "result": "passed",
+  "source": {
+    "repository": "hlptyqwe/appforge",
+    "headCommit": "41575d4c62af8f34114cfe1232911f9299be555b",
+    "workflow": "customer-site-evidence-contract",
+    "event": "push",
+    "runId": 31983360432,
+    "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31983360432"
+  },
+  "runtime": {
+    "runnerGroup": "GitHub Actions",
+    "job": "native-amd64-contract",
+    "platform": "ubuntu-24.04",
+    "architecture": "x86_64",
+    "startedAt": "2026-08-17T00:54:17Z",
+    "completedAt": "2026-08-17T00:54:26Z",
+    "conclusion": "success"
+  },
+  "steps": {
+    "checkout": "success",
+    "fixedEightGateAndDualSignatureContract": "success",
+    "redactedMachineEvidenceVerification": "success",
+    "artifactUpload": "success"
+  },
+  "artifact": {
+    "id": 9273011536,
+    "name": "customer-site-evidence-contract-31983360432",
+    "sizeBytes": 790,
+    "expiredAtObservation": false,
+    "createdAt": "2026-08-17T00:54:23Z",
+    "expiresAt": "2026-09-16T00:54:22Z"
+  },
+  "verified": [
+    "native-linux-fixed-eight-gate-contract",
+    "native-linux-customer-and-appforge-detached-signatures",
+    "native-linux-negative-tamper-and-boundary-cases",
+    "redacted-machine-report-policy",
+    "public-ci-artifact-upload"
+  ],
+  "dataPolicy": {
+    "syntheticContractDataOnly": true,
+    "customerDataAccessed": false,
+    "productionCredentialsAccessed": false,
+    "customerApprovalKeysAccessed": false
+  },
+  "limitations": [
+    "public-runner-contract-test-not-customer-site-acceptance",
+    "does-not-close-any-of-the-eight-customer-gates",
+    "artifact-retention-is-thirty-days"
+  ]
+}
