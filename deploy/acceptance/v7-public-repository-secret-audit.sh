@@ -224,5 +224,20 @@ if [[ $self_test == true ]]; then
   rg -q '存在未登记的高风险凭据文件名' "$temporary/risky-name-negative.log"
 fi
 
+report_update="$temporary/report-update.json"
+jq --argjson executed "$self_test" '
+  .contractNegativeTests = if $executed then {
+    executed: true,
+    result: "passed",
+    currentTrackedSyntheticAccessKeyRejected: true,
+    removedHistoricalSyntheticAccessKeyRejected: true,
+    unreviewedRiskNamedFileRejected: true
+  } else {
+    executed: false,
+    result: "not-run"
+  } end
+' "$report_file" >"$report_update"
+install -m 0600 "$report_update" "$report_file"
+
 echo "公开仓库 Secret 审计通过: 当前 $tracked_file_count 个跟踪文件、完整 $commit_count 个可达提交"
 echo "证据: $report_file"
