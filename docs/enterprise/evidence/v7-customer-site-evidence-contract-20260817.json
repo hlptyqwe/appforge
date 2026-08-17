@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "evidenceType": "v7-customer-site-evidence-contract",
-  "acceptedAt": "2026-08-17T00:59:20Z",
+  "acceptedAt": "2026-08-17T01:13:34Z",
   "result": "passed",
   "source": {
-    "gitCommit": "8fd22befce9aea4f3293eed6ff157aff70dd5271"
+    "gitCommit": "9470d388a02469c3f8ed5e51d47cf0fa98ce36f6"
   },
   "runtime": {
     "os": "darwin",
@@ -15,6 +15,9 @@
     "customer-test-or-production-environment-only",
     "release-schema113-agent-protocol3-boundary",
     "exact-common-and-gate-specific-fields",
+    "private-pending-template-layout",
+    "pending-template-assembly-rejected",
+    "failed-assembly-removes-partial-output",
     "customer-and-appforge-detached-signatures",
     "sha256-tamper-rejected",
     "fixture-environment-rejected",
