@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-local-agent-protocol-window",
+  "acceptedAt": "2026-08-17T00:16:43Z",
+  "result": "passed",
+  "source": {
+    "gitCommit": "28029165a04bf53e059bbeac8b23c2a08b0928d6"
+  },
+  "runtime": {
+    "goos": "darwin",
+    "goarch": "arm64",
+    "database": "temporary-test-records-on-local-docker-mysql"
+  },
+  "compatibilityWindow": {
+    "minimumProtocol": 2,
+    "currentProtocol": 3,
+    "taskBundleProtocol": 3,
+    "protocol1": {
+      "heartbeat": "upgrade-required",
+      "certificateRotation": "allowed",
+      "newTaskClaim": "rejected"
+    },
+    "protocol2": {
+      "heartbeat": "online",
+      "newTaskClaim": "rejected-task-bundle-unsupported"
+    },
+    "protocol3": {
+      "heartbeat": "online",
+      "newTaskClaim": "allowed"
+    },
+    "protocol4": {
+      "heartbeat": "upgrade-required",
+      "newTaskClaim": "rejected-future-protocol"
+    }
+  },
+  "verified": [
+    "single-shared-protocol-contract",
+    "deployment-window-configuration-drift-rejected",
+    "unsupported-agents-retain-safe-heartbeat-and-certificate-rotation",
+    "unsupported-agents-cannot-claim-new-tasks",
+    "supported-legacy-agent-cannot-claim-task-bundle-v3",
+    "current-agent-can-claim-and-complete-runtime-lifecycle",
+    "air-gapped-export-and-import-use-current-protocol-contract",
+    "temporary-agent-certificate-task-quota-and-event-records-cleaned"
+  ],
+  "dataPolicy": {
+    "syntheticDataOnly": true,
+    "customerDataAccessed": false,
+    "productionCredentialsAccessed": false,
+    "credentialsIncludedInEvidence": false
+  },
+  "limitations": [
+    "local-docker-mysql-integration-not-customer-environment",
+    "does-not-replace-representative-old-agent-binary-upgrade-test",
+    "does-not-replace-customer-offline-upgrade-and-rollback-validation"
+  ]
+}
