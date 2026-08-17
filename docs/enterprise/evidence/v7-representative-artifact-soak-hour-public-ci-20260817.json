@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-representative-artifact-mixed-soak-hour-public-ci",
+  "acceptedAt": "2026-08-17T00:00:22Z",
+  "result": "passed",
+  "source": {
+    "repository": "hlptyqwe/appforge",
+    "gitCommit": "12df402ea2be04cc0fd8f47c5ca51c8b88b738a3",
+    "workflowPath": ".github/workflows/hourly-api-soak.yml",
+    "event": "push"
+  },
+  "githubActions": {
+    "runId": 31977504252,
+    "runNumber": 8,
+    "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31977504252",
+    "runStartedAt": "2026-08-16T22:51:43Z",
+    "runCompletedAt": "2026-08-17T00:00:22Z",
+    "runDurationSeconds": 4119,
+    "jobId": 95239081540,
+    "jobName": "current-source-compose-hour",
+    "jobStartedAt": "2026-08-16T22:51:46Z",
+    "jobCompletedAt": "2026-08-17T00:00:21Z",
+    "jobDurationSeconds": 4115,
+    "runnerLabel": "ubuntu-24.04",
+    "conclusion": "success"
+  },
+  "hourSoak": {
+    "configuredDurationSeconds": 3600,
+    "actualDurationSecondsMinimum": 3600,
+    "continuousSingleRunnerAndComposeStack": true,
+    "authenticatedApi": {
+      "minimumRequests": 32400,
+      "errors": 0,
+      "maximumConsecutiveErrors": 0,
+      "p99ThresholdsEnforced": true,
+      "probes": [
+        "health",
+        "ready",
+        "jwt-rbac-rpc-database-deployment-status"
+      ]
+    },
+    "apkBuild": {
+      "syntheticPayloadMiBPerBuild": 32,
+      "minimumCompleted": 100,
+      "minimumSourcePayloadBytesProcessed": 3355443200,
+      "failed": 0,
+      "payloadSha256PreservedFromSourceToSignedApk": true,
+      "validation": [
+        "apk-signature",
+        "package-name",
+        "result-sha256",
+        "synthetic-payload-sha256-preserved"
+      ]
+    },
+    "objectStorage": {
+      "provider": "temporary-minio",
+      "objectMiBPerRoundTrip": 8,
+      "minimumRoundTrips": 600,
+      "minimumBytesUploaded": 5033164800,
+      "minimumBytesDownloaded": 5033164800,
+      "failed": 0,
+      "sha256Verified": true,
+      "deleteNotFoundVerified": true,
+      "temporaryPrefixRemoved": true
+    },
+    "platform": {
+      "containersRunning": 8,
+      "containersWithNonZeroRestartCount": 0,
+      "containers": [
+        "mysql",
+        "redis",
+        "etcd",
+        "minio",
+        "system-rpc",
+        "core-rpc",
+        "builder-rpc",
+        "admin-api"
+      ],
+      "syntheticPlatformRemoved": true
+    }
+  },
+  "workflowSteps": {
+    "contractValidation": "passed",
+    "currentSourceBuildAndStartup": "passed",
+    "representativePayloadPreflight": "passed",
+    "hourMixedSoak": "passed",
+    "thresholdAndZeroRestartVerification": "passed",
+    "artifactUpload": "passed",
+    "syntheticPlatformCleanup": "passed"
+  },
+  "artifact": {
+    "id": 9272248481,
+    "name": "hourly-api-soak-31977504252",
+    "sizeBytes": 4882996,
+    "sha256": "2e616f6f444ca9b57675522ef92e00bec300679eeeb756677911c8921644ad40",
+    "createdAt": "2026-08-17T00:00:14Z",
+    "expiresAt": "2026-09-16T00:00:13Z",
+    "contentDownloadRequiresGitHubAuthentication": true
+  },
+  "evidenceBasis": [
+    "public-run-job-and-artifact-metadata",
+    "all-enforcing-workflow-steps-concluded-success",
+    "thresholds-read-from-the-exact-workflow-at-the-recorded-git-commit",
+    "operation-counts-and-byte-counts-are-workflow-enforced-lower-bounds"
+  ],
+  "limitations": [
+    "synthetic-apk-random-payload-and-test-keystore-only",
+    "temporary-minio-on-a-single-public-runner",
+    "does-not-use-customer-or-production-data",
+    "does-not-qualify-day-level-soak",
+    "does-not-represent-customer-peak-or-production-capacity",
+    "does-not-replace-authorized-physical-android-device-testing"
+  ]
+}
