@@ -75,6 +75,7 @@ PITR 使用随正式发布和离线 OCI 包交付的同版本 `mysql-binlog-tool
 
 - 所有容器以非 root、只读根文件系统、drop capabilities 和 no-new-privileges 运行。
 - 生产 Secret 只由 Kubernetes Secret、Vault/KMS 或外部 Secret Operator 注入，不写入 values、Compose 文件、日志和诊断包。
+- 公开源码提交前和 CI 中运行 `deploy/acceptance/v7-public-repository-secret-audit.sh`；它检查当前跟踪文件及完整可达 Git 历史，高置信度发现只输出路径。该门禁不替代 GitHub Secret Scanning；若真实凭据曾进入 Git，必须立即吊销/轮换，不能只删除文件或重写报告。
 - NetworkPolicy 默认拒绝，仅放行组件间、DNS、入口 Namespace 和明确外部依赖出站。新交付必须使用 `networkPolicy.externalEgressRules`，同时指定调用组件、目标 CIDR、协议和端口；`egressCIDRs` 仅为旧配置兼容字段，会放行目标 CIDR 的全部端口，新部署禁止使用。Calico v3.32.1/Kind v1.32.2 已真实验证允许端口可达、同 CIDR 未授权端口与未授权组件不可达、入口 Namespace 隔离，证据见 `evidence/v7-network-policy-20260815.json`；客户目标 CNI 和最终 allowlist 仍需现场复验。
 - 受限网络环境可启用内置 `egress-proxy`。它仅接受 Allowlist 中的 HTTPS CONNECT，拒绝普通 HTTP 和未登记目标；Compose 只有代理连接非 internal 出口网络，Helm 要求代理专属 CIDR/端口 NetworkPolicy。远程 APK 签名和 Webhook 为保护 APK 与 SSRF 边界而显式不继承通用代理，详细配置和直连要求见 [受限网络出口与企业代理契约](./restricted-egress-proxy.md)。本地合成 TLS E2E 证据见 `evidence/v7-egress-proxy-20260816.json`，客户最终域名/IP、CNI、DNS、防火墙和容量仍需现场联调。
 - 发布流水线对 16 个 AppForge 发布镜像和两个原始第三方运行镜像生成 SPDX SBOM、独立许可证清单，并以 Trivy 阻断可修复 High/Critical 漏洞；16 个 AppForge 发布镜像另用 Cosign OIDC 逐镜像签名和回验。仓库源码依赖再由 Trivy 文件系统模式独立阻断，且不导出依赖明细。全部 18 个 digest、镜像证据和源码门禁成功状态由同一工作流身份签署聚合清单，离线包生成器必须先验证该聚合签名并按清单 digest 拉取镜像。
