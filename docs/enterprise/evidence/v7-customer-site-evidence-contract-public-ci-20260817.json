@@ -1,23 +1,23 @@
 {
   "schemaVersion": 1,
   "evidenceType": "v7-customer-site-evidence-contract-public-ci",
-  "observedAt": "2026-08-17T00:54:26Z",
+  "observedAt": "2026-08-17T00:59:51Z",
   "result": "passed",
   "source": {
     "repository": "hlptyqwe/appforge",
-    "headCommit": "41575d4c62af8f34114cfe1232911f9299be555b",
+    "headCommit": "e6707f639e8862cf979a8450ed41661e59a73ca9",
     "workflow": "customer-site-evidence-contract",
     "event": "push",
-    "runId": 31983360432,
-    "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31983360432"
+    "runId": 31983611758,
+    "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31983611758"
   },
   "runtime": {
     "runnerGroup": "GitHub Actions",
     "job": "native-amd64-contract",
     "platform": "ubuntu-24.04",
     "architecture": "x86_64",
-    "startedAt": "2026-08-17T00:54:17Z",
-    "completedAt": "2026-08-17T00:54:26Z",
+    "startedAt": "2026-08-17T00:59:40Z",
+    "completedAt": "2026-08-17T00:59:51Z",
     "conclusion": "success"
   },
   "steps": {
@@ -27,12 +27,12 @@
     "artifactUpload": "success"
   },
   "artifact": {
-    "id": 9273011536,
-    "name": "customer-site-evidence-contract-31983360432",
-    "sizeBytes": 790,
+    "id": 9273086200,
+    "name": "customer-site-evidence-contract-31983611758",
+    "sizeBytes": 788,
     "expiredAtObservation": false,
-    "createdAt": "2026-08-17T00:54:23Z",
-    "expiresAt": "2026-09-16T00:54:22Z"
+    "createdAt": "2026-08-17T00:59:47Z",
+    "expiresAt": "2026-09-16T00:59:46Z"
   },
   "verified": [
     "native-linux-fixed-eight-gate-contract",
