@@ -1,0 +1,66 @@
+name: customer-site-evidence-contract
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/customer-site-evidence-contract.yml
+      - deploy/acceptance/v7-customer-site-evidence-contract.sh
+      - deploy/acceptance/v7-enterprise-delivery.sh
+      - deploy/acceptance/v7-offline-layout.sh
+      - deploy/production/assemble-customer-site-evidence.sh
+      - deploy/production/validate-customer-site-evidence.sh
+      - deploy/production/offline-bundle.sh
+      - docs/enterprise/customer-site-acceptance.md
+  pull_request:
+    paths:
+      - .github/workflows/customer-site-evidence-contract.yml
+      - deploy/acceptance/v7-customer-site-evidence-contract.sh
+      - deploy/acceptance/v7-enterprise-delivery.sh
+      - deploy/acceptance/v7-offline-layout.sh
+      - deploy/production/assemble-customer-site-evidence.sh
+      - deploy/production/validate-customer-site-evidence.sh
+      - deploy/production/offline-bundle.sh
+      - docs/enterprise/customer-site-acceptance.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: customer-site-evidence-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-amd64-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run fixed eight-gate and dual-signature contract
+        env:
+          APPFORGE_CUSTOMER_SITE_EVIDENCE_CONTRACT_REPORT_FILE: ${{ runner.temp }}/v7-customer-site-evidence-contract.json
+        run: deploy/acceptance/v7-customer-site-evidence-contract.sh
+      - name: Verify redacted machine evidence
+        env:
+          REPORT: ${{ runner.temp }}/v7-customer-site-evidence-contract.json
+        run: |
+          jq -e '
+            .result == "passed" and
+            .runtime.os == "linux" and
+            .runtime.architecture == "x86_64" and
+            .dataPolicy.syntheticContractDataOnly == true and
+            .dataPolicy.customerDataAccessed == false and
+            .dataPolicy.productionCredentialsAccessed == false and
+            .dataPolicy.privateSigningKeysPersisted == false and
+            (.verified | index("customer-and-appforge-detached-signatures")) != null and
+            (.verified | index("sha256-tamper-rejected")) != null and
+            (.limitations | index("does-not-close-any-of-the-eight-customer-gates")) != null
+          ' "$REPORT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: customer-site-evidence-contract-${{ github.run_id }}
+          path: ${{ runner.temp }}/v7-customer-site-evidence-contract.json
+          if-no-files-found: error
+          retention-days: 30
