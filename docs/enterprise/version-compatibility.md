@@ -24,7 +24,7 @@
 | 3 | `ONLINE` | 允许 | 允许 |
 | 4 及更高 | `UPGRADE_REQUIRED` | 允许 | 拒绝，防止未来协议被旧控制面误调度 |
 
-协议窗口由 `common/agentprotocol` 在控制面、Local Agent 和 AIR_GAPPED 路径共享；部署配置只能声明编译时窗口 `2–3`，漂移会导致启动配置校验失败。真实本地 MySQL 验收已覆盖协议1–4的状态切换、升级所需证书轮换、领取拒绝、协议3正常领取及临时数据清理，证据见 `evidence/v7-agent-protocol-window-20260817.json`。
+协议窗口由 `common/agentprotocol` 在控制面、Local Agent 和 AIR_GAPPED 路径共享；部署配置只能声明编译时窗口 `2–3`，漂移会导致启动配置校验失败。真实本地 MySQL 验收已覆盖协议1–4的状态切换、升级所需证书轮换、领取拒绝、协议3正常领取及临时数据清理，证据见 `evidence/v7-agent-protocol-window-20260817.json`。协议实现变更后的公开当前源码 Compose 又通过 3600 秒代表性尺寸 API/APK/临时 MinIO 混合回归、强制阈值/零重启校验、Artifact 上传和环境清理，证据见 `evidence/v7-agent-protocol-window-soak-public-ci-20260817.json`；该合成回归不替代旧版正式 Agent 和客户现场升级验证。
 
 当前连续迁移说明：`108` 增加 V7 企业交付业务表，`109` 增加 Local Agent 菜单权限，`110` 增加 Builder 隔离节点恢复权限，`111` 增加只读企业部署状态菜单权限，`112` 增加客户存储对象模式和 Agent 归属字段，`113` 增加 AIR_GAPPED 状态与六条细粒度权限目录。正式发版前必须在空库和上一兼容版本数据库各执行一次迁移验证。
 

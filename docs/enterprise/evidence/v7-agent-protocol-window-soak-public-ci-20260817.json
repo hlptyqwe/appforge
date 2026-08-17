@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "v7-agent-protocol-window-representative-soak-public-ci",
+  "acceptedAt": "2026-08-17T01:40:15Z",
+  "result": "passed",
+  "source": {
+    "repository": "hlptyqwe/appforge",
+    "gitCommit": "7f0fdbdb3ded553afd97a63081c3a2017e3a6372",
+    "protocolImplementationCommit": "28029165a04bf53e059bbeac8b23c2a08b0928d6",
+    "workflowPath": ".github/workflows/hourly-api-soak.yml",
+    "event": "push"
+  },
+  "githubActions": {
+    "runId": 31982233976,
+    "runUrl": "https://github.com/hlptyqwe/appforge/actions/runs/31982233976",
+    "runTriggeredAt": "2026-08-17T00:30:40Z",
+    "jobId": 95250969247,
+    "jobName": "current-source-compose-hour",
+    "jobStartedAt": "2026-08-17T00:30:45Z",
+    "jobCompletedAt": "2026-08-17T01:40:15Z",
+    "jobDurationSeconds": 4170,
+    "runnerLabel": "ubuntu-24.04",
+    "conclusion": "success"
+  },
+  "hourSoak": {
+    "startedAt": "2026-08-17T00:39:56Z",
+    "completedAt": "2026-08-17T01:40:03Z",
+    "configuredDurationSeconds": 3600,
+    "actualStepDurationSeconds": 3607,
+    "continuousSingleRunnerAndComposeStack": true,
+    "authenticatedApi": {
+      "minimumRequests": 32400,
+      "errors": 0,
+      "maximumConsecutiveErrors": 0,
+      "p99ThresholdsEnforced": true,
+      "probes": [
+        "health",
+        "ready",
+        "jwt-rbac-rpc-database-deployment-status"
+      ]
+    },
+    "apkBuild": {
+      "syntheticPayloadMiBPerBuild": 32,
+      "minimumCompleted": 100,
+      "minimumSourcePayloadBytesProcessed": 3355443200,
+      "failed": 0,
+      "payloadSha256PreservedFromSourceToSignedApk": true
+    },
+    "objectStorage": {
+      "provider": "temporary-minio",
+      "objectMiBPerRoundTrip": 8,
+      "minimumRoundTrips": 600,
+      "minimumBytesUploaded": 5033164800,
+      "minimumBytesDownloaded": 5033164800,
+      "failed": 0,
+      "sha256Verified": true,
+      "deleteNotFoundVerified": true,
+      "temporaryPrefixRemoved": true
+    },
+    "platform": {
+      "containersRunning": 8,
+      "containersWithNonZeroRestartCount": 0,
+      "syntheticPlatformRemoved": true
+    }
+  },
+  "workflowSteps": {
+    "hourMixedSoak": {
+      "conclusion": "success",
+      "completedAt": "2026-08-17T01:40:03Z"
+    },
+    "thresholdAndZeroRestartVerification": {
+      "conclusion": "success",
+      "completedAt": "2026-08-17T01:40:05Z"
+    },
+    "serviceLogCollection": {
+      "conclusion": "success",
+      "completedAt": "2026-08-17T01:40:08Z"
+    },
+    "artifactUpload": {
+      "conclusion": "success",
+      "completedAt": "2026-08-17T01:40:10Z"
+    },
+    "syntheticPlatformCleanup": {
+      "conclusion": "success",
+      "completedAt": "2026-08-17T01:40:14Z"
+    }
+  },
+  "artifact": {
+    "id": 9273672880,
+    "name": "hourly-api-soak-31982233976",
+    "displaySize": "4.67 MB",
+    "sha256": "794bfd1147423693aa64ccec31b6b6bb8849becf0efda903130beaa22838da0f",
+    "contentDownloadRequiresGitHubAuthentication": true
+  },
+  "coverageRelationship": {
+    "protocolWindowRuntimeEvidence": "v7-agent-protocol-window-20260817.json",
+    "purpose": "post-change-current-source-regression",
+    "doesNotReplaceProtocol1To4RuntimeAcceptance": true
+  },
+  "evidenceBasis": [
+    "public-run-job-step-and-artifact-metadata",
+    "all-enforcing-workflow-steps-concluded-success",
+    "thresholds-read-from-the-exact-workflow-at-the-recorded-git-commit",
+    "operation-counts-and-byte-counts-are-workflow-enforced-lower-bounds"
+  ],
+  "dataPolicy": {
+    "syntheticDataOnly": true,
+    "customerDataAccessed": false,
+    "productionCredentialsAccessed": false
+  },
+  "limitations": [
+    "synthetic-apk-random-payload-and-test-keystore-only",
+    "temporary-minio-on-a-single-public-runner",
+    "does-not-qualify-day-level-soak",
+    "does-not-represent-customer-peak-or-production-capacity",
+    "does-not-replace-representative-old-agent-binary-upgrade-test",
+    "does-not-replace-customer-offline-upgrade-and-rollback-validation"
+  ]
+}
