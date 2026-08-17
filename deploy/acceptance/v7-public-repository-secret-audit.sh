@@ -16,7 +16,7 @@ fail() {
 [[ $repo_root == /* ]] || fail "仓库路径必须是绝对路径"
 [[ $report_file == /* ]] || fail "证据路径必须是绝对路径"
 [[ $self_test == true || $self_test == false ]] || fail "SELF_TEST 只允许 true 或 false"
-for tool in git rg jq; do
+for tool in git grep jq; do
   command -v "$tool" >/dev/null 2>&1 || fail "缺少工具 $tool"
 done
 git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1 || fail "目标不是 Git 工作树"
@@ -51,11 +51,11 @@ risky_history="$temporary/risky-history"
 risky_name_pattern='(^|/)(\.env($|\.)|.*\.(pem|key|p12|pfx|jks|keystore)$|id_(rsa|dsa|ecdsa|ed25519)$|credentials($|\.)|secrets?\.ya?ml$)'
 (
   cd "$repo_root"
-  git ls-files | rg -i "$risky_name_pattern" || true
+  git ls-files | grep -Ei "$risky_name_pattern" || true
 ) | LC_ALL=C sort -u >"$risky_current"
 (
   cd "$repo_root"
-  git log --all --no-renames --name-only --pretty=format: 2>/dev/null | rg -i "$risky_name_pattern" || true
+  git log --all --no-renames --name-only --pretty=format: 2>/dev/null | grep -Ei "$risky_name_pattern" || true
 ) | LC_ALL=C sort -u >"$risky_history"
 
 is_synthetic_pattern_path() {
@@ -97,17 +97,17 @@ if git -C "$repo_root" ls-files --error-unmatch appforge-ui/.env >/dev/null 2>&1
   [[ $actual_keys == "$expected_keys" ]] || fail "appforge-ui/.env 只能包含固定公开 VITE 配置键"
   [[ $(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' "$frontend_env" | wc -l | tr -d ' ') == 6 ]] ||
     fail "appforge-ui/.env 存在重复或额外配置"
-  rg -q '^VITE_API_BASE_URL=http://localhost:[0-9]{2,5}$' "$frontend_env" || fail "基础前端 API 地址必须是 localhost 开发地址"
-  rg -q '^VITE_API_TIMEOUT=[0-9]{3,6}$' "$frontend_env" || fail "基础前端超时必须是整数"
-  rg -q '^VITE_APP_NAME=[A-Za-z0-9 _.-]{1,64}$' "$frontend_env" || fail "基础前端应用名格式无效"
-  rg -q '^VITE_ROUTER_BASE=/[^[:space:]]*$' "$frontend_env" || fail "基础前端路由必须是相对路径"
-  rg -q '^VITE_ENABLE_MOCK=(true|false)$' "$frontend_env" || fail "基础前端 Mock 开关格式无效"
-  rg -q '^VITE_ENABLE_LOG=(true|false)$' "$frontend_env" || fail "基础前端日志开关格式无效"
+  grep -Eq '^VITE_API_BASE_URL=http://localhost:[0-9]{2,5}$' "$frontend_env" || fail "基础前端 API 地址必须是 localhost 开发地址"
+  grep -Eq '^VITE_API_TIMEOUT=[0-9]{3,6}$' "$frontend_env" || fail "基础前端超时必须是整数"
+  grep -Eq '^VITE_APP_NAME=[A-Za-z0-9 _.-]{1,64}$' "$frontend_env" || fail "基础前端应用名格式无效"
+  grep -Eq '^VITE_ROUTER_BASE=/[^[:space:]]*$' "$frontend_env" || fail "基础前端路由必须是相对路径"
+  grep -Eq '^VITE_ENABLE_MOCK=(true|false)$' "$frontend_env" || fail "基础前端 Mock 开关格式无效"
+  grep -Eq '^VITE_ENABLE_LOG=(true|false)$' "$frontend_env" || fail "基础前端日志开关格式无效"
 fi
 
 if [[ -s $unreviewed_matches ]]; then
   LC_ALL=C sort -u "$unreviewed_matches" | sed 's/^/  - /' >&2
-  if comm -12 <(LC_ALL=C sort -u "$current_matches") <(LC_ALL=C sort -u "$unreviewed_matches") | rg -q .; then
+  if comm -12 <(LC_ALL=C sort -u "$current_matches") <(LC_ALL=C sort -u "$unreviewed_matches") | grep -q .; then
     fail "当前跟踪文件命中未登记的高置信度 Secret 模式；以上仅显示路径"
   fi
   fail "Git 历史命中未登记的高置信度 Secret 模式；以上仅显示路径"
@@ -195,7 +195,7 @@ if [[ $self_test == true ]]; then
     "$scanner" >"$temporary/current-negative.log" 2>&1; then
     fail "当前文件合成 Access Key 未被拒绝"
   fi
-  rg -q '当前跟踪文件命中未登记的高置信度 Secret 模式' "$temporary/current-negative.log"
+  grep -q '当前跟踪文件命中未登记的高置信度 Secret 模式' "$temporary/current-negative.log"
   git -C "$fixture_repo" commit -qm 'synthetic leak fixture'
   git -C "$fixture_repo" rm -q current-leak.txt
   git -C "$fixture_repo" commit -qm 'remove synthetic leak fixture'
@@ -205,7 +205,7 @@ if [[ $self_test == true ]]; then
     "$scanner" >"$temporary/history-negative.log" 2>&1; then
     fail "Git 历史中的合成 Access Key 未被拒绝"
   fi
-  rg -q 'Git 历史命中未登记的高置信度 Secret 模式' "$temporary/history-negative.log"
+  grep -q 'Git 历史命中未登记的高置信度 Secret 模式' "$temporary/history-negative.log"
 
   fixture_repo="$temporary/risky-name-repo"
   mkdir -m 700 "$fixture_repo"
@@ -221,7 +221,7 @@ if [[ $self_test == true ]]; then
     "$scanner" >"$temporary/risky-name-negative.log" 2>&1; then
     fail "未登记高风险文件名未被拒绝"
   fi
-  rg -q '存在未登记的高风险凭据文件名' "$temporary/risky-name-negative.log"
+  grep -q '存在未登记的高风险凭据文件名' "$temporary/risky-name-negative.log"
 fi
 
 report_update="$temporary/report-update.json"
