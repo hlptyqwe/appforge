@@ -25,13 +25,16 @@ for file in docker-compose.yml .env.example egress-allowlist.example nginx.conf 
 done
 cp "$repo_root/deploy/etcd/admin-api.yaml" "$package_root/admin-api.yaml.template"
 cp -R "$repo_root/deploy/local-agent" "$package_root/local-agent"
-for file in delivery-guide.md local-agent-artifact-protocol.md customer-storage-contract.md air-gapped-artifact-contract.md remote-apk-signing-contract.md restricted-egress-proxy.md secret-providers.md version-compatibility.md; do
+for file in delivery-guide.md local-agent-artifact-protocol.md customer-storage-contract.md air-gapped-artifact-contract.md remote-apk-signing-contract.md restricted-egress-proxy.md secret-providers.md version-compatibility.md customer-site-acceptance.md; do
   cp "$repo_root/docs/enterprise/$file" "$package_root/docs/$file"
 done
 cp "$repo_root/deploy/production/preflight.sh" "$package_root/bin/licensectl"
 cp "$repo_root/deploy/production/preflight.sh" "$package_root/bin/appforgectl"
 cp "$repo_root/deploy/production/validate-release-evidence.sh" "$package_root/bin/validate-release-evidence"
-chmod 0755 "$package_root/bin/licensectl" "$package_root/bin/appforgectl" "$package_root/bin/validate-release-evidence"
+cp "$repo_root/deploy/production/assemble-customer-site-evidence.sh" "$package_root/bin/assemble-customer-site-evidence"
+cp "$repo_root/deploy/production/validate-customer-site-evidence.sh" "$package_root/bin/validate-customer-site-evidence"
+chmod 0755 "$package_root/bin/licensectl" "$package_root/bin/appforgectl" "$package_root/bin/validate-release-evidence" \
+  "$package_root/bin/assemble-customer-site-evidence" "$package_root/bin/validate-customer-site-evidence"
 
 fixture_security_input="$temporary/security-input"
 mkdir -p "$fixture_security_input"
@@ -140,7 +143,8 @@ tar -C "$package_root" -cf "$temporary/offline.tar" .
 "$repo_root/deploy/production/offline-install.sh" "$temporary/offline.tar" "$install_root" >/dev/null
 for required in diagnostics.sh archive-binlogs.sh pitr-restore.sh configure-object-replication.sh egress-allowlist.example local-agent/docker-compose.yml local-agent/register.sh local-agent/secret-import.sh \
   local-agent/customer-storage-secret-import.sh local-agent/customer-storage-import.sh \
-  local-agent/upgrade.sh docs/delivery-guide.md docs/air-gapped-artifact-contract.md docs/remote-apk-signing-contract.md docs/restricted-egress-proxy.md docs/version-compatibility.md; do
+  local-agent/upgrade.sh docs/delivery-guide.md docs/air-gapped-artifact-contract.md docs/remote-apk-signing-contract.md docs/restricted-egress-proxy.md docs/version-compatibility.md docs/customer-site-acceptance.md \
+  bin/assemble-customer-site-evidence bin/validate-customer-site-evidence; do
   [[ -f "$install_root/$required" ]] || { echo "验收失败: 离线安装缺少 $required" >&2; exit 1; }
 done
 [[ -f "$install_root/admin-api.yaml.template" ]] || {
@@ -171,5 +175,8 @@ done
 }
 [[ -x "$install_root/bin/validate-release-evidence" ]] || {
   echo "验收失败: 离线安装缺少可执行发布证据校验器" >&2; exit 1;
+}
+[[ -x "$install_root/bin/assemble-customer-site-evidence" && -x "$install_root/bin/validate-customer-site-evidence" ]] || {
+  echo "验收失败: 离线安装缺少客户现场证据汇总器或校验器" >&2; exit 1;
 }
 echo "通过: 离线包SHA校验、OCI导入、签名发布安全证据、控制面文件、CLI、Local Agent安装包和企业文档落盘"

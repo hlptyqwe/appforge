@@ -148,6 +148,8 @@ echo "通过: 断网许可证密钥生成、签发、部署绑定和持久状态
 
 APPFORGE_DIAGNOSTIC_API_URL="$api_url" "$repo_root/deploy/acceptance/v7-diagnostics.sh"
 "$repo_root/deploy/acceptance/v7-production-preflight.sh"
+APPFORGE_CUSTOMER_SITE_EVIDENCE_CONTRACT_REPORT_FILE="$license_tmp/v7-customer-site-evidence-contract.json" \
+  "$repo_root/deploy/acceptance/v7-customer-site-evidence-contract.sh"
 "$repo_root/deploy/acceptance/v7-offline-layout.sh"
 APPFORGE_REMOTE_SIGNER_EVIDENCE_PATH="$license_tmp/v7-remote-apk-signing.json" \
   "$repo_root/deploy/acceptance/v7-remote-apk-signing.sh"

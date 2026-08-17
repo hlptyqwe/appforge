@@ -82,6 +82,7 @@ PITR 使用随正式发布和离线 OCI 包交付的同版本 `mysql-binlog-tool
 - API、RPC 和纯 Worker 统一通过 `APPFORGE_PROMETHEUS_*` 暴露独立指标端口，并通过 `APPFORGE_OTLP_ENDPOINT`/`APPFORGE_OTLP_SAMPLER` 导出 OTLP/HTTP Trace。生产 Compose 仅在后端网络暴露指标；Helm 默认只允许 `monitoring` Namespace 抓取，可通过 `observability.prometheusNamespaceLabels` 精确替换。生产 OTLP 必须使用无凭据的 HTTPS URL，认证 Header 只允许从受保护运行配置注入；本地合成验收证据见 `evidence/v7-observability-20260815.json`，客户 Collector、证书和容量仍需现场联调。
 - `deploy/production/diagnostics.sh` 提供最小脱敏诊断包：只收集组件镜像/状态、健康探针、迁移版本、Local Agent 聚合状态和部署文件哈希，不收集日志、`.env`、数据库业务内容、私钥、Keystore 或令牌；输出权限为 `0600`，包含 SHA 清单并执行敏感值扫描。仅系统管理员可见的“部署与升级”页面通过只读受 RBAC 和服务端用户类型双重保护的接口展示 API/System/Core/Builder gRPC 健康、数据库实际迁移、产品版本、部署模式和许可证公开状态；页面只复制诊断命令，不允许浏览器执行服务器 Shell。
 - Local Agent 不接收入站连接，也不提供 shell/任意命令 RPC；任务协议只有注册、心跳、领取、续租、进度、完成/失败、轮换和 Drain。
+- V7 客户现场验收统一使用 [客户现场验收与双签证据契约](./customer-site-acceptance.md)。正式离线介质携带 `bin/assemble-customer-site-evidence` 与 `bin/validate-customer-site-evidence`：前者只汇总固定 8 个门禁 JSON 和 SHA，后者强制客户/AppForge 双 detached signature、Schema 113、协议3、真实客户环境、敏感字段拒绝和门禁指标。私钥不进入介质或证据目录；双签不能替代原始现场记录。
 
 ## 故障排查
 
@@ -90,6 +91,8 @@ PITR 使用随正式发布和离线 OCI 包交付的同版本 `mysql-binlog-tool
 ## 当前交付边界
 
 Compose、Helm、配置 Schema、迁移 Job、备份恢复脚本、离线镜像脚本、离线许可证、Local Agent 客户安装/升级包、控制面协议、固定 APK 执行器和企业 Secret Resolver 已实现基础能力；全新 Private 与 Dedicated Compose 空数据卷安装、真实 Agent 临期证书自动轮换与吊销拒绝、Local Agent 真实 APK 执行中断恢复及离线升级回滚、三种 Artifact 模式的合成真实构建 E2E、当前 Schema 113 灾备、kind/Helm 1.2.x 滚动升级与应用回滚已完成本地验收。本地模拟断网已通过预载镜像、禁止拉取、双 internal 网络、内部 TLS/API 登录、外部 HTTPS 拒绝及严格 Schema 113 门禁；Schema 113 的空库安装、112→113 升级、幂等、数据保持和已有角色零自动授权证据见 `evidence/v7-schema113-production-20260816.json`。npm 官方生产及全部依赖审计均为零漏洞，证据见 `evidence/v7-npm-audit-20260816.json`。发布安全证据契约已完成 16 个自建签名加两个原始第三方镜像的合成结构、许可证清单、源码依赖无明细导出门禁、SHA 防篡改与离线介质落盘验收，证据见 `evidence/v7-release-evidence-contract-20260816.json`；`v1.2.6` 的真实远端 tag/OIDC/漏洞库、公开 Release、匿名双层签名验证、正式介质本地断网全新安装、Compose 正式版本差异升级/回滚以及原生 amd64 正式 Kubernetes 双版本升级/回滚均已通过，证据见 `evidence/v7-public-release-v1.2.6-20260816.json`、`evidence/v7-formal-offline-media-v1.2.6-20260816.json`、`evidence/v7-formal-offline-upgrade-v1.2.5-v1.2.6-20260817.json` 与 `evidence/v7-formal-kubernetes-upgrade-v1.2.5-v1.2.6-20260817.json`。正式交付前仍必须完成：客户 Linux/物理断网介质及现场离线升级复验、客户目标 Kubernetes/CSI/Ingress/私有仓库、生产规模业务备份恢复与客户 RPO/RTO、真实 AWS/S3/OSS、目标网络策略和客户 SIEM 联调。当前状态以 [V7 企业交付验收报告](../../V7企业交付验收报告.md) 为准。
+
+上述外部门禁现在由固定 8 门禁现场证据包统一收口；汇总器、双签校验器和负向契约验收已经进入源码与离线介质。它使客户结果可机器判定，但在真实证据尚未产生前不改变 V7 状态。
 
 客户 HSM/远程 APK 签名必须遵守 [远程 APK 签名与 HSM 接入契约](./remote-apk-signing-contract.md)。仓库已完成管理 API、Schema 112 兼容持久化、创建时身份验证、Core 任务快照、Builder 远程签名分支、能力调度门禁、最终 APK 证书校验，以及协议级和完整任务级合成 E2E；该证据仍不等于真实 HSM、不可导出密钥、PIN/会话、HA、审计、限流或性能已经验收。
 
