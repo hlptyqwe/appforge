@@ -60,16 +60,31 @@ jq -e '
 expected_names=$(for gate_id in "${gate_ids[@]}"; do printf '%s.json\n' "$gate_id"; done | LC_ALL=C sort)
 actual_names=$(find "$gate_directory" -mindepth 1 -maxdepth 1 -print | sed 's#^.*/##' | LC_ALL=C sort)
 [[ $actual_names == "$expected_names" ]] || fail "输入目录必须且只能包含固定 8 个门禁 JSON"
+metadata_context=$(jq -r '[.environmentKind,.siteFingerprint,.releaseVersion,.targetSchemaVersion,(.agentProtocol|tostring),.gitCommit] | @tsv' "$metadata")
+generated_at=$(jq -r .generatedAt "$metadata")
 
 mkdir -m 700 "$output"
-trap 'rm -rf "$output"' ERR
+cleanup_output=true
+cleanup() {
+  if [[ $cleanup_output == true && -d $output ]]; then
+    rm -rf -- "$output"
+  fi
+}
+trap cleanup EXIT
 for gate_id in "${gate_ids[@]}"; do
   source_file="$gate_directory/$gate_id.json"
   [[ -f $source_file && ! -L $source_file ]] || fail "门禁证据必须是普通文件: $gate_id"
   jq -e --arg gate "$gate_id" '
     .schemaVersion == 1 and .evidenceType == "v7-customer-site-gate" and
-    .gateId == $gate and .result == "passed"
+    .gateId == $gate and .result == "passed" and
+    (.openFindings | type == "array" and length == 0) and
+    .dataPolicy.credentialsIncluded == false and
+    .dataPolicy.rawCustomerDataIncluded == false
   ' "$source_file" >/dev/null || fail "门禁证据类型、ID 或结果无效: $gate_id"
+  source_context=$(jq -r '[.environmentKind,.siteFingerprint,.releaseVersion,.targetSchemaVersion,(.agentProtocol|tostring),.gitCommit] | @tsv' "$source_file")
+  [[ $source_context == "$metadata_context" ]] || fail "门禁与汇总元数据环境/版本/Schema/协议/提交不一致: $gate_id"
+  finished_at=$(jq -r .finishedAt "$source_file")
+  [[ $generated_at > $finished_at || $generated_at == "$finished_at" ]] || fail "汇总时间早于门禁结束时间: $gate_id"
   install -m 0600 "$source_file" "$output/$gate_id.json"
 done
 
@@ -123,6 +138,7 @@ jq \
     physical-air-gap.json remote-signing-hsm.json >SHA256SUMS
 )
 
-trap - ERR
+cleanup_output=false
+trap - EXIT
 echo "客户现场证据待签名目录已生成: $output"
 echo "客户和 AppForge 必须分别对 $output/SHA256SUMS 生成 detached signature，之后再运行 validate-customer-site-evidence"

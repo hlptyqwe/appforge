@@ -50,11 +50,11 @@ remote-signing-hsm.json
   "result": "passed",
   "runId": "customer-change-20260818-storage",
   "environmentKind": "customer-test",
-  "siteFingerprint": "64位小写SHA-256，不记录客户名称或地址",
+  "siteFingerprint": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
   "releaseVersion": "1.2.7",
   "targetSchemaVersion": "20260815_113_v7_air_gapped",
   "agentProtocol": 3,
-  "gitCommit": "40位小写Git提交",
+  "gitCommit": "0123456789abcdef0123456789abcdef01234567",
   "startedAt": "2026-08-18T00:00:00Z",
   "finishedAt": "2026-08-18T01:00:00Z",
   "verified": ["由固定门禁验证器要求的项目"],
@@ -63,7 +63,7 @@ remote-signing-hsm.json
   "dataPolicy": {
     "credentialsIncluded": false,
     "rawCustomerDataIncluded": false,
-    "executionApprovalRef": "客户变更或数据处理批准编号"
+    "executionApprovalRef": "CUSTOMER-CHANGE-20260818"
   }
 }
 ```
@@ -88,19 +88,19 @@ remote-signing-hsm.json
 ```json
 {
   "environmentKind": "customer-test",
-  "siteFingerprint": "64位小写SHA-256",
+  "siteFingerprint": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
   "releaseVersion": "1.2.7",
   "targetSchemaVersion": "20260815_113_v7_air_gapped",
   "agentProtocol": 3,
-  "gitCommit": "40位小写Git提交",
+  "gitCommit": "0123456789abcdef0123456789abcdef01234567",
   "generatedAt": "2026-08-18T02:00:00Z",
   "customerApproval": {
-    "approvalRef": "客户批准编号",
-    "approverRole": "客户变更负责人角色"
+    "approvalRef": "CUSTOMER-CHANGE-20260818",
+    "approverRole": "customer-change-owner"
   },
   "appforgeApproval": {
-    "approvalRef": "AppForge交付批准编号",
-    "approverRole": "AppForge交付负责人角色"
+    "approvalRef": "APPFORGE-DELIVERY-20260818",
+    "approverRole": "appforge-delivery-owner"
   }
 }
 ```
@@ -116,7 +116,7 @@ bin/assemble-customer-site-evidence \
   /secure/appforge-approval.pub.pem
 ```
 
-客户和 AppForge 分别在自己的签名控制域对同一 `SHA256SUMS` 生成 detached signature。私钥不得进入交付包、证据目录、工单或另一方控制域：
+客户和 AppForge 分别使用受 OpenSSL `dgst -sha256` 支持的 RSA/ECDSA PEM 批准密钥，在自己的签名控制域对同一 `SHA256SUMS` 生成 detached signature。传给汇总器和校验器的必须是对应 PEM 公钥的同一文件字节；私钥不得进入交付包、证据目录、工单或另一方控制域：
 
 ```bash
 openssl dgst -sha256 -sign /customer-controlled/customer-approval.key.pem \

@@ -194,6 +194,20 @@ if "$assembler" "$gate_source" "$temporary/version-drift-output" "$temporary/ver
   exit 1
 fi
 
+jq '.environmentKind="fixture"' "$gate_source/customer-kubernetes.json" >"$temporary/gate-context-drift.json"
+mv "$temporary/gate-context-drift.json" "$gate_source/customer-kubernetes.json"
+if "$assembler" "$gate_source" "$temporary/gate-context-drift-output" "$temporary/metadata.json" \
+  "$temporary/customer.pub" "$temporary/appforge.pub" >/dev/null 2>&1; then
+  echo "验收失败: 门禁与汇总元数据环境漂移未被拒绝" >&2
+  exit 1
+fi
+[[ ! -e $temporary/gate-context-drift-output ]] || {
+  echo "验收失败: 汇总失败后遗留部分证据目录" >&2
+  exit 1
+}
+jq '.environmentKind="customer-test"' "$gate_source/customer-kubernetes.json" >"$temporary/gate-context-restored.json"
+mv "$temporary/gate-context-restored.json" "$gate_source/customer-kubernetes.json"
+
 printf '\n' >>"$bundle/customer-object-storage.json"
 expect_failure "摘要篡改"
 jq -c . "$bundle/customer-object-storage.json" >"$temporary/restored.json"
